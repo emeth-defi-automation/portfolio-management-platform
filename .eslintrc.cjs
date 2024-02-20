@@ -39,6 +39,6 @@ module.exports = {
     "@typescript-eslint/consistent-type-imports": "warn",
     "@typescript-eslint/no-unnecessary-condition": "warn",
     "@stylexjs/valid-styles": "error",
-    "@stylexjs/sort-keys": "warn"
+    "@stylexjs/sort-keys": "warn",
   },
 };
