@@ -35,15 +35,15 @@ jobs:
         with:
           node-version: 21.6.2
 
-      - name: Install ESLint
-        run: |
-          npm install eslint@8.56.0
-          npm install @microsoft/eslint-formatter-sarif@3.0.0
-          npm install @stylexjs/eslint-plugin@0.5.1
-          npm install @types/eslint@8.56.2
-          npm install @typescript-eslint/eslint-plugin@7.0.2
-          npm install @typescript-eslint/parser@7.0.2
-          npm install eslint-plugin-qwik@1.4.5
+      - name: Install ESLint and plugins
+        run: npm install
+          "eslint@8.56.0"
+          "@microsoft/eslint-formatter-sarif@3.0.0"
+          "@stylexjs/eslint-plugin@0.5.1"
+          "@types/eslint@8.56.2"
+          "@typescript-eslint/eslint-plugin@7.0.2"
+          "@typescript-eslint/parser@7.0.2"
+          "eslint-plugin-qwik@1.4.5"
 
       - name: Run ESLint
         run: npx eslint .
