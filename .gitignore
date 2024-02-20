@@ -9,6 +9,7 @@
 node_modules
 *.local
 package-lock.json
+*.sarif
 
 # Cache
 .cache
