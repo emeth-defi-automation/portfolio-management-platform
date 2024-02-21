@@ -67,6 +67,12 @@
   },
   "dependencies": {
     "@dnlup/fastify-traps": "3.0.2",
-    "@stylexjs/stylex": "0.5.1"
+    "@stylexjs/stylex": "0.5.1",
+    "@wagmi/connectors": "4.1.14",
+    "@wagmi/core": "2.6.5",
+    "@web3modal/siwe": "4.0.6",
+    "@web3modal/wagmi": "4.0.6",
+    "siwe": "2.1.4",
+    "viem": "2.7.11"
   }
 }
