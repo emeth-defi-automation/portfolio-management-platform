@@ -115,10 +115,8 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         <div class="flex items-center justify-between gap-2 text-xs">
           <div class="flex items-center gap-2">
             <h2 class="custom-text-50 uppercase">Value over time</h2>
-            <div class="bg-white bg-opacity-5 custom-border-1 flex h-8 gap-2 rounded-[8px] p-[3.5px]">
-              <button class="custom-bg-button rounded-[8px] px-2">
-                24h
-              </button>
+            <div class="custom-border-1 flex h-8 gap-2 rounded-[8px] bg-white bg-opacity-5 p-[3.5px]">
+              <button class="custom-bg-button rounded-[8px] px-2">24h</button>
               <button class="rounded-[8px] px-2">1W</button>
               <button class="rounded-[8px] px-2">1M</button>
               <button class="rounded-[8px] px-2">1Y</button>
@@ -127,12 +125,12 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
           <div class="flex items-center gap-2">
             <h2 class="custom-text-50 uppercase lg:hidden">Portfolio</h2>
-            <button class="bg-white bg-opacity-5 custom-border-1 flex h-8 items-center gap-2 rounded-[8px] px-2">
+            <button class="custom-border-1 flex h-8 items-center gap-2 rounded-[8px] bg-white bg-opacity-5 px-2">
               <p>All</p>
               <IconArrowDown />
             </button>
             <button
-              class="bg-white bg-opacity-5 custom-border-1 h-8 items-center rounded-[8px] px-2 duration-300 ease-in-out hover:scale-110"
+              class="custom-border-1 h-8 items-center rounded-[8px] bg-white bg-opacity-5 px-2 duration-300 ease-in-out hover:scale-110"
               onClick$={() => {
                 isPortfolioFullScreen.value = !isPortfolioFullScreen.value;
                 console.log(isPortfolioFullScreen.value);
