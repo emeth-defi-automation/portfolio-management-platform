@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: emeth
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    cert-manager.io/issuer: letsencrypt-http01-issuer
+spec:
+  ingressClassName: nginx-ingress-prod
+  tls:
+    - hosts:
+        - stg.emeth.xyz
+      secretName: stg-emeth-xyz-tls
+  rules:
+    - host: stg.emeth.xyz
+      http:
+        paths:
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: emeth
+                port:
+                  number: 80
