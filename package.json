@@ -2,7 +2,7 @@
   "name": "portfolio-management-platform",
   "description": "Portfolio Management Platform",
   "engines": {
-    "node": "21.6.2"
+    "node": "21.7.3"
   },
   "private": true,
   "trustedDependencies": [
