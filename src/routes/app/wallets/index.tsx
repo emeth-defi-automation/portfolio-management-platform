@@ -6,6 +6,7 @@ import {
   useSignal,
   useStore,
   noSerialize,
+  useVisibleTask$,
 } from "@builder.io/qwik";
 import {
   Form,
@@ -55,6 +56,7 @@ import Moralis from "moralis";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
 import { messagesContext } from "../layout";
+import { Readable } from "node:stream";
 import { type Chain, sepolia } from "viem/chains";
 import {
   getAccount,
@@ -357,6 +359,7 @@ export interface addWalletFormStore {
   address: string;
   isExecutable: number;
   isNameUnique: boolean;
+  isNameUniqueLoading: boolean;
 }
 
 export interface transferredCoinInterface {
@@ -382,6 +385,28 @@ interface ModalStore {
   config?: NoSerialize<Config>;
 }
 
+export const dbBalancesStream = server$(async function* () {
+  const db = await connectToDB(this.env);
+
+  const resultsStream = new Readable({
+    objectMode: true,
+    read() {},
+  });
+
+  await db.live("balance", ({ action, result }) => {
+    if (action === "CLOSE") {
+      resultsStream.push(null);
+      return;
+    }
+    console.log("live query result", result);
+    resultsStream.push(result);
+  });
+
+  for await (const result of resultsStream) {
+    yield result;
+  }
+});
+
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
   const formMessageProvider = useContext(messagesContext);
@@ -399,6 +424,7 @@ export default component$(() => {
     address: "",
     isExecutable: 0,
     isNameUnique: true,
+    isNameUniqueLoading: false,
   });
   const receivingWalletAddress = useSignal("");
   const transferredTokenAmount = useSignal("");
@@ -429,6 +455,15 @@ export default component$(() => {
         temporaryModalStore.isConnected = data.isConnected;
       },
     });
+  });
+  const msg = useSignal("1");
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async () => {
+    const data = await dbBalancesStream();
+    for await (const value of data) {
+      console.log("Stream value:", value);
+      msg.value = value;
+    }
   });
 
   const handleAddWallet = $(async () => {
@@ -503,19 +538,12 @@ export default component$(() => {
                 console.log("Errorek: ", err);
               }
             }
-
-            const allowance = await readContract(temporaryModalStore.config, {
-              account: account.address,
-              address: checksumAddress(token.address as `0x${string}`),
-              abi: contractABI,
-              functionName: "allowance",
-              args: [account.address as `0x${string}`, emethContractAddress],
-            });
-
-            console.log(`checking allowance for ${token.symbol}: ${allowance}`);
           }
         }
         // approving logged in user by observed wallet by emeth contract
+        console.log(
+          "approving logged in user by observed wallet by emeth contract",
+        );
         const cookie = getCookie("accessToken");
         if (!cookie) throw new Error("No accessToken cookie found");
 
@@ -609,6 +637,7 @@ export default component$(() => {
         .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
       try {
         console.log("--> address: emethContractAddress", emethContractAddress);
+        console.log("--> from", from);
         console.log("--> token", token);
         console.log("--> to", to);
 
@@ -761,8 +790,7 @@ export default component$(() => {
               disabled={
                 addWalletFormStore.isExecutable
                   ? isExecutableDisabled(addWalletFormStore)
-                  : isNotExecutableDisabled(addWalletFormStore) ||
-                    !addWalletFormStore.isNameUnique
+                  : isNotExecutableDisabled(addWalletFormStore)
               }
             >
               <p
@@ -867,7 +895,10 @@ export default component$(() => {
 });
 
 const isExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
-  addWalletFormStore.name === "" || !isValidName(addWalletFormStore.name);
+  addWalletFormStore.name === "" ||
+  !isValidName(addWalletFormStore.name) ||
+  !addWalletFormStore.isNameUnique ||
+  addWalletFormStore.isNameUniqueLoading;
 // !isPrivateKey32Bytes(addWalletFormStore.privateKey) ||
 // !isPrivateKeyHex(addWalletFormStore.privateKey);
 
@@ -876,7 +907,8 @@ const isNotExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
   addWalletFormStore.address === "" ||
   !isValidName(addWalletFormStore.name) ||
   !isValidAddress(addWalletFormStore.address) ||
-  !addWalletFormStore.isNameUnique;
+  !addWalletFormStore.isNameUnique ||
+  addWalletFormStore.isNameUniqueLoading;
 
 const isExecutableClass = (addWalletFormStore: addWalletFormStore) =>
   isExecutableDisabled(addWalletFormStore)

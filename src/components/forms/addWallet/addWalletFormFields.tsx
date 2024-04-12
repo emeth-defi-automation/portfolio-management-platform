@@ -1,6 +1,7 @@
-import { type QRL, component$ } from "@builder.io/qwik";
+import { type QRL, component$, $ } from "@builder.io/qwik";
 import { getAddress } from "viem";
 import { type addWalletFormStore } from "~/routes/app/wallets";
+import { useDebouncer } from "~/utils/debouncer";
 import {
   isCheckSum,
   isNameUnique,
@@ -16,6 +17,15 @@ export interface AddWalletFormFieldsProps {
 
 export default component$<AddWalletFormFieldsProps>(
   ({ addWalletFormStore, onConnectWalletClick, isWalletConnected }) => {
+    const nameInputDebounce = useDebouncer(
+      $(async (value: string) => {
+        addWalletFormStore.isNameUniqueLoading = true;
+        addWalletFormStore.isNameUnique = await isNameUnique(value);
+        addWalletFormStore.isNameUniqueLoading = false;
+      }),
+      300,
+    );
+
     return (
       <>
         <div>
@@ -36,6 +46,9 @@ export default component$<AddWalletFormFieldsProps>(
             {!isValidName(addWalletFormStore.name) && (
               <span class="text-xs text-red-500">Invalid name</span>
             )}
+            {!addWalletFormStore.isNameUnique && (
+              <span class="text-xs text-red-500">Name already exists</span>
+            )}
           </label>
           <input
             type="text"
@@ -47,9 +60,7 @@ export default component$<AddWalletFormFieldsProps>(
             onInput$={async (e) => {
               const target = e.target as HTMLInputElement;
               addWalletFormStore.name = target.value;
-              addWalletFormStore.isNameUnique = await isNameUnique(
-                target.value,
-              );
+              nameInputDebounce(target.value);
             }}
           />
         </div>
@@ -85,14 +96,14 @@ export default component$<AddWalletFormFieldsProps>(
             <div>
               {isWalletConnected ? (
                 <div
-                  class={`block flex h-12 w-full items-center justify-center rounded border border-[#24A148] bg-transparent p-3 text-[#24A148]`}
+                  class={`flex h-12 w-full items-center justify-center rounded border border-[#24A148] bg-transparent p-3 text-[#24A148]`}
                 >
                   wallet address
                   {/* {addWalletFormStore.address.substring(0,6)}... */}
                 </div>
               ) : (
                 <div
-                  class={`block flex h-12 w-full items-center justify-center rounded border border-[#FDD835] bg-transparent p-3 text-[#FDD835]`}
+                  class={`mb-10 flex h-12 w-full items-center justify-center rounded border border-[#FDD835] bg-transparent p-3 text-[#FDD835]`}
                 >
                   Wallet not connected
                 </div>
