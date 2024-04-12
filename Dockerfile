@@ -1,4 +1,4 @@
-ARG NODE_VERSION=21.6.2
+ARG NODE_VERSION=21.7.3
 
 ################################################################################
 # Use node image for base image for all stages.
