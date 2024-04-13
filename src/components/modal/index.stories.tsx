@@ -11,7 +11,7 @@ const meta: Meta<ModalProps> = {
 type Story = StoryObj<ModalProps>;
 
 export default meta;
-    
+
 export const WalletsAdd: Story = {
   render: () => (
     <Modal title="Add Wallet">
