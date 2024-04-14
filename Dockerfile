@@ -56,4 +56,4 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/server ./server
 
 # Run the application.
-ENTRYPOINT [ "node", "server/entry.fastify" ]
+ENTRYPOINT [ "node", "server/entry.express" ]

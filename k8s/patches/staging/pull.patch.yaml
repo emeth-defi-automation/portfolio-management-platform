@@ -1,7 +1,3 @@
 - op: add
-  path: /spec/template/spec/imagePullSecrets
-  value:
-    - name: regcred
-- op: add
   path: /spec/template/spec/containers/0/image
-  value: registry.visoft.dev/emeth-staging:latest
+  value: registry.internal.iosis.tech/emeth-staging:latest
