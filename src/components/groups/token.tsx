@@ -1,5 +1,8 @@
 import { component$ } from "@builder.io/qwik";
-import MenuDots from "/public/images/svg/portfolio/menuDots.svg?jsx";
+import type { QRL } from "@builder.io/qwik";
+import IconDelete from "/public/assets/icons/delete-white.svg?jsx";
+import IconGraph from "/public/assets/icons/graph.svg?jsx";
+import IconSwap from "/public/assets/icons/portfolio/swap.svg?jsx";
 
 export interface TokenProps {
   icon?: string;
@@ -9,37 +12,48 @@ export interface TokenProps {
   value?: string;
   wallet?: string;
   network?: string;
+  onClick$?: QRL<() => void>;
 }
-
 export const Token = component$<TokenProps>((props) => {
   return (
     <>
       <div
-        class="grid max-h-[56px] items-center gap-[8px] text-nowrap px-[20px]"
-        style="grid-template-columns: minmax(200px, 400px) minmax(100px, 200px) repeat(4, minmax(145px, 300px)) 16px;"
+        class="custom-border-b custom-border-b-1 grid items-center text-nowrap py-4 text-sm"
+        style="grid-template-columns: minmax(200px, 400px) minmax(145px, 200px) minmax(200px, 200px) minmax(200px, 300px) repeat(2, minmax(100px, 300px)) minmax(130px, 300px) 40px;"
       >
         <div class="flex h-[40px] items-center gap-[6px]">
-          <div class="flex min-h-[32px] min-w-[32px] items-center justify-center rounded-full border border-[#E6E6E6]">
+          <div class="custom-border-1 flex items-center justify-center rounded-[8px] p-[8px]">
             {props.icon && <img src={props.icon} width="20" height="20" />}
           </div>
           <div class="flex h-full items-center gap-[6px] overflow-x-auto">
             <p>{props.name}</p>
-            <span class="text-[10px] text-[#222222] text-opacity-[50%]">
-              {props.symbol}
-            </span>
+            <span class="custom-text-50">{props.symbol}</span>
           </div>
         </div>
-        <p class="flex h-full items-center overflow-x-auto">{props.quantity}</p>
-        <p class="font-mediumh-full flex items-center overflow-x-auto">
-          {props.value}
-        </p>
-        <p class="flex h-full items-center overflow-x-auto"></p>
-        <p class="flex h-full items-center overflow-x-auto">{props.wallet}</p>
-        <p class="flex h-full items-center overflow-x-auto underline underline-offset-2">
+        <div class="flex h-full items-center overflow-auto">
+          {props.quantity}
+        </div>
+        <div class="flex h-full items-center overflow-auto">{props.value}</div>
+
+        <div class="flex h-full items-center  gap-4">
+          <span class="text-customGreen">3,6%</span>
+          <IconGraph />
+        </div>
+        <div class="flex h-full items-center overflow-auto">{props.wallet}</div>
+        <div class="flex h-full items-center overflow-auto font-medium">
           {props.network}
-        </p>
-        <button class="rounded-[2px] bg-[#22222214] bg-opacity-[8]">
-          <MenuDots />
+        </div>
+        <div class="flex h-full items-center overflow-auto font-medium">
+          <button class="custom-border-1 flex gap-2 rounded-3xl px-4 py-2">
+            <IconSwap />
+            <span>Swap Token</span>
+          </button>
+        </div>
+        <button
+          class=" flex h-[28px] w-[28px] items-center justify-center rounded-[8px]"
+          onClick$={props.onClick$}
+        >
+          <IconDelete />
         </button>
       </div>
     </>
