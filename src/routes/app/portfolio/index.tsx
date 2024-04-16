@@ -51,7 +51,7 @@ interface ModalStore {
   config?: NoSerialize<Config>;
 }
 type WalletWithBalance = {
-  wallet: { id: string; chainID: number; name: string };
+  wallet: { id: string; chainID: number; name: string, address: string };
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
 };
 export const useDeleteStructure = routeAction$(
@@ -123,7 +123,7 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
   for (const observedWalletAddress of resultAddresses[0]["->observes_wallet"]
     .out.address) {
     const walletDetails = await getWalletDetails(db, observedWalletAddress);
-    const [balances]: any = await db.query(
+        const [balances]: any = await db.query(
       `SELECT id, value FROM balance WHERE ->(for_wallet WHERE out = '${walletDetails[0].id}')`,
     );
 
@@ -352,68 +352,70 @@ export default component$(() => {
   );
 
  const handleBatchTransfer = $(async () => {
-  const cookie = getCookie("accessToken");
+  console.log('observer: ',observedWalletsWithBalance.value)
+  console.log('structures: ',availableStructures.value[1].structureBalance)
+  // const cookie = getCookie("accessToken");
   
-    if (!cookie) throw new Error("No accessToken cookie found");
+  //   if (!cookie) throw new Error("No accessToken cookie found");
 
-  const emethContractAddress = import.meta.env
-  .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
+  // const emethContractAddress = import.meta.env
+  // .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
 
-  if (!emethContractAddress) {
-    throw new Error("Missing PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA");
-  }
+  // if (!emethContractAddress) {
+  //   throw new Error("Missing PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA");
+  // }
 
-  try{
-    const argsArray = [
-      {
-        from: '0x0577b55800816b6A2Da3BDbD3d862dce8e99505D' as `0x${string}`,
-        to: '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87' as `0x${string}`,
-        amount: BigInt(10 * 10**18),
-        token: '0xD418937d10c9CeC9d20736b2701E506867fFD85f' as `0x${string}`
-      },
-      {
-        from: '0x4F4acBC8047651cE5A00f57Eff73e831669df3fc' as `0x${string}`,
-        to: '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87' as `0x${string}`,
-        amount: BigInt(10 * 10**18),
-        token: '0xD418937d10c9CeC9d20736b2701E506867fFD85f' as `0x${string}`
-      }
-    ]
-    const { request } = await simulateContract(modalStore.config as Config, {
-      abi: emethContractAbi,
-      address: emethContractAddress,
-      functionName: "transferBatch",
-      args: [argsArray]
-    });
-    console.log("--> TRANSFER REQUEST", request);
-    formMessageProvider.messages.push({
-      id: formMessageProvider.messages.length,
-      variant: "info",
-      message: "Transferring tokens...",
-      isVisible: true,
-    });
-    const transactionHash = await writeContract(modalStore.config as Config, request);
+  // try{
+  //   const argsArray = [
+  //     {
+  //       from: '0x0577b55800816b6A2Da3BDbD3d862dce8e99505D' as `0x${string}`,
+  //       to: '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87' as `0x${string}`,
+  //       amount: BigInt(10 * 10**18),
+  //       token: '0xD418937d10c9CeC9d20736b2701E506867fFD85f' as `0x${string}`
+  //     },
+  //     {
+  //       from: '0x4F4acBC8047651cE5A00f57Eff73e831669df3fc' as `0x${string}`,
+  //       to: '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87' as `0x${string}`,
+  //       amount: BigInt(10 * 10**18),
+  //       token: '0xD418937d10c9CeC9d20736b2701E506867fFD85f' as `0x${string}`
+  //     }
+  //   ]
+  //   const { request } = await simulateContract(modalStore.config as Config, {
+  //     abi: emethContractAbi,
+  //     address: emethContractAddress,
+  //     functionName: "transferBatch",
+  //     args: [argsArray]
+  //   });
+  //   console.log("--> TRANSFER REQUEST", request);
+  //   formMessageProvider.messages.push({
+  //     id: formMessageProvider.messages.length,
+  //     variant: "info",
+  //     message: "Transferring tokens...",
+  //     isVisible: true,
+  //   });
+  //   const transactionHash = await writeContract(modalStore.config as Config, request);
 
-    const receipt = await waitForTransactionReceipt(modalStore.config as Config, {
-       hash: transactionHash,
-     });
+  //   const receipt = await waitForTransactionReceipt(modalStore.config as Config, {
+  //      hash: transactionHash,
+  //    });
 
-     console.log('[RECEIPT]: ', receipt)
-    formMessageProvider.messages.push({
-            id: formMessageProvider.messages.length,
-            variant: "success",
-            message: "Success!",
-            isVisible: true,
-          });
+  //    console.log('[RECEIPT]: ', receipt)
+  //   formMessageProvider.messages.push({
+  //           id: formMessageProvider.messages.length,
+  //           variant: "success",
+  //           message: "Success!",
+  //           isVisible: true,
+  //         });
 
-  }catch(err){
-    console.log('error while tranfering: ', err);
-    formMessageProvider.messages.push({
-      id: formMessageProvider.messages.length,
-      variant: "error",
-      message: "Something went wrong.",
-      isVisible: true,
-    });
-  }     
+  // }catch(err){
+  //   console.log('error while tranfering: ', err);
+  //   formMessageProvider.messages.push({
+  //     id: formMessageProvider.messages.length,
+  //     variant: "error",
+  //     message: "Something went wrong.",
+  //     isVisible: true,
+  //   });
+  // }     
  })
   return (
     <>
@@ -603,8 +605,8 @@ export default component$(() => {
                         <p class="text-xs uppercase text-white">
                           <span class="bg-gradient-to-r from-red-600 via-orange-400 to-pink-500 bg-clip-text font-semibold text-transparent">
                             {selectedWallets.wallets.length} wallets
-                          </span>{" "}
-                          selected{" "}
+                          </span>
+                          selected
                         </p>
                         <div class="relative">
                           <label class="flex h-6 items-center gap-3">
