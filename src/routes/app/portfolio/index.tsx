@@ -1,4 +1,4 @@
-import { ButtonWithIcon } from "~/components/Buttons/Buttons";
+import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
 import IconEdit from "/public/assets/icons/portfolio/edit.svg?jsx";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import IconClose from "/public/assets/icons/close.svg?jsx";
@@ -12,7 +12,10 @@ import {
   useSignal,
   useStore,
   useTask$,
+  type NoSerialize,
+  useContext,
 } from "@builder.io/qwik";
+import { messagesContext } from "../layout";
 import {
   Form,
   routeAction$,
@@ -31,7 +34,22 @@ import { type Wallet } from "~/interface/auth/Wallet";
 import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
 import { structureExists } from "~/interface/structure/removeStructure";
-
+import {
+  getAccount,
+  simulateContract,
+  watchAccount,
+  writeContract,
+  type Config,
+  readContract,
+  waitForTransactionReceipt,
+} from "@wagmi/core";
+import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import { emethContractAbi } from "~/abi/emethContractAbi";
+import { getCookie } from "~/utils/refresh";
+interface ModalStore {
+  isConnected?: boolean;
+  config?: NoSerialize<Config>;
+}
 type WalletWithBalance = {
   wallet: { id: string; chainID: number; name: string };
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
@@ -262,11 +280,14 @@ export const useCreateStructure = routeAction$(
 );
 
 export default component$(() => {
+  const modalStore = useContext(ModalStoreContext);
   const clickedToken = useStore({ balanceId: "", structureId: "" });
   const structureStore = useStore({ name: "" });
   const selectedWallets = useStore({ wallets: [] as any[] });
   const isCreateNewStructureModalOpen = useSignal(false);
+  const isTransferModalOpen = useSignal(false);
   const deleteToken = useDeleteToken();
+  const formMessageProvider = useContext(messagesContext);
   const availableStructures = useAvailableStructures();
   const createStructureAction = useCreateStructure();
   const deleteStructureAction = useDeleteStructure();
@@ -330,6 +351,70 @@ export default component$(() => {
     },
   );
 
+ const handleBatchTransfer = $(async () => {
+  const cookie = getCookie("accessToken");
+  
+    if (!cookie) throw new Error("No accessToken cookie found");
+
+  const emethContractAddress = import.meta.env
+  .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
+
+  if (!emethContractAddress) {
+    throw new Error("Missing PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA");
+  }
+
+  try{
+    const argsArray = [
+      {
+        from: '0x0577b55800816b6A2Da3BDbD3d862dce8e99505D' as `0x${string}`,
+        to: '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87' as `0x${string}`,
+        amount: BigInt(10 * 10**18),
+        token: '0xD418937d10c9CeC9d20736b2701E506867fFD85f' as `0x${string}`
+      },
+      {
+        from: '0x4F4acBC8047651cE5A00f57Eff73e831669df3fc' as `0x${string}`,
+        to: '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87' as `0x${string}`,
+        amount: BigInt(10 * 10**18),
+        token: '0xD418937d10c9CeC9d20736b2701E506867fFD85f' as `0x${string}`
+      }
+    ]
+    const { request } = await simulateContract(modalStore.config as Config, {
+      abi: emethContractAbi,
+      address: emethContractAddress,
+      functionName: "transferBatch",
+      args: [argsArray]
+    });
+    console.log("--> TRANSFER REQUEST", request);
+    formMessageProvider.messages.push({
+      id: formMessageProvider.messages.length,
+      variant: "info",
+      message: "Transferring tokens...",
+      isVisible: true,
+    });
+    const transactionHash = await writeContract(modalStore.config as Config, request);
+
+    const receipt = await waitForTransactionReceipt(modalStore.config as Config, {
+       hash: transactionHash,
+     });
+
+     console.log('[RECEIPT]: ', receipt)
+    formMessageProvider.messages.push({
+            id: formMessageProvider.messages.length,
+            variant: "success",
+            message: "Success!",
+            isVisible: true,
+          });
+
+  }catch(err){
+    console.log('error while tranfering: ', err);
+    formMessageProvider.messages.push({
+      id: formMessageProvider.messages.length,
+      variant: "error",
+      message: "Something went wrong.",
+      isVisible: true,
+    });
+  }     
+ })
   return (
     <>
       <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
@@ -343,6 +428,7 @@ export default component$(() => {
               image="/assets/icons/portfolio/transfer.svg"
               text="Transfer"
               class="custom-border-2"
+              onClick$={async () => {isTransferModalOpen.value = true}}
             />
             <ButtonWithIcon
               image="/assets/icons/portfolio/add.svg"
@@ -408,7 +494,30 @@ export default component$(() => {
                 />
               ))}
             </div>
-
+            {
+              isTransferModalOpen.value ? <Modal title="Transfer Funds" isOpen={isTransferModalOpen}>
+                <div class="flex flex-col">
+                  
+                </div>
+                <div class="flex gap-4">
+                <Button
+                  class="custom-border-1 w-full bg-transparent  disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
+                  onClick$={async () => {
+                   
+                  }}
+                  type="button"
+                  text="Cancel"
+                />
+                  <Button
+                  class="w-full border-0 bg-customBlue disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
+                  onClick$={async () => {
+                    await handleBatchTransfer();
+                  }}
+                  text="Next"
+                />
+                </div>
+              </Modal> : null 
+            }
             {isCreateNewStructureModalOpen.value && (
               <Modal
                 isOpen={isCreateNewStructureModalOpen}
