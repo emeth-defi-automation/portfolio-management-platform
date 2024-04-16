@@ -63,14 +63,23 @@ export const setupStream = server$(async function () {
     type: "function",
   };
 
-  const triggerAllowanceFrom = {
+  const triggerAllowanceFromOnTransfer = {
     contractAddress: "$contract",
     functionAbi: allowanceABI,
     inputs: ["$from", "0x9B2985a026c243A5133AaE819544ADb213366D7F"],
     type: "erc20transfer" as const,
   };
 
-  const triggers = [triggerFrom, triggerTo, triggerAllowanceFrom];
+  const triggerAllowanceFromOnApproval = {
+    contractAddress: "$contract",
+    functionAbi: allowanceABI,
+    inputs: ["$owner", "0x9B2985a026c243A5133AaE819544ADb213366D7F"],
+    type: "erc20approval" as const,
+  };
+
+
+
+  const triggers = [triggerFrom, triggerTo, triggerAllowanceFromOnTransfer, triggerAllowanceFromOnApproval];
 
   const ERC20TransferABI = [
     {
@@ -96,6 +105,16 @@ export const setupStream = server$(async function () {
         },
       ],
       name: "Transfer",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        { indexed: true, name: "src", type: "address" },
+        { indexed: true, name: "guy", type: "address" },
+        { indexed: false, name: "wad", type: "uint256" },
+      ],
+      name: "Approval",
       type: "event",
     },
   ];
@@ -134,11 +153,11 @@ export const setupStream = server$(async function () {
     newStream = await Moralis.Streams.add({
       chains: [EvmChain.SEPOLIA.hex],
       description: "Listen for Transfers",
-      tag: "transfers",
+      tag: "transfers - filip",
       includeNativeTxs: true,
       abi: ERC20TransferABI,
       includeContractLogs: true,
-      topic0: ["Transfer(address,address,uint256)"],
+      topic0: ["Transfer(address,address,uint256)", "Approval(address,address,uint256)"],
       webhookUrl: ngrokWebhookUrl,
       triggers: triggers,
       getNativeBalances: [
@@ -148,7 +167,17 @@ export const setupStream = server$(async function () {
         },
       ],
     });
+    console.log("Stream created", newStream);
+    console.log("stream id:", newStream['jsonResponse']['id']);
+    const id = newStream['jsonResponse']['id'];
+    if (!id) {
+      throw new Error("Stream id not found");
+    }
+    await Moralis.Streams.addAddress({ id, address: "0x9B2985a026c243A5133AaE819544ADb213366D7F" });
+
+    // await Moralis.Streams.update({ id, abi:  })
   }
+
 
   _stream = newStream;
   return newStream;
