@@ -77,9 +77,12 @@ export const setupStream = server$(async function () {
     type: "erc20approval" as const,
   };
 
-
-
-  const triggers = [triggerFrom, triggerTo, triggerAllowanceFromOnTransfer, triggerAllowanceFromOnApproval];
+  const triggers = [
+    triggerFrom,
+    triggerTo,
+    triggerAllowanceFromOnTransfer,
+    triggerAllowanceFromOnApproval,
+  ];
 
   const ERC20TransferABI = [
     {
@@ -157,7 +160,10 @@ export const setupStream = server$(async function () {
       includeNativeTxs: true,
       abi: ERC20TransferABI,
       includeContractLogs: true,
-      topic0: ["Transfer(address,address,uint256)", "Approval(address,address,uint256)"],
+      topic0: [
+        "Transfer(address,address,uint256)",
+        "Approval(address,address,uint256)",
+      ],
       webhookUrl: ngrokWebhookUrl,
       triggers: triggers,
       getNativeBalances: [
@@ -168,16 +174,18 @@ export const setupStream = server$(async function () {
       ],
     });
     console.log("Stream created", newStream);
-    console.log("stream id:", newStream['jsonResponse']['id']);
-    const id = newStream['jsonResponse']['id'];
+    console.log("stream id:", newStream["jsonResponse"]["id"]);
+    const id = newStream["jsonResponse"]["id"];
     if (!id) {
       throw new Error("Stream id not found");
     }
-    await Moralis.Streams.addAddress({ id, address: "0x9B2985a026c243A5133AaE819544ADb213366D7F" });
+    await Moralis.Streams.addAddress({
+      id,
+      address: "0x9B2985a026c243A5133AaE819544ADb213366D7F",
+    });
 
     // await Moralis.Streams.update({ id, abi:  })
   }
-
 
   _stream = newStream;
   return newStream;

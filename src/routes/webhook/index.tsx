@@ -13,7 +13,7 @@ export const onPost: RequestHandler = async ({ request, env, json }) => {
       for (const transfer of transfers) {
         const { from, to, tokenSymbol, triggers } = transfer;
         for (const trigger of triggers) {
-          console.log("--> TRIGGER", trigger)
+          console.log("--> TRIGGER", trigger);
           if (trigger.name === "fromBalance") {
             await updateBalanceIfExists(db, from, tokenSymbol, trigger.value);
           } else {
