@@ -77,7 +77,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
           </div>
         </div>
         <div class="grid gap-4">
-          <div class="custom-text-50 grid grid-cols-[22%_15%_15%_15%_15%_15%_3%] items-center gap-2 text-left text-xs uppercase">
+          <div class="custom-text-50 grid grid-cols-[22%_15%_15%_15%_15%_15%] items-center gap-2 text-left text-xs uppercase">
             <div class="">Token name</div>
             <div class="">Quantity</div>
             <div class="">Value</div>
@@ -87,7 +87,9 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               <button class="rounded-lg px-2">3d</button>
               <button class="rounded-lg px-2">30d</button>
             </div>
-            <div class="">Authorization</div>
+            {selectedWallet.value.wallet.isExecutable ? (
+              <div class=""></div>
+            ) : null}
             {/* <div class="">Menu</div> */}
           </div>
           <div>
@@ -104,6 +106,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
                   balanceValueUSD={token.balanceValueUSD}
                   isTransferModalOpen={isTransferModalOpen}
                   transferredCoin={transferredCoin}
+                  isExecutable={selectedWallet.value?.wallet.isExecutable}
                 />
               );
             })}
