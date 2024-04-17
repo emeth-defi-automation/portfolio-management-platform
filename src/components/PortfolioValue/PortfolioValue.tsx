@@ -12,7 +12,7 @@ import ImgMinimalize from "/public/assets/icons/minimalize.svg?jsx";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import * as d3 from "d3";
 import { type PeriodState } from "~/interface/balance/Balance";
-import { axisFormater } from "~/utils/portfolio/axisFormater";
+import { axisFormatter } from "~/utils/portfolio/axisFormatter";
 
 export interface PortfolioValueProps {
   totalPortfolioValue: string;
@@ -93,7 +93,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
           d3
             .axisBottom(scaleX)
             .tickValues(data.map((d) => d[0]))
-            .tickFormat((d) => axisFormater(d as Date, selectedPeriod))
+            .tickFormat((d) => axisFormatter(d as Date, selectedPeriod))
             .tickSize(-height + marginTop + marginBottom)
             .tickPadding(12),
         )

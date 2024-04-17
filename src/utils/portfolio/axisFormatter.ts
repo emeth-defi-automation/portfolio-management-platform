@@ -2,7 +2,7 @@ import { type PeriodState } from "~/interface/balance/Balance";
 import { getSelectedPeriodKey } from "../timestamps/timestamp";
 import * as d3 from "d3";
 
-export const axisFormater = (value: Date, period: PeriodState): string => {
+export const axisFormatter = (value: Date, period: PeriodState): string => {
   let formatter = null;
   const key = getSelectedPeriodKey(period);
   switch (key) {
