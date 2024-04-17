@@ -432,7 +432,8 @@ export default component$(() => {
         await waitForTransactionReceipt(modalStore.config, {
           hash: transactionHash,
         });
-
+        batchTransferFormStore.receiverAddress = "";
+        batchTransferFormStore.coinsToTransfer = [];
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "success",
@@ -441,6 +442,7 @@ export default component$(() => {
         });
       }
     } catch (err) {
+      console.log(err);
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "error",
@@ -546,7 +548,15 @@ export default component$(() => {
               ))}
             </div>
             {isTransferModalOpen.value ? (
-              <Modal title="Transfer Funds" isOpen={isTransferModalOpen}>
+              <Modal
+                title="Transfer Funds"
+                isOpen={isTransferModalOpen}
+                onClose={$(() => {
+                  batchTransferFormStore.receiverAddress = "";
+                  batchTransferFormStore.coinsToTransfer = [];
+                  stepsCounter.value = 1;
+                })}
+              >
                 <div class="flex flex-col overflow-y-scroll">
                   {stepsCounter.value === 1 ? (
                     <CoinsToTransfer
@@ -574,7 +584,10 @@ export default component$(() => {
                       if (stepsCounter.value > 1) {
                         stepsCounter.value = stepsCounter.value - 1;
                       } else {
-                        //clear the form
+                        batchTransferFormStore.receiverAddress = "";
+                        batchTransferFormStore.coinsToTransfer = [];
+                        stepsCounter.value = 1;
+                        isTransferModalOpen.value = false;
                       }
                     }}
                     type="button"
@@ -584,6 +597,8 @@ export default component$(() => {
                     class="w-full border-0 bg-customBlue disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
                     onClick$={async () => {
                       if (stepsCounter.value === 3) {
+                        isTransferModalOpen.value = false;
+                        stepsCounter.value = 1;
                         await handleBatchTransfer();
                       } else {
                         stepsCounter.value = stepsCounter.value + 1;
