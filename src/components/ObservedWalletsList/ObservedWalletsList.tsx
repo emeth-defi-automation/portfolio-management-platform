@@ -24,6 +24,7 @@ import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance"
 import { ObservedWallet } from "../Wallets/Observed/ObservedWallet";
 import { type Balance } from "~/interface/balance/Balance";
 import { chainIdToNetworkName } from "~/utils/chains";
+import { Spinner } from "../Spinner/Spinner";
 
 export const serverFunction = server$(async function () {
   const db = await connectToDB(this.env);
@@ -164,24 +165,34 @@ interface ObservedWalletsListProps {
 
 export const ObservedWalletsList = component$<ObservedWalletsListProps>(
   ({ selectedWallet }) => {
+    const isLoading = useSignal(true);
     const observedWallets = useSignal<WalletTokensBalances[]>([]);
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async () => {
       observedWallets.value = await serverFunction();
+      isLoading.value = false;
       console.log("====================================");
       console.log(observedWallets);
     });
 
     return (
       <div class="">
-        {observedWallets.value.map((observedWallet) => (
-          <ObservedWallet
-            key={observedWallet.wallet.address}
-            observedWallet={observedWallet}
-            selectedWallet={selectedWallet}
-            chainIdToNetworkName={chainIdToNetworkName}
-          />
-        ))}
+        {isLoading.value ? ( // if loading --> display spinner
+          <Spinner />
+        ) : observedWallets.value.length === 0 ? ( // if no wallets --> display message
+          <div class="flex h-full items-center justify-center">
+            <span>No wallets added yet</span>
+          </div>
+        ) : (
+          observedWallets.value.map((observedWallet) => (
+            <ObservedWallet
+              key={observedWallet.wallet.address}
+              observedWallet={observedWallet}
+              selectedWallet={selectedWallet}
+              chainIdToNetworkName={chainIdToNetworkName}
+            />
+          ))
+        )}
       </div>
     );
   },
