@@ -19,7 +19,8 @@ import { checksumAddress } from "viem";
 import { type Wallet } from "~/interface/auth/Wallet";
 import {
   convertWeiToQuantity,
-  getTotalValueChange,
+  getPercentageOfTotalValueChange,
+  getProperTotalValueChange,
 } from "~/utils/formatBalances/formatTokenBalance";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { type Balance, type PeriodState } from "~/interface/balance/Balance";
@@ -30,6 +31,7 @@ import Moralis from "moralis";
 import {
   generateTimestamps,
   getSelectedPeriodInHours,
+  getSelectedPeriodKey,
 } from "~/utils/timestamps/timestamp";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 
@@ -68,11 +70,12 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
   const dashboardBalance: { tokenAddress: string; balance: string }[] = [];
   const ethBlocks = [];
   const sepBlocks = [];
-  const chartData = [];
   const chartTimestamps = generateTimestamps(
     selectedPeriod.period,
     selectedPeriod.interval,
   );
+  const chartData: number[] = new Array(chartTimestamps.length).fill(0);
+
   for (const item of chartTimestamps) {
     try {
       const blockDetails = await Moralis.EvmApi.block.getDateToBlock({
@@ -145,27 +148,55 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
               .reduce((sum, currentItem) => {
                 return (
                   sum +
-                  parseFloat(currentItem.balance) * tokenPrice.raw.usdPrice
+                  parseFloat(
+                    convertWeiToQuantity(
+                      currentItem.balance,
+                      currentItem.decimals,
+                    ),
+                  ) *
+                    tokenPrice.raw.usdPrice
                 );
               }, 0);
           }
-          chartData.push(partBalance);
+          chartData[i] += partBalance;
         } catch (error) {
           console.error(error);
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
+  let totalValueChange = 0;
+
+  if (chartData.length >= 2) {
+    totalValueChange = getProperTotalValueChange(
+      chartData[0],
+      chartData[chartData.length - 1],
+    );
+  }
+
+  let percentageOfTotalValueChange = 0;
+
+  if (chartData.length >= 2) {
+    percentageOfTotalValueChange = getPercentageOfTotalValueChange(
+      chartData[0],
+      totalValueChange,
+    );
+  }
+
   return {
+    percentageOfTotalValueChange: percentageOfTotalValueChange.toFixed(2) + "%",
+    totalValueChange: totalValueChange.toFixed(2),
+    period: getSelectedPeriodKey(data as PeriodState),
     chartData: chartData.map((value, index) => [
       index,
       parseFloat(value.toFixed(2)),
     ]) as [number, number][],
   };
 });
+
 export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
   const db = await connectToDB(requestEvent.env);
 
@@ -181,16 +212,11 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
   if (!result) throw new Error("No observed wallets");
 
   const observedWalletsQueryResult = result[0];
-
   const dashboardBalance: { tokenAddress: string; balance: string }[] = [];
-  const valueChange: { valueChangeUSD: string; percentageChange: string }[] =
-    [];
-  let totalBalance = 0;
-
   const ethBlocks = [];
   const sepBlocks = [];
-  const chartData = [];
   const chartTimestamps = generateTimestamps(24, 4);
+  const chartData: number[] = new Array(chartTimestamps.length).fill(0);
 
   for (const item of chartTimestamps) {
     try {
@@ -209,7 +235,6 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
       console.error(error);
     }
   }
-
   for (const observedWallet of observedWalletsQueryResult) {
     const [wallet] = await db.select<Wallet>(`${observedWallet}`);
 
@@ -250,65 +275,63 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
               ],
               address: wallet.address,
             });
+
           let partBalance: number = 0;
           for (const balanceEntry of dashboardBalance) {
             const ethTokenAddress = mapTokenAddress(balanceEntry.tokenAddress);
             const tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
               chain: EvmChain.ETHEREUM.hex,
               toBlock: ethBlocks[i],
-              include: "percent_change",
               address: ethTokenAddress,
             });
-            console.log("Token Price", tokenPrice);
 
             partBalance += tokenBalance.raw
               .filter((item) => item.symbol === tokenPrice.raw.tokenSymbol)
               .reduce((sum, currentItem) => {
                 return (
                   sum +
-                  parseFloat(currentItem.balance) * tokenPrice.raw.usdPrice
+                  parseFloat(
+                    convertWeiToQuantity(
+                      currentItem.balance,
+                      currentItem.decimals,
+                    ),
+                  ) *
+                    tokenPrice.raw.usdPrice
                 );
               }, 0);
-
-            if (
-              tokenPrice.raw["24hrPercentChange"] &&
-              tokenPrice.raw.usdPrice
-            ) {
-              valueChange.push({
-                valueChangeUSD: (
-                  parseFloat(tokenPrice.raw["24hrPercentChange"]) *
-                  parseInt(balanceEntry.balance) *
-                  0.01
-                ).toFixed(2),
-                percentageChange:
-                  (parseFloat(tokenPrice.raw["24hrPercentChange"]).toFixed(
-                    2,
-                  ) as string) + "%",
-              });
-              totalBalance +=
-                parseFloat(balanceEntry.balance) * tokenPrice.raw.usdPrice;
-            }
           }
-          chartData.push(partBalance);
+          chartData[i] += partBalance;
         } catch (error) {
           console.error(error);
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
-    const totalValueChange = getTotalValueChange(valueChange);
-
-    return {
-      valueChange: totalValueChange.toFixed(2),
-      percentageChange:
-        ((100 * totalValueChange) / totalBalance).toFixed(2) + "%",
-      chartData: chartData.map((value, index) => [
-        index,
-        parseFloat(value.toFixed(2)),
-      ]) as [number, number][],
-    };
   }
+  let totalValueChange = 0;
+
+  totalValueChange = getProperTotalValueChange(
+    chartData[0],
+    chartData[chartData.length - 1],
+  );
+
+  let percentageOfTotalValueChange = 0;
+
+  percentageOfTotalValueChange = getPercentageOfTotalValueChange(
+    chartData[0],
+    totalValueChange,
+  );
+
+  return {
+    percentageOfTotalValueChange: percentageOfTotalValueChange.toFixed(2) + "%",
+    totalValueChange: totalValueChange.toFixed(2),
+    period: "24h",
+    chartData: chartData.map((value, index) => [
+      index,
+      parseFloat(value.toFixed(2)),
+    ]) as [number, number][],
+  };
 });
 
 export const useTotalPortfolioValue = routeLoader$(async (requestEvent) => {
@@ -413,10 +436,7 @@ export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
     `SELECT * FROM ${userId}->has_structure WHERE out.name = 'Favourite Tokens';`,
   );
   if (!result.length) return [];
-  // console.log("result", result);
   const createdStructure = result[0].out;
-
-  // console.log("createdStructure", createdStructure);
   const availableStructures: any[] = [];
 
   const [structure] = await db.select(`${createdStructure}`);
@@ -440,7 +460,6 @@ export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
     );
     const [tokenValue] = await getDBTokenPriceUSD(db, token[0].address);
     const [imagePath] = await getTokenImagePath(db, token[0].symbol);
-    // console.log("---------IMAGE PATH---------", imagePath.imagePath);
     const tokenWithBalance = {
       id: token[0].id,
       name: token[0].name,
@@ -469,7 +488,6 @@ export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
     structureBalance: structureTokens,
   });
 
-  // console.log("Available Structures from routeloader: ", availableStructures);
   return availableStructures;
 });
 
@@ -481,10 +499,13 @@ export default component$(() => {
   const toggleChart = useToggleChart();
   const portfolioValueChange = usePortfolio24hChange();
   const chartDataStore = useStore({
-    data: portfolioValueChange.value?.chartData ?? [
-      [0, 0],
-      [0, 0],
-    ],
+    data: portfolioValueChange.value.chartData,
+  });
+  const portfolioValueStore = useStore({
+    selectedPeriodLabel: portfolioValueChange.value.period,
+    portfolioValueChange: portfolioValueChange.value.totalValueChange,
+    portfolioPercentageValueChange:
+      portfolioValueChange.value.percentageOfTotalValueChange,
   });
   const changePeriod = useSignal(false);
   const selectedPeriod: PeriodState = useStore({
@@ -510,10 +531,12 @@ export default component$(() => {
 
       if (changePeriod.value !== false) {
         const newChartData = await toggleChart.submit(selectedPeriod);
-        console.log("=========================");
-        console.log(newChartData);
-        console.log("=========================");
         chartDataStore.data = newChartData.value.chartData;
+        portfolioValueStore.selectedPeriodLabel = newChartData.value.period;
+        portfolioValueStore.portfolioValueChange =
+          newChartData.value.totalValueChange;
+        portfolioValueStore.portfolioPercentageValueChange =
+          newChartData.value.percentageOfTotalValueChange;
       }
     });
   });
@@ -522,9 +545,13 @@ export default component$(() => {
     <PortfolioValue
       totalPortfolioValue={totalPortfolioValue.value}
       isPortfolioFullScreen={isPortfolioFullScreen}
-      portfolioValueChange={portfolioValueChange.value}
+      portfolioValueChange={portfolioValueStore.portfolioValueChange}
+      portfolioPercentageValueChange={
+        portfolioValueStore.portfolioPercentageValueChange
+      }
       chartData={chartDataStore.data}
       selectedPeriod={selectedPeriod}
+      period={portfolioValueStore.selectedPeriodLabel}
       onClick$={(e: any) => {
         togglePeriod(e.target.name);
         changePeriod.value = true;
@@ -536,9 +563,13 @@ export default component$(() => {
         <PortfolioValue
           totalPortfolioValue={totalPortfolioValue.value}
           isPortfolioFullScreen={isPortfolioFullScreen}
-          portfolioValueChange={portfolioValueChange.value}
+          portfolioValueChange={portfolioValueStore.portfolioValueChange}
+          portfolioPercentageValueChange={
+            portfolioValueStore.portfolioPercentageValueChange
+          }
           chartData={chartDataStore.data}
           selectedPeriod={selectedPeriod}
+          period={portfolioValueStore.selectedPeriodLabel}
           onClick$={(e: any) => {
             togglePeriod(e.target.name);
             changePeriod.value = true;
@@ -548,7 +579,7 @@ export default component$(() => {
         <div class="custom-border-1 custom-shadow grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Alerts</h1>
-            <button class="custom-border-2 rounded-10 px-4 py-2 text-xs font-medium duration-300 ease-in-out hover:scale-110">
+            <button class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110">
               See All
             </button>
           </div>
@@ -571,7 +602,7 @@ export default component$(() => {
         <div class="custom-border-1 custom-shadow grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Actions</h1>
-            <button class="custom-border-2 rounded-10 px-4 py-2 text-xs font-medium duration-300 ease-in-out hover:scale-110">
+            <button class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110">
               See All
             </button>
           </div>
@@ -599,7 +630,7 @@ export default component$(() => {
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold">Favourite Tokens</h1>
           <button
-            class="custom-border-2 rounded-10 px-4 py-2 text-xs font-medium duration-300 ease-in-out hover:scale-110"
+            class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110"
             onClick$={() => {
               nav("/app/portfolio");
             }}

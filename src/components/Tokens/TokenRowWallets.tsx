@@ -1,5 +1,5 @@
 import { $, type Signal, component$ } from "@builder.io/qwik";
-import IconMenuDots from "/public/assets/icons/menu-dots.svg?jsx";
+// import IconMenuDots from "/public/assets/icons/menu-dots.svg?jsx";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
 import {
   Image,
@@ -29,9 +29,8 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     balanceValueUSD,
     isTransferModalOpen,
     transferredCoin,
-    // allowance,
+    allowance,
   }) => {
-    console.log("imagePath", imagePath);
     const imageTransformer$ = $(
       ({ src, width, height }: ImageTransformerProps): string => {
         return `${src}?height=${height}&width=${width}&format=webp&fit=fill`;
@@ -44,7 +43,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     });
     return (
       <>
-        <div class="custom-border-b-1 grid grid-cols-[22%_12%_15%_22%_20%_4%] items-center gap-2 py-2 text-sm">
+        <div class="custom-border-b-1 grid grid-cols-[22%_15%_15%_15%_15%_15%] items-center gap-2 py-2 text-sm">
           <div class="flex items-center gap-4 py-2">
             <div class="custom-border-1 rounded-lg p-[10px]">
               <Image
@@ -62,7 +61,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
           </div>
           <div class="overflow-auto">{balance}</div>
           <div class="overflow-auto">${balanceValueUSD}</div>
-          {/* <div class="">{allowance}</div> */}
+          <div class="">{allowance}</div>
           <div class="flex h-full items-center gap-4">
             <span class="text-customGreen">3,6%</span>
             <IconGraph />
@@ -80,11 +79,11 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             </button>
           </div>
 
-          <div class="text-right">
+          {/* <div class="text-right">
             <button class="">
               <IconMenuDots />
             </button>
-          </div>
+          </div> */}
         </div>
       </>
     );

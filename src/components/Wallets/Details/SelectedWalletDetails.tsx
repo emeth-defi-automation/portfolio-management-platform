@@ -24,6 +24,10 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
     transferredCoin,
   }) => {
     if (!selectedWallet.value) return <></>;
+    let shortAddress = selectedWallet.value.wallet.address;
+    if (shortAddress) {
+      shortAddress = shortAddress.slice(0, 4) + "..." + shortAddress.slice(-4);
+    }
     return (
       <div class="grid grid-rows-[64px_1fr] gap-6">
         <div class="flex justify-between">
@@ -34,13 +38,15 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             <div class="mt-4 flex gap-2">
               <span class="custom-btn-gradient flex h-7 items-center rounded-lg px-[1px] text-xs ">
                 <div class="flex h-[26px] items-center rounded-lg bg-black px-3">
-                  Executable
+                  {selectedWallet.value.wallet.isExecutable
+                    ? "Executable"
+                    : "Read-only"}
                 </div>
               </span>
               <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">
                 <IconWallet />
                 {/* {selectedWallet.value.wallet.address} */}
-                0x5B...83db
+                {shortAddress}
               </span>
               <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">
                 <IconEthereum />
@@ -71,18 +77,18 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
           </div>
         </div>
         <div class="grid gap-4">
-          <div class="custom-text-50 grid grid-cols-[22%_12%_15%_22%_20%_4%] items-center gap-2 text-left text-xs uppercase">
+          <div class="custom-text-50 grid grid-cols-[22%_15%_15%_15%_15%_15%_3%] items-center gap-2 text-left text-xs uppercase">
             <div class="">Token name</div>
             <div class="">Quantity</div>
             <div class="">Value</div>
-            {/* <div class="">Allowance</div> */}
+            <div class="">Allowance</div>
             <div class="custom-border-1 flex h-8 w-fit gap-2 rounded-lg bg-white bg-opacity-5 p-1 text-white">
               <button class="custom-bg-button rounded-lg px-2">24h</button>
               <button class="rounded-lg px-2">3d</button>
               <button class="rounded-lg px-2">30d</button>
             </div>
             <div class="">Authorization</div>
-            <div></div>
+            {/* <div class="">Menu</div> */}
           </div>
           <div>
             {selectedWallet.value.tokens.map((token: any) => {
