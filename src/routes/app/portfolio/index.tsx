@@ -14,12 +14,14 @@ import {
   useTask$,
   type NoSerialize,
   useContext,
+  useVisibleTask$,
 } from "@builder.io/qwik";
 import { messagesContext } from "../layout";
 import {
   Form,
   routeAction$,
   routeLoader$,
+  server$,
   z,
   zod$,
 } from "@builder.io/qwik-city";
@@ -49,6 +51,7 @@ import { getCookie } from "~/utils/refresh";
 import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
 import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
 import Destination from "~/components/Forms/portfolioTransfters/Destination";
+import { convertToFraction } from "../wallets";
 interface ModalStore {
   isConnected?: boolean;
   config?: NoSerialize<Config>;
@@ -299,7 +302,12 @@ export const useCreateStructure = routeAction$(
     balancesId: z.array(z.string()),
   }),
 );
+const queryTokens = server$(async function(){
+    const db = await connectToDB(this.env);
 
+    const [tokens]: any = await db.query(`SELECT decimals, symbol, address FROM token;`);
+    return tokens;
+})
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
   const clickedToken = useStore({ balanceId: "", structureId: "" });
@@ -377,72 +385,79 @@ export default component$(() => {
   );
 
  const handleBatchTransfer = $(async () => {
-  console.log('observer: ',observedWalletsWithBalance.value)
-  console.log('structures full: ',availableStructures.value)
-  console.log('structures: ',availableStructures.value[1].structureBalance)
-  console.log('store: ', batchTransferFormStore)
-  // const cookie = getCookie("accessToken");
+//  watchAccount
+  const cookie = getCookie("accessToken");
   
-  //   if (!cookie) throw new Error("No accessToken cookie found");
+    if (!cookie) throw new Error("No accessToken cookie found");
 
-  // const emethContractAddress = import.meta.env
-  // .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
+  const emethContractAddress = import.meta.env
+  .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
 
-  // if (!emethContractAddress) {
-  //   throw new Error("Missing PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA");
-  // }
+  if (!emethContractAddress) {
+    throw new Error("Missing PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA");
+  }
 
-  // try{
-  //   const argsArray = [
-  //     {
-  //       from: '0x0577b55800816b6A2Da3BDbD3d862dce8e99505D' as `0x${string}`,
-  //       to: '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87' as `0x${string}`,
-  //       amount: BigInt(10 * 10**18),
-  //       token: '0xD418937d10c9CeC9d20736b2701E506867fFD85f' as `0x${string}`
-  //     },
-  //     {
-  //       from: '0x4F4acBC8047651cE5A00f57Eff73e831669df3fc' as `0x${string}`,
-  //       to: '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87' as `0x${string}`,
-  //       amount: BigInt(10 * 10**18),
-  //       token: '0xD418937d10c9CeC9d20736b2701E506867fFD85f' as `0x${string}`
-  //     }
-  //   ]
-  //   const { request } = await simulateContract(modalStore.config as Config, {
-  //     abi: emethContractAbi,
-  //     address: emethContractAddress,
-  //     functionName: "transferBatch",
-  //     args: [argsArray]
-  //   });
-  //   console.log("--> TRANSFER REQUEST", request);
-  //   formMessageProvider.messages.push({
-  //     id: formMessageProvider.messages.length,
-  //     variant: "info",
-  //     message: "Transferring tokens...",
-  //     isVisible: true,
-  //   });
-  //   const transactionHash = await writeContract(modalStore.config as Config, request);
+  try{
+    console.log('dupa');
+   const tokens = await queryTokens();
+   console.log(tokens);
+   if(modalStore.config){
+    const argsArray = [];
+    for(const cStructure of batchTransferFormStore.coinsToTransfer){
+      for(const cWallet of cStructure.coins){
+        for(const cCoin of cWallet.coins){
+          const chosenToken = tokens.find((token: any) => token.symbol === cCoin.symbol.toUpperCase());
+          const { numerator, denominator } = convertToFraction(cCoin.amount);
+          const calculation =
+      BigInt(numerator * BigInt(10**chosenToken.decimals)) / BigInt(denominator);
+          argsArray.push({
+            from: cWallet.address as `0x${string}`,
+            to: batchTransferFormStore.receiverAddress as `0x${string}`,
+            amount:calculation,
+            token:chosenToken.address as `0x${string}`
+          })
+        }
+      }
+    }
+    console.log(argsArray);
 
-  //   const receipt = await waitForTransactionReceipt(modalStore.config as Config, {
-  //      hash: transactionHash,
-  //    });
+    const { request } = await simulateContract(modalStore.config, {
+      abi: emethContractAbi,
+      address: emethContractAddress,
+      functionName: "transferBatch",
+      args: [argsArray]
+    });
+    console.log("--> TRANSFER REQUEST", request);
+    formMessageProvider.messages.push({
+      id: formMessageProvider.messages.length,
+      variant: "info",
+      message: "Transferring tokens...",
+      isVisible: true,
+    });
+    const transactionHash = await writeContract(modalStore.config, request);
 
-  //    console.log('[RECEIPT]: ', receipt)
-  //   formMessageProvider.messages.push({
-  //           id: formMessageProvider.messages.length,
-  //           variant: "success",
-  //           message: "Success!",
-  //           isVisible: true,
-  //         });
+    const receipt = await waitForTransactionReceipt(modalStore.config, {
+       hash: transactionHash,
+     });
 
-  // }catch(err){
-  //   console.log('error while tranfering: ', err);
-  //   formMessageProvider.messages.push({
-  //     id: formMessageProvider.messages.length,
-  //     variant: "error",
-  //     message: "Something went wrong.",
-  //     isVisible: true,
-  //   });
-  // }     
+     console.log('[RECEIPT]: ', receipt)
+    formMessageProvider.messages.push({
+            id: formMessageProvider.messages.length,
+            variant: "success",
+            message: "Success!",
+            isVisible: true,
+          });
+        
+   }
+  }catch(err){
+    console.log('error while tranfering: ', err);
+    formMessageProvider.messages.push({
+      id: formMessageProvider.messages.length,
+      variant: "error",
+      message: "Something went wrong.",
+      isVisible: true,
+    });
+  }     
  })
   return (
     <>
