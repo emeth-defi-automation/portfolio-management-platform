@@ -191,9 +191,9 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
     totalValueChange: totalValueChange.toFixed(2),
     period: getSelectedPeriodKey(data as PeriodState),
     chartData: chartData.map((value, index) => [
-      index,
+      chartTimestamps[index],
       parseFloat(value.toFixed(2)),
-    ]) as [number, number][],
+    ]) as [string, number][],
   };
 });
 
@@ -328,9 +328,9 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
     totalValueChange: totalValueChange.toFixed(2),
     period: "24h",
     chartData: chartData.map((value, index) => [
-      index,
+      chartTimestamps[index],
       parseFloat(value.toFixed(2)),
-    ]) as [number, number][],
+    ]) as [string, number][],
   };
 });
 

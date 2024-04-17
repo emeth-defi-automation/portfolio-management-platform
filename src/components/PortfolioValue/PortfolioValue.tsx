@@ -4,6 +4,7 @@ import {
   type QRL,
   type Signal,
   useVisibleTask$,
+  useSignal,
 } from "@builder.io/qwik";
 import IconMaximize from "/public/assets/icons/dashboard/maximize.svg?jsx";
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
@@ -11,13 +12,14 @@ import ImgMinimalize from "/public/assets/icons/minimalize.svg?jsx";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import * as d3 from "d3";
 import { type PeriodState } from "~/interface/balance/Balance";
+import { axisFormatter } from "~/utils/portfolio/axisFormatter";
 
 export interface PortfolioValueProps {
   totalPortfolioValue: string;
   isPortfolioFullScreen: Signal<boolean>;
   portfolioValueChange: string;
   portfolioPercentageValueChange: string;
-  chartData?: [number, number][];
+  chartData: [string, number][];
   onClick$?: QRL<(e: any) => void>;
   selectedPeriod: PeriodState;
   period: string;
@@ -34,17 +36,14 @@ export const PortfolioValue = component$<PortfolioValueProps>(
     chartData,
     period,
   }) => {
+    const outputRef = useSignal<Element>();
     const chart = $(() => {
-      let data: [number, number][] = [];
-      if (chartData) {
-        data = chartData;
-      } else {
-        data = [
-          [0, 0],
-          [0, 0],
-        ];
-      }
+      const data: [Date, number][] = [];
 
+      chartData.forEach((d) => {
+        data.push([new Date(d[0]), d[1]]);
+      });
+      console.log("chart", chartData);
       const max =
         data.reduce(
           (acc, curr) => Math.max(acc, curr[1]),
@@ -57,27 +56,30 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         ) * 0.999;
 
       // Declare the chart dimensions and margins.
-      const width = isPortfolioFullScreen.value ? 1310 : 618;
-      const height = isPortfolioFullScreen.value ? 364 : 170;
-      const marginTop = 10;
-      const marginRight = 0;
+      const width = outputRef.value?.getBoundingClientRect().width ?? 0;
+      const height = outputRef.value?.getBoundingClientRect().height ?? 0;
+      const marginTop = 20;
+      const marginRight = 30;
       const marginBottom = 30;
       const marginLeft = 30;
 
       // Declare the x (horizontal position) scale.
-      const x = d3.scaleLinear(
-        [0, data.length - 1],
-        [marginLeft, width - marginRight],
-      );
+      const scaleX = d3
+        .scaleTime()
+        .domain([new Date(data[0][0]), new Date(data[data.length - 1][0])])
+        .range([marginLeft, width - marginRight]);
 
       // Declare the y (vertical position) scale.
-      const y = d3.scaleLinear([min, max], [height - marginBottom, marginTop]);
+      const scaleY = d3
+        .scaleLinear()
+        .domain([min, max])
+        .range([height - marginBottom, marginTop]);
 
       // Declare the line generator.
       const line = d3
         .line()
-        .x((d) => x(d[0]))
-        .y((d) => y(d[1]));
+        .x((d) => scaleX(d[0]))
+        .y((d) => scaleY(d[1]));
 
       // Create the SVG container.
       const svg = d3.create("svg").attr("width", width).attr("height", height);
@@ -86,12 +88,12 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       svg
         .append("g")
         .attr("transform", `translate(0,${height - marginBottom})`)
-        .attr("opacity", 0.1)
+        .attr("opacity", 0.3)
         .call(
           d3
-            .axisBottom(x)
-            .ticks(3)
-            .tickFormat(d3.format("d"))
+            .axisBottom(scaleX)
+            .tickValues(data.map((d) => d[0]))
+            .tickFormat((d) => axisFormatter(d as Date, selectedPeriod))
             .tickSize(-height + marginTop + marginBottom)
             .tickPadding(12),
         )
@@ -104,10 +106,10 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       svg
         .append("g")
         .attr("transform", `translate(${marginLeft},0)`)
-        .attr("opacity", 0.1)
+        .attr("opacity", 0.3)
         .call(
           d3
-            .axisLeft(y)
+            .axisLeft(scaleY)
             .ticks(5)
             .tickFormat(d3.format("d"))
             .tickSize(-width + marginLeft + marginRight)
@@ -120,14 +122,14 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
       svg
         .append("path")
+        .data([data])
         .attr("fill", "none")
         .attr("stroke", "white")
         .attr("stroke-width", 1)
-        .attr("d", line(data));
+        .attr("d", line as any);
 
       // Append the svg element
-      const container = document.getElementById("container");
-      container!.replaceChildren(svg.node()!);
+      outputRef.value!.replaceChildren(svg.node()!);
     });
 
     // eslint-disable-next-line qwik/no-use-visible-task
@@ -226,7 +228,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
           </div>
         </div>
 
-        <div id="container"></div>
+        <div id="container" ref={outputRef}></div>
         {isPortfolioFullScreen.value && (
           <div class="ml-7">
             <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
