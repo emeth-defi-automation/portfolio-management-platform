@@ -398,7 +398,6 @@ export default component$(() => {
   }
 
   try{
-    console.log('dupa');
    const tokens = await queryTokens();
    console.log(tokens);
    if(modalStore.config){
