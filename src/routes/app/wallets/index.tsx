@@ -542,8 +542,6 @@ export default component$(() => {
                   console.error("Error: ", err);
                 }
               }
-            } else {
-              console.log(`Skipping ${token.symbol}`);
             }
           }
         }
