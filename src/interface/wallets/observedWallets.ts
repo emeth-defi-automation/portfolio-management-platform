@@ -24,7 +24,7 @@ export const GetWalletDetails = z.object({
   chainId: z.number(),
   id: z.string(),
   name: z.string(),
-  address: z.string()
+  address: z.string(),
 });
 
 export type GetWalletDetails = z.infer<typeof GetWalletDetails>;
