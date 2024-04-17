@@ -36,14 +36,14 @@ export const PortfolioValue = component$<PortfolioValueProps>(
     chartData,
     period,
   }) => {
-    const outputRef = useSignal<Element>()
+    const outputRef = useSignal<Element>();
     const chart = $(() => {
       const data: [Date, number][] = [];
 
-      chartData.forEach(d => {
-        data.push([new Date(d[0]), d[1]])
+      chartData.forEach((d) => {
+        data.push([new Date(d[0]), d[1]]);
       });
-      console.log("chart", chartData)
+      console.log("chart", chartData);
       const max =
         data.reduce(
           (acc, curr) => Math.max(acc, curr[1]),
@@ -64,14 +64,16 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       const marginLeft = 30;
 
       // Declare the x (horizontal position) scale.
-      const scaleX = d3.scaleTime()
+      const scaleX = d3
+        .scaleTime()
         .domain([new Date(data[0][0]), new Date(data[data.length - 1][0])])
-        .range([marginLeft, width - marginRight])
+        .range([marginLeft, width - marginRight]);
 
       // Declare the y (vertical position) scale.
-      const scaleY = d3.scaleLinear()
+      const scaleY = d3
+        .scaleLinear()
         .domain([min, max])
-        .range([height - marginBottom, marginTop])
+        .range([height - marginBottom, marginTop]);
 
       // Declare the line generator.
       const line = d3
@@ -90,8 +92,8 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         .call(
           d3
             .axisBottom(scaleX)
-            .tickValues(data.map(d => d[0]))
-            .tickFormat(d => axisFormater(d as Date, selectedPeriod))
+            .tickValues(data.map((d) => d[0]))
+            .tickFormat((d) => axisFormater(d as Date, selectedPeriod))
             .tickSize(-height + marginTop + marginBottom)
             .tickPadding(12),
         )
