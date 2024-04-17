@@ -22,7 +22,7 @@ import { type Token } from "~/interface/token/Token";
 import { contractABI } from "~/abi/abi";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import { ObservedWallet } from "../Wallets/Observed/ObservedWallet";
-import { Balance } from "~/interface/balance/Balance";
+import { type Balance } from "~/interface/balance/Balance";
 import { chainIdToNetworkName } from "~/utils/chains";
 
 export const serverFunction = server$(async function () {

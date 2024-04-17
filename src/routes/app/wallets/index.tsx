@@ -71,7 +71,7 @@ import AmountOfCoins from "~/components/Forms/AmountOfCoins";
 import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
 // import { PendingAuthorization } from "~/components/PendingAuthorization/PendingAuthorization";
 import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
-import { ObservedWalletsList } from "~/components/test/test";
+import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 
 export const useAddWallet = routeAction$(
   async (data, requestEvent) => {
