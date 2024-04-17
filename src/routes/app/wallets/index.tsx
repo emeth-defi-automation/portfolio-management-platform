@@ -74,6 +74,8 @@ import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
 
 export const useAddWallet = routeAction$(
   async (data, requestEvent) => {
+    console.log("data", data);
+
     const db = await connectToDB(requestEvent.env);
     await db.query(
       `DEFINE INDEX walletAddressChainIndex ON TABLE wallet COLUMNS address, chainId UNIQUE;`,
@@ -96,6 +98,7 @@ export const useAddWallet = routeAction$(
         chainId: 1,
         address: data.address.toString(),
         name: data.name.toString(),
+        isExecutable: data.isExecutable === "1" ? true : false,
       });
       walletId = createWalletQueryResult.id;
       const nativeBalance = await testPublicClient.getBalance({
@@ -238,6 +241,7 @@ export const useObservedWallets = routeLoader$(async (requestEvent) => {
         chainId: wallet.chainId,
         address: wallet.address,
         nativeBalance: nativeBalance,
+        isExecutable: wallet.isExecutable,
       },
       tokens: [],
     };
