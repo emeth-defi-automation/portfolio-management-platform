@@ -1,4 +1,4 @@
-import { ButtonWithIcon } from "~/components/Buttons/Buttons";
+import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
 import IconEdit from "/public/assets/icons/portfolio/edit.svg?jsx";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import IconClose from "/public/assets/icons/close.svg?jsx";
@@ -12,11 +12,14 @@ import {
   useSignal,
   useStore,
   useTask$,
+  useContext,
 } from "@builder.io/qwik";
+import { messagesContext } from "../layout";
 import {
   Form,
   routeAction$,
   routeLoader$,
+  server$,
   z,
   zod$,
 } from "@builder.io/qwik-city";
@@ -31,11 +34,40 @@ import { type Wallet } from "~/interface/auth/Wallet";
 import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
 import { structureExists } from "~/interface/structure/removeStructure";
+import {
+  simulateContract,
+  writeContract,
+  waitForTransactionReceipt,
+} from "@wagmi/core";
+import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import { emethContractAbi } from "~/abi/emethContractAbi";
+import { getCookie } from "~/utils/refresh";
+import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
+import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
+import Destination from "~/components/Forms/portfolioTransfters/Destination";
+import { convertToFraction } from "../wallets";
 
 type WalletWithBalance = {
-  wallet: { id: string; chainID: number; name: string };
+  wallet: { id: string; chainID: number; name: string; address: string };
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
 };
+type CoinObject = {
+  symbol: string;
+  amount: string;
+};
+type CoinToApprove = {
+  wallet: string;
+  address: string;
+  coins: CoinObject[];
+};
+type StructureToApprove = {
+  name: string;
+  coins: CoinToApprove[];
+};
+export interface BatchTransferFormStore {
+  receiverAddress: string;
+  coinsToTransfer: StructureToApprove[];
+}
 export const useDeleteStructure = routeAction$(
   async (structure, requestEvent) => {
     const db = await connectToDB(requestEvent.env);
@@ -260,13 +292,23 @@ export const useCreateStructure = routeAction$(
     balancesId: z.array(z.string()),
   }),
 );
+const queryTokens = server$(async function () {
+  const db = await connectToDB(this.env);
 
+  const [tokens]: any = await db.query(
+    `SELECT decimals, symbol, address FROM token;`,
+  );
+  return tokens;
+});
 export default component$(() => {
+  const modalStore = useContext(ModalStoreContext);
   const clickedToken = useStore({ balanceId: "", structureId: "" });
   const structureStore = useStore({ name: "" });
   const selectedWallets = useStore({ wallets: [] as any[] });
   const isCreateNewStructureModalOpen = useSignal(false);
+  const isTransferModalOpen = useSignal(false);
   const deleteToken = useDeleteToken();
+  const formMessageProvider = useContext(messagesContext);
   const availableStructures = useAvailableStructures();
   const createStructureAction = useCreateStructure();
   const deleteStructureAction = useDeleteStructure();
@@ -280,7 +322,11 @@ export default component$(() => {
     selection: [] as { balanceId: string; status: boolean }[],
   });
   const availableBalances = useSignal<number>(0);
-
+  const stepsCounter = useSignal(1);
+  const batchTransferFormStore = useStore<BatchTransferFormStore>({
+    receiverAddress: "",
+    coinsToTransfer: [],
+  });
   useTask$(async ({ track }) => {
     track(() => {
       clickedToken.structureId;
@@ -330,6 +376,81 @@ export default component$(() => {
     },
   );
 
+  const handleBatchTransfer = $(async () => {
+    //  watchAccount
+    const cookie = getCookie("accessToken");
+
+    if (!cookie) throw new Error("No accessToken cookie found");
+
+    const emethContractAddress = import.meta.env
+      .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
+
+    if (!emethContractAddress) {
+      throw new Error("Missing PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA");
+    }
+
+    try {
+      const tokens = await queryTokens();
+      if (modalStore.config) {
+        const argsArray = [];
+        for (const cStructure of batchTransferFormStore.coinsToTransfer) {
+          for (const cWallet of cStructure.coins) {
+            for (const cCoin of cWallet.coins) {
+              const chosenToken = tokens.find(
+                (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
+              );
+              const { numerator, denominator } = convertToFraction(
+                cCoin.amount,
+              );
+              const calculation =
+                BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
+                BigInt(denominator);
+              argsArray.push({
+                from: cWallet.address as `0x${string}`,
+                to: batchTransferFormStore.receiverAddress as `0x${string}`,
+                amount: calculation,
+                token: chosenToken.address as `0x${string}`,
+              });
+            }
+          }
+        }
+
+        const { request } = await simulateContract(modalStore.config, {
+          abi: emethContractAbi,
+          address: emethContractAddress,
+          functionName: "transferBatch",
+          args: [argsArray],
+        });
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "info",
+          message: "Transferring tokens...",
+          isVisible: true,
+        });
+        const transactionHash = await writeContract(modalStore.config, request);
+
+        await waitForTransactionReceipt(modalStore.config, {
+          hash: transactionHash,
+        });
+        batchTransferFormStore.receiverAddress = "";
+        batchTransferFormStore.coinsToTransfer = [];
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "success",
+          message: "Success!",
+          isVisible: true,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      formMessageProvider.messages.push({
+        id: formMessageProvider.messages.length,
+        variant: "error",
+        message: "Something went wrong.",
+        isVisible: true,
+      });
+    }
+  });
   return (
     <>
       <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
@@ -343,6 +464,24 @@ export default component$(() => {
               image="/assets/icons/portfolio/transfer.svg"
               text="Transfer"
               class="custom-border-2"
+              onClick$={async () => {
+                for (const structure of availableStructures.value) {
+                  const coins = [];
+                  for (const wallet of structure.structureBalance) {
+                    const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.name === wallet.wallet.name)?.wallet.address}`;
+                    coins.push({
+                      wallet: wallet.wallet.name,
+                      address: walletAddress,
+                      coins: [],
+                    });
+                  }
+                  batchTransferFormStore.coinsToTransfer.push({
+                    name: structure.structure.name,
+                    coins: coins,
+                  });
+                }
+                isTransferModalOpen.value = true;
+              }}
             />
             <ButtonWithIcon
               image="/assets/icons/portfolio/add.svg"
@@ -408,7 +547,68 @@ export default component$(() => {
                 />
               ))}
             </div>
-
+            {isTransferModalOpen.value ? (
+              <Modal
+                title="Transfer Funds"
+                isOpen={isTransferModalOpen}
+                onClose={$(() => {
+                  batchTransferFormStore.receiverAddress = "";
+                  batchTransferFormStore.coinsToTransfer = [];
+                  stepsCounter.value = 1;
+                })}
+              >
+                <div class="flex flex-col overflow-y-scroll">
+                  {stepsCounter.value === 1 ? (
+                    <CoinsToTransfer
+                      availableStructures={availableStructures}
+                      batchTransferFormStore={batchTransferFormStore}
+                    />
+                  ) : null}
+                  {stepsCounter.value === 2 ? (
+                    <CoinsAmounts
+                      availableStructures={availableStructures}
+                      batchTransferFormStore={batchTransferFormStore}
+                    />
+                  ) : null}
+                  {stepsCounter.value === 3 ? (
+                    <Destination
+                      availableStructures={availableStructures}
+                      batchTransferFormStore={batchTransferFormStore}
+                    />
+                  ) : null}
+                </div>
+                <div class="flex gap-4">
+                  <Button
+                    class="custom-border-1 w-full bg-transparent  disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
+                    onClick$={async () => {
+                      if (stepsCounter.value > 1) {
+                        stepsCounter.value = stepsCounter.value - 1;
+                      } else {
+                        batchTransferFormStore.receiverAddress = "";
+                        batchTransferFormStore.coinsToTransfer = [];
+                        stepsCounter.value = 1;
+                        isTransferModalOpen.value = false;
+                      }
+                    }}
+                    type="button"
+                    text={stepsCounter.value === 1 ? "Cancel" : "Back"}
+                  />
+                  <Button
+                    class="w-full border-0 bg-customBlue disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
+                    onClick$={async () => {
+                      if (stepsCounter.value === 3) {
+                        isTransferModalOpen.value = false;
+                        stepsCounter.value = 1;
+                        await handleBatchTransfer();
+                      } else {
+                        stepsCounter.value = stepsCounter.value + 1;
+                      }
+                    }}
+                    text={stepsCounter.value === 3 ? "Send" : "Next"}
+                  />
+                </div>
+              </Modal>
+            ) : null}
             {isCreateNewStructureModalOpen.value && (
               <Modal
                 isOpen={isCreateNewStructureModalOpen}
@@ -494,8 +694,8 @@ export default component$(() => {
                         <p class="text-xs uppercase text-white">
                           <span class="bg-gradient-to-r from-red-600 via-orange-400 to-pink-500 bg-clip-text font-semibold text-transparent">
                             {selectedWallets.wallets.length} wallets
-                          </span>{" "}
-                          selected{" "}
+                          </span>
+                          selected
                         </p>
                         <div class="relative">
                           <label class="flex h-6 items-center gap-3">

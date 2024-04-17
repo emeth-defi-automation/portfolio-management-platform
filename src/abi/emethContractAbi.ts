@@ -1,18 +1,97 @@
 export const emethContractAbi = [
   {
     type: "function",
+    name: "allowance",
+    inputs: [
+      {
+        name: "_owner",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "_spender",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "approvals",
     inputs: [
-      { name: "", type: "address", internalType: "address" },
-      { name: "", type: "address", internalType: "address" },
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "approve",
-    inputs: [{ name: "_user", type: "address", internalType: "address" }],
+    inputs: [
+      {
+        name: "_user",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "transferBatch",
+    inputs: [
+      {
+        name: "transfers",
+        type: "tuple[]",
+        internalType: "struct TokenDelegator.Transfer[]",
+        components: [
+          {
+            name: "token",
+            type: "address",
+            internalType: "contract IERC20",
+          },
+          {
+            name: "from",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "to",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "amount",
+            type: "uint256",
+            internalType: "uint256",
+          },
+        ],
+      },
+    ],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -25,9 +104,21 @@ export const emethContractAbi = [
         type: "address",
         internalType: "contract IERC20",
       },
-      { name: "_from", type: "address", internalType: "address" },
-      { name: "_to", type: "address", internalType: "address" },
-      { name: "_amount", type: "uint256", internalType: "uint256" },
+      {
+        name: "_from",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "_to",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
