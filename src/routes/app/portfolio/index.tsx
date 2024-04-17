@@ -46,8 +46,9 @@ import {
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import { getCookie } from "~/utils/refresh";
-import { FormBadge } from "~/components/FormBadge/FormBadge";
-import CoinsToApprove from "~/components/Forms/CoinsToApprove";
+import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
+import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
+import Destination from "~/components/Forms/portfolioTransfters/Destination";
 interface ModalStore {
   isConnected?: boolean;
   config?: NoSerialize<Config>;
@@ -58,7 +59,8 @@ type WalletWithBalance = {
 };
 type CoinObject = {
   symbol: string;
-  amount: BigInt;
+  amount: string;
+
 }
 type CoinToApprove = {
   wallet: string;
@@ -320,6 +322,7 @@ export default component$(() => {
     selection: [] as { balanceId: string; status: boolean }[],
   });
   const availableBalances = useSignal<number>(0);
+  const stepsCounter = useSignal(1);
   const batchTransferFormStore = useStore<BatchTransferFormStore>({
     receiverAddress: "",
     coinsToTransfer: [],
@@ -540,71 +543,35 @@ export default component$(() => {
             {
               isTransferModalOpen.value ? <Modal title="Transfer Funds" isOpen={isTransferModalOpen}>
                 <div class="flex flex-col overflow-y-scroll">
-                  {
-                    availableStructures.value.map((structure, index) => (
-                      <div class="flex flex-col" key={`${structure.name}${index}`}>
-                        <p>{structure.structure.name}</p>
-                        <div class="flex flex-col p-2 custom-border-1">
-                          {structure.structureBalance.map((balance:any, index: number) => (
-                            <FormBadge key={index}
-                            class="mb-2"
-                            description={balance.wallet.name}
-                            image={`/assets/icons/tokens/${balance.balance.symbol.toLowerCase()}.svg`}
-                            for={`${structure.structure.name}${balance.balance.symbol}`}
-                            input={ <input
-                              id={`${structure.structure.name}${balance.balance.symbol}`}
-                              name={`${structure.structure.name}${balance.balance.symbol}`}
-                              type="checkbox"
-                              value={`${structure.structure.name}${balance.balance.symbol}`}
-                              class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10  h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                              checked={false}
-                             
-                              onClick$={() => {
-                                console.log('Adding that bitch..')
-                                const x = batchTransferFormStore.coinsToTransfer.find(item => item.name === structure.structure.name);
-                                if(x){
-                                  const y = x.coins.find(item => item.wallet === balance.wallet.name);
-                                  if(y){    
-                                    if(!y.coins.find(coin => coin.symbol === balance.balance.symbol)){
-                                      console.log('pushnalem')
-                                      y.coins.push({
-                                        symbol: balance.balance.symbol,
-                                        amount: BigInt(0)
-                                      })
-                                    }else {
-                                      const element = y.coins.find(coin => coin.symbol === balance.balance.symbol)!;
-                                      const indexToRemove = y.coins.indexOf(element);
-                                      y.coins.splice(indexToRemove, 1);
-                                    }
-                                    
-                                  } 
-                                }
-                                
-                              }}
-                            />
-                            }
-                            />
-                            ))}
-                        </div>
-                      </div> 
-                    ))
-                  }
+                  {stepsCounter.value === 1 ? <CoinsToTransfer availableStructures={availableStructures} batchTransferFormStore={batchTransferFormStore}/> :null}
+                  {stepsCounter.value === 2 ? <CoinsAmounts availableStructures={availableStructures} batchTransferFormStore={batchTransferFormStore}/> :null}
+                  {stepsCounter.value === 3 ? <Destination availableStructures={availableStructures} batchTransferFormStore={batchTransferFormStore}/> :null}
+                 
                 </div>
                 <div class="flex gap-4">
                 <Button
                   class="custom-border-1 w-full bg-transparent  disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
                   onClick$={async () => {
-                   
+                   if(stepsCounter.value > 1){
+                    stepsCounter.value = stepsCounter.value -1
+                   }else {
+                    //clear the form
+                   }
                   }}
                   type="button"
-                  text="Cancel"
+                  text={stepsCounter.value === 1 ? 'Cancel' : 'Back'}
                 />
                   <Button
                   class="w-full border-0 bg-customBlue disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
                   onClick$={async () => {
-                    await handleBatchTransfer();
+                    if(stepsCounter.value === 3){
+                      await handleBatchTransfer();
+                    } else {
+                      stepsCounter.value = stepsCounter.value + 1
+                    }
+                    
                   }}
-                  text="Next"
+                  text={stepsCounter.value === 3 ? 'Send' : 'Next'}
                 />
                 </div>
               </Modal> : null 
