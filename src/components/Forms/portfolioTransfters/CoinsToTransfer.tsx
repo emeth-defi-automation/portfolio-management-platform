@@ -42,7 +42,7 @@ export default component$<CoinsToTransferProps>(({ batchTransferFormStore, avail
                                       console.log('pushnalem')
                                       y.coins.push({
                                         symbol: balance.balance.symbol,
-                                        amount: BigInt(0)
+                                        amount: '0'
                                       })
                                     }else {
                                       const element = y.coins.find(coin => coin.symbol === balance.balance.symbol)!;
