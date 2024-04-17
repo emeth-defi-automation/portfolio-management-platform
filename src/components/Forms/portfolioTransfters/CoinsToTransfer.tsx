@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
-import { BatchTransferFormStore } from "~/routes/app/portfolio";
+import { type BatchTransferFormStore } from "~/routes/app/portfolio";
 
 export interface CoinsToTransferProps {
   batchTransferFormStore: BatchTransferFormStore;

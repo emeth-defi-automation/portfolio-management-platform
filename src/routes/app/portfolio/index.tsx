@@ -12,9 +12,7 @@ import {
   useSignal,
   useStore,
   useTask$,
-  type NoSerialize,
   useContext,
-  useVisibleTask$,
 } from "@builder.io/qwik";
 import { messagesContext } from "../layout";
 import {
@@ -37,12 +35,8 @@ import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
 import { structureExists } from "~/interface/structure/removeStructure";
 import {
-  getAccount,
   simulateContract,
-  watchAccount,
   writeContract,
-  type Config,
-  readContract,
   waitForTransactionReceipt,
 } from "@wagmi/core";
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
@@ -52,10 +46,7 @@ import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTrans
 import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
 import Destination from "~/components/Forms/portfolioTransfters/Destination";
 import { convertToFraction } from "../wallets";
-interface ModalStore {
-  isConnected?: boolean;
-  config?: NoSerialize<Config>;
-}
+
 type WalletWithBalance = {
   wallet: { id: string; chainID: number; name: string; address: string };
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
@@ -400,7 +391,6 @@ export default component$(() => {
 
     try {
       const tokens = await queryTokens();
-      console.log(tokens);
       if (modalStore.config) {
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
@@ -424,7 +414,6 @@ export default component$(() => {
             }
           }
         }
-        console.log(argsArray);
 
         const { request } = await simulateContract(modalStore.config, {
           abi: emethContractAbi,
@@ -432,7 +421,6 @@ export default component$(() => {
           functionName: "transferBatch",
           args: [argsArray],
         });
-        console.log("--> TRANSFER REQUEST", request);
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "info",
@@ -441,11 +429,10 @@ export default component$(() => {
         });
         const transactionHash = await writeContract(modalStore.config, request);
 
-        const receipt = await waitForTransactionReceipt(modalStore.config, {
+        await waitForTransactionReceipt(modalStore.config, {
           hash: transactionHash,
         });
 
-        console.log("[RECEIPT]: ", receipt);
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "success",
@@ -454,7 +441,6 @@ export default component$(() => {
         });
       }
     } catch (err) {
-      console.log("error while tranfering: ", err);
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "error",
