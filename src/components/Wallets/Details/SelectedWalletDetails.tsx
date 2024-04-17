@@ -38,7 +38,9 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             <div class="mt-4 flex gap-2">
               <span class="custom-btn-gradient flex h-7 items-center rounded-lg px-[1px] text-xs ">
                 <div class="flex h-[26px] items-center rounded-lg bg-black px-3">
-                  Executable
+                  {selectedWallet.value.wallet.isExecutable
+                    ? "Executable"
+                    : "Read-only"}
                 </div>
               </span>
               <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">

@@ -1,5 +1,5 @@
 import { $, type Signal, component$ } from "@builder.io/qwik";
-import IconMenuDots from "/public/assets/icons/menu-dots.svg?jsx";
+// import IconMenuDots from "/public/assets/icons/menu-dots.svg?jsx";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
 import {
   Image,
