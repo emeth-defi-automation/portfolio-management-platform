@@ -71,8 +71,8 @@
     "@moralisweb3/common-evm-utils": "2.25.4",
     "@wagmi/connectors": "4.1.26",
     "@wagmi/core": "2.6.17",
-    "@web3modal/siwe": "4.1.8",
-    "@web3modal/wagmi": "4.1.8",
+    "@web3modal/siwe": "4.1.9",
+    "@web3modal/wagmi": "4.1.9",
     "d3": "7.9.0",
     "jsonwebtoken": "9.0.2",
     "jwt-decode": "4.0.0",
@@ -81,6 +81,6 @@
     "siwe": "2.3.1",
     "surrealdb.js": "0.11.0",
     "tailwind-merge": "2.2.2",
-    "viem": "2.9.19"
+    "viem": "2.9.20"
   }
 }
