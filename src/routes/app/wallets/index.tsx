@@ -719,7 +719,7 @@ export default component$(() => {
             />
           ))}
         </div> */}
-        <ObservedWalletsList />
+        <ObservedWalletsList selectedWallet={selectedWallet} />
       </div>
 
       <div class="grid gap-6">

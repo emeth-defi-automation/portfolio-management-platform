@@ -1,5 +1,6 @@
 import {
   component$,
+  Signal,
   useSignal,
   useTask$,
   useVisibleTask$,
@@ -157,27 +158,31 @@ export const serverFunction = server$(async function () {
   return observedWallets;
 });
 
-export const ObservedWalletsList = component$(() => {
-  const observedWallets = useSignal<WalletTokensBalances[]>([]);
-  const selectedWallet = useSignal<WalletTokensBalances | null>(null);
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async () => {
-    observedWallets.value = await serverFunction();
-    console.log("====================================");
+interface ObservedWalletsListProps {
+  selectedWallet: Signal<WalletTokensBalances | null>;
+}
 
-    console.log(observedWallets);
-  });
+export const ObservedWalletsList = component$<ObservedWalletsListProps>(
+  ({ selectedWallet }) => {
+    const observedWallets = useSignal<WalletTokensBalances[]>([]);
+    // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(async () => {
+      observedWallets.value = await serverFunction();
+      console.log("====================================");
+      console.log(observedWallets);
+    });
 
-  return (
-    <div class="">
-      {observedWallets.value.map((observedWallet) => (
-        <ObservedWallet
-          key={observedWallet.wallet.address}
-          observedWallet={observedWallet}
-          selectedWallet={selectedWallet}
-          chainIdToNetworkName={chainIdToNetworkName}
-        />
-      ))}
-    </div>
-  );
-});
+    return (
+      <div class="">
+        {observedWallets.value.map((observedWallet) => (
+          <ObservedWallet
+            key={observedWallet.wallet.address}
+            observedWallet={observedWallet}
+            selectedWallet={selectedWallet}
+            chainIdToNetworkName={chainIdToNetworkName}
+          />
+        ))}
+      </div>
+    );
+  },
+);
