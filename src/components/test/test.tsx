@@ -1,4 +1,9 @@
-import { component$, useSignal, useTask$ } from "@builder.io/qwik";
+import {
+  component$,
+  useSignal,
+  useTask$,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
 import { connectToDB } from "~/utils/db";
 import jwt, { type JwtPayload } from "jsonwebtoken";
@@ -16,6 +21,8 @@ import { type Token } from "~/interface/token/Token";
 import { contractABI } from "~/abi/abi";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import { ObservedWallet } from "../Wallets/Observed/ObservedWallet";
+import { Balance } from "~/interface/balance/Balance";
+import { chainIdToNetworkName } from "~/utils/chains";
 
 export const serverFunction = server$(async function () {
   const db = await connectToDB(this.env);
@@ -150,10 +157,14 @@ export const serverFunction = server$(async function () {
   return observedWallets;
 });
 
-export default component$(() => {
-  const observedWallets = useSignal([] as any);
-  useTask$(async () => {
+export const ObservedWalletsList = component$(() => {
+  const observedWallets = useSignal<WalletTokensBalances[]>([]);
+  const selectedWallet = useSignal<WalletTokensBalances | null>(null);
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async () => {
     observedWallets.value = await serverFunction();
+    console.log("====================================");
+
     console.log(observedWallets);
   });
 
