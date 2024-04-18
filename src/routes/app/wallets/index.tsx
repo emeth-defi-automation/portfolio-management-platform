@@ -561,17 +561,6 @@ export default component$(() => {
             class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
           />
         </div>
-
-        {/* <div class="">
-          {observedWallets.value.map((observedWallet) => (
-            <ObservedWallet
-              key={observedWallet.wallet.address}
-              observedWallet={observedWallet}
-              selectedWallet={selectedWallet}
-              chainIdToNetworkName={chainIdToNetworkName}
-            />
-          ))}
-        </div> */}
         <ObservedWalletsList
           observedWallets={observedWallets}
           selectedWallet={selectedWallet}
