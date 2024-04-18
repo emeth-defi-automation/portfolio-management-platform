@@ -2,13 +2,13 @@ import {
   $,
   component$,
   type NoSerialize,
+  noSerialize,
   useContext,
   useSignal,
   useStore,
-  noSerialize,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { Form, routeAction$, zod$, z, server$ } from "@builder.io/qwik-city";
+import { Form, routeAction$, server$, z, zod$ } from "@builder.io/qwik-city";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { contractABI } from "~/abi/abi";
 import { type Wallet } from "~/interface/auth/Wallet";
@@ -18,8 +18,8 @@ import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type Balance } from "~/interface/balance/Balance";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { isAddress, checksumAddress } from "viem";
-import { isValidName, isValidAddress } from "~/utils/validators/addWallet";
+import { checksumAddress, isAddress } from "viem";
+import { isValidAddress, isValidName } from "~/utils/validators/addWallet";
 import {
   getUsersObservingWallet,
   walletExists,
@@ -41,13 +41,13 @@ import { messagesContext } from "../layout";
 import { Readable } from "node:stream";
 import { type Chain, sepolia } from "viem/chains";
 import {
+  type Config,
   getAccount,
+  readContract,
   simulateContract,
+  waitForTransactionReceipt,
   watchAccount,
   writeContract,
-  type Config,
-  readContract,
-  waitForTransactionReceipt,
   disconnect,
 } from "@wagmi/core";
 import { returnWeb3ModalAndClient } from "~/components/WalletConnect";
@@ -138,6 +138,67 @@ export const useAddWallet = routeAction$(
   }),
 );
 
+export const useGetBalanceHistory = routeAction$(async (data) => {
+  const walletTransactions = await getErc20TokenTransfers(
+    null,
+    data.address as string,
+  );
+
+  const balances = walletTransactions.map(
+    async (tx: { block_number: string }) => {
+      return getWalletBalance(tx.block_number, data.address as string);
+    },
+  );
+
+  const responses = await Promise.all(balances);
+  for (const item of responses) {
+    console.log(item);
+  }
+});
+
+async function getErc20TokenTransfers(cursor: string | null, address: string) {
+  let allEntries: any = [];
+  try {
+    const response = await Moralis.EvmApi.token.getWalletTokenTransfers({
+      chain: EvmChain.SEPOLIA,
+      order: "ASC",
+      cursor: cursor as string,
+      contractAddresses: [
+        "0x054E1324CF61fe915cca47C48625C07400F1B587",
+        "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
+        "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
+      ],
+      address: address,
+    });
+    allEntries = allEntries.concat(response.raw.result);
+
+    if (response.raw.cursor) {
+      allEntries = allEntries.concat(
+        await getErc20TokenTransfers(response.raw.cursor, address),
+      );
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return allEntries;
+}
+
+async function getWalletBalance(block: string, address: string) {
+  try {
+    return Moralis.EvmApi.token.getWalletTokenBalances({
+      chain: EvmChain.SEPOLIA,
+      toBlock: parseInt(block),
+      tokenAddresses: [
+        "0x054E1324CF61fe915cca47C48625C07400F1B587",
+        "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
+        "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
+      ],
+      address: address,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
 export const useRemoveWallet = routeAction$(
   async (wallet, requestEvent) => {
     const db = await connectToDB(requestEvent.env);
@@ -301,7 +362,8 @@ export default component$(() => {
     coinsToCount: [],
     coinsToApprove: [],
   });
-  // const moralisTokenBalancesAction = useMoralisBalance();
+  const getWalletBalanceHistory = useGetBalanceHistory();
+
   const temporaryModalStore = useStore<ModalStore>({
     isConnected: false,
     config: undefined,
@@ -442,6 +504,9 @@ export default component$(() => {
       });
       if (success) {
         observedWallets.value = await getObservedWallets();
+        await getWalletBalanceHistory.submit({
+          address: addWalletFormStore.address,
+        });
       }
 
       formMessageProvider.messages.push({
@@ -478,7 +543,6 @@ export default component$(() => {
   });
 
   const handleReadBalances = $(async (wallet: string) => {
-    // const tokenBalances = await moralisTokenBalancesAction.submit({ wallet });
     const tokenBalances = await getMoralisBalance({ wallet });
 
     walletTokenBalances.value = tokenBalances.tokens;
