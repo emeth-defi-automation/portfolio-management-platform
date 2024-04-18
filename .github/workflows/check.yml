@@ -7,7 +7,7 @@ on:
     branches: ["master"]
 
 env:
-  NODE_VERSION: "21.6.2"
+  NODE_VERSION: "21.7.3"
 
 jobs:
   check:
