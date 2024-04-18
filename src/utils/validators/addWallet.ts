@@ -56,13 +56,4 @@ export const isNameUnique = server$(async function (name: string) {
     }
   }
   return true;
-
-  //const queryResult = (
-  //  await db.query(`SELECT count() as total FROM wallet WHERE name = '${name}'`)
-  //).at(0);
-  //const parsedQueryResult = UniqueNameResult.array().parse(queryResult);
-  //if (parsedQueryResult.length === 0) {
-  //  return true;
-  //}
-  //return parsedQueryResult[0].total === 0;
 });
