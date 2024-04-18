@@ -25,7 +25,7 @@ import { type Balance } from "~/interface/balance/Balance";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Spinner } from "../Spinner/Spinner";
 
-export const serverFunction = server$(async function () {
+export const getObservedWallets = server$(async function () {
   const db = await connectToDB(this.env);
 
   const cookie = this.cookie.get("accessToken");
@@ -160,18 +160,16 @@ export const serverFunction = server$(async function () {
 
 interface ObservedWalletsListProps {
   selectedWallet: Signal<WalletTokensBalances | null>;
+  observedWallets: Signal<WalletTokensBalances[]>;
 }
 
 export const ObservedWalletsList = component$<ObservedWalletsListProps>(
-  ({ selectedWallet }) => {
+  ({ selectedWallet, observedWallets }) => {
     const isLoading = useSignal(true);
-    const observedWallets = useSignal<WalletTokensBalances[]>([]);
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async () => {
-      observedWallets.value = await serverFunction();
+      observedWallets.value = await getObservedWallets();
       isLoading.value = false;
-      console.log("====================================");
-      console.log(observedWallets);
     });
 
     return (

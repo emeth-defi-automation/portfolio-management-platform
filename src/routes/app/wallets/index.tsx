@@ -56,7 +56,10 @@ import AmountOfCoins from "~/components/Forms/AmountOfCoins";
 import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
 // import { PendingAuthorization } from "~/components/PendingAuthorization/PendingAuthorization";
 import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
-import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
+import {
+  getObservedWallets,
+  ObservedWalletsList,
+} from "~/components/ObservedWalletsList/ObservedWalletsList";
 
 export const useAddWallet = routeAction$(
   async (data, requestEvent) => {
@@ -263,7 +266,7 @@ export default component$(() => {
   const { streamId } = useContext(StreamStoreContext);
   const addWalletAction = useAddWallet();
   const removeWalletAction = useRemoveWallet();
-  // const observedWallets = useObservedWallets();
+  const observedWallets = useSignal<WalletTokensBalances[]>([]);
   const isAddWalletModalOpen = useSignal(false);
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
@@ -380,14 +383,9 @@ export default component$(() => {
 
                 // keep receipts for now, to use waitForTransactionReceipt
                 try {
-                  const receipt = await writeContract(
+                  await writeContract(
                     temporaryModalStore.config,
                     approval.request,
-                  );
-
-                  console.log(
-                    `Contract for ${token.symbol} has been written... `,
-                    receipt,
                   );
                 } catch (err) {
                   console.error("Error: ", err);
@@ -416,11 +414,16 @@ export default component$(() => {
         await writeContract(temporaryModalStore.config as Config, request);
       }
 
-      await addWalletAction.submit({
+      const {
+        value: { success },
+      } = await addWalletAction.submit({
         address: addWalletFormStore.address as `0x${string}`,
         name: addWalletFormStore.name,
         isExecutable: addWalletFormStore.isExecutable.toString(),
       });
+      if (success) {
+        observedWallets.value = await getObservedWallets();
+      }
 
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
@@ -569,7 +572,10 @@ export default component$(() => {
             />
           ))}
         </div> */}
-        <ObservedWalletsList selectedWallet={selectedWallet} />
+        <ObservedWalletsList
+          observedWallets={observedWallets}
+          selectedWallet={selectedWallet}
+        />
       </div>
 
       <div class="grid gap-6">
