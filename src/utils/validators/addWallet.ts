@@ -46,7 +46,6 @@ export const isNameUnique = server$(async function (name: string) {
   const [result]: any = await db.query(
     `SELECT VALUE ->observes_wallet.out FROM ${userId};`,
   );
-  if (!result) throw new Error("No observed wallets");
 
   const observedWalletsQueryResult = result[0];
   for (const observedWallet of observedWalletsQueryResult) {
