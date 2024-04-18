@@ -1,4 +1,11 @@
-import { $, component$, useSignal, useStore, useTask$ } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  useSignal,
+  useStore,
+  useTask$,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { PortfolioValue } from "~/components/PortfolioValue/PortfolioValue";
 import { ActionAlertMessage } from "~/components/ActionAlertsMessage/ActionAlertsMessage";
 import {
@@ -8,7 +15,12 @@ import {
 import { TokenRow } from "~/components/Tokens/TokenRow";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { connectToDB } from "~/utils/db";
-import { routeAction$, routeLoader$, useNavigate } from "@builder.io/qwik-city";
+import {
+  routeAction$,
+  routeLoader$,
+  server$,
+  useNavigate,
+} from "@builder.io/qwik-city";
 import {
   fetchTokenDayData,
   getDBTokenPriceUSD,
@@ -34,6 +46,7 @@ import {
   getSelectedPeriodKey,
 } from "~/utils/timestamps/timestamp";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
+import { Spinner } from "~/components/Spinner/Spinner";
 
 function mapTokenAddress(sepoliaAddress: string): any {
   const tokenMap: any = {
@@ -197,10 +210,10 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
   };
 });
 
-export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
-  const db = await connectToDB(requestEvent.env);
+export const getPortfolio24hChange = server$(async function () {
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
@@ -330,18 +343,16 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
   };
 });
 
-export const useTotalPortfolioValue = routeLoader$(async (requestEvent) => {
-  const db = await connectToDB(requestEvent.env);
+export const getTotalPortfolioValue = server$(async function () {
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
-  const uniswapSubgraphURL = requestEvent.env.get(
-    "UNIV3_OPTIMIST_SUBGRAPH_URL",
-  );
+  const uniswapSubgraphURL = this.env.get("UNIV3_OPTIMIST_SUBGRAPH_URL");
   if (!uniswapSubgraphURL) {
     throw new Error("Missing UNISWAP_SUBGRAPH_URL");
   }
@@ -420,10 +431,10 @@ export const useTotalPortfolioValue = routeLoader$(async (requestEvent) => {
   return totalValue.toFixed(2);
 });
 
-export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
-  const db = await connectToDB(requestEvent.env);
+export const getFavouriteTokens = server$(async function () {
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
@@ -490,13 +501,36 @@ export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const nav = useNavigate();
   const isPortfolioFullScreen = useSignal(false);
-  const totalPortfolioValue = useTotalPortfolioValue();
-  const favoriteTokens = useGetFavoriteTokens();
+  // const totalPortfolioValue = useTotalPortfolioValue();
+  const totalPortfolioValue = useSignal("0");
+  const totalPortfolioValueLoading = useSignal(true);
+
+  // const portfolioValueChange = usePortfolio24hChange();
+  const portfolioValueChange = useSignal<any>({});
+  const portfolioValueChangeLoading = useSignal(true);
+
+  // const favoriteTokens = useGetFavoriteTokens();
+  const favoriteTokenLoading = useSignal(true);
+  const favoriteTokens = useSignal<any[]>([]);
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async () => {
+    portfolioValueChange.value = await getPortfolio24hChange();
+    portfolioValueChangeLoading.value = false;
+
+    totalPortfolioValue.value = await getTotalPortfolioValue();
+    totalPortfolioValueLoading.value = false;
+
+    favoriteTokens.value = await getFavouriteTokens();
+    favoriteTokenLoading.value = false;
+  });
+
   const toggleChart = useToggleChart();
-  const portfolioValueChange = usePortfolio24hChange();
+
   const chartDataStore = useStore({
     data: portfolioValueChange.value.chartData,
   });
+
+  // TODO: get rid of that?
   const portfolioValueStore = useStore({
     selectedPeriodLabel: portfolioValueChange.value.period,
     portfolioValueChange: portfolioValueChange.value.totalValueChange,
@@ -651,7 +685,16 @@ export default component$(() => {
             <div class=""></div>
           </div>
           <div>
-            {favoriteTokens.value[0] &&
+            {favoriteTokenLoading.value ? (
+              <div class="flex flex-col items-center pt-12">
+                <Spinner />
+              </div>
+            ) : favoriteTokens.value.length === 0 ? (
+              <div class="flex flex-col items-center pt-12">
+                <span>No wallets added yet</span>
+              </div>
+            ) : (
+              favoriteTokens.value[0] &&
               favoriteTokens.value[0].structureBalance.map(
                 async (token: any, index: number) => {
                   const formattedBalance = convertWeiToQuantity(
@@ -675,7 +718,8 @@ export default component$(() => {
                     />
                   );
                 },
-              )}
+              )
+            )}
           </div>
         </div>
       </div>
