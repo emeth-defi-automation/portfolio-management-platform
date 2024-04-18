@@ -12,7 +12,7 @@ import ImgMinimalize from "/public/assets/icons/minimalize.svg?jsx";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import * as d3 from "d3";
 import { type PeriodState } from "~/interface/balance/Balance";
-import { axisFormatter } from "~/utils/portfolio/axisFormatter";
+import { axisXFormatter, axisYFormatter } from "~/utils/portfolio/axisFormatter";
 
 export interface PortfolioValueProps {
   totalPortfolioValue: string;
@@ -61,7 +61,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       const marginTop = 20;
       const marginRight = 30;
       const marginBottom = 30;
-      const marginLeft = 30;
+      const marginLeft = 60;
 
       // Declare the x (horizontal position) scale.
       const scaleX = d3
@@ -74,7 +74,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         .scaleLinear()
         .domain([min, max])
         .range([height - marginBottom, marginTop]);
-
+        
       // Declare the line generator.
       const line = d3
         .line()
@@ -83,17 +83,35 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
       // Create the SVG container.
       const svg = d3.create("svg").attr("width", width).attr("height", height);
+      console.log("Y", scaleY.ticks())
+
+      // Define the gradient
+      //const gradient = svg.append("defs")
+      //  .append("linearGradient")
+      //  .attr("id", "gradient")
+      //  .attr("x1", "0%")
+      //  .attr("y1", "0%")
+      //  .attr("x2", "100%")
+      //  .attr("y2", "100%");
+
+      //gradient.append("stop")
+      //  .attr("offset", "0%")
+      //  .attr("stop-color", "blue");
+
+      //gradient.append("stop")
+      //  .attr("offset", "100%")
+      //  .attr("stop-color", "green");
 
       // Add the x-axis.
       svg
         .append("g")
         .attr("transform", `translate(0,${height - marginBottom})`)
-        .attr("opacity", 0.3)
+        .attr("opacity", 0.4)
         .call(
           d3
             .axisBottom(scaleX)
             .tickValues(data.map((d) => d[0]))
-            .tickFormat((d) => axisFormatter(d as Date, selectedPeriod))
+            .tickFormat((d) => axisXFormatter(d as Date, selectedPeriod))
             .tickSize(-height + marginTop + marginBottom)
             .tickPadding(12),
         )
@@ -106,12 +124,12 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       svg
         .append("g")
         .attr("transform", `translate(${marginLeft},0)`)
-        .attr("opacity", 0.3)
+        .attr("opacity", 0.4)
         .call(
           d3
             .axisLeft(scaleY)
             .ticks(5)
-            .tickFormat(d3.format("d"))
+            .tickFormat((d) => axisYFormatter(Number(d)))
             .tickSize(-width + marginLeft + marginRight)
             .tickPadding(12),
         )
@@ -127,6 +145,17 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         .attr("stroke", "white")
         .attr("stroke-width", 1)
         .attr("d", line as any);
+
+      svg
+        .append("g")
+        .selectAll("dot")
+        .data(data)
+        .enter()
+        .append("circle")
+          .attr("cx", (d) => scaleX(d[0]))
+          .attr("cy", (d) => scaleY(d[1]))
+          .attr("r", 5)
+          .attr("fill", "#69b3a2") 
 
       // Append the svg element
       outputRef.value!.replaceChildren(svg.node()!);
