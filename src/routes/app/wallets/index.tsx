@@ -726,11 +726,16 @@ export default component$(() => {
             <button
               onClick$={async () => {
                 if (selectedWallet.value && selectedWallet.value.wallet.id) {
-                  await removeWalletAction.submit({
+                  const {
+                    value: { success },
+                  } = await removeWalletAction.submit({
                     id: selectedWallet.value.wallet.id,
                   });
                   selectedWallet.value = null;
                   isDeleteModalOpen.value = false;
+                  if (success) {
+                    observedWallets.value = await getObservedWallets();
+                  }
                 }
               }}
               class="h-12 rounded-3xl bg-red-500 px-2 text-center text-sm text-white duration-300 ease-in-out hover:scale-105"
