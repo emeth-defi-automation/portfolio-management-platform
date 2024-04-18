@@ -12,7 +12,10 @@ import ImgMinimalize from "/public/assets/icons/minimalize.svg?jsx";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import * as d3 from "d3";
 import { type PeriodState } from "~/interface/balance/Balance";
-import { axisXFormatter, axisYFormatter } from "~/utils/portfolio/axisFormatter";
+import {
+  axisXFormatter,
+  axisYFormatter,
+} from "~/utils/portfolio/axisFormatter";
 
 export interface PortfolioValueProps {
   totalPortfolioValue: string;
@@ -43,7 +46,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       chartData.forEach((d) => {
         data.push([new Date(d[0]), d[1]]);
       });
-      console.log("chart", chartData);
+
       const max =
         data.reduce(
           (acc, curr) => Math.max(acc, curr[1]),
@@ -74,7 +77,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         .scaleLinear()
         .domain([min, max])
         .range([height - marginBottom, marginTop]);
-        
+
       // Declare the line generator.
       const line = d3
         .line()
@@ -83,7 +86,6 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
       // Create the SVG container.
       const svg = d3.create("svg").attr("width", width).attr("height", height);
-      console.log("Y", scaleY.ticks())
 
       // Define the gradient
       //const gradient = svg.append("defs")
@@ -152,10 +154,10 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         .data(data)
         .enter()
         .append("circle")
-          .attr("cx", (d) => scaleX(d[0]))
-          .attr("cy", (d) => scaleY(d[1]))
-          .attr("r", 5)
-          .attr("fill", "#69b3a2") 
+        .attr("cx", (d) => scaleX(d[0]))
+        .attr("cy", (d) => scaleY(d[1]))
+        .attr("r", 5)
+        .attr("fill", "#69b3a2");
 
       // Append the svg element
       outputRef.value!.replaceChildren(svg.node()!);

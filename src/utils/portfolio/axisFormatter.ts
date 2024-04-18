@@ -30,9 +30,17 @@ export const axisYFormatter = (value: number): string => {
     { value: 1e9, symbol: "G", digits: 1 },
     { value: 1e12, symbol: "T", digits: 1 },
     { value: 1e15, symbol: "P", digits: 1 },
-    { value: 1e18, symbol: "E", digits: 1 }
+    { value: 1e18, symbol: "E", digits: 1 },
   ];
   const regexp = /\.0+$|(?<=\.[0-9]*[1-9])0+$/;
-  const item = lookup.reverse().find(item => value >= item.value);
-  return "$" + (item ? (value / item.value).toFixed(item.digits).replace(regexp, "").concat(item.symbol) : "0");
-}
+  const item = lookup.reverse().find((item) => value >= item.value);
+  return (
+    "$" +
+    (item
+      ? (value / item.value)
+          .toFixed(item.digits)
+          .replace(regexp, "")
+          .concat(item.symbol)
+      : "0")
+  );
+};
