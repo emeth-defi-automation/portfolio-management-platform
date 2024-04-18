@@ -61,7 +61,7 @@ export const getObservedWallets = server$(async function () {
   const [result]: any = await db.query(
     `SELECT ->observes_wallet.out FROM ${userId};`,
   );
-  if (!result) throw new Error("No observed wallets");
+  if (!result || !result[0]) return [];
   const observedWalletsQueryResult = result[0]["->observes_wallet"].out;
 
   const observedWallets: WalletTokensBalances[] = [];
@@ -175,9 +175,11 @@ export const ObservedWalletsList = component$<ObservedWalletsListProps>(
     return (
       <div class="">
         {isLoading.value ? ( // if loading --> display spinner
-          <Spinner />
+          <div class="flex flex-col items-center pt-12">
+            <Spinner />
+          </div>
         ) : observedWallets.value.length === 0 ? ( // if no wallets --> display message
-          <div class="flex h-full items-center justify-center">
+          <div class="flex flex-col items-center pt-12">
             <span>No wallets added yet</span>
           </div>
         ) : (

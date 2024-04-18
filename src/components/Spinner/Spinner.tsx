@@ -2,7 +2,7 @@ import { component$ } from "@builder.io/qwik";
 
 export const Spinner = component$(() => {
   return (
-    <div class="flex flex-col items-center pt-12" role="status">
+    <>
       <svg
         aria-hidden="true"
         class="h-16 w-16 animate-spin fill-blue-600 text-gray-200 dark:text-gray-600"
@@ -20,6 +20,6 @@ export const Spinner = component$(() => {
         />
       </svg>
       <div class="mt-2 text-3xl font-medium text-blue-600">Loading...</div>
-    </div>
+    </>
   );
 });
