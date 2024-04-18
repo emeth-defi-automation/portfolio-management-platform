@@ -38,10 +38,10 @@ export type UniqueNameResult = z.infer<typeof UniqueNameResult>;
 export const isNameUnique = server$(async function (name: string) {
   const db = await connectToDB(this.env);
   const cookie = this.cookie.get("accessToken");
-    if (!cookie) {
-      throw new Error("No cookie found");
-    }
-    const { userId } = jwt.decode(cookie.value) as JwtPayload;
+  if (!cookie) {
+    throw new Error("No cookie found");
+  }
+  const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
   const [result]: any = await db.query(
     `SELECT VALUE ->observes_wallet.out FROM ${userId};`,
@@ -52,10 +52,10 @@ export const isNameUnique = server$(async function (name: string) {
   for (const observedWallet of observedWalletsQueryResult) {
     const [wallet] = await db.select<Wallet>(`${observedWallet}`);
     if (wallet.name === name) {
-      return false
+      return false;
     }
   }
-  return true
+  return true;
 
   //const queryResult = (
   //  await db.query(`SELECT count() as total FROM wallet WHERE name = '${name}'`)
