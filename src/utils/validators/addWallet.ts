@@ -1,6 +1,8 @@
 import { isAddress, getAddress } from "viem";
 import { connectToDB } from "../db";
 import { server$, z } from "@builder.io/qwik-city";
+import { type Wallet } from "~/interface/auth/Wallet";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 
 export function isValidName(name: string): boolean {
   return name.length > 0 ? name.trim().length > 3 : true;
@@ -35,12 +37,32 @@ export type UniqueNameResult = z.infer<typeof UniqueNameResult>;
 
 export const isNameUnique = server$(async function (name: string) {
   const db = await connectToDB(this.env);
-  const queryResult = (
-    await db.query(`SELECT count() as total FROM wallet WHERE name = '${name}'`)
-  ).at(0);
-  const parsedQueryResult = UniqueNameResult.array().parse(queryResult);
-  if (parsedQueryResult.length === 0) {
-    return true;
+  const cookie = this.cookie.get("accessToken");
+    if (!cookie) {
+      throw new Error("No cookie found");
+    }
+    const { userId } = jwt.decode(cookie.value) as JwtPayload;
+
+  const [result]: any = await db.query(
+    `SELECT VALUE ->observes_wallet.out FROM ${userId};`,
+  );
+  if (!result) throw new Error("No observed wallets");
+
+  const observedWalletsQueryResult = result[0];
+  for (const observedWallet of observedWalletsQueryResult) {
+    const [wallet] = await db.select<Wallet>(`${observedWallet}`);
+    if (wallet.name === name) {
+      return false
+    }
   }
-  return parsedQueryResult[0].total === 0;
+  return true
+
+  //const queryResult = (
+  //  await db.query(`SELECT count() as total FROM wallet WHERE name = '${name}'`)
+  //).at(0);
+  //const parsedQueryResult = UniqueNameResult.array().parse(queryResult);
+  //if (parsedQueryResult.length === 0) {
+  //  return true;
+  //}
+  //return parsedQueryResult[0].total === 0;
 });
