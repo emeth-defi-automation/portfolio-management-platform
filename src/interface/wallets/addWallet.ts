@@ -39,6 +39,7 @@ export const ExistingRelationResult = z.object({
   id: z.string(),
   in: z.string(),
   out: z.string(),
+  name: z.string()
 });
 export type ExistingRelationResult = z.infer<typeof ExistingRelationResult>;
 

@@ -87,7 +87,6 @@ export const useAddWallet = routeAction$(
       const [createWalletQueryResult] = await db.create<Wallet>("wallet", {
         chainId: 1,
         address: data.address.toString(),
-        name: data.name.toString(),
         isExecutable: data.isExecutable === "1" ? true : false,
       });
       walletId = createWalletQueryResult.id;
@@ -122,7 +121,8 @@ export const useAddWallet = routeAction$(
     }
 
     if (!(await getExistingRelation(db, userId, walletId)).at(0)) {
-      await db.query(`RELATE ONLY ${userId}->observes_wallet->${walletId};`);
+      await db.query(`RELATE ONLY ${userId}->observes_wallet->${walletId}
+      SET name = ${data.name};`);
     }
 
     return {
