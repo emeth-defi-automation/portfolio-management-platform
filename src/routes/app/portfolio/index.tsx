@@ -48,7 +48,7 @@ import Destination from "~/components/Forms/portfolioTransfters/Destination";
 import { convertToFraction } from "../wallets";
 
 type WalletWithBalance = {
-  wallet: { id: string; chainID: number; name: string; address: string };
+  wallet: { id: string; chainID: number; name: string; address: string, isExecutable: boolean };
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
 };
 type CoinObject = {
@@ -57,6 +57,7 @@ type CoinObject = {
 };
 type CoinToApprove = {
   wallet: string;
+  isExecutable: boolean;
   address: string;
   coins: CoinObject[];
 };
@@ -233,6 +234,7 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
             id: wallet.id,
             name: wallet.name,
             chainId: wallet.chainId,
+            isExecutable: wallet.isExecutable
           },
           balance: tokenWithBalance,
         });
@@ -391,7 +393,8 @@ export default component$(() => {
 
     try {
       const tokens = await queryTokens();
-      if (modalStore.config) {
+      console.log("[MODAL STORE]: ", modalStore);
+      if (modalStore.config) { 
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
           for (const cWallet of cStructure.coins) {
@@ -414,7 +417,6 @@ export default component$(() => {
             }
           }
         }
-
         const { request } = await simulateContract(modalStore.config, {
           abi: emethContractAbi,
           address: emethContractAddress,
@@ -432,6 +434,7 @@ export default component$(() => {
         await waitForTransactionReceipt(modalStore.config, {
           hash: transactionHash,
         });
+
         batchTransferFormStore.receiverAddress = "";
         batchTransferFormStore.coinsToTransfer = [];
         formMessageProvider.messages.push({

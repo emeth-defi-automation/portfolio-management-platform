@@ -48,6 +48,7 @@ import {
   type Config,
   readContract,
   waitForTransactionReceipt,
+  disconnect
 } from "@wagmi/core";
 import { returnWeb3ModalAndClient } from "~/components/WalletConnect";
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
@@ -443,6 +444,7 @@ export default component$(() => {
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
       temporaryModalStore.isConnected = false;
+      await disconnect(temporaryModalStore.config as Config);
       temporaryModalStore.config = undefined;
     } catch (err) {
       console.error("error: ", err);
@@ -587,13 +589,14 @@ export default component$(() => {
         <Modal
           isOpen={isAddWalletModalOpen}
           title="Add Wallet"
-          onClose={$(() => {
+          onClose={$( async () => {
             addWalletFormStore.address = "";
             addWalletFormStore.name = "";
             addWalletFormStore.isExecutable = 0;
             addWalletFormStore.coinsToCount = [];
             addWalletFormStore.coinsToApprove = [];
             stepsCounter.value = 1;
+            await disconnect(temporaryModalStore.config as Config);
             temporaryModalStore.isConnected = false;
             temporaryModalStore.config = undefined;
           })}
