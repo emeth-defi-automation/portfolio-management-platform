@@ -64,6 +64,8 @@ function mapTokenAddress(sepoliaAddress: string): any {
   }
 }
 export const useToggleChart = routeAction$(async (data, requestEvent) => {
+  console.log("useToggleChart started");
+
   const selectedPeriod: { period: number; interval: number } =
     getSelectedPeriodInHours(data as PeriodState);
   const db = await connectToDB(requestEvent.env);
@@ -198,7 +200,7 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
       totalValueChange,
     );
   }
-
+  console.log("chartData", chartData);
   return {
     percentageOfTotalValueChange: percentageOfTotalValueChange.toFixed(2) + "%",
     totalValueChange: totalValueChange.toFixed(2),
@@ -514,29 +516,29 @@ export default component$(() => {
   const favoriteTokens = useSignal<any[]>([]);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
-    portfolioValueChange.value = await getPortfolio24hChange();
-    portfolioValueChangeLoading.value = false;
+    favoriteTokens.value = await getFavouriteTokens();
+    favoriteTokenLoading.value = false;
 
     totalPortfolioValue.value = await getTotalPortfolioValue();
     totalPortfolioValueLoading.value = false;
 
-    favoriteTokens.value = await getFavouriteTokens();
-    favoriteTokenLoading.value = false;
+    portfolioValueChange.value = await getPortfolio24hChange();
+    portfolioValueChangeLoading.value = false;
   });
 
   const toggleChart = useToggleChart();
 
-  const chartDataStore = useStore({
-    data: portfolioValueChange.value.chartData,
-  });
+  // const chartDataStore = useStore({
+  //   data: portfolioValueChange.value.chartData,
+  // });
 
   // TODO: get rid of that?
-  const portfolioValueStore = useStore({
-    selectedPeriodLabel: portfolioValueChange.value.period,
-    portfolioValueChange: portfolioValueChange.value.totalValueChange,
-    portfolioPercentageValueChange:
-      portfolioValueChange.value.percentageOfTotalValueChange,
-  });
+  // const portfolioValueStore = useStore({
+  //   selectedPeriodLabel: portfolioValueChange.value.period,
+  //   portfolioValueChange: portfolioValueChange.value.totalValueChange,
+  //   portfolioPercentageValueChange:
+  //     portfolioValueChange.value.percentageOfTotalValueChange,
+  // });
   const changePeriod = useSignal(false);
   const selectedPeriod: PeriodState = useStore({
     "24h": true,
@@ -554,18 +556,20 @@ export default component$(() => {
 
   useTask$(async ({ track }) => {
     track(async () => {
+      console.log("use task started");
       selectedPeriod["24h"];
       selectedPeriod["1W"];
       selectedPeriod["1M"];
       selectedPeriod["1Y"];
 
       if (changePeriod.value !== false) {
+        console.log("selectedPeriod", selectedPeriod);
         const newChartData = await toggleChart.submit(selectedPeriod);
-        chartDataStore.data = newChartData.value.chartData;
-        portfolioValueStore.selectedPeriodLabel = newChartData.value.period;
-        portfolioValueStore.portfolioValueChange =
+        portfolioValueChange.value.chartData = newChartData.value.chartData;
+        portfolioValueChange.value.period = newChartData.value.period;
+        portfolioValueChange.value.totalValueChange =
           newChartData.value.totalValueChange;
-        portfolioValueStore.portfolioPercentageValueChange =
+        portfolioValueChange.value.percentageOfTotalValueChange =
           newChartData.value.percentageOfTotalValueChange;
       }
     });
@@ -573,15 +577,17 @@ export default component$(() => {
 
   return isPortfolioFullScreen.value ? (
     <PortfolioValue
+      portfolioValueChangeLoading={portfolioValueChangeLoading.value}
+      totalPortfolioValueLoading={totalPortfolioValueLoading.value}
       totalPortfolioValue={totalPortfolioValue.value}
       isPortfolioFullScreen={isPortfolioFullScreen}
-      portfolioValueChange={portfolioValueStore.portfolioValueChange}
+      portfolioValueChange={portfolioValueChange.value.totalValueChange}
       portfolioPercentageValueChange={
-        portfolioValueStore.portfolioPercentageValueChange
+        portfolioValueChange.value.percentageOfTotalValueChange
       }
-      chartData={chartDataStore.data}
+      chartData={portfolioValueChange.value.chartData}
       selectedPeriod={selectedPeriod}
-      period={portfolioValueStore.selectedPeriodLabel}
+      period={portfolioValueChange.value.period}
       onClick$={(e: any) => {
         togglePeriod(e.target.name);
         changePeriod.value = true;
@@ -591,15 +597,17 @@ export default component$(() => {
     <div class="grid grid-rows-[max(330px)_auto] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue
+          portfolioValueChangeLoading={portfolioValueChangeLoading.value}
+          totalPortfolioValueLoading={totalPortfolioValueLoading.value}
           totalPortfolioValue={totalPortfolioValue.value}
           isPortfolioFullScreen={isPortfolioFullScreen}
-          portfolioValueChange={portfolioValueStore.portfolioValueChange}
+          portfolioValueChange={portfolioValueChange.value.totalValueChange}
           portfolioPercentageValueChange={
-            portfolioValueStore.portfolioPercentageValueChange
+            portfolioValueChange.value.percentageOfTotalValueChange
           }
-          chartData={chartDataStore.data}
+          chartData={portfolioValueChange.value.chartData}
           selectedPeriod={selectedPeriod}
-          period={portfolioValueStore.selectedPeriodLabel}
+          period={portfolioValueChange.value.period}
           onClick$={(e: any) => {
             togglePeriod(e.target.name);
             changePeriod.value = true;
@@ -691,7 +699,7 @@ export default component$(() => {
               </div>
             ) : favoriteTokens.value.length === 0 ? (
               <div class="flex flex-col items-center pt-12">
-                <span>No wallets added yet</span>
+                <span>No Favourite Tokens</span>
               </div>
             ) : (
               favoriteTokens.value[0] &&

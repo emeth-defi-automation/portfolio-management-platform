@@ -16,6 +16,7 @@ import {
   axisXFormatter,
   axisYFormatter,
 } from "~/utils/portfolio/axisFormatter";
+import { Spinner } from "../Spinner/Spinner";
 
 export interface PortfolioValueProps {
   totalPortfolioValue: string;
@@ -26,6 +27,8 @@ export interface PortfolioValueProps {
   onClick$?: QRL<(e: any) => void>;
   selectedPeriod: PeriodState;
   period: string;
+  totalPortfolioValueLoading: boolean;
+  portfolioValueChangeLoading: boolean;
 }
 
 export const PortfolioValue = component$<PortfolioValueProps>(
@@ -38,6 +41,8 @@ export const PortfolioValue = component$<PortfolioValueProps>(
     selectedPeriod,
     chartData,
     period,
+    totalPortfolioValueLoading,
+    portfolioValueChangeLoading,
   }) => {
     const outputRef = useSignal<Element>();
     const chart = $(() => {
@@ -165,101 +170,117 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(({ track }) => {
+      console.log("chartData", chartData);
       track(() => chartData);
       chart();
     });
     return (
       <div
-        class={`custom-border-1 custom-shadow grid gap-4 rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
+        class={`custom-border-1 custom-shadow ${portfolioValueChangeLoading ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
       >
         <div class="custom-border-b-1 flex items-center justify-between pb-4">
           <h1 class="text-xl font-semibold">Portfolio Value</h1>
           <div class="text-right">
             <h1 class="custom-text-gradient text-xl font-semibold text-transparent">
-              ${totalPortfolioValue}
+              {totalPortfolioValueLoading || portfolioValueChangeLoading
+                ? "Loading..."
+                : `$${totalPortfolioValue}`}
             </h1>
-            <p class="text-xs">
-              {period} change: {portfolioValueChange}{" "}
-              <span class="text-customGreen">
-                {portfolioPercentageValueChange}
-              </span>
-            </p>
+            {totalPortfolioValueLoading ||
+            portfolioValueChangeLoading ? null : (
+              <div>
+                {" "}
+                <p class="text-xs">
+                  {period} change: {portfolioValueChange}{" "}
+                  <span class="text-customGreen">
+                    {portfolioPercentageValueChange}
+                  </span>
+                </p>{" "}
+              </div>
+            )}
           </div>
         </div>
+        {portfolioValueChangeLoading ? (
+          <div class="flex-column flex h-full items-center justify-center">
+            <Spinner isTextVisible={false} />
+          </div>
+        ) : (
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <h3 class="custom-text-50 uppercase">Value over time</h3>
+              <div class="custom-bg-white custom-border-1 flex h-8 gap-2 rounded-lg p-1">
+                <button
+                  name="24h"
+                  class={
+                    selectedPeriod["24h"]
+                      ? "custom-bg-button rounded-lg px-2"
+                      : "rounded-lg px-2"
+                  }
+                  onClick$={onClick$}
+                >
+                  24h
+                </button>
+                <button
+                  name="1W"
+                  class={
+                    selectedPeriod["1W"]
+                      ? "custom-bg-button rounded-lg px-2"
+                      : "rounded-lg px-2"
+                  }
+                  onClick$={onClick$}
+                >
+                  1W
+                </button>
+                <button
+                  name="1M"
+                  class={
+                    selectedPeriod["1M"]
+                      ? "custom-bg-button rounded-lg px-2"
+                      : "rounded-lg px-2"
+                  }
+                  onClick$={onClick$}
+                >
+                  1M
+                </button>
+                <button
+                  name="1Y"
+                  class={
+                    selectedPeriod["1Y"]
+                      ? "custom-bg-button rounded-lg px-2"
+                      : "rounded-lg px-2"
+                  }
+                  onClick$={onClick$}
+                >
+                  1Y
+                </button>
+              </div>
+            </div>
 
-        <div class="flex items-center justify-between text-xs">
-          <div class="flex items-center gap-2">
-            <h3 class="custom-text-50 uppercase">Value over time</h3>
-            <div class="custom-bg-white custom-border-1 flex h-8 gap-2 rounded-lg p-1">
-              <button
-                name="24h"
-                class={
-                  selectedPeriod["24h"]
-                    ? "custom-bg-button rounded-lg px-2"
-                    : "rounded-lg px-2"
-                }
-                onClick$={onClick$}
-              >
-                24h
+            <div class="flex items-center gap-2">
+              <h2 class="custom-text-50 uppercase lg:hidden">Portfolio</h2>
+              <button class="custom-border-1 flex h-8 items-center gap-2 rounded-lg bg-white bg-opacity-5 px-2">
+                <p>All</p>
+                <IconArrowDown />
               </button>
               <button
-                name="1W"
-                class={
-                  selectedPeriod["1W"]
-                    ? "custom-bg-button rounded-lg px-2"
-                    : "rounded-lg px-2"
-                }
-                onClick$={onClick$}
+                class="custom-border-1 h-8 items-center rounded-lg bg-white bg-opacity-5 px-2 duration-300 ease-in-out hover:scale-110"
+                onClick$={() => {
+                  isPortfolioFullScreen.value = !isPortfolioFullScreen.value;
+                }}
               >
-                1W
-              </button>
-              <button
-                name="1M"
-                class={
-                  selectedPeriod["1M"]
-                    ? "custom-bg-button rounded-lg px-2"
-                    : "rounded-lg px-2"
-                }
-                onClick$={onClick$}
-              >
-                1M
-              </button>
-              <button
-                name="1Y"
-                class={
-                  selectedPeriod["1Y"]
-                    ? "custom-bg-button rounded-lg px-2"
-                    : "rounded-lg px-2"
-                }
-                onClick$={onClick$}
-              >
-                1Y
+                {!isPortfolioFullScreen.value ? (
+                  <IconMaximize />
+                ) : (
+                  <ImgMinimalize />
+                )}
               </button>
             </div>
           </div>
+        )}
 
-          <div class="flex items-center gap-2">
-            <h2 class="custom-text-50 uppercase lg:hidden">Portfolio</h2>
-            <button class="custom-border-1 flex h-8 items-center gap-2 rounded-lg bg-white bg-opacity-5 px-2">
-              <p>All</p>
-              <IconArrowDown />
-            </button>
-            <button
-              class="custom-border-1 h-8 items-center rounded-lg bg-white bg-opacity-5 px-2 duration-300 ease-in-out hover:scale-110"
-              onClick$={() => {
-                isPortfolioFullScreen.value = !isPortfolioFullScreen.value;
-              }}
-            >
-              {!isPortfolioFullScreen.value ? (
-                <IconMaximize />
-              ) : (
-                <ImgMinimalize />
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div id="container" ref={outputRef}></div>
+        {portfolioValueChangeLoading ? null : (
+          <div id="container" ref={outputRef}></div>
+        )}
         {isPortfolioFullScreen.value && (
           <div class="ml-7">
             <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
