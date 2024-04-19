@@ -653,6 +653,9 @@ export default component$(() => {
                 <Button
                   class="w-full border-0 bg-customBlue text-white disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
                   onClick$={async () => {
+                    if(stepsCounter.value ===1){
+                      // TODO check wallet balances mozna to zrobic moralisem
+                    }
                     if (stepsCounter.value === 2) {
                       for (
                         let i = 0;
