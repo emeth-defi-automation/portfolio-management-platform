@@ -31,7 +31,7 @@ export type GetWalletDetails = z.infer<typeof GetWalletDetails>;
 export const getWalletDetails = async (db: Surreal, address: string) => {
   const walletDetails = (
     await db.query(
-      `SELECT id, name, address, chainId FROM wallet WHERE address = '${getAddress(address)}';`,
+      `SELECT id, name, address, chainId, isExecutable FROM wallet WHERE address = '${getAddress(address)}';`,
     )
   ).at(0);
   return GetWalletDetails.array().parse(walletDetails);

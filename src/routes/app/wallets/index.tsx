@@ -48,6 +48,7 @@ import {
   type Config,
   readContract,
   waitForTransactionReceipt,
+  disconnect
 } from "@wagmi/core";
 import { returnWeb3ModalAndClient } from "~/components/WalletConnect";
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
@@ -443,6 +444,7 @@ export default component$(() => {
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
       temporaryModalStore.isConnected = false;
+      await disconnect(temporaryModalStore.config as Config);
       temporaryModalStore.config = undefined;
     } catch (err) {
       console.error("error: ", err);
@@ -587,13 +589,14 @@ export default component$(() => {
         <Modal
           isOpen={isAddWalletModalOpen}
           title="Add Wallet"
-          onClose={$(() => {
+          onClose={$( async () => {
             addWalletFormStore.address = "";
             addWalletFormStore.name = "";
             addWalletFormStore.isExecutable = 0;
             addWalletFormStore.coinsToCount = [];
             addWalletFormStore.coinsToApprove = [];
             stepsCounter.value = 1;
+            await disconnect(temporaryModalStore.config as Config);
             temporaryModalStore.isConnected = false;
             temporaryModalStore.config = undefined;
           })}
@@ -650,6 +653,9 @@ export default component$(() => {
                 <Button
                   class="w-full border-0 bg-customBlue text-white disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
                   onClick$={async () => {
+                    if(stepsCounter.value ===1){
+                      // TODO check wallet balances mozna to zrobic moralisem
+                    }
                     if (stepsCounter.value === 2) {
                       for (
                         let i = 0;

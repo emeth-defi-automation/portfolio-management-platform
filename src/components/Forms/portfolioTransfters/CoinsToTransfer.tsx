@@ -13,13 +13,14 @@ export default component$<CoinsToTransferProps>(
       <>
         {availableStructures.value.map((structure: any, index: number) => {
           // TODO usowanie struktur bez wybranych walletow
+          {console.log(availableStructures)}
           return (
             <div class="flex flex-col" key={`${structure.name}${index}`}>
               <p>{structure.structure.name}</p>
               <div class="custom-border-1 flex flex-col p-2">
                 {structure.structureBalance.map(
                   (balance: any, index: number) => (
-                    <FormBadge
+                    balance.wallet.isExecutable ? <FormBadge
                       key={index}
                       text={balance.balance.symbol}
                       class="mb-2"
@@ -68,7 +69,7 @@ export default component$<CoinsToTransferProps>(
                           }}
                         />
                       }
-                    />
+                    /> : null
                   ),
                 )}
               </div>
