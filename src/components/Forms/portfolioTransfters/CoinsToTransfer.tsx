@@ -13,9 +13,6 @@ export default component$<CoinsToTransferProps>(
       <>
         {availableStructures.value.map((structure: any, index: number) => {
           // TODO usowanie struktur bez wybranych walletow
-          {
-            console.log(availableStructures);
-          }
           return (
             <div class="flex flex-col" key={`${structure.name}${index}`}>
               <p>{structure.structure.name}</p>

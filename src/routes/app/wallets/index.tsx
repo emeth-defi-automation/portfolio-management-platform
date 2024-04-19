@@ -309,6 +309,7 @@ export default component$(() => {
     config: undefined,
   });
   const walletTokenBalances = useSignal<any>([]);
+
   const setWeb3Modal = $(async () => {
     const chains: [Chain, ...Chain[]] = [sepolia];
     const projectId = import.meta.env.PUBLIC_PROJECT_ID;
