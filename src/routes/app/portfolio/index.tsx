@@ -48,7 +48,13 @@ import Destination from "~/components/Forms/portfolioTransfters/Destination";
 import { convertToFraction } from "../wallets";
 
 type WalletWithBalance = {
-  wallet: { id: string; chainID: number; name: string; address: string, isExecutable: boolean };
+  wallet: {
+    id: string;
+    chainID: number;
+    name: string;
+    address: string;
+    isExecutable: boolean;
+  };
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
 };
 type CoinObject = {
@@ -234,7 +240,7 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
             id: wallet.id,
             name: wallet.name,
             chainId: wallet.chainId,
-            isExecutable: wallet.isExecutable
+            isExecutable: wallet.isExecutable,
           },
           balance: tokenWithBalance,
         });
@@ -394,7 +400,7 @@ export default component$(() => {
     try {
       const tokens = await queryTokens();
       console.log("[MODAL STORE]: ", modalStore);
-      if (modalStore.config) { 
+      if (modalStore.config) {
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
           for (const cWallet of cStructure.coins) {

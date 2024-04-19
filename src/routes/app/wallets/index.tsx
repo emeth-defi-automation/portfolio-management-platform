@@ -18,7 +18,7 @@ import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type Balance } from "~/interface/balance/Balance";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { isAddress, checksumAddress, getAddress } from "viem";
+import { isAddress, checksumAddress } from "viem";
 import { isValidName, isValidAddress } from "~/utils/validators/addWallet";
 import {
   getUsersObservingWallet,
@@ -48,7 +48,7 @@ import {
   type Config,
   readContract,
   waitForTransactionReceipt,
-  disconnect
+  disconnect,
 } from "@wagmi/core";
 import { returnWeb3ModalAndClient } from "~/components/WalletConnect";
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
@@ -250,7 +250,7 @@ export const dbBalancesStream = server$(async function* () {
   });
 
   await db.live("balance", ({ action, result }) => {
-    if (action === "CLOSE") { 
+    if (action === "CLOSE") {
       resultsStream.push(null);
       return;
     }
@@ -262,22 +262,22 @@ export const dbBalancesStream = server$(async function* () {
   }
 });
 
-export const useMoralisBalance = routeAction$(async (data ,requestEvent) => {
+export const useMoralisBalance = routeAction$(async (data) => {
   const walletAddress = data.wallet;
-  console.log(walletAddress)
+  console.log(walletAddress);
   const response = await Moralis.EvmApi.token.getWalletTokenBalances({
     chain: EvmChain.SEPOLIA.hex,
     tokenAddresses: [
       "0x054E1324CF61fe915cca47C48625C07400F1B587",
       "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-      "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709"
+      "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
     ],
-    address: `${walletAddress}`
-  })
+    address: `${walletAddress}`,
+  });
 
- const rawResponse = response.raw;
- return {tokens: rawResponse};
-})
+  const rawResponse = response.raw;
+  return { tokens: rawResponse };
+});
 
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
@@ -308,7 +308,7 @@ export default component$(() => {
     isConnected: false,
     config: undefined,
   });
- const walletTokenBalances = useSignal<any>([]);
+  const walletTokenBalances = useSignal<any>([]);
   const setWeb3Modal = $(async () => {
     const chains: [Chain, ...Chain[]] = [sepolia];
     const projectId = import.meta.env.PUBLIC_PROJECT_ID;
@@ -332,12 +332,12 @@ export default component$(() => {
     });
   });
   const msg = useSignal("1");
-  // eslint-disable-next-line qwik/no-use-visible-task  
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     const data = await dbBalancesStream();
-    for await (const value of data) { 
+    for await (const value of data) {
       msg.value = value;
-    } 
+    }
   });
 
   const handleAddWallet = $(async () => {
@@ -475,13 +475,12 @@ export default component$(() => {
       });
     }
   });
- 
 
- const handleReadBalances = $(async (wallet: string) => {
-  const tokenBalances = await moralisTokenBalancesAction.submit({wallet}); 
-   
-   walletTokenBalances.value = tokenBalances.value.tokens;
- });
+  const handleReadBalances = $(async (wallet: string) => {
+    const tokenBalances = await moralisTokenBalancesAction.submit({ wallet });
+
+    walletTokenBalances.value = tokenBalances.value.tokens;
+  });
 
   const handleTransfer = $(async () => {
     if (!selectedWallet.value || !modalStore.config) {
@@ -582,7 +581,7 @@ export default component$(() => {
             image="/assets/icons/search.svg"
             text="Search for wallet"
             class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
-          /> 
+          />
           <ButtonWithIcon
             image="/assets/icons/arrow-down.svg"
             text="Choose Network"
@@ -615,7 +614,7 @@ export default component$(() => {
         <Modal
           isOpen={isAddWalletModalOpen}
           title="Add Wallet"
-          onClose={$( async () => {
+          onClose={$(async () => {
             addWalletFormStore.address = "";
             addWalletFormStore.name = "";
             addWalletFormStore.isExecutable = 0;
@@ -639,10 +638,16 @@ export default component$(() => {
               </>
             ) : null}
             {stepsCounter.value === 2 ? (
-              <CoinsToApprove addWalletFormStore={addWalletFormStore} walletTokenBalances={walletTokenBalances} />
+              <CoinsToApprove
+                addWalletFormStore={addWalletFormStore}
+                walletTokenBalances={walletTokenBalances}
+              />
             ) : null}
             {stepsCounter.value === 3 ? (
-              <AmountOfCoins addWalletFormStore={addWalletFormStore} />
+              <AmountOfCoins
+                addWalletFormStore={addWalletFormStore}
+                walletTokenBalances={walletTokenBalances}
+              />
             ) : null}
             <div class="flex w-full items-center justify-between gap-2">
               {stepsCounter.value > 1 && addWalletFormStore.isExecutable ? (
@@ -679,8 +684,10 @@ export default component$(() => {
                 <Button
                   class="w-full border-0 bg-customBlue text-white disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
                   onClick$={async () => {
-                    if(stepsCounter.value === 1){
-                      const {address} = await getAccount(temporaryModalStore.config as Config)
+                    if (stepsCounter.value === 1) {
+                      const { address } = await getAccount(
+                        temporaryModalStore.config as Config,
+                      );
                       await handleReadBalances(address as `0x${string}`);
                     }
                     if (stepsCounter.value === 2) {

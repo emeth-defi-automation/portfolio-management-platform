@@ -1,4 +1,4 @@
-import { type QRL, component$, $, useVisibleTask$ } from "@builder.io/qwik";
+import { type QRL, component$, $ } from "@builder.io/qwik";
 import { getAddress } from "viem";
 import { Input } from "~/components/Input/Input";
 import { type addWalletFormStore } from "~/routes/app/wallets";
@@ -140,7 +140,7 @@ export default component$<AddWalletFormFieldsProps>(
                   {/* {addWalletFormStore.address
                     ? `${addWalletFormStore.address.slice(0, 4) + "..." + addWalletFormStore.address.slice(-4)}`
                     : "wallet address"} */}
-                    Wallet address 
+                  Wallet address
                   <IconSuccess width={16} height={16} />
                 </div>
               ) : (
