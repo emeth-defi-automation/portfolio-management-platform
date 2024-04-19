@@ -9,10 +9,13 @@ export interface CoinsAmountsProps {
 }
 
 export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
-  return (
+  return ( 
     <>
       {batchTransferFormStore.coinsToTransfer.map(
-        (structure: any, index: number) => (
+        (structure: any, index: number) => {
+          const s = structure.coins.filter((c:any) => c.coins.length > 0);  
+          if(!s.length) return null;
+          return(
           <div class="flex flex-col" key={`${structure.name}${index}`}>
             <p>{structure.name}</p>
             <div class="custom-border-1 flex flex-col p-2">
@@ -82,7 +85,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
               ))}
             </div>
           </div>
-        ),
+        )},
       )}
     </>
   );
