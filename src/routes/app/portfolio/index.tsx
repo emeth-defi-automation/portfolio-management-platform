@@ -609,7 +609,6 @@ export default component$(() => {
                             coins: coins,
                           });
                         }
-                        console.log('dead'); 
                       }
                       if (stepsCounter.value > 1) {
                         stepsCounter.value = stepsCounter.value - 1;
