@@ -62,6 +62,7 @@ import {
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
+import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
 export const useAddWallet = routeAction$(
   async (data, requestEvent) => {
@@ -138,21 +139,67 @@ export const useAddWallet = routeAction$(
   }),
 );
 
-export const useGetBalanceHistory = routeAction$(async (data) => {
+export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
+  const balanceHistory: any[] = [];
+
   const walletTransactions = await getErc20TokenTransfers(
     null,
     data.address as string,
   );
 
-  const balances = walletTransactions.map(
-    async (tx: { block_number: string }) => {
-      return getWalletBalance(tx.block_number, data.address as string);
-    },
-  );
+  const responses = [];
+  for (const tx of walletTransactions) {
+    balanceHistory.push({
+      blockNumber: tx.block_number,
+      timestamp: tx.block_timestamp,
+    });
+    responses.push(
+      await getWalletBalance(tx.block_number, data.address as string),
+    );
+  }
 
-  const responses = await Promise.all(balances);
-  for (const item of responses) {
-    console.log(item);
+  const db = await connectToDB(requestEvent.env);
+  const cookie = requestEvent.cookie.get("accessToken");
+
+  if (!cookie) {
+    throw new Error("No cookie found");
+  }
+
+  const tokenAddresses = {
+    GLM: "0x054e1324cf61fe915cca47c48625c07400f1b587",
+    USDC: "0xd418937d10c9cec9d20736b2701e506867ffd85f",
+    USDT: "0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709",
+  };
+
+  for (let i = 0; i < responses.length; i++) {
+    const currentBalance: { [key: string]: string } = {};
+    // @ts-ignore
+    responses[i]?.jsonResponse.forEach((entry: any) => {
+      currentBalance[entry.token_address] = convertWeiToQuantity(
+        entry.balance,
+        parseInt(entry.decimals),
+      );
+    });
+
+    console.log();
+
+    const dbObject = {
+      blockNumber: balanceHistory[i].blockNumber,
+      timestamp: balanceHistory[i].timestamp,
+      walletAddress: data.address,
+      [tokenAddresses.GLM]: currentBalance[tokenAddresses.GLM]
+        ? currentBalance[tokenAddresses.GLM]
+        : "0",
+      [tokenAddresses.USDC]: currentBalance[tokenAddresses.USDC]
+        ? currentBalance[tokenAddresses.USDC]
+        : "0",
+      [tokenAddresses.USDT]: currentBalance[tokenAddresses.USDT]
+        ? currentBalance[tokenAddresses.USDT]
+        : "0",
+    };
+
+    const dbResponse = await db.create("wallet_balance", dbObject);
+    console.log(dbResponse);
   }
 });
 
