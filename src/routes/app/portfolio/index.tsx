@@ -482,7 +482,7 @@ export default component$(() => {
                       wallet: wallet.wallet.name,
                       address: walletAddress,
                       coins: [],
-                      isExecutable: wallet.wallet.isExecutable
+                      isExecutable: wallet.wallet.isExecutable,
                     });
                   }
                   batchTransferFormStore.coinsToTransfer.push({
@@ -591,7 +591,7 @@ export default component$(() => {
                   <Button
                     class="custom-border-1 w-full bg-transparent  disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
                     onClick$={async () => {
-                      if(stepsCounter.value === 2){
+                      if (stepsCounter.value === 2) {
                         batchTransferFormStore.coinsToTransfer = [];
                         for (const structure of availableStructures.value) {
                           const coins = [];
@@ -601,7 +601,7 @@ export default component$(() => {
                               wallet: wallet.wallet.name,
                               address: walletAddress,
                               coins: [],
-                              isExecutable: wallet.wallet.isExecutable
+                              isExecutable: wallet.wallet.isExecutable,
                             });
                           }
                           batchTransferFormStore.coinsToTransfer.push({
