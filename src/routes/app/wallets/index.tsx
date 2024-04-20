@@ -48,7 +48,7 @@ import {
   type Config,
   readContract,
   waitForTransactionReceipt,
-  disconnect
+  disconnect,
 } from "@wagmi/core";
 import { returnWeb3ModalAndClient } from "~/components/WalletConnect";
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
@@ -61,6 +61,7 @@ import {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
+import { EvmChain } from "@moralisweb3/common-evm-utils";
 
 export const useAddWallet = routeAction$(
   async (data, requestEvent) => {
@@ -261,6 +262,23 @@ export const dbBalancesStream = server$(async function* () {
   }
 });
 
+export const useMoralisBalance = routeAction$(async (data) => {
+  const walletAddress = data.wallet;
+  console.log(walletAddress);
+  const response = await Moralis.EvmApi.token.getWalletTokenBalances({
+    chain: EvmChain.SEPOLIA.hex,
+    tokenAddresses: [
+      "0x054E1324CF61fe915cca47C48625C07400F1B587",
+      "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
+      "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
+    ],
+    address: `${walletAddress}`,
+  });
+
+  const rawResponse = response.raw;
+  return { tokens: rawResponse };
+});
+
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
   const formMessageProvider = useContext(messagesContext);
@@ -285,11 +303,12 @@ export default component$(() => {
     coinsToCount: [],
     coinsToApprove: [],
   });
-
+  const moralisTokenBalancesAction = useMoralisBalance();
   const temporaryModalStore = useStore<ModalStore>({
     isConnected: false,
     config: undefined,
   });
+  const walletTokenBalances = useSignal<any>([]);
 
   const setWeb3Modal = $(async () => {
     const chains: [Chain, ...Chain[]] = [sepolia];
@@ -305,6 +324,7 @@ export default component$(() => {
     await modal.open();
     temporaryModalStore.config = noSerialize(config);
     const { address } = getAccount(config);
+
     addWalletFormStore.address = address as `0x${string}`;
     watchAccount(config, {
       onChange(data) {
@@ -437,6 +457,10 @@ export default component$(() => {
         streamId,
         addWalletFormStore.address as `0x${string}`,
       );
+      if (temporaryModalStore.isConnected) {
+        await disconnect(temporaryModalStore.config as Config);
+        temporaryModalStore.config = undefined;
+      }
       addWalletFormStore.address = "";
       addWalletFormStore.name = "";
       addWalletFormStore.isExecutable = 0;
@@ -444,8 +468,6 @@ export default component$(() => {
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
       temporaryModalStore.isConnected = false;
-      await disconnect(temporaryModalStore.config as Config);
-      temporaryModalStore.config = undefined;
     } catch (err) {
       console.error("error: ", err);
       formMessageProvider.messages.push({
@@ -455,6 +477,12 @@ export default component$(() => {
         isVisible: true,
       });
     }
+  });
+
+  const handleReadBalances = $(async (wallet: string) => {
+    const tokenBalances = await moralisTokenBalancesAction.submit({ wallet });
+
+    walletTokenBalances.value = tokenBalances.value.tokens;
   });
 
   const handleTransfer = $(async () => {
@@ -589,16 +617,18 @@ export default component$(() => {
         <Modal
           isOpen={isAddWalletModalOpen}
           title="Add Wallet"
-          onClose={$( async () => {
+          onClose={$(async () => {
+            if (temporaryModalStore.isConnected) {
+              await disconnect(temporaryModalStore.config as Config);
+              temporaryModalStore.config = undefined;
+            }
             addWalletFormStore.address = "";
             addWalletFormStore.name = "";
             addWalletFormStore.isExecutable = 0;
             addWalletFormStore.coinsToCount = [];
             addWalletFormStore.coinsToApprove = [];
             stepsCounter.value = 1;
-            await disconnect(temporaryModalStore.config as Config);
             temporaryModalStore.isConnected = false;
-            temporaryModalStore.config = undefined;
           })}
         >
           <Form>
@@ -613,10 +643,16 @@ export default component$(() => {
               </>
             ) : null}
             {stepsCounter.value === 2 ? (
-              <CoinsToApprove addWalletFormStore={addWalletFormStore} />
+              <CoinsToApprove
+                addWalletFormStore={addWalletFormStore}
+                walletTokenBalances={walletTokenBalances}
+              />
             ) : null}
             {stepsCounter.value === 3 ? (
-              <AmountOfCoins addWalletFormStore={addWalletFormStore} />
+              <AmountOfCoins
+                addWalletFormStore={addWalletFormStore}
+                walletTokenBalances={walletTokenBalances}
+              />
             ) : null}
             <div class="flex w-full items-center justify-between gap-2">
               {stepsCounter.value > 1 && addWalletFormStore.isExecutable ? (
@@ -653,8 +689,11 @@ export default component$(() => {
                 <Button
                   class="w-full border-0 bg-customBlue text-white disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
                   onClick$={async () => {
-                    if(stepsCounter.value ===1){
-                      // TODO check wallet balances mozna to zrobic moralisem
+                    if (stepsCounter.value === 1) {
+                      const { address } = await getAccount(
+                        temporaryModalStore.config as Config,
+                      );
+                      await handleReadBalances(address as `0x${string}`);
                     }
                     if (stepsCounter.value === 2) {
                       for (

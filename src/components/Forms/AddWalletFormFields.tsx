@@ -140,7 +140,7 @@ export default component$<AddWalletFormFieldsProps>(
                   {/* {addWalletFormStore.address
                     ? `${addWalletFormStore.address.slice(0, 4) + "..." + addWalletFormStore.address.slice(-4)}`
                     : "wallet address"} */}
-                    Wallet address 
+                  Wallet address
                   <IconSuccess width={16} height={16} />
                 </div>
               ) : (

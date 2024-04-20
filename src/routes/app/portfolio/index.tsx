@@ -48,7 +48,13 @@ import Destination from "~/components/Forms/portfolioTransfters/Destination";
 import { convertToFraction } from "../wallets";
 
 type WalletWithBalance = {
-  wallet: { id: string; chainID: number; name: string; address: string, isExecutable: boolean };
+  wallet: {
+    id: string;
+    chainID: number;
+    name: string;
+    address: string;
+    isExecutable: boolean;
+  };
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
 };
 type CoinObject = {
@@ -234,7 +240,7 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
             id: wallet.id,
             name: wallet.name,
             chainId: wallet.chainId,
-            isExecutable: wallet.isExecutable
+            isExecutable: wallet.isExecutable,
           },
           balance: tokenWithBalance,
         });
@@ -394,7 +400,7 @@ export default component$(() => {
     try {
       const tokens = await queryTokens();
       console.log("[MODAL STORE]: ", modalStore);
-      if (modalStore.config) { 
+      if (modalStore.config) {
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
           for (const cWallet of cStructure.coins) {
@@ -476,6 +482,7 @@ export default component$(() => {
                       wallet: wallet.wallet.name,
                       address: walletAddress,
                       coins: [],
+                      isExecutable: wallet.wallet.isExecutable,
                     });
                   }
                   batchTransferFormStore.coinsToTransfer.push({
@@ -584,6 +591,25 @@ export default component$(() => {
                   <Button
                     class="custom-border-1 w-full bg-transparent  disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
                     onClick$={async () => {
+                      if (stepsCounter.value === 2) {
+                        batchTransferFormStore.coinsToTransfer = [];
+                        for (const structure of availableStructures.value) {
+                          const coins = [];
+                          for (const wallet of structure.structureBalance) {
+                            const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.name === wallet.wallet.name)?.wallet.address}`;
+                            coins.push({
+                              wallet: wallet.wallet.name,
+                              address: walletAddress,
+                              coins: [],
+                              isExecutable: wallet.wallet.isExecutable,
+                            });
+                          }
+                          batchTransferFormStore.coinsToTransfer.push({
+                            name: structure.structure.name,
+                            coins: coins,
+                          });
+                        }
+                      }
                       if (stepsCounter.value > 1) {
                         stepsCounter.value = stepsCounter.value - 1;
                       } else {
@@ -876,8 +902,8 @@ export default component$(() => {
                         <p class="text-xs uppercase text-white">
                           <span class="bg-gradient-to-r from-red-600 via-orange-400 to-pink-500 bg-clip-text font-semibold text-transparent">
                             {selectedTokens.balances.length} tokens
-                          </span>{" "}
-                          selected{" "}
+                          </span>
+                          selected
                         </p>
                         <div class="">
                           <label class="flex h-6 items-center gap-3">
