@@ -63,6 +63,7 @@ import {
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
+import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
 export const useAddWallet = routeAction$(
   async (data, requestEvent) => {
@@ -180,8 +181,6 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
         parseInt(entry.decimals),
       );
     });
-
-    console.log();
 
     const dbObject = {
       blockNumber: balanceHistory[i].blockNumber,
