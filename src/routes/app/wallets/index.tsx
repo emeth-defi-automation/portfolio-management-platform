@@ -457,10 +457,6 @@ export default component$(() => {
         streamId,
         addWalletFormStore.address as `0x${string}`,
       );
-      if (temporaryModalStore.isConnected) {
-        await disconnect(temporaryModalStore.config as Config);
-        temporaryModalStore.config = undefined;
-      }
       addWalletFormStore.address = "";
       addWalletFormStore.name = "";
       addWalletFormStore.isExecutable = 0;
@@ -468,6 +464,8 @@ export default component$(() => {
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
       temporaryModalStore.isConnected = false;
+      await disconnect(temporaryModalStore.config as Config);
+      temporaryModalStore.config = undefined;
     } catch (err) {
       console.error("error: ", err);
       formMessageProvider.messages.push({
@@ -618,17 +616,15 @@ export default component$(() => {
           isOpen={isAddWalletModalOpen}
           title="Add Wallet"
           onClose={$(async () => {
-            if (temporaryModalStore.isConnected) {
-              await disconnect(temporaryModalStore.config as Config);
-              temporaryModalStore.config = undefined;
-            }
             addWalletFormStore.address = "";
             addWalletFormStore.name = "";
             addWalletFormStore.isExecutable = 0;
             addWalletFormStore.coinsToCount = [];
             addWalletFormStore.coinsToApprove = [];
             stepsCounter.value = 1;
+            await disconnect(temporaryModalStore.config as Config);
             temporaryModalStore.isConnected = false;
+            temporaryModalStore.config = undefined;
           })}
         >
           <Form>
