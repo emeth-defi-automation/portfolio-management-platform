@@ -89,13 +89,13 @@ export const toggleChart = server$(async function (data) {
       const ethBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
         chain: EvmChain.ETHEREUM.hex,
         date: item,
-      })
-      return ethBlockDetails.raw.block
-    })
+      });
+      return ethBlockDetails.raw.block;
+    });
 
-    ethBlocks = await Promise.all(ethPromiseArray)
-  } catch(error) {
-    console.error('Error occurred when fetching Eth block details', error)
+    ethBlocks = await Promise.all(ethPromiseArray);
+  } catch (error) {
+    console.error("Error occurred when fetching Eth block details", error);
   }
 
   for (const observedWallet of observedWalletsQueryResult) {
@@ -219,22 +219,21 @@ export const getPortfolio24hChange = server$(async function () {
   const dashboardBalance: { tokenAddress: string; balance: string }[] = [];
   const chartTimestamps = generateTimestamps(24, 4);
   const chartData: number[] = new Array(chartTimestamps.length).fill(0);
-  let ethBlocks: number[] = []
+  let ethBlocks: number[] = [];
 
   try {
-  const ethPromiseArray = chartTimestamps.map(async (item) => {
-    const ethBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
-      chain: EvmChain.ETHEREUM.hex,
-      date: item,
-    })
-    return ethBlockDetails.raw.block
-  })
+    const ethPromiseArray = chartTimestamps.map(async (item) => {
+      const ethBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
+        chain: EvmChain.ETHEREUM.hex,
+        date: item,
+      });
+      return ethBlockDetails.raw.block;
+    });
 
-    ethBlocks = await Promise.all(ethPromiseArray)
-  } catch(error) {
-     console.error('Error occurred when fetching Eth block details', error)
+    ethBlocks = await Promise.all(ethPromiseArray);
+  } catch (error) {
+    console.error("Error occurred when fetching Eth block details", error);
   }
-
 
   for (const observedWallet of observedWalletsQueryResult) {
     const [wallet] = await db.select<Wallet>(`${observedWallet}`);
