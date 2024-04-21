@@ -399,7 +399,6 @@ export default component$(() => {
 
     try {
       const tokens = await queryTokens();
-      console.log("[MODAL STORE]: ", modalStore);
       if (modalStore.config) {
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
@@ -451,7 +450,7 @@ export default component$(() => {
         });
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "error",

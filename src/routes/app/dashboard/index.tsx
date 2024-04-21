@@ -1,4 +1,11 @@
-import { $, component$, useSignal, useStore, useTask$ } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  useSignal,
+  useStore,
+  useTask$,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { PortfolioValue } from "~/components/PortfolioValue/PortfolioValue";
 import { ActionAlertMessage } from "~/components/ActionAlertsMessage/ActionAlertsMessage";
 import {
@@ -8,7 +15,7 @@ import {
 import { TokenRow } from "~/components/Tokens/TokenRow";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { connectToDB } from "~/utils/db";
-import { routeAction$, routeLoader$, useNavigate } from "@builder.io/qwik-city";
+import { server$, useNavigate } from "@builder.io/qwik-city";
 import {
   fetchTokenDayData,
   getDBTokenPriceUSD,
@@ -34,6 +41,7 @@ import {
   getSelectedPeriodKey,
 } from "~/utils/timestamps/timestamp";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
+import { Spinner } from "~/components/Spinner/Spinner";
 
 function mapTokenAddress(sepoliaAddress: string): any {
   const tokenMap: any = {
@@ -50,12 +58,13 @@ function mapTokenAddress(sepoliaAddress: string): any {
     return null;
   }
 }
-export const useToggleChart = routeAction$(async (data, requestEvent) => {
+
+export const toggleChart = server$(async function (data) {
   const selectedPeriod: { period: number; interval: number } =
     getSelectedPeriodInHours(data as PeriodState);
-  const db = await connectToDB(requestEvent.env);
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
@@ -197,10 +206,10 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
   };
 });
 
-export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
-  const db = await connectToDB(requestEvent.env);
+export const getPortfolio24hChange = server$(async function () {
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
@@ -330,18 +339,16 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
   };
 });
 
-export const useTotalPortfolioValue = routeLoader$(async (requestEvent) => {
-  const db = await connectToDB(requestEvent.env);
+export const getTotalPortfolioValue = server$(async function () {
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
-  const uniswapSubgraphURL = requestEvent.env.get(
-    "UNIV3_OPTIMIST_SUBGRAPH_URL",
-  );
+  const uniswapSubgraphURL = this.env.get("UNIV3_OPTIMIST_SUBGRAPH_URL");
   if (!uniswapSubgraphURL) {
     throw new Error("Missing UNISWAP_SUBGRAPH_URL");
   }
@@ -420,10 +427,10 @@ export const useTotalPortfolioValue = routeLoader$(async (requestEvent) => {
   return totalValue.toFixed(2);
 });
 
-export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
-  const db = await connectToDB(requestEvent.env);
+export const getFavouriteTokens = server$(async function () {
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
@@ -490,19 +497,29 @@ export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const nav = useNavigate();
   const isPortfolioFullScreen = useSignal(false);
-  const totalPortfolioValue = useTotalPortfolioValue();
-  const favoriteTokens = useGetFavoriteTokens();
-  const toggleChart = useToggleChart();
-  const portfolioValueChange = usePortfolio24hChange();
-  const chartDataStore = useStore({
-    data: portfolioValueChange.value.chartData,
+  // const totalPortfolioValue = useTotalPortfolioValue();
+  const totalPortfolioValue = useSignal("0");
+  const totalPortfolioValueLoading = useSignal(true);
+
+  // const portfolioValueChange = usePortfolio24hChange();
+  const portfolioValueChange = useSignal<any>({});
+  const portfolioValueChangeLoading = useSignal(true);
+
+  // const favoriteTokens = useGetFavoriteTokens();
+  const favoriteTokenLoading = useSignal(true);
+  const favoriteTokens = useSignal<any[]>([]);
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async () => {
+    favoriteTokens.value = await getFavouriteTokens();
+    favoriteTokenLoading.value = false;
+
+    totalPortfolioValue.value = await getTotalPortfolioValue();
+    totalPortfolioValueLoading.value = false;
+
+    portfolioValueChange.value = await getPortfolio24hChange();
+    portfolioValueChangeLoading.value = false;
   });
-  const portfolioValueStore = useStore({
-    selectedPeriodLabel: portfolioValueChange.value.period,
-    portfolioValueChange: portfolioValueChange.value.totalValueChange,
-    portfolioPercentageValueChange:
-      portfolioValueChange.value.percentageOfTotalValueChange,
-  });
+
   const changePeriod = useSignal(false);
   const selectedPeriod: PeriodState = useStore({
     "24h": true,
@@ -518,6 +535,9 @@ export default component$(() => {
     selectedPeriod[button] = true;
   });
 
+  const redrawChart = useSignal<boolean>(false);
+  const hideChartWhileLoading = useSignal<boolean>(false);
+
   useTask$(async ({ track }) => {
     track(async () => {
       selectedPeriod["24h"];
@@ -526,28 +546,35 @@ export default component$(() => {
       selectedPeriod["1Y"];
 
       if (changePeriod.value !== false) {
-        const newChartData = await toggleChart.submit(selectedPeriod);
-        chartDataStore.data = newChartData.value.chartData;
-        portfolioValueStore.selectedPeriodLabel = newChartData.value.period;
-        portfolioValueStore.portfolioValueChange =
-          newChartData.value.totalValueChange;
-        portfolioValueStore.portfolioPercentageValueChange =
-          newChartData.value.percentageOfTotalValueChange;
+        hideChartWhileLoading.value = true;
+        const newChartData = await toggleChart(selectedPeriod);
+        portfolioValueChange.value.chartData = newChartData.chartData;
+        portfolioValueChange.value.period = newChartData.period;
+        portfolioValueChange.value.totalValueChange =
+          newChartData.totalValueChange;
+        portfolioValueChange.value.percentageOfTotalValueChange =
+          newChartData.percentageOfTotalValueChange;
+        redrawChart.value = !redrawChart.value;
+        hideChartWhileLoading.value = false;
       }
     });
   });
 
   return isPortfolioFullScreen.value ? (
     <PortfolioValue
+      hideChartWhileLoading={hideChartWhileLoading}
+      redrawChart={redrawChart.value}
+      portfolioValueChangeLoading={portfolioValueChangeLoading}
+      totalPortfolioValueLoading={totalPortfolioValueLoading.value}
       totalPortfolioValue={totalPortfolioValue.value}
       isPortfolioFullScreen={isPortfolioFullScreen}
-      portfolioValueChange={portfolioValueStore.portfolioValueChange}
+      portfolioValueChange={portfolioValueChange.value.totalValueChange}
       portfolioPercentageValueChange={
-        portfolioValueStore.portfolioPercentageValueChange
+        portfolioValueChange.value.percentageOfTotalValueChange
       }
-      chartData={chartDataStore.data}
+      chartData={portfolioValueChange.value.chartData}
       selectedPeriod={selectedPeriod}
-      period={portfolioValueStore.selectedPeriodLabel}
+      period={portfolioValueChange.value.period}
       onClick$={(e: any) => {
         togglePeriod(e.target.name);
         changePeriod.value = true;
@@ -557,15 +584,19 @@ export default component$(() => {
     <div class="grid grid-rows-[max(330px)_auto] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue
+          hideChartWhileLoading={hideChartWhileLoading}
+          redrawChart={redrawChart.value}
+          portfolioValueChangeLoading={portfolioValueChangeLoading}
+          totalPortfolioValueLoading={totalPortfolioValueLoading.value}
           totalPortfolioValue={totalPortfolioValue.value}
           isPortfolioFullScreen={isPortfolioFullScreen}
-          portfolioValueChange={portfolioValueStore.portfolioValueChange}
+          portfolioValueChange={portfolioValueChange.value.totalValueChange}
           portfolioPercentageValueChange={
-            portfolioValueStore.portfolioPercentageValueChange
+            portfolioValueChange.value.percentageOfTotalValueChange
           }
-          chartData={chartDataStore.data}
+          chartData={portfolioValueChange.value.chartData}
           selectedPeriod={selectedPeriod}
-          period={portfolioValueStore.selectedPeriodLabel}
+          period={portfolioValueChange.value.period}
           onClick$={(e: any) => {
             togglePeriod(e.target.name);
             changePeriod.value = true;
@@ -651,7 +682,16 @@ export default component$(() => {
             <div class=""></div>
           </div>
           <div>
-            {favoriteTokens.value[0] &&
+            {favoriteTokenLoading.value ? (
+              <div class="flex flex-col items-center pt-12">
+                <Spinner />
+              </div>
+            ) : favoriteTokens.value.length === 0 ? (
+              <div class="flex flex-col items-center pt-12">
+                <span>No Favourite Tokens</span>
+              </div>
+            ) : (
+              favoriteTokens.value[0] &&
               favoriteTokens.value[0].structureBalance.map(
                 async (token: any, index: number) => {
                   const formattedBalance = convertWeiToQuantity(
@@ -675,7 +715,8 @@ export default component$(() => {
                     />
                   );
                 },
-              )}
+              )
+            )}
           </div>
         </div>
       </div>
