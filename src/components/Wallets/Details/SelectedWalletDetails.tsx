@@ -3,7 +3,7 @@ import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/wal
 import IconDelete from "/public/assets/icons/wallets/delete-red.svg?jsx";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconWallet from "/public/assets/icons/wallets/wallet.svg?jsx";
-import IconLoading from "/public/assets/icons/wallets/loading.svg?jsx";
+// import IconLoading from "/public/assets/icons/wallets/loading.svg?jsx";
 import { TokenRowWallets } from "~/components/Tokens/TokenRowWallets";
 import { type transferredCoinInterface } from "~/routes/app/wallets";
 
@@ -52,10 +52,10 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
                 <IconEthereum />
                 {chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
               </span>
-              <span class="flex items-center gap-2 text-nowrap rounded-lg border border-customBlue px-2 text-xs text-customBlue">
+              {/* <span class="flex items-center gap-2 text-nowrap rounded-lg border border-customBlue px-2 text-xs text-customBlue">
                 <IconLoading />
                 Loading Tokens 5/10
-              </span>
+              </span> */}
             </div>
           </div>
           <div class="flex gap-2">
@@ -77,7 +77,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
           </div>
         </div>
         <div class="grid gap-4">
-          <div class="custom-text-50 grid grid-cols-[22%_15%_15%_15%_15%_15%] items-center gap-2 text-left text-xs uppercase">
+          <div class="custom-text-50 grid grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 text-left text-xs uppercase">
             <div class="">Token name</div>
             <div class="">Quantity</div>
             <div class="">Value</div>

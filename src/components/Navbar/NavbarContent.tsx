@@ -26,7 +26,7 @@ export const NavbarContent = component$(() => {
       </div>
       <div class="flex items-center gap-2">
         <ImgAvatar />
-        <div class="">
+        <div class="flex flex-col">
           <p>{address}</p>
 
           <p class="text-[10px] text-customGreen">Account verified</p>

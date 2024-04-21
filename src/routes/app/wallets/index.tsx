@@ -674,7 +674,7 @@ export default component$(() => {
 
   return (
     <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
-      <div class="custom-border-1 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
+      <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
         <div class="flex items-center justify-between gap-2">
           <h1 class="text-xl font-semibold">Wallets</h1>
           <button
@@ -707,7 +707,7 @@ export default component$(() => {
 
       <div class="grid gap-6">
         {/* <PendingAuthorization/> */}
-        <div class="custom-border-1 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
+        <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
           {selectedWallet.value && (
             <SelectedWalletDetails
               key={selectedWallet.value.wallet.address}

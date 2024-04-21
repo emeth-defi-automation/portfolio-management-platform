@@ -24,14 +24,10 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
   ({
     name,
     symbol,
-    address,
     balance,
     imagePath,
     balanceValueUSD,
-    isTransferModalOpen,
-    transferredCoin,
     allowance,
-    isExecutable,
   }) => {
     const imageTransformer$ = $(
       ({ src, width, height }: ImageTransformerProps): string => {
@@ -45,7 +41,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     });
     return (
       <>
-        <div class="custom-border-b-1 grid grid-cols-[22%_15%_15%_15%_15%_15%] items-center gap-2 py-2 text-sm">
+        <div class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm">
           <div class="flex items-center gap-4 py-2">
             <div class="custom-border-1 rounded-lg p-[10px]">
               <Image
@@ -68,22 +64,6 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             <span class="text-customGreen">3,6%</span>
             <IconGraph />
           </div>
-
-          {isExecutable ? (
-            <div class="text-left">
-              <button
-                class=""
-                onClick$={() => {
-                  isTransferModalOpen.value = !isTransferModalOpen.value;
-                  transferredCoin.symbol = symbol;
-                  transferredCoin.address = address;
-                }}
-              >
-                <span class="text-xs hover:text-blue-500">TRANSFER</span>
-              </button>
-            </div>
-          ) : null}
-
           {/* <div class="text-right">
             <button class="">
               <IconMenuDots />

@@ -40,7 +40,7 @@ export const TokenRow = component$<TokenRowProps>(
       imageTransformer$,
     });
     return (
-      <div class="custom-border-b-1 grid h-16 grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2 text-sm ">
+      <div class="custom-border-b-1-opacity-5 last:border-b-0 last:pb-0 grid h-16 grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2 text-sm ">
         <div class="flex items-center gap-4">
           <div class="custom-border-1 rounded-lg bg-white bg-opacity-10 p-2">
             <Image

@@ -581,7 +581,7 @@ export default component$(() => {
       }}
     />
   ) : (
-    <div class="grid grid-rows-[max(460px)_min(250px)] gap-6 p-10">
+    <div class="grid grid-rows-[max(460px)_minmax(250px_auto)] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue
           hideChartWhileLoading={hideChartWhileLoading}
@@ -703,11 +703,11 @@ export default component$(() => {
           </div>
           <div>
             {favoriteTokenLoading.value ? (
-              <div class="flex flex-col items-center pt-12">
+              <div class="flex flex-col items-center py-12">
                 <Spinner />
               </div>
             ) : favoriteTokens.value.length === 0 ? (
-              <div class="flex flex-col items-center pt-12">
+              <div class="flex flex-col items-center py-12">
                 <span>No Favourite Tokens</span>
               </div>
             ) : (
