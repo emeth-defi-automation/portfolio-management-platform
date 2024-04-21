@@ -73,22 +73,16 @@ jobs:
       - name: Install SurrealDB CLI
         run: curl -sSf https://install.surrealdb.com | sh
 
-      # - name: Install ngrok
-      #   run: curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
+      - name: Install ngrok
+        run: curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
 
-      # - name: Configure ngrok
-      #   run: ngrok authtoken ${{ env.NGROK_AUTH_TOKEN }}
-
-      # - name: Dry print
-      #   run: echo "ngrok http --domain=${{ env.NGROK_STATIC_DOMAIN }} ${{ env.APP_PORT }}"
+      - name: Configure ngrok
+        run: ngrok authtoken ${{ env.NGROK_AUTH_TOKEN }}
 
       - name: Run ngrok
         uses: JarvusInnovations/background-action@v1
         with:
-          run: |
-            curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
-            ngrok authtoken ${{ env.NGROK_AUTH_TOKEN }}
-            ngrok http --domain=${{ env.NGROK_STATIC_DOMAIN }} ${{ env.APP_PORT }} > /dev/null &
+          run: ngrok http --domain=${{ env.NGROK_STATIC_DOMAIN }} ${{ env.APP_PORT }} > /dev/null &
           wait-on: http-get://localhost:4040/status
 
       - name: Start app database
