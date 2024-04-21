@@ -119,12 +119,12 @@ export const useAddWallet = routeAction$(
         );
       }
     }
-
+    console.log("Before")
     if (!(await getExistingRelation(db, userId, walletId)).at(0)) {
-      await db.query(`RELATE ONLY ${userId}->observes_wallet->${walletId}
-      SET name = ${data.name};`);
+      console.log("Inside")
+      await db.query(`RELATE ONLY ${userId}->observes_wallet->${walletId} SET name = '${data.name}';`);
     }
-
+    console.log("After")
     return {
       success: true,
       wallet: { id: walletId, chainId: 1, address: data.address },
@@ -543,7 +543,7 @@ export default component$(() => {
 
         await writeContract(temporaryModalStore.config as Config, request);
       }
-
+      console.log("Before AddWallet")
       const {
         value: { success },
       } = await addWalletAction.submit({
@@ -551,13 +551,15 @@ export default component$(() => {
         name: addWalletFormStore.name,
         isExecutable: addWalletFormStore.isExecutable.toString(),
       });
+      console.log("Success", {success})
       if (success) {
+        console.log("Before get observed")
         observedWallets.value = await getObservedWallets();
         await getWalletBalanceHistory.submit({
           address: addWalletFormStore.address,
         });
       }
-
+      console.log("After AddWallet")
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "success",

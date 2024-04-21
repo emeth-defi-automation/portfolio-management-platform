@@ -1,7 +1,6 @@
 import { isAddress, getAddress } from "viem";
 import { connectToDB } from "../db";
 import { server$, z } from "@builder.io/qwik-city";
-import { type Wallet } from "~/interface/auth/Wallet";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 
 export function isValidName(name: string): boolean {
@@ -31,7 +30,7 @@ export function isPrivateKeyHex(key: string): boolean {
 }
 
 export const UniqueNameResult = z.object({
-  total: z.number(),
+  name: z.string(),
 });
 export type UniqueNameResult = z.infer<typeof UniqueNameResult>;
 
@@ -42,16 +41,15 @@ export const isNameUnique = server$(async function (name: string) {
     throw new Error("No cookie found");
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
-  //change query to include observes_wallet.name result
-  const [result]: any = await db.query(
-    `SELECT VALUE ->observes_wallet.out FROM ${userId};`,
-  );
-  if (!result[0]) return true;
-
-  const observedWalletsQueryResult = result[0];
-  for (const observedWallet of observedWalletsQueryResult) {
-    const [wallet] = await db.select<Wallet>(`${observedWallet}`);
-    if (wallet.name === name) {   //use result from new query
+  const result = (await db.query(
+    `SELECT name FROM '${userId}'->observes_wallet;`,
+  )).at(0);
+  if (!result) {
+    return true;
+  }
+  const usersObservedWallets = UniqueNameResult.array().parse(result);
+  for (const observedWallet of usersObservedWallets) {
+    if (observedWallet.name === name) {
       return false;
     }
   }

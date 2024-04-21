@@ -440,8 +440,12 @@ export const getFavouriteTokens = server$(async function () {
 
   for (const balance of structureBalances[0]["->structure_balance"].out) {
     const [walletId]: any = await db.query(`
-      SELECT out  FROM for_wallet WHERE in = ${balance}`);
+      SELECT out FROM for_wallet WHERE in = ${balance}`);
     const [wallet] = await db.select<Wallet>(`${walletId[0].out}`);
+
+    const [walletName]: any = await db.query(
+      `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`
+    );
 
     const [tokenBalance]: any = await db.query(`
       SELECT * FROM balance WHERE id=${balance}`);
@@ -467,7 +471,7 @@ export const getFavouriteTokens = server$(async function () {
     structureTokens.push({
       wallet: {
         id: wallet.id,
-        name: wallet.name,
+        name: walletName,
         chainId: wallet.chainId,
       },
       balance: tokenWithBalance,

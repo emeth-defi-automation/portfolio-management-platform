@@ -52,7 +52,7 @@ function extractData(
     <TokenRow
       key={`${entry.balanceId} - ${index}`}
       icon={`/assets/icons/tokens/${entry.symbol.toLowerCase()}.svg`}
-      name={entry.name}
+      name={entry.walletName}
       symbol={entry.symbol}
       quantity={entry.quantity}
       value={`$${(entry.value * entry.quantity).toFixed(2)}`}

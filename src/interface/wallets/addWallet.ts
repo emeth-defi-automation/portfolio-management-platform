@@ -6,7 +6,6 @@ export const ExistingWalletResult = z.object({
   id: z.string(),
   chainId: z.number(),
   address: z.string(),
-  name: z.string(),
   nativeBalance: z.string().optional(),
 });
 export type ExistingWalletResult = z.infer<typeof ExistingWalletResult>;
