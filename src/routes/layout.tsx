@@ -2,33 +2,23 @@ import {
   component$,
   Slot,
   useContextProvider,
-  useStore,
   noSerialize,
-  useVisibleTask$,
   useTask$,
   useContext,
 } from "@builder.io/qwik";
 import type { RequestHandler } from "@builder.io/qwik-city";
-import { reconnect, watchAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
-import { type Chain, mainnet, sepolia } from "viem/chains";
-import { StreamStoreContext } from "~/interface/streamStore/streamStore";
+import { mainnet, sepolia } from "viem/chains";
 import {
-  type ModalStore,
-  ModalStoreContext,
-} from "~/interface/web3modal/ModalStore";
+  LoginContext,
+  ModalConfigContext,
+} from "~/components/WalletConnect/context";
+import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import {
   getStream,
   initializeStreamIfNeeded,
   setupStream,
 } from "~/utils/stream";
-
-export const metadata = {
-  name: "Web3Modal",
-  description: "Web3Modal Example",
-  url: "https://web3modal.com",
-  icons: ["https://avatars.githubusercontent.com/u/37784886"],
-};
 
 export const onGet: RequestHandler = async ({ cacheControl }) => {
   // Control caching for this request for best performance and to reduce hosting costs:
@@ -42,10 +32,24 @@ export const onGet: RequestHandler = async ({ cacheControl }) => {
 };
 
 export default component$(() => {
-  const modalStore = useStore<ModalStore>({
-    isConnected: undefined,
-    config: undefined,
+  const metadata = {
+    name: import.meta.env.PUBLIC_METADATA_NAME,
+    description: import.meta.env.PUBLIC_METADATA_DESCRIPTION,
+    url: "https://web3modal.com",
+    icons: ["https://avatars.githubusercontent.com/u/37784886"],
+  };
+
+  useContextProvider(ModalConfigContext, {
+    config: noSerialize(
+      defaultWagmiConfig({
+        chains: [mainnet, sepolia],
+        projectId: import.meta.env.PUBLIC_PROJECT_ID,
+        metadata,
+      }),
+    ),
   });
+
+  useContextProvider(LoginContext, { account: undefined });
 
   useContextProvider(StreamStoreContext, { streamId: "" });
   const streamStore = useContext(StreamStoreContext);
@@ -55,36 +59,6 @@ export default component$(() => {
     const stream = await getStream();
     streamStore.streamId = stream["jsonResponse"]["id"];
   });
-
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async () => {
-    const chains: [Chain, ...Chain[]] = [mainnet, sepolia];
-    const projectId = import.meta.env.PUBLIC_PROJECT_ID;
-    if (!projectId || typeof projectId !== "string") {
-      throw new Error("Missing project ID");
-    }
-    const config2 = defaultWagmiConfig({
-      chains, // required
-      projectId, // required
-      metadata, // required
-      enableWalletConnect: true, // Optional - true by default
-      enableInjected: true, // Optional - true by default
-      enableEIP6963: true, // Optional - true by default
-      enableCoinbase: true, // Optional - true by default
-    });
-    await reconnect(config2);
-
-    modalStore.config = noSerialize(config2);
-    if (modalStore.config) {
-      watchAccount(modalStore.config, {
-        onChange(data) {
-          modalStore.isConnected = data.isConnected;
-        },
-      });
-    }
-  });
-
-  useContextProvider(ModalStoreContext, modalStore);
 
   return (
     <>
