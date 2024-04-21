@@ -258,7 +258,11 @@ export const useRemoveWallet = routeAction$(
     }
 
     const { userId } = jwt.decode(cookie.value) as JwtPayload;
-    await db.query(`DELETE ${userId}->observes_wallet WHERE out=${wallet.id};`);
+
+    await db.query(`
+    DELETE ${userId}->observes_wallet WHERE out=${wallet.id};
+    LET $wallet_address = SELECT VALUE address FROM ${wallet.id};
+    DELETE wallet_balance WHERE walletAddress = $wallet_address[0]`);
 
     const [usersObservingWallet] = await getUsersObservingWallet(db, wallet.id);
 
