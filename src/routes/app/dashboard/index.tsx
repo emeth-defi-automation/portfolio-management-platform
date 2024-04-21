@@ -63,14 +63,13 @@ function mapTokenAddress(sepoliaAddress: string): any {
     return null;
   }
 }
-export const useToggleChart = routeAction$(async (data, requestEvent) => {
-  console.log("useToggleChart started");
 
+export const toggleChart = server$(async function (data) {
   const selectedPeriod: { period: number; interval: number } =
     getSelectedPeriodInHours(data as PeriodState);
-  const db = await connectToDB(requestEvent.env);
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
@@ -200,7 +199,7 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
       totalValueChange,
     );
   }
-  console.log("chartData", chartData);
+
   return {
     percentageOfTotalValueChange: percentageOfTotalValueChange.toFixed(2) + "%",
     totalValueChange: totalValueChange.toFixed(2),
@@ -526,19 +525,6 @@ export default component$(() => {
     portfolioValueChangeLoading.value = false;
   });
 
-  const toggleChart = useToggleChart();
-
-  // const chartDataStore = useStore({
-  //   data: portfolioValueChange.value.chartData,
-  // });
-
-  // TODO: get rid of that?
-  // const portfolioValueStore = useStore({
-  //   selectedPeriodLabel: portfolioValueChange.value.period,
-  //   portfolioValueChange: portfolioValueChange.value.totalValueChange,
-  //   portfolioPercentageValueChange:
-  //     portfolioValueChange.value.percentageOfTotalValueChange,
-  // });
   const changePeriod = useSignal(false);
   const selectedPeriod: PeriodState = useStore({
     "24h": true,
@@ -554,30 +540,36 @@ export default component$(() => {
     selectedPeriod[button] = true;
   });
 
+  const redrawChart = useSignal<boolean>(false);
+  const hideChartWhileLoading = useSignal<boolean>(false);
+
   useTask$(async ({ track }) => {
     track(async () => {
-      console.log("use task started");
       selectedPeriod["24h"];
       selectedPeriod["1W"];
       selectedPeriod["1M"];
       selectedPeriod["1Y"];
 
       if (changePeriod.value !== false) {
-        console.log("selectedPeriod", selectedPeriod);
-        const newChartData = await toggleChart.submit(selectedPeriod);
-        portfolioValueChange.value.chartData = newChartData.value.chartData;
-        portfolioValueChange.value.period = newChartData.value.period;
+        hideChartWhileLoading.value = true;
+        const newChartData = await toggleChart(selectedPeriod);
+        portfolioValueChange.value.chartData = newChartData.chartData;
+        portfolioValueChange.value.period = newChartData.period;
         portfolioValueChange.value.totalValueChange =
-          newChartData.value.totalValueChange;
+          newChartData.totalValueChange;
         portfolioValueChange.value.percentageOfTotalValueChange =
-          newChartData.value.percentageOfTotalValueChange;
+          newChartData.percentageOfTotalValueChange;
+        redrawChart.value = !redrawChart.value;
+        hideChartWhileLoading.value = false;
       }
     });
   });
 
   return isPortfolioFullScreen.value ? (
     <PortfolioValue
-      portfolioValueChangeLoading={portfolioValueChangeLoading.value}
+      hideChartWhileLoading={hideChartWhileLoading}
+      redrawChart={redrawChart.value}
+      portfolioValueChangeLoading={portfolioValueChangeLoading}
       totalPortfolioValueLoading={totalPortfolioValueLoading.value}
       totalPortfolioValue={totalPortfolioValue.value}
       isPortfolioFullScreen={isPortfolioFullScreen}
@@ -597,7 +589,9 @@ export default component$(() => {
     <div class="grid grid-rows-[max(330px)_auto] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue
-          portfolioValueChangeLoading={portfolioValueChangeLoading.value}
+          hideChartWhileLoading={hideChartWhileLoading}
+          redrawChart={redrawChart.value}
+          portfolioValueChangeLoading={portfolioValueChangeLoading}
           totalPortfolioValueLoading={totalPortfolioValueLoading.value}
           totalPortfolioValue={totalPortfolioValue.value}
           isPortfolioFullScreen={isPortfolioFullScreen}

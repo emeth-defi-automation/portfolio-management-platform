@@ -35,7 +35,9 @@ export const Spinner = component$<SpinnerProps>(({ isTextVisible = true }) => {
         />
       </svg>
       {isTextVisible ? (
-        <div class="mt-2 text-3xl font-medium text-blue-600">Loading...</div>
+        <div class="custom-text-gradient mt-2 text-3xl font-medium">
+          Loading...
+        </div>
       ) : null}
     </>
   );
