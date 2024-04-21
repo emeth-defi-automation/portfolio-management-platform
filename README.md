@@ -120,6 +120,14 @@ npm run dev
 
 ## Build & serve
 
+Fristly, run ngrok tunnel (and copy https url to `.env.local` into `NGROK_WEBHOOK_URL`):
+
+```bash
+npm run ngrok
+```
+
+Export all variables from `.env` and `.env.local` files to your shell.
+
 Start database and provision it with data (as above) - `production` build require database up and running.
 
 Build `production` mode:
