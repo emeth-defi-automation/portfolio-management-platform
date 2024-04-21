@@ -1,13 +1,10 @@
 import { component$, useContext } from "@builder.io/qwik";
 import ImgAvatar from "/public/assets/images/avatar.png?jsx";
-import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import IconLogout from "/public/assets/icons/logout.svg?jsx";
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
 import { type Config, disconnect, getAccount } from "@wagmi/core";
 import { NavLink } from "./NavLink";
 import { useNavigate } from "@builder.io/qwik-city";
-import { type ConnectorParameter } from "@wagmi/core/internal";
-import { getCookie } from "~/utils/refresh";
 
 export const NavbarContent = component$(() => {
   const nav = useNavigate();
