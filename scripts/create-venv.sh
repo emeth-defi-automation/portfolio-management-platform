@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # Define the name of the virtual environment
 VENV_NAME=".venv"
 
