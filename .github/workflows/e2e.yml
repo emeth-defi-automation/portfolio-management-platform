@@ -79,12 +79,15 @@ jobs:
       - name: Configure ngrok
         run: ngrok authtoken ${{ env.NGROK_AUTH_TOKEN }}
 
+      - name: Dry print
+        run: echo "ngrok http --domain=${{ vars.NGROK_STATIC_DOMAIN }} ${{ env.APP_PORT }}"
+
       - name: Run ngrok
         uses: JarvusInnovations/background-action@v1
         with:
-          run: ngrok http --domain=${{ vars.NGROK_STATIC_DOMAIN }} ${{ env.APP_PORT }}
-          # wait-on: http://localhost:4040/status
-          wait-on: file://home/runner/.config/ngrok/ngrok.yml
+          run: ngrok http --domain=${{ env.NGROK_STATIC_DOMAIN }} ${{ env.APP_PORT }}
+          wait-on: http://localhost:4040/status
+          # wait-on: file://home/runner/.config/ngrok/ngrok.yml
 
       - name: Start app database
         uses: JarvusInnovations/background-action@v1
