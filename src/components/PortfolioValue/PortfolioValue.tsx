@@ -25,7 +25,7 @@ export interface PortfolioValueProps {
   isPortfolioFullScreen: Signal<boolean>;
   portfolioValueChange: string;
   portfolioPercentageValueChange: string;
-  chartData: [string, number][];
+  chartData: [string, number][] | undefined;
   onClick$?: QRL<(e: any) => void>;
   selectedPeriod: PeriodState;
   period: string;

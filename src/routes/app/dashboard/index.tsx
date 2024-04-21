@@ -15,12 +15,7 @@ import {
 import { TokenRow } from "~/components/Tokens/TokenRow";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { connectToDB } from "~/utils/db";
-import {
-  routeAction$,
-  routeLoader$,
-  server$,
-  useNavigate,
-} from "@builder.io/qwik-city";
+import { server$, useNavigate } from "@builder.io/qwik-city";
 import {
   fetchTokenDayData,
   getDBTokenPriceUSD,
