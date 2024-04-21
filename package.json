@@ -30,6 +30,7 @@
     "test.e2e": "playwright test",
     "test.e2e.report": "playwright show-report",
     "test.e2e.setup": "playwright install --with-deps",
+    "test.e2e.setup-system": "playwright install-deps",
     "test.e2e.ui": "playwright test --ui",
     "update": "npx npm-check-updates -u",
     "update.check": "npx npm-check-updates",

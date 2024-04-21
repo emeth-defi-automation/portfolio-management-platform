@@ -70,6 +70,10 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npm run test.e2e.setup
 
+      - name: Install Playwright system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npm run test.e2e.setup-system
+
       - name: Install SurrealDB CLI
         run: curl -sSf https://install.surrealdb.com | sh
 
