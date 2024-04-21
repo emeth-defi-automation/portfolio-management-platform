@@ -83,7 +83,8 @@ jobs:
         uses: JarvusInnovations/background-action@v1
         with:
           run: ngrok http --domain=${{ vars.NGROK_STATIC_DOMAIN }} ${{ env.APP_PORT }}
-          wait-on: http://localhost:4040/status
+          # wait-on: http://localhost:4040/status
+          wait-on: file://home/runner/.config/ngrok/ngrok.yml
 
       - name: Start app database
         uses: JarvusInnovations/background-action@v1
