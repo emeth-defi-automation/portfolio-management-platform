@@ -21,6 +21,7 @@ env:
   PUBLIC_EMETH_CONTRACT_ADDRESS: ${{ vars.PUBLIC_EMETH_CONTRACT_ADDRESS }}
   PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA: ${{ vars.PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA }}
   PW_BASE_URL: ${{ vars.PW_BASE_URL }}
+  NGROK_STATIC_DOMAIN: ${{ vars.NGROK_STATIC_DOMAIN }}
   SURREALDB_URL: ${{ secrets.SURREALDB_URL }}
   SURREALDB_USER: ${{ secrets.SURREALDB_USER }}
   SURREALDB_PASS: ${{ secrets.SURREALDB_PASS }}
@@ -32,6 +33,7 @@ env:
   UNIV3_OPTIMIST_SUBGRAPH_URL: ${{ secrets.UNIV3_OPTIMIST_SUBGRAPH_URL }}
   MORALIS_API_KEY: ${{ secrets.MORALIS_API_KEY }}
   NGROK_WEBHOOK_URL: ${{ secrets.NGROK_WEBHOOK_URL }}
+  NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
 jobs:
   e2e:
@@ -70,6 +72,18 @@ jobs:
 
       - name: Install SurrealDB CLI
         run: curl -sSf https://install.surrealdb.com | sh
+
+      - name: Install ngrok
+        run: curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
+
+      - name: Configure ngrok
+        run: ngrok authtoken ${{ env.NGROK_AUTH_TOKEN }}
+
+      - name: Run ngrok
+        uses: JarvusInnovations/background-action@v1
+        with:
+          run: ngrok http --domain=${{ vars.NGROK_STATIC_DOMAIN }} ${{ env.APP_PORT }}
+          wait-on: http-get://localhost:4040/api/tunnels
 
       - name: Start app database
         uses: JarvusInnovations/background-action@v1

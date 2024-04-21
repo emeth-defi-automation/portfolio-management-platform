@@ -118,7 +118,7 @@ Last step is run the app (in dev mode):
 npm run dev
 ```
 
-## Build
+## Build & serve
 
 Start database and provision it with data (as above) - `production` build require database up and running.
 
