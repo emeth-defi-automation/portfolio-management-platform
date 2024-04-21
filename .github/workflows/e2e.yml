@@ -83,7 +83,7 @@ jobs:
         uses: JarvusInnovations/background-action@v1
         with:
           run: ngrok http --domain=${{ vars.NGROK_STATIC_DOMAIN }} ${{ env.APP_PORT }}
-          # wait-on: http-get://localhost:4040/api/tunnels
+          wait-on: http-get://localhost:4040/status
 
       - name: Start app database
         uses: JarvusInnovations/background-action@v1
