@@ -120,7 +120,7 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
       }
     }
 
-    let combinedQuery: string = ''
+    let combinedQuery: string = "";
     for (let i = 0; i < chartTimestamps.length; i++) {
       const walletBalanceQuery = `
         SELECT blockNumber, timestamp, 0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709, 0xd418937d10c9cec9d20736b2701e506867ffd85f, 0x054e1324cf61fe915cca47c48625c07400f1b587
@@ -129,10 +129,10 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
           AND wallwalletAddress = ${wallet.address}
         ORDER BY timestamp DESC
           LIMIT 1;
-      `
-      combinedQuery += walletBalanceQuery
+      `;
+      combinedQuery += walletBalanceQuery;
     }
-    const walletBalanceAtTimestamp: any = await db.query(combinedQuery)
+    const walletBalanceAtTimestamp: any = await db.query(combinedQuery);
 
     try {
       for (let i = 0; i < chartTimestamps.length; i++) {
@@ -147,14 +147,16 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
               address: ethTokenAddress,
             });
 
-            if(walletBalanceAtTimestamp[i].length > 0) {
+            if (walletBalanceAtTimestamp[i].length > 0) {
               partBalance +=
-                parseFloat(walletBalanceAtTimestamp[i][0][balanceEntry.tokenAddress.toLowerCase()]) *
-                tokenPrice.raw.usdPrice;
+                parseFloat(
+                  walletBalanceAtTimestamp[i][0][
+                    balanceEntry.tokenAddress.toLowerCase()
+                  ],
+                ) * tokenPrice.raw.usdPrice;
             } else {
-              partBalance += 0
+              partBalance += 0;
             }
-
           }
           chartData[i] += partBalance;
         } catch (error) {
@@ -259,7 +261,7 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
       }
     }
 
-    let combinedQuery: string = ''
+    let combinedQuery: string = "";
     for (let i = 0; i < chartTimestamps.length; i++) {
       const walletBalanceQuery = `
         SELECT blockNumber, timestamp, 0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709, 0xd418937d10c9cec9d20736b2701e506867ffd85f, 0x054e1324cf61fe915cca47c48625c07400f1b587
@@ -268,11 +270,10 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
           AND wallwalletAddress = ${wallet.address}
         ORDER BY timestamp DESC
           LIMIT 1;
-      `
-      combinedQuery += walletBalanceQuery
+      `;
+      combinedQuery += walletBalanceQuery;
     }
-    const walletBalanceAtTimestamp: any = await db.query(combinedQuery)
-
+    const walletBalanceAtTimestamp: any = await db.query(combinedQuery);
 
     try {
       for (let i = 0; i < chartTimestamps.length; i++) {
@@ -287,8 +288,11 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
             });
 
             partBalance +=
-              parseFloat(walletBalanceAtTimestamp[i][0][balanceEntry.tokenAddress.toLowerCase()]) *
-              tokenPrice.raw.usdPrice;
+              parseFloat(
+                walletBalanceAtTimestamp[i][0][
+                  balanceEntry.tokenAddress.toLowerCase()
+                ],
+              ) * tokenPrice.raw.usdPrice;
           }
 
           chartData[i] += partBalance;

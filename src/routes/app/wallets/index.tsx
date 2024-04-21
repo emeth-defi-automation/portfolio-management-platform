@@ -63,7 +63,6 @@ import {
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
-import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
 export const useAddWallet = routeAction$(
   async (data, requestEvent) => {
@@ -232,7 +231,7 @@ async function getErc20TokenTransfers(cursor: string | null, address: string) {
 async function getWalletBalance(block: string, address: string) {
   try {
     return Moralis.EvmApi.token.getWalletTokenBalances({
-      chain: EvmChain.SEPOLIA,
+      chain: EvmChain.SEPOLIA.hex,
       toBlock: parseInt(block),
       tokenAddresses: [
         "0x054E1324CF61fe915cca47C48625C07400F1B587",
