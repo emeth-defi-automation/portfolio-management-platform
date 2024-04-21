@@ -120,21 +120,25 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
       }
     }
 
+    let combinedQuery: string = ''
+    for (let i = 0; i < chartTimestamps.length; i++) {
+      const walletBalanceQuery = `
+        SELECT blockNumber, timestamp, 0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709, 0xd418937d10c9cec9d20736b2701e506867ffd85f, 0x054e1324cf61fe915cca47c48625c07400f1b587
+        FROM wallet_balance
+        WHERE '${chartTimestamps[i]}' >= timestamp
+          AND wallwalletAddress = ${wallet.address}
+        ORDER BY timestamp DESC
+          LIMIT 1;
+      `
+      combinedQuery += walletBalanceQuery
+    }
+    const walletBalanceAtTimestamp: any = await db.query(combinedQuery)
+
     try {
       for (let i = 0; i < chartTimestamps.length; i++) {
         try {
-          const tokenBalance =
-            await Moralis.EvmApi.token.getWalletTokenBalances({
-              chain: EvmChain.SEPOLIA.hex,
-              toBlock: sepBlocks[i],
-              tokenAddresses: [
-                "0x054E1324CF61fe915cca47C48625C07400F1B587",
-                "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-                "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-              ],
-              address: wallet.address,
-            });
           let partBalance: number = 0;
+
           for (const balanceEntry of dashboardBalance) {
             const ethTokenAddress = mapTokenAddress(balanceEntry.tokenAddress);
             const tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
@@ -143,20 +147,14 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
               address: ethTokenAddress,
             });
 
-            partBalance += tokenBalance.raw
-              .filter((item) => item.symbol === tokenPrice.raw.tokenSymbol)
-              .reduce((sum, currentItem) => {
-                return (
-                  sum +
-                  parseFloat(
-                    convertWeiToQuantity(
-                      currentItem.balance,
-                      currentItem.decimals,
-                    ),
-                  ) *
-                    tokenPrice.raw.usdPrice
-                );
-              }, 0);
+            if(walletBalanceAtTimestamp[i].length > 0) {
+              partBalance +=
+                parseFloat(walletBalanceAtTimestamp[i][0][balanceEntry.tokenAddress.toLowerCase()]) *
+                tokenPrice.raw.usdPrice;
+            } else {
+              partBalance += 0
+            }
+
           }
           chartData[i] += partBalance;
         } catch (error) {
@@ -261,21 +259,24 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
       }
     }
 
+    let combinedQuery: string = ''
+    for (let i = 0; i < chartTimestamps.length; i++) {
+      const walletBalanceQuery = `
+        SELECT blockNumber, timestamp, 0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709, 0xd418937d10c9cec9d20736b2701e506867ffd85f, 0x054e1324cf61fe915cca47c48625c07400f1b587
+        FROM wallet_balance
+        WHERE '${chartTimestamps[i]}' >= timestamp
+          AND wallwalletAddress = ${wallet.address}
+        ORDER BY timestamp DESC
+          LIMIT 1;
+      `
+      combinedQuery += walletBalanceQuery
+    }
+    const walletBalanceAtTimestamp: any = await db.query(combinedQuery)
+
+
     try {
       for (let i = 0; i < chartTimestamps.length; i++) {
         try {
-          const tokenBalance =
-            await Moralis.EvmApi.token.getWalletTokenBalances({
-              chain: EvmChain.SEPOLIA.hex,
-              toBlock: sepBlocks[i],
-              tokenAddresses: [
-                "0x054E1324CF61fe915cca47C48625C07400F1B587",
-                "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-                "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-              ],
-              address: wallet.address,
-            });
-
           let partBalance: number = 0;
           for (const balanceEntry of dashboardBalance) {
             const ethTokenAddress = mapTokenAddress(balanceEntry.tokenAddress);
@@ -285,21 +286,11 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
               address: ethTokenAddress,
             });
 
-            partBalance += tokenBalance.raw
-              .filter((item) => item.symbol === tokenPrice.raw.tokenSymbol)
-              .reduce((sum, currentItem) => {
-                return (
-                  sum +
-                  parseFloat(
-                    convertWeiToQuantity(
-                      currentItem.balance,
-                      currentItem.decimals,
-                    ),
-                  ) *
-                    tokenPrice.raw.usdPrice
-                );
-              }, 0);
+            partBalance +=
+              parseFloat(walletBalanceAtTimestamp[i][0][balanceEntry.tokenAddress.toLowerCase()]) *
+              tokenPrice.raw.usdPrice;
           }
+
           chartData[i] += partBalance;
         } catch (error) {
           console.error(error);
@@ -309,6 +300,7 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
       console.error(error);
     }
   }
+
   let totalValueChange = 0;
 
   totalValueChange = getProperTotalValueChange(
