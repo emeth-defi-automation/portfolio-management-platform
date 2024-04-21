@@ -504,7 +504,7 @@ export default component$(() => {
           </div>
         </div>
         <div class="grid">
-          <div class="custom-border-1 flex min-h-[260px] flex-col gap-4 rounded-2xl p-6">
+          <div class="custom-border-1 custom-bg-opacity-5 flex min-h-[260px] flex-col gap-4 rounded-2xl p-6">
             <p class="text-xl font-semibold">Token list</p>
             <div class="grid grid-cols-4 gap-2">
               <ButtonWithIcon

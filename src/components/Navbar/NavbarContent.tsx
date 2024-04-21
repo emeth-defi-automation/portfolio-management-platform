@@ -26,13 +26,13 @@ export const NavbarContent = component$(() => {
       </div>
       <div class="flex items-center gap-2">
         <ImgAvatar />
-        <div class="flex flex-col">
+        <div class="">
           <p>{address}</p>
 
           <p class="text-[10px] text-customGreen">Account verified</p>
         </div>
         <button
-          class="ml-2"
+          class="ml-1"
           type="button"
           onClick$={async () => {
             localStorage.removeItem("refreshToken");
