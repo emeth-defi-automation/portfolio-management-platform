@@ -642,7 +642,7 @@ export default component$(() => {
             </button>
           </div>
           <div>
-          <ActionAlertMessage
+            <ActionAlertMessage
               title="Automation name #1"
               description="6 hours ago"
             >

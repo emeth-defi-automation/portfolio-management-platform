@@ -21,14 +21,7 @@ type TokenRowWalletsProps = {
 };
 
 export const TokenRowWallets = component$<TokenRowWalletsProps>(
-  ({
-    name,
-    symbol,
-    balance,
-    imagePath,
-    balanceValueUSD,
-    allowance,
-  }) => {
+  ({ name, symbol, balance, imagePath, balanceValueUSD, allowance }) => {
     const imageTransformer$ = $(
       ({ src, width, height }: ImageTransformerProps): string => {
         return `${src}?height=${height}&width=${width}&format=webp&fit=fill`;

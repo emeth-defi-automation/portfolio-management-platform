@@ -271,12 +271,12 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
             <div class="flex items-center gap-2">
               <h2 class="custom-text-50 uppercase lg:hidden">Portfolio</h2>
-              <button class="custom-border-1 flex h-8 items-center gap-2 rounded-lg custom-bg-opacity-5 px-2">
+              <button class="custom-border-1 custom-bg-opacity-5 flex h-8 items-center gap-2 rounded-lg px-2">
                 <p>All</p>
                 <IconArrowDown />
               </button>
               <button
-                class="custom-border-1 h-8 items-center rounded-lg custom-bg-opacity-5 px-2 duration-300 ease-in-out hover:scale-110"
+                class="custom-border-1 custom-bg-opacity-5 h-8 items-center rounded-lg px-2 duration-300 ease-in-out hover:scale-110"
                 onClick$={() => {
                   isPortfolioFullScreen.value = !isPortfolioFullScreen.value;
                 }}
