@@ -12,16 +12,16 @@ import { Message } from "~/components/Message/Message";
 import { Navbar } from "~/components/Navbar/Navbar";
 import { NavbarContent } from "~/components/Navbar/NavbarContent";
 
-export const onRequest: RequestHandler = ({ json, cookie, env }) => {
+export const onRequest: RequestHandler = ({ redirect, cookie, env }) => {
   const accessToken = cookie.get("accessToken");
   if (!accessToken) {
-    json(401, { message: "Unauthorized - No Access Token" });
+    redirect(302, "/");
     return;
   }
   const secret = env.get("ACCESS_TOKEN_SECRET");
   if (!secret) throw new Error("No secret");
   if (!jwt.verify(accessToken.value, secret)) {
-    json(401, { message: "Unauthorized - Token Not Verified" });
+    redirect(302, "/");
     return;
   }
 };
