@@ -11,7 +11,7 @@ export const Navbar = component$<NavbarProps>((props) => {
     <>
       <div
         class={twMerge(
-          "custom-shadow custom-border-b-1 flex h-20 items-center justify-between px-10 text-xs",
+          "custom-shadow custom-border-b-1 custom-bg-opacity-5 flex h-20 items-center justify-between px-10 text-xs",
           props.class,
         )}
       >

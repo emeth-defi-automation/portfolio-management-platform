@@ -572,7 +572,7 @@ export default component$(() => {
       }}
     />
   ) : (
-    <div class="grid grid-rows-[max(330px)_auto] gap-6 p-10">
+    <div class="grid grid-rows-[max(460px)_minmax(250px_auto)] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue
           hideChartWhileLoading={hideChartWhileLoading}
@@ -594,7 +594,7 @@ export default component$(() => {
           }}
         />
 
-        <div class="custom-border-1 custom-shadow grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
+        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Alerts</h1>
             <button class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110">
@@ -614,10 +614,18 @@ export default component$(() => {
               title="Bitcoin share exceeded 20%"
               description="6 hours ago"
             />
+            <ActionAlertMessage
+              title="Bitcoin share exceeded 20%"
+              description="6 hours ago"
+            />
+            <ActionAlertMessage
+              title="Bitcoin share exceeded 20%"
+              description="6 hours ago"
+            />
           </div>
         </div>
 
-        <div class="custom-border-1 custom-shadow grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
+        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Actions</h1>
             <button class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110">
@@ -625,8 +633,11 @@ export default component$(() => {
             </button>
           </div>
           <div>
-            <ActionAlertMessage title="DCA" description="1 day ago">
-              <WarningStatus />
+            <ActionAlertMessage
+              title="Automation name #1"
+              description="6 hours ago"
+            >
+              <SuccessStatus />
             </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #2"
@@ -634,17 +645,26 @@ export default component$(() => {
             >
               <SuccessStatus />
             </ActionAlertMessage>
+            <ActionAlertMessage title="DCA" description="1 day ago">
+              <WarningStatus />
+            </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #3"
               description="6 hours ago"
             >
-              <WarningStatus />
+              <SuccessStatus />
+            </ActionAlertMessage>
+            <ActionAlertMessage
+              title="Automation name #4"
+              description="6 hours ago"
+            >
+              <SuccessStatus />
             </ActionAlertMessage>
           </div>
         </div>
       </div>
 
-      <div class="custom-border-1 grid grid-rows-[32px_1fr] gap-6 rounded-2xl p-6">
+      <div class="custom-border-1 custom-shadow custom-bg-opacity-5 grid grid-rows-[32px_1fr] gap-6 rounded-2xl p-6">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold">Favourite Tokens</h1>
           <button
@@ -674,11 +694,11 @@ export default component$(() => {
           </div>
           <div>
             {favoriteTokenLoading.value ? (
-              <div class="flex flex-col items-center pt-12">
+              <div class="flex flex-col items-center py-12">
                 <Spinner />
               </div>
             ) : favoriteTokens.value.length === 0 ? (
-              <div class="flex flex-col items-center pt-12">
+              <div class="flex flex-col items-center py-12">
                 <span>No Favourite Tokens</span>
               </div>
             ) : (

@@ -32,7 +32,7 @@ export const NavbarContent = component$(() => {
           <p class="text-[10px] text-customGreen">Account verified</p>
         </div>
         <button
-          class="ml-2"
+          class="ml-1"
           type="button"
           onClick$={async () => {
             localStorage.removeItem("refreshToken");

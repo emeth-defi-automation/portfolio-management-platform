@@ -186,9 +186,9 @@ export const PortfolioValue = component$<PortfolioValueProps>(
     });
     return (
       <div
-        class={`custom-border-1 custom-shadow ${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
+        class={`custom-border-1 custom-bg-opacity-5 ${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
       >
-        <div class="custom-border-b-1 flex items-center justify-between pb-4">
+        <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
           <h1 class="text-xl font-semibold">Portfolio Value</h1>
           <div class="text-right">
             <h1 class="custom-text-gradient text-xl font-semibold text-transparent">
@@ -221,7 +221,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
           <div class="flex items-center justify-between text-xs">
             <div class="flex items-center gap-2">
               <h3 class="custom-text-50 uppercase">Value over time</h3>
-              <div class="custom-bg-white custom-border-1 flex h-8 gap-2 rounded-lg p-1">
+              <div class="custom-bg-opacity-5 custom-border-1 flex h-8 rounded-lg p-1">
                 <button
                   name="24h"
                   class={
@@ -271,12 +271,12 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
             <div class="flex items-center gap-2">
               <h2 class="custom-text-50 uppercase lg:hidden">Portfolio</h2>
-              <button class="custom-border-1 flex h-8 items-center gap-2 rounded-lg bg-white bg-opacity-5 px-2">
+              <button class="custom-border-1 custom-bg-opacity-5 flex h-8 items-center gap-2 rounded-lg px-2">
                 <p>All</p>
                 <IconArrowDown />
               </button>
               <button
-                class="custom-border-1 h-8 items-center rounded-lg bg-white bg-opacity-5 px-2 duration-300 ease-in-out hover:scale-110"
+                class="custom-border-1 custom-bg-opacity-5 h-8 items-center rounded-lg px-2 duration-300 ease-in-out hover:scale-110"
                 onClick$={() => {
                   isPortfolioFullScreen.value = !isPortfolioFullScreen.value;
                 }}

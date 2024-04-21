@@ -74,7 +74,9 @@ export const Group = component$<GroupProps>((props) => {
           <div class="flex items-center gap-2">
             <IconArrowDown />
             <h3>{props.createdStructure.structure.name}</h3>
-            <IconDelete />
+            <button class="cursor-pointer" onClick$={props.onClick$}>
+              <IconDelete />
+            </button>
           </div>
           <button class="custom-border-2 rounded-3xl px-4 py-2 text-xs">
             See Performance

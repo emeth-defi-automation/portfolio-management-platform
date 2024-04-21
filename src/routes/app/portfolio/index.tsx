@@ -1,5 +1,4 @@
 import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
-import IconEdit from "/public/assets/icons/portfolio/edit.svg?jsx";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import IconClose from "/public/assets/icons/close.svg?jsx";
 import { Group } from "~/components/Groups/Group";
@@ -463,10 +462,7 @@ export default component$(() => {
     <>
       <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
         <div class="flex items-center justify-between">
-          <div class="text flex items-center gap-2 text-2xl font-semibold">
-            <h2>Portfolio Name</h2>
-            <IconEdit />
-          </div>
+          <h2 class="text-2xl font-semibold">Portfolio Name</h2>
           <div class="flex items-center gap-2">
             <ButtonWithIcon
               image="/assets/icons/portfolio/transfer.svg"
@@ -504,7 +500,7 @@ export default component$(() => {
           </div>
         </div>
         <div class="grid">
-          <div class="custom-border-1 flex min-h-[260px] flex-col gap-4 rounded-2xl p-6">
+          <div class="custom-border-1 custom-bg-opacity-5 flex min-h-[260px] flex-col gap-6 rounded-2xl p-6">
             <p class="text-xl font-semibold">Token list</p>
             <div class="grid grid-cols-4 gap-2">
               <ButtonWithIcon
@@ -529,7 +525,7 @@ export default component$(() => {
               />
             </div>
             <div class="grid grid-rows-[40px_auto] items-center gap-4 overflow-auto text-left text-sm">
-              <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_16%_3%] items-center text-xs font-normal">
+              <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
                 <div class="">TOKEN NAME</div>
                 <div class="">QUANTITY</div>
                 <div class="">VALUE</div>
