@@ -77,30 +77,25 @@ export const toggleChart = server$(async function (data) {
   const observedWalletsQueryResult = result[0];
 
   const dashboardBalance: { tokenAddress: string; balance: string }[] = [];
-  const ethBlocks = [];
-  const sepBlocks = [];
+  let ethBlocks: number[] = [];
   const chartTimestamps = generateTimestamps(
     selectedPeriod.period,
     selectedPeriod.interval,
   );
   const chartData: number[] = new Array(chartTimestamps.length).fill(0);
 
-  for (const item of chartTimestamps) {
-    try {
-      const blockDetails = await Moralis.EvmApi.block.getDateToBlock({
+  try {
+    const ethPromiseArray = chartTimestamps.map(async (item) => {
+      const ethBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
         chain: EvmChain.ETHEREUM.hex,
         date: item,
       });
-      ethBlocks.push(blockDetails.raw.block);
+      return ethBlockDetails.raw.block;
+    });
 
-      const sepoliaBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
-        chain: EvmChain.SEPOLIA.hex,
-        date: item,
-      });
-      sepBlocks.push(sepoliaBlockDetails.raw.block);
-    } catch (error) {
-      console.error(error);
-    }
+    ethBlocks = await Promise.all(ethPromiseArray);
+  } catch (error) {
+    console.error("Error occurred when fetching Eth block details", error);
   }
 
   for (const observedWallet of observedWalletsQueryResult) {
@@ -208,42 +203,38 @@ export const toggleChart = server$(async function (data) {
 
 export const getPortfolio24hChange = server$(async function () {
   const db = await connectToDB(this.env);
-
   const cookie = this.cookie.get("accessToken");
+
   if (!cookie) {
     throw new Error("No cookie found");
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
-
   const [result]: any = await db.query(
     `SELECT VALUE ->observes_wallet.out FROM ${userId};`,
   );
+
   if (!result) throw new Error("No observed wallets");
 
   const observedWalletsQueryResult = result[0];
   const dashboardBalance: { tokenAddress: string; balance: string }[] = [];
-  const ethBlocks = [];
-  const sepBlocks = [];
   const chartTimestamps = generateTimestamps(24, 4);
   const chartData: number[] = new Array(chartTimestamps.length).fill(0);
+  let ethBlocks: number[] = [];
 
-  for (const item of chartTimestamps) {
-    try {
-      const blockDetails = await Moralis.EvmApi.block.getDateToBlock({
+  try {
+    const ethPromiseArray = chartTimestamps.map(async (item) => {
+      const ethBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
         chain: EvmChain.ETHEREUM.hex,
         date: item,
       });
-      ethBlocks.push(blockDetails.raw.block);
+      return ethBlockDetails.raw.block;
+    });
 
-      const sepoliaBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
-        chain: EvmChain.SEPOLIA.hex,
-        date: item,
-      });
-      sepBlocks.push(sepoliaBlockDetails.raw.block);
-    } catch (error) {
-      console.error(error);
-    }
+    ethBlocks = await Promise.all(ethPromiseArray);
+  } catch (error) {
+    console.error("Error occurred when fetching Eth block details", error);
   }
+
   for (const observedWallet of observedWalletsQueryResult) {
     const [wallet] = await db.select<Wallet>(`${observedWallet}`);
 
