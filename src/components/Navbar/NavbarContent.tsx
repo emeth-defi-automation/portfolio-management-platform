@@ -1,11 +1,13 @@
 import { component$, useContext } from "@builder.io/qwik";
 import ImgAvatar from "/public/assets/images/avatar.png?jsx";
-import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
+import IconLogout from "/public/assets/icons/logout.svg?jsx";
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
-import { getAccount } from "@wagmi/core";
+import { type Config, disconnect, getAccount } from "@wagmi/core";
 import { NavLink } from "./NavLink";
+import { useNavigate } from "@builder.io/qwik-city";
 
 export const NavbarContent = component$(() => {
+  const nav = useNavigate();
   const modalStore = useContext(ModalStoreContext);
   let address;
   modalStore.config &&
@@ -29,8 +31,19 @@ export const NavbarContent = component$(() => {
 
           <p class="text-[10px] text-customGreen">Account verified</p>
         </div>
-        <button>
-          <IconArrowDown />
+        <button
+          class="ml-2"
+          type="button"
+          onClick$={async () => {
+            localStorage.removeItem("refreshToken");
+            document.cookie =
+              "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/app;";
+
+            await disconnect(modalStore.config as Config);
+            await nav("/");
+          }}
+        >
+          <IconLogout />
         </button>
       </div>
     </>
