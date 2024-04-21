@@ -120,7 +120,7 @@ npm run dev
 
 ## Build & serve
 
-Fristly, run ngrok tunnel (and copy https url to `.env.local` into `NGROK_WEBHOOK_URL`):
+Firstly, run ngrok tunnel (and copy https url to `.env.local` into `NGROK_WEBHOOK_URL`):
 
 ```bash
 npm run ngrok
