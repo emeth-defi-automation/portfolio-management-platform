@@ -501,7 +501,7 @@ export default component$(() => {
           </div>
         </div>
         <div class="grid">
-          <div class="custom-border-1 custom-bg-opacity-5 min-h-[260px] grid grid-rows-[20px_32px_auto] gap-6 rounded-2xl p-6">
+          <div class="custom-border-1 custom-bg-opacity-5 grid min-h-[260px] grid-rows-[20px_32px_auto] gap-6 rounded-2xl p-6">
             <p class="text-xl font-semibold">Token list</p>
             <div class="grid grid-cols-4 gap-2">
               <ButtonWithIcon
@@ -545,12 +545,10 @@ export default component$(() => {
                   title="You didn't add any Sub Portfolio yet"
                   description="Please add your first Sub Portfolio"
                   buttonText="Add Sub Portfolio"
-                  buttonOnClick$={
-                    async () => {
-                      isCreateNewStructureModalOpen.value =
-                        !isCreateNewStructureModalOpen.value;
-                    }
-                  }
+                  buttonOnClick$={async () => {
+                    isCreateNewStructureModalOpen.value =
+                      !isCreateNewStructureModalOpen.value;
+                  }}
                 />
               ) : (
                 availableStructures.value.map((createdStructures) => (

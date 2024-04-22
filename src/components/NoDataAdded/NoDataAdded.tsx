@@ -12,7 +12,7 @@ export interface NoDataAddedProps {
 export const NoDataAdded = component$<NoDataAddedProps>((props) => {
   return (
     <>
-      <div class="flex flex-col h-full items-center justify-center gap-6">
+      <div class="flex h-full flex-col items-center justify-center gap-6">
         <div class="flex flex-col justify-center gap-4 text-center">
           <div class="grid justify-center">
             <IconInfo height={40} width={40} />
