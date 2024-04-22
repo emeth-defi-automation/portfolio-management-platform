@@ -71,9 +71,12 @@ export default component$<AmountOfCoinsProps>(
                     const calculation =
                       BigInt(chosenTokenBalance.balance) /
                       BigInt(10 ** decimals);
-                    const denominator =
-                      BigInt(chosenTokenBalance.balance) -
-                      BigInt(calculation) * BigInt(10 ** decimals);
+                    const denominator = chosenTokenBalance.balance
+                      .toString()
+                      .substring(
+                        calculation.toString().length,
+                        chosenTokenBalance.balance.toString().length - 1,
+                      );
 
                     inputTokenValue!.amount = `${calculation}.${denominator}`;
                   }}

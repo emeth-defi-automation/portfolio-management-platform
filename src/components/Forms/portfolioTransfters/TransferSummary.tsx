@@ -8,7 +8,7 @@ export interface TransferSummeryProps {
 }
 
 export default component$<TransferSummeryProps>(
-  ({ batchTransferFormStore }) => {
+  () => {
     return (
       <>
         <p class="custom-text-50 text-xs font-light uppercase">Summary</p>
