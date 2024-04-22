@@ -429,7 +429,7 @@ export default component$(() => {
 
   const openWeb3Modal = $(async () => {
     const { config, modal } = await setWeb3Modal();
-    await modal.open();
+    await modal.open({ view: "Connect" });
     temporaryModalStore.config = noSerialize(config);
     const { address } = getAccount(config);
 

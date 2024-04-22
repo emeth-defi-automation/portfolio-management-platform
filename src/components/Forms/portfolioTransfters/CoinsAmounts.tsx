@@ -27,7 +27,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
               </div>
               <div class="mr-2 flex flex-col py-2">
                 {structure.coins.map((coinObject: any, index: number) => (
-                  <div key={`${coinObject.name}${index}`}>
+                  <div key={`${coinObject.wallet}${index}`}>
                     {coinObject.coins.map((coin: any) => (
                       <>
                         <FormBadge
@@ -36,7 +36,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                           customClass="h-[56px]"
                           labelClass="start-4"
                           imgClass="end-5"
-                          description={`${coinObject.name}`}
+                          description={`${coinObject.wallet}`}
                           text={coin.symbol}
                           image={`/assets/icons/tokens/${coin.symbol.toLowerCase()}.svg`}
                           // for={}
