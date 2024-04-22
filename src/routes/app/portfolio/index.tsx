@@ -280,10 +280,9 @@ export const useCreateStructure = routeAction$(
     const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
     const db = await connectToDB(requestEvent.env);
-    let [namesList]: any = await db.query(`
-    SELECT name FROM structure GROUP BY name`);
 
-    namesList = namesList.map((item: { name: string }) => item.name.trim());
+    const [namesList]: any = await db.query(`
+    SELECT VALUE out.name FROM ${userId}->has_structure`);
 
     if (namesList.includes(data.name)) {
       return {
