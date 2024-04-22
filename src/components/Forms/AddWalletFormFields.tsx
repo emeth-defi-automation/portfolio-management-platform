@@ -10,6 +10,7 @@ import {
   isValidName,
 } from "~/utils/validators/addWallet";
 import IconSuccess from "/public/assets/icons/dashboard/success.svg?jsx";
+import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
 import { Button } from "../Buttons/Buttons";
 
 export interface AddWalletFormFieldsProps {
@@ -114,7 +115,7 @@ export default component$<AddWalletFormFieldsProps>(
               />
 
               <Button
-                class="custom-border-1 ml-2 h-8 rounded-3xl px-2 text-xs font-normal text-white disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
+                class="ml-2 h-8 rounded-3xl border-0 bg-customBlue px-2 text-xs font-normal text-white duration-300 ease-in-out hover:scale-105 disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
                 type="button"
                 text="Convert"
                 onClick$={async () => {
@@ -139,15 +140,16 @@ export default component$<AddWalletFormFieldsProps>(
                   {/* don't delete this div it's for correct flex */}
                   {addWalletFormStore.address
                     ? `${addWalletFormStore.address.slice(0, 4) + "..." + addWalletFormStore.address.slice(-4)}`
-                    : "wallet address"}
-                  {/* Wallet address */}
-                  <IconSuccess width={16} height={16} />
+                    : "wallet address"} */}
+                  Wallet address
+                  <IconSuccess class="h-4 w-4" />
                 </div>
               ) : (
                 <div
-                  class={`mb-8 mt-4 flex h-12 w-full items-center justify-center rounded-lg border border-customWarning bg-customWarning bg-opacity-10 p-3 text-customWarning`}
+                  class={`relative mb-8 mt-4 flex h-12 w-full items-center justify-center rounded-lg border border-customWarning bg-customWarning bg-opacity-10 p-3 text-customWarning`}
                 >
                   Wallet not connected
+                  <IconWarning class="absolute end-3 h-4 w-4" />
                 </div>
               )}
             </div>

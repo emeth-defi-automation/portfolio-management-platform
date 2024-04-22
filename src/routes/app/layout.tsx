@@ -47,7 +47,7 @@ export default component$(() => {
   const messagesProvider = useContext(messagesContext);
   return (
     <>
-      <div class="relative z-0 grid h-screen grid-rows-[auto_1fr] bg-black font-['Sora']">
+      <div class="scrollbar relative z-0 grid h-screen grid-rows-[auto_1fr] bg-black font-['Sora']">
         <div class="gradient absolute left-1/4 top-0 h-1/5 w-6/12 rounded-full"></div>
         <Navbar>
           <NavbarContent />
