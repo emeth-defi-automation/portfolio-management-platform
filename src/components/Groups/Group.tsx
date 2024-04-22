@@ -69,7 +69,7 @@ function extractData(
 export const Group = component$<GroupProps>((props) => {
   return (
     <>
-      <div>
+      <div class="">
         <div class="flex gap-6 text-sm">
           <div class="flex items-center gap-2">
             <IconArrowDown />

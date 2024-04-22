@@ -45,6 +45,7 @@ import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTrans
 import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
 import Destination from "~/components/Forms/portfolioTransfters/Destination";
 import { convertToFraction } from "../wallets";
+import { NoDataAdded } from "~/components/NoDataAdded/NoDataAdded";
 
 type WalletWithBalance = {
   wallet: {
@@ -500,7 +501,7 @@ export default component$(() => {
           </div>
         </div>
         <div class="grid">
-          <div class="custom-border-1 custom-bg-opacity-5 flex min-h-[260px] flex-col gap-6 rounded-2xl p-6">
+          <div class="custom-border-1 custom-bg-opacity-5 min-h-[260px] grid grid-rows-[20px_32px_auto] gap-6 rounded-2xl p-6">
             <p class="text-xl font-semibold">Token list</p>
             <div class="grid grid-cols-4 gap-2">
               <ButtonWithIcon
@@ -524,7 +525,7 @@ export default component$(() => {
                 class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
               />
             </div>
-            <div class="grid grid-rows-[40px_auto] items-center gap-4 overflow-auto text-left text-sm">
+            <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
               <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
                 <div class="">TOKEN NAME</div>
                 <div class="">QUANTITY</div>
@@ -539,7 +540,34 @@ export default component$(() => {
                 <div class=""></div>
               </div>
 
-              {availableStructures.value.map((createdStructures) => (
+              {availableStructures.value.length === 0 ? (
+                <NoDataAdded
+                  title="You didn't add any Sub Portfolio yet"
+                  description="Please add your first Sub Portfolio"
+                  buttonText="Add Sub Portfolio"
+                  buttonOnClick$={
+                    async () => {
+                      isCreateNewStructureModalOpen.value =
+                        !isCreateNewStructureModalOpen.value;
+                    }
+                  }
+                />
+              ) : (
+                availableStructures.value.map((createdStructures) => (
+                  <Group
+                    key={createdStructures.structure.name}
+                    createdStructure={createdStructures}
+                    tokenStore={clickedToken}
+                    onClick$={async () => {
+                      await deleteStructureAction.submit({
+                        id: createdStructures.structure.id,
+                      });
+                    }}
+                  />
+                ))
+              )}
+
+              {/* {availableStructures.value.map((createdStructures) => (
                 <Group
                   key={createdStructures.structure.name}
                   createdStructure={createdStructures}
@@ -550,7 +578,7 @@ export default component$(() => {
                     });
                   }}
                 />
-              ))}
+              ))} */}
             </div>
             {isTransferModalOpen.value ? (
               <Modal
