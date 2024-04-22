@@ -1,32 +1,31 @@
 import { HeroText } from "~/components/HeroText/HeroText";
 import {
   component$,
-  useContext,
-  useStore,
-  useVisibleTask$,
+  // useContext,
+  // useVisibleTask$,
 } from "@builder.io/qwik";
 import { ConnectButton } from "~/components/Buttons/Buttons";
 import WalletConnect from "~/components/WalletConnect";
 import { Copyright } from "~/components/Paragraph/Paragraph";
 import { mainnet, sepolia } from "viem/chains";
 import IconLogo from "/public/assets/icons/logo.svg?jsx";
-import { disconnect, Config } from "@wagmi/core";
-import {
-  ModalStoreContext,
-} from "~/interface/web3modal/ModalStore";
+// import { disconnect, Config } from "@wagmi/core";
+// import {
+//   ModalStoreContext,
+// } from "~/interface/web3modal/ModalStore";
 
 export default component$(() => {
-  const modalStore = useContext(ModalStoreContext);
+  // const modalStore = useContext(ModalStoreContext);
 
-  useVisibleTask$(async () => {
-    console.log("elo ");
-    console.log(modalStore )
-    if (modalStore.config) {
-      console.log("rozlaczam");
-      await disconnect(modalStore.config as Config);
-      console.log("rozlaczylemm");
-    }
-  });
+  // useVisibleTask$(async () => {
+  //   console.log("elo ");
+  //   console.log(modalStore )
+  //   if (modalStore.config) {
+  //     console.log("rozlaczam");
+  //     await disconnect(modalStore.config as Config);
+  //     console.log("rozlaczylemm");
+  //   }
+  // });
 
   return (
     <>

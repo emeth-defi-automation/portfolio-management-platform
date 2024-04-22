@@ -1,4 +1,4 @@
-import { type QRL, component$, $, useVisibleTask$ } from "@builder.io/qwik";
+import { type QRL, component$, $ } from "@builder.io/qwik";
 import { getAddress } from "viem";
 import { Input } from "~/components/Input/Input";
 import { type addWalletFormStore } from "~/routes/app/wallets";
@@ -27,9 +27,7 @@ export default component$<AddWalletFormFieldsProps>(
         addWalletFormStore.isNameUniqueLoading = false;
       }),
       300,
-    ); 
-
-    useVisibleTask$(() => {})
+    );
 
     return (
       <>

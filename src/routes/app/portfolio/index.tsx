@@ -196,7 +196,7 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
   const [result]: any = await db.query(`
     SELECT VALUE ->has_structure.out FROM ${userId}`);
 
-  if (!result) throw new Error("No structures available"); 
+  if (!result) throw new Error("No structures available");
   const createdStructureQueryResult = result[0];
   const availableStructures: any[] = [];
 

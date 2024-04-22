@@ -15,7 +15,6 @@ export interface FormBadgeProps {
 }
 
 export const FormBadge = component$<FormBadgeProps>((props) => {
-  
   return (
     <div class={twMerge("relative flex min-h-11 items-center", props.class)}>
       {props.input ? props.input : null}

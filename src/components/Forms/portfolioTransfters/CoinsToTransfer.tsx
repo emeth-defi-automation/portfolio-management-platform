@@ -26,7 +26,7 @@ export default component$<CoinsToTransferProps>(
                         description={balance.wallet.name}
                         image={`/assets/icons/tokens/${balance.balance.symbol.toLowerCase()}.svg`}
                         for={`${structure.structure.name}${balance.wallet.name}${balance.balance.symbol}`}
-                        input={ 
+                        input={
                           <input
                             id={`${structure.structure.name}${balance.wallet.name}${balance.balance.symbol}`}
                             name={`${structure.structure.name}${balance.wallet.name}${balance.balance.symbol}`}

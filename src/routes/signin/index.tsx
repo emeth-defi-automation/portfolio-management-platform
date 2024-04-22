@@ -50,7 +50,7 @@ export default component$(() => {
 
   const cancelHandler = $(async () => {
     if (modalStore.isConnected && modalStore.config) {
-      // await disconnect(modalStore.config); 
+      await disconnect(modalStore.config);
       await nav("/");
     }
   });
