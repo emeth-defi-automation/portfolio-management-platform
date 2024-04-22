@@ -15,7 +15,7 @@ export const NoDataAdded = component$<NoDataAddedProps>((props) => {
       <div class="flex h-full flex-col items-center justify-center gap-6">
         <div class="flex flex-col justify-center gap-4 text-center">
           <div class="grid justify-center">
-            <IconInfo height={40} width={40} />
+            <IconInfo class="h-10 w-10" />
           </div>
           <div class="flex flex-col gap-2">
             <h3 class="text-sm font-medium">{props.title}</h3>
