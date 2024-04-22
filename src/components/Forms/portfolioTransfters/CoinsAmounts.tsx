@@ -20,13 +20,15 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
             <p>{structure.name}</p>
             <div class="custom-border-1 flex flex-col p-2">
               {structure.coins.map((coinObject: any, index: number) => (
-                <div key={`${coinObject.name}${index}`}>
-                  {coinObject.coins.map((coin: any) => (
+                <div key={`${coinObject.wallet}${index}`}>
+                  {coinObject.coins.map((coin: any) => { 
+                    console.log(coinObject)
+                    return(
                     <>
-                      <FormBadge
+                      <FormBadge 
                         key={`${coin}${index}`}
                         class="mb-2"
-                        description={`${coinObject.name}`}
+                        description={`${coinObject.wallet}`}
                         text={coin.symbol}
                         image={`/assets/icons/tokens/${coin.symbol.toLowerCase()}.svg`}
                         // for={}
@@ -80,7 +82,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                         ) : null}
                       </span>
                     </>
-                  ))}
+                  )})}
                 </div>
               ))}
             </div>

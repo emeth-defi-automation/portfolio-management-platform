@@ -18,14 +18,16 @@ export default component$<AmountOfCoinsProps>(
     return (
       <>
         <div class="mb-8">
-          {addWalletFormStore.coinsToCount.map((symbol) => (
-            <div class="flex flex-col " key={symbol}>
+          {addWalletFormStore.coinsToCount.map((symbol) => {
+            console.log('dupa ', symbol);
+           return( <div class="flex flex-col " key={symbol}>
               <div class="flex items-center justify-between">
                 <FormBadge
                   key={symbol}
                   image={`/assets/icons/tokens/${symbol.toLowerCase()}.svg`}
                   description={symbol}
                   class="mb-2 w-[85%]"
+                  text={`${symbol}`}
                   input={
                     <input
                       type="text"
@@ -87,8 +89,8 @@ export default component$<AmountOfCoinsProps>(
                   </span>
                 ) : null}
               </span>
-            </div>
-          ))}
+            </div>)
+  })}
         </div>
       </>
     );
