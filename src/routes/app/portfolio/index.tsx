@@ -601,7 +601,7 @@ export default component$(() => {
                   stepsCounter.value = 1;
                 })}
               >
-                <div class="flex flex-col overflow-y-scroll">
+                <div class="mb-4 flex flex-col overflow-y-scroll">
                   {stepsCounter.value === 1 ? (
                     <CoinsToTransfer
                       availableStructures={availableStructures}
@@ -772,7 +772,7 @@ export default component$(() => {
                           <label class="flex h-6 items-center gap-3">
                             <input
                               type="checkbox"
-                              class="border-gradient custom-border-1 custom-bg-white checked:after:border-bg z-10 h-5 w-5 appearance-none rounded checked:after:absolute checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                              class="border-gradient custom-border-1 custom-bg-white checked:after:border-bg z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:ms-2 checked:after:mt-1 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
                               checked={isSelectAllChecked.wallets}
                               onClick$={(e) => {
                                 isSelectAllChecked.wallets = true;
@@ -833,9 +833,12 @@ export default component$(() => {
                         </div>
                       </div>
                       {/* div strikte z opcjami */}
-                      <div class="flex max-h-[180px] w-[98%] flex-col gap-2 overflow-auto">
+                      <div class="scrollbar m-1 flex max-h-[80px] flex-col gap-2 overflow-auto">
                         {observedWalletsWithBalance.value.map((option) => (
-                          <div class="relative min-h-9" key={option.wallet.id}>
+                          <div
+                            class="relative mr-2 min-h-9"
+                            key={option.wallet.id}
+                          >
                             <input
                               type="checkbox"
                               name="walletsId[]"
@@ -952,7 +955,7 @@ export default component$(() => {
                             <input
                               type="checkbox"
                               checked={isSelectAllChecked.tokens}
-                              class="border-gradient custom-border-1 custom-bg-white checked:after:border-bg  z-10 h-5 w-5 appearance-none rounded checked:after:absolute checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                              class="border-gradient custom-border-1 custom-bg-white checked:after:border-bg  z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:ms-2 checked:after:mt-1 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
                               onClick$={(e) => {
                                 isSelectAllChecked.tokens = true;
 
@@ -1008,7 +1011,7 @@ export default component$(() => {
                         </div>
                       </div>
                       {/* div strikte z opcjami */}
-                      <div class="flex max-h-[180px] w-[98%] flex-col gap-2 overflow-auto">
+                      <div class="scrollbar flex max-h-[80px] flex-col gap-2 overflow-auto">
                         {parseWalletsToOptions(
                           selectedWallets.wallets,
                           selectedTokens,
@@ -1108,7 +1111,7 @@ function parseWalletsToOptions(
     item.balance.forEach((balance) => {
       totalBalances += 1;
       options.push(
-        <div class="relative min-h-9">
+        <div class="relative mr-2 min-h-9">
           <input
             key={balance.balanceId}
             id={balance.balanceId}

@@ -12,6 +12,8 @@ export interface FormBadgeProps {
   class?: string;
   customClass?: string;
   for?: string;
+  labelClass?: string;
+  imgClass?: string;
 }
 
 export const FormBadge = component$<FormBadgeProps>((props) => {
@@ -25,9 +27,14 @@ export const FormBadge = component$<FormBadgeProps>((props) => {
           props.customClass,
         )}
       >
-        <span class="absolute start-2 flex items-center gap-2">
-          <div class="custom-border-1 mr-2 rounded-lg p-1">
-            {props.image && <img src={props.image} width="20" height="20" />}
+        <span
+          class={twMerge(
+            `absolute start-2 flex items-center gap-2`,
+            props.labelClass,
+          )}
+        >
+          <div class="custom-border-1 custom-shadow-2 mr-2 rounded-lg p-1 ">
+            {props.image && <img src={props.image} width="24" height="24" />}
           </div>
           <div class="">
             <p>{props.text}</p>
@@ -40,7 +47,7 @@ export const FormBadge = component$<FormBadgeProps>((props) => {
           src={props.hasImg}
           width="14"
           height="14"
-          class="absolute end-4 "
+          class={twMerge(`absolute end-[62px]`, props.imgClass)}
         />
       ) : null}
     </div>

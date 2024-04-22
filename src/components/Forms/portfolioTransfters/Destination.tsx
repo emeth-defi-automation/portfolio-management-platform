@@ -14,6 +14,8 @@ export default component$<DestinationProps>(({ batchTransferFormStore }) => {
         text="DELIVERY ADDRESS"
         name="receiverAddress"
         type="text"
+        placeholder="Type or paste deposit address here"
+        customClass="w-[98%] ml-0.5"
         value={batchTransferFormStore.receiverAddress}
         onInput={$((e) => {
           const target = e.target;
