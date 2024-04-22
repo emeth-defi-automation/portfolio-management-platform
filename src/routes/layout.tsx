@@ -5,13 +5,16 @@ import {
   noSerialize,
   useTask$,
   useContext,
+  useVisibleTask$,
+  useSignal,
 } from "@builder.io/qwik";
 import type { RequestHandler } from "@builder.io/qwik-city";
+import { watchAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, sepolia } from "viem/chains";
 import {
   LoginContext,
-  ModalConfigContext,
+  WagmiConfigContext,
 } from "~/components/WalletConnect/context";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import {
@@ -39,7 +42,7 @@ export default component$(() => {
     icons: ["https://avatars.githubusercontent.com/u/37784886"],
   };
 
-  useContextProvider(ModalConfigContext, {
+  useContextProvider(WagmiConfigContext, {
     config: noSerialize(
       defaultWagmiConfig({
         chains: [mainnet, sepolia],
@@ -49,10 +52,28 @@ export default component$(() => {
     ),
   });
 
-  useContextProvider(LoginContext, { account: undefined });
+  useContextProvider(LoginContext, {
+    account: undefined,
+    address: useSignal(undefined),
+    chainId: useSignal(undefined),
+  });
 
   useContextProvider(StreamStoreContext, { streamId: "" });
   const streamStore = useContext(StreamStoreContext);
+
+  const wagmiConfig = useContext(WagmiConfigContext);
+  const login = useContext(LoginContext);
+
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(() => {
+    watchAccount(wagmiConfig.config!, {
+      onChange: (account) => {
+        login.account = noSerialize(account);
+        login.address.value = account.address;
+        login.chainId.value = account.chainId;
+      },
+    });
+  });
 
   useTask$(async function () {
     await initializeStreamIfNeeded(setupStream);
