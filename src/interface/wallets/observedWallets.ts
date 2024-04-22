@@ -22,17 +22,21 @@ export const GetWalletDetails = z.object({
   chainId: z.number(),
   id: z.string(),
   address: z.string(),
+  name: z.string(),
 });
 
 export type GetWalletDetails = z.infer<typeof GetWalletDetails>;
 
-export const getWalletDetails = async (db: Surreal, address: string) => {
-  const walletDetails = (
+export const getWalletDetails = async (db: Surreal, address: string, userId: string) => {
+  const [[walletDetails]]: any = (
     await db.query(
       `SELECT id, address, chainId, isExecutable FROM wallet WHERE address = '${getAddress(address)}';`,
     )
-  ).at(0);
-  return GetWalletDetails.array().parse(walletDetails);
+  );
+  const [[name]]: any = (await db.query(`SELECT VALUE name FROM '${userId}'->observes_wallet;`));
+  walletDetails.name = name;
+
+  return GetWalletDetails.parse(walletDetails);
 };
 
 export const GetBalanceToUpdate = z.object({

@@ -145,13 +145,14 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
     const walletDetails = await getWalletDetails(
       db,
       observedWalletAddress.address,
+      userId,
     );
     const [balances]: any = await db.query(
-      `SELECT id, value FROM balance WHERE ->(for_wallet WHERE out = '${walletDetails[0].id}')`,
+      `SELECT id, value FROM balance WHERE ->(for_wallet WHERE out = '${walletDetails.id}')`,
     );
 
     const walletNameResult: any = await db.query(
-      `SELECT VALUE name FROM ${walletDetails[0].id}<-observes_wallet WHERE in = ${userId}`,
+      `SELECT VALUE name FROM ${walletDetails.id}<-observes_wallet WHERE in = ${userId}`,
     );
 
     for (const balance of balances) {
@@ -173,7 +174,7 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
     }
 
     const walletWithBalance = {
-      wallet: walletDetails[0],
+      wallet: walletDetails,
       walletName: walletNameResult,
       balance: balanceDetails,
     };
@@ -217,8 +218,12 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
 
         const [wallet] = await db.select<Wallet>(`${walletId[0].out}`);
 
-        const walletNameResult: any = await db.query(
+        const [[walletNameResult]]: any = await db.query(
           `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`,
+        );
+        console.log(
+          "walletNameResult useAvailableStructures",
+          walletNameResult,
         );
 
         const [tokenBalance]: string[] = await db.query(`

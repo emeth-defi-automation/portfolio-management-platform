@@ -196,8 +196,7 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
         : "0",
     };
 
-    const dbResponse = await db.create("wallet_balance", dbObject);
-    console.log(dbResponse);
+    await db.create("wallet_balance", dbObject);
   }
 });
 
