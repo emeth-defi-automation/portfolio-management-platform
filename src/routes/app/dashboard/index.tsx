@@ -444,7 +444,7 @@ export const getFavouriteTokens = server$(async function () {
     const [wallet] = await db.select<Wallet>(`${walletId[0].out}`);
 
     const [walletName]: any = await db.query(
-      `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`
+      `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`,
     );
 
     const [tokenBalance]: any = await db.query(`

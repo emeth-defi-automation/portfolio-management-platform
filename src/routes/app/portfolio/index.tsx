@@ -50,7 +50,7 @@ type WalletWithBalance = {
   wallet: {
     id: string;
     chainID: number;
-   
+
     address: string;
     isExecutable: boolean;
   };
@@ -142,14 +142,17 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
   let balanceDetails = [];
 
   for (const observedWalletAddress of resultAddresses) {
-    const walletDetails = await getWalletDetails(db, observedWalletAddress.address);
+    const walletDetails = await getWalletDetails(
+      db,
+      observedWalletAddress.address,
+    );
     const [balances]: any = await db.query(
       `SELECT id, value FROM balance WHERE ->(for_wallet WHERE out = '${walletDetails[0].id}')`,
     );
 
     const walletNameResult: any = await db.query(
-    `SELECT VALUE name FROM ${walletDetails[0].id}<-observes_wallet WHERE in = ${userId}`
-  );
+      `SELECT VALUE name FROM ${walletDetails[0].id}<-observes_wallet WHERE in = ${userId}`,
+    );
 
     for (const balance of balances) {
       if (balance.value === "0") {
@@ -215,7 +218,7 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
         const [wallet] = await db.select<Wallet>(`${walletId[0].out}`);
 
         const walletNameResult: any = await db.query(
-          `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`
+          `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`,
         );
 
         const [tokenBalance]: string[] = await db.query(`
@@ -600,7 +603,7 @@ export default component$(() => {
                         for (const structure of availableStructures.value) {
                           const coins = [];
                           for (const wallet of structure.structureBalance) {
-                            const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.name === wallet.wallet.name)?.wallet.address}`;
+                            const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.walletName === wallet.wallet.name)?.wallet.address}`;
                             coins.push({
                               wallet: wallet.wallet.name,
                               address: walletAddress,

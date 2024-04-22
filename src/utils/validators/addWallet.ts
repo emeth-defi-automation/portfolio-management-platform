@@ -41,9 +41,9 @@ export const isNameUnique = server$(async function (name: string) {
     throw new Error("No cookie found");
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
-  const result = (await db.query(
-    `SELECT name FROM '${userId}'->observes_wallet;`,
-  )).at(0);
+  const result = (
+    await db.query(`SELECT name FROM '${userId}'->observes_wallet;`)
+  ).at(0);
   if (!result) {
     return true;
   }

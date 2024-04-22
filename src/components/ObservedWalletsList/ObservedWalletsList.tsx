@@ -63,11 +63,12 @@ export const getObservedWallets = server$(async function () {
     out: z.string(),
   });
   type UserObservedWalletsResult = z.infer<typeof UserObservedWalletsResult>;
-  const result = (await db.query(
-    `SELECT out, name FROM ${userId}->observes_wallet;`,
-  )).at(0);
+  const result = (
+    await db.query(`SELECT out, name FROM ${userId}->observes_wallet;`)
+  ).at(0);
   if (!result) return [];
-  const observedWalletsQueryResult = UserObservedWalletsResult.array().parse(result);
+  const observedWalletsQueryResult =
+    UserObservedWalletsResult.array().parse(result);
   const observedWallets: WalletTokensBalances[] = [];
   for (const observedWallet of observedWalletsQueryResult) {
     const [wallet] = await db.select<Wallet>(`${observedWallet.out}`);

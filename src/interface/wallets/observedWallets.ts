@@ -4,14 +4,16 @@ import { checksumAddress, getAddress } from "viem";
 
 export const GetResultAddresses = z.object({
   address: z.string(),
-  name: z.string()
+  name: z.string(),
 });
 
 export type GetResultAddresses = z.infer<typeof GetResultAddresses>;
 
 export const getResultAddresses = async (db: Surreal, userId: string) => {
   const resultAddresses = (
-    await db.query(`SELECT out.address as address, name FROM '${userId}'->observes_wallet;`)
+    await db.query(
+      `SELECT out.address as address, name FROM '${userId}'->observes_wallet;`,
+    )
   ).at(0);
   return GetResultAddresses.array().parse(resultAddresses);
 };

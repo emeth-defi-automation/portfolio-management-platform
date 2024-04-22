@@ -121,7 +121,9 @@ export const useAddWallet = routeAction$(
     }
 
     if (!(await getExistingRelation(db, userId, walletId)).at(0)) {
-      await db.query(`RELATE ONLY ${userId}->observes_wallet->${walletId} SET name = '${data.name}';`);
+      await db.query(
+        `RELATE ONLY ${userId}->observes_wallet->${walletId} SET name = '${data.name}';`,
+      );
     }
     return {
       success: true,
