@@ -92,7 +92,6 @@ export default component$<CoinsToApproveProps>(
                   }}
                 />
               }
-              for={symbol.symbol}
               customClass="border-gradient"
             />
           ))}
