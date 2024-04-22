@@ -23,6 +23,7 @@ export default component$<CoinsToApproveProps>(
               class="mb-2"
               image={`/assets/icons/tokens/${symbol.symbol.toLowerCase()}.svg`}
               description={symbol.symbol}
+              for={symbol.symbol}
               //  TODO: Why the checkbox component returns "insertBefore" error while it is the same thing.
               //  input={<CheckBox
               //   name={symbol}
@@ -77,7 +78,6 @@ export default component$<CoinsToApproveProps>(
                   }}
                 />
               }
-              for={symbol}
               customClass="border-gradient"
             />
           ))}
