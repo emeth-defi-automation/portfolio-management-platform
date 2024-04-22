@@ -20,7 +20,7 @@ export default component$<AmountOfCoinsProps>(
         <div class="mb-8">
           {addWalletFormStore.coinsToCount.map((symbol) => {
             return (
-              <div class="flex flex-col " key={symbol}>
+              <div class="flex flex-col" key={symbol}>
                 <div class="flex items-center justify-between">
                   <FormBadge
                     key={symbol}
