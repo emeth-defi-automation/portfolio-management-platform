@@ -62,6 +62,12 @@ function mapTokenAddress(sepoliaAddress: string): any {
 export const toggleChart = server$(async function (data) {
   const selectedPeriod: { period: number; interval: number } =
     getSelectedPeriodInHours(data as PeriodState);
+
+  const tokenMap: any = {
+    "0x054E1324CF61fe915cca47C48625C07400F1B587": "GLM",
+    "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709": "USDT",
+    "0xD418937d10c9CeC9d20736b2701E506867fFD85f": "USDC",
+  };
   const db = await connectToDB(this.env);
 
   const cookie = this.cookie.get("accessToken");
@@ -77,26 +83,11 @@ export const toggleChart = server$(async function (data) {
   const observedWalletsQueryResult = result[0];
 
   const dashboardBalance: { tokenAddress: string; balance: string }[] = [];
-  let ethBlocks: number[] = [];
   const chartTimestamps = generateTimestamps(
     selectedPeriod.period,
     selectedPeriod.interval,
   );
   const chartData: number[] = new Array(chartTimestamps.length).fill(0);
-
-  try {
-    const ethPromiseArray = chartTimestamps.map(async (item) => {
-      const ethBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
-        chain: EvmChain.ETHEREUM.hex,
-        date: item,
-      });
-      return ethBlockDetails.raw.block;
-    });
-
-    ethBlocks = await Promise.all(ethPromiseArray);
-  } catch (error) {
-    console.error("Error occurred when fetching Eth block details", error);
-  }
 
   for (const observedWallet of observedWalletsQueryResult) {
     const [wallet] = await db.select<Wallet>(`${observedWallet}`);
@@ -144,22 +135,27 @@ export const toggleChart = server$(async function (data) {
           let partBalance: number = 0;
 
           for (const balanceEntry of dashboardBalance) {
-            const ethTokenAddress = mapTokenAddress(balanceEntry.tokenAddress);
-            const tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
-              chain: EvmChain.ETHEREUM.hex,
-              toBlock: ethBlocks[i],
-              address: ethTokenAddress,
-            });
-
-            if (walletBalanceAtTimestamp[i].length > 0) {
-              partBalance +=
-                parseFloat(
-                  walletBalanceAtTimestamp[i][0][
-                    balanceEntry.tokenAddress.toLowerCase()
-                  ],
-                ) * tokenPrice.raw.usdPrice;
+            if (tokenMap[balanceEntry.tokenAddress] !== "USDT") {
+              const startTime =
+                Math.floor(new Date(chartTimestamps[i]).getTime() / 3600000) *
+                3600000;
+              const endTime = startTime + 3600000;
+              const symbol = `${tokenMap[balanceEntry.tokenAddress]}USDT`;
+              const interval = "1h";
+              const binancePrice = await fetch(
+                `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`,
+              );
+              const [data] = await binancePrice.json();
+              if (walletBalanceAtTimestamp[i].length > 0) {
+                partBalance +=
+                  parseFloat(
+                    walletBalanceAtTimestamp[i][0][
+                      balanceEntry.tokenAddress.toLowerCase()
+                    ],
+                  ) * data[4];
+              }
             } else {
-              partBalance += 0;
+              partBalance += parseFloat(balanceEntry.balance);
             }
           }
           chartData[i] += partBalance;
@@ -219,21 +215,12 @@ export const getPortfolio24hChange = server$(async function () {
   const dashboardBalance: { tokenAddress: string; balance: string }[] = [];
   const chartTimestamps = generateTimestamps(24, 4);
   const chartData: number[] = new Array(chartTimestamps.length).fill(0);
-  let ethBlocks: number[] = [];
 
-  try {
-    const ethPromiseArray = chartTimestamps.map(async (item) => {
-      const ethBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
-        chain: EvmChain.ETHEREUM.hex,
-        date: item,
-      });
-      return ethBlockDetails.raw.block;
-    });
-
-    ethBlocks = await Promise.all(ethPromiseArray);
-  } catch (error) {
-    console.error("Error occurred when fetching Eth block details", error);
-  }
+  const tokenMap: any = {
+    "0x054E1324CF61fe915cca47C48625C07400F1B587": "GLM",
+    "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709": "USDT",
+    "0xD418937d10c9CeC9d20736b2701E506867fFD85f": "USDC",
+  };
 
   for (const observedWallet of observedWalletsQueryResult) {
     const [wallet] = await db.select<Wallet>(`${observedWallet}`);
@@ -280,19 +267,26 @@ export const getPortfolio24hChange = server$(async function () {
         try {
           let partBalance: number = 0;
           for (const balanceEntry of dashboardBalance) {
-            const ethTokenAddress = mapTokenAddress(balanceEntry.tokenAddress);
-            const tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
-              chain: EvmChain.ETHEREUM.hex,
-              toBlock: ethBlocks[i],
-              address: ethTokenAddress,
-            });
-
-            partBalance +=
-              parseFloat(
-                walletBalanceAtTimestamp[i][0][
-                  balanceEntry.tokenAddress.toLowerCase()
-                ],
-              ) * tokenPrice.raw.usdPrice;
+            if (tokenMap[balanceEntry.tokenAddress] !== "USDT") {
+              const startTime =
+                Math.floor(new Date(chartTimestamps[i]).getTime() / 3600000) *
+                3600000;
+              const endTime = startTime + 3600000;
+              const symbol = `${tokenMap[balanceEntry.tokenAddress]}USDT`;
+              const interval = "1h";
+              const binancePrice = await fetch(
+                `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${startTime}&endTime=${endTime}`,
+              );
+              const [data] = await binancePrice.json();
+              partBalance +=
+                parseFloat(
+                  walletBalanceAtTimestamp[i][0][
+                    balanceEntry.tokenAddress.toLowerCase()
+                  ],
+                ) * data[4];
+            } else {
+              partBalance += parseFloat(balanceEntry.balance);
+            }
           }
 
           chartData[i] += partBalance;
