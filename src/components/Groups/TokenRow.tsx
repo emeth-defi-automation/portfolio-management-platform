@@ -36,7 +36,9 @@ export const TokenRow = component$<TokenRowProps>((props) => {
           <span class="text-customGreen">3,6%</span>
           <IconGraph />
         </div>
-        <div class="flex h-full items-center overflow-auto">{props.walletName}</div>
+        <div class="flex h-full items-center overflow-auto">
+          {props.walletName}
+        </div>
         <div class="flex h-full items-center overflow-auto font-medium">
           {props.network}
         </div>

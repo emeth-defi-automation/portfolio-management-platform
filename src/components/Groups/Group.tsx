@@ -38,7 +38,7 @@ function extractData(
         networkName:
           chainIdToNetworkName[balanceEntry.wallet.chainId.toString()],
         symbol: balanceEntry.balance.symbol,
-        tokenName:balanceEntry.balance.name,
+        tokenName: balanceEntry.balance.name,
         quantity: convertWeiToQuantity(
           balanceEntry.balance.balance,
           balanceEntry.balance.decimals,
