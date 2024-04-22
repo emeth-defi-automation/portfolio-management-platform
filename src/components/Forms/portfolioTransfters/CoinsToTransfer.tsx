@@ -16,7 +16,7 @@ export default component$<CoinsToTransferProps>(
           return (
             <>
               <div
-                class="scrollbar mb-4 flex  max-h-[250px]  flex-col overflow-auto"
+                class="scrollbar mb-4 flex max-h-[250px] flex-col overflow-auto"
                 key={`${structure.name}${index}`}
               >
                 <div class="flex gap-2">

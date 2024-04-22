@@ -13,6 +13,7 @@ export interface FormBadgeProps {
   customClass?: string;
   for?: string;
   labelClass?: string;
+  imgClass?: string;
 }
 
 export const FormBadge = component$<FormBadgeProps>((props) => {
@@ -46,7 +47,7 @@ export const FormBadge = component$<FormBadgeProps>((props) => {
           src={props.hasImg}
           width="14"
           height="14"
-          class="absolute end-[62px] "
+          class={twMerge(`absolute end-[62px]`, props.imgClass)}
         />
       ) : null}
     </div>
