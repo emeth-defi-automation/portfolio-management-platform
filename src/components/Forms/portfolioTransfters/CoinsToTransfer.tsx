@@ -25,11 +25,11 @@ export default component$<CoinsToTransferProps>(
                         class="mb-2"
                         description={balance.wallet.name}
                         image={`/assets/icons/tokens/${balance.balance.symbol.toLowerCase()}.svg`}
-                        for={`${structure.structure.name}${balance.balance.symbol}`}
+                        for={`${structure.structure.name}${balance.wallet.name}${balance.balance.symbol}`}
                         input={
                           <input
-                            id={`${structure.structure.name}${balance.balance.symbol}`}
-                            name={`${structure.structure.name}${balance.balance.symbol}`}
+                            id={`${structure.structure.name}${balance.wallet.name}${balance.balance.symbol}`}
+                            name={`${structure.structure.name}${balance.wallet.name}${balance.balance.symbol}`}
                             type="checkbox"
                             value={`${structure.structure.name}${balance.balance.symbol}`}
                             class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10  h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
