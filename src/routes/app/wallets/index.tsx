@@ -464,7 +464,7 @@ export default component$(() => {
 
     try {
       if (addWalletFormStore.isExecutable) {
-        if (temporaryModalStore.isConnected && temporaryModalStore.config) {
+        if (temporaryModalStore.config) {
           const account = getAccount(temporaryModalStore.config);
 
           addWalletFormStore.address = account.address as `0x${string}`;
@@ -542,6 +542,11 @@ export default component$(() => {
 
         await writeContract(temporaryModalStore.config as Config, request);
       }
+      if (temporaryModalStore.config) {
+        await disconnect(temporaryModalStore.config as Config);
+        temporaryModalStore.config = undefined;
+        console.log("disconnected");
+      }
 
       const {
         value: { success },
@@ -552,11 +557,18 @@ export default component$(() => {
       });
 
       if (success) {
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "info",
+          message: "Fetching historical wallet data...",
+          isVisible: true,
+        });
         observedWallets.value = await getObservedWallets();
         await getWalletBalanceHistory.submit({
           address: addWalletFormStore.address,
         });
       }
+      console.log("success: before modal");
 
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
@@ -565,14 +577,12 @@ export default component$(() => {
         isVisible: true,
       });
 
+      console.log("success: after modal");
+
       await addAddressToStreamConfig(
         streamId,
         addWalletFormStore.address as `0x${string}`,
       );
-      if (temporaryModalStore.config) {
-        await disconnect(temporaryModalStore.config as Config);
-        temporaryModalStore.config = undefined;
-      }
       addWalletFormStore.address = "";
       addWalletFormStore.name = "";
       addWalletFormStore.isExecutable = 0;
