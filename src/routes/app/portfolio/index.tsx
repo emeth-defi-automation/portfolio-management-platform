@@ -637,6 +637,13 @@ export default component$(() => {
               <Modal
                 isOpen={isCreateNewStructureModalOpen}
                 title="Create new structure"
+                onClose={$(() => {
+                  isWalletSelected.selection = [];
+                  isTokenSelected.selection = [];
+                  selectedWallets.wallets = [];
+                  selectedTokens.balances = [];
+                  structureStore.name = "";
+                })}
               >
                 <Form
                   action={createStructureAction}
@@ -647,6 +654,7 @@ export default component$(() => {
                       isTokenSelected.selection = [];
                       selectedWallets.wallets = [];
                       selectedTokens.balances = [];
+                      structureStore.name = "";
                     }
                   }}
                   class="mt-8 text-sm"
@@ -974,9 +982,16 @@ export default component$(() => {
                   </div>
                   <div class="flex gap-4">
                     <button
-                      type="submit"
-                      class="custom-border-1 h-12 w-1/2 rounded-10 duration-300 ease-in-out hover:scale-105"
-                      disabled={!isValidName(structureStore.name)}
+                      type="button"
+                      class="custom-border-1 h-12 w-1/2 rounded-10 duration-300 ease-in-out hover:scale-105 "
+                      onClick$={() => {
+                        isCreateNewStructureModalOpen.value = false;
+                        isWalletSelected.selection = [];
+                        isTokenSelected.selection = [];
+                        selectedWallets.wallets = [];
+                        selectedTokens.balances = [];
+                        structureStore.name = "";
+                      }}
                     >
                       Cancel
                     </button>
