@@ -93,8 +93,8 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                             ) : null}
                           </span>
                         </>
-                      );
-                    })}
+                      ),
+                    )}
                   </div>
                 ))}
               </div>

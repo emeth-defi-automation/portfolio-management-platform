@@ -92,8 +92,8 @@ export default component$<AmountOfCoinsProps>(
                   ) : null}
                 </span>
               </div>
-            );
-          })}
+            ),
+          )}
         </div>
       </>
     );
