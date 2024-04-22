@@ -3,18 +3,17 @@ import { z } from "@builder.io/qwik-city";
 import { checksumAddress, getAddress } from "viem";
 
 export const GetResultAddresses = z.object({
-  "->observes_wallet": z.object({
-    out: z.object({
-      address: z.array(z.string()),
-    }),
-  }),
+  address: z.string(),
+  name: z.string(),
 });
 
 export type GetResultAddresses = z.infer<typeof GetResultAddresses>;
 
 export const getResultAddresses = async (db: Surreal, userId: string) => {
   const resultAddresses = (
-    await db.query(`SELECT ->observes_wallet.out.address FROM ${userId};`)
+    await db.query(
+      `SELECT out.address as address, name FROM '${userId}'->observes_wallet;`,
+    )
   ).at(0);
   return GetResultAddresses.array().parse(resultAddresses);
 };
@@ -22,7 +21,6 @@ export const getResultAddresses = async (db: Surreal, userId: string) => {
 export const GetWalletDetails = z.object({
   chainId: z.number(),
   id: z.string(),
-  name: z.string(),
   address: z.string(),
 });
 
@@ -31,7 +29,7 @@ export type GetWalletDetails = z.infer<typeof GetWalletDetails>;
 export const getWalletDetails = async (db: Surreal, address: string) => {
   const walletDetails = (
     await db.query(
-      `SELECT id, name, address, chainId, isExecutable FROM wallet WHERE address = '${getAddress(address)}';`,
+      `SELECT id, address, chainId, isExecutable FROM wallet WHERE address = '${getAddress(address)}';`,
     )
   ).at(0);
   return GetWalletDetails.array().parse(walletDetails);

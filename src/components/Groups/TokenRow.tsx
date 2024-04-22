@@ -6,11 +6,11 @@ import { ButtonWithIcon } from "../Buttons/Buttons";
 
 export interface TokenRowProps {
   icon?: string;
-  name?: string;
+  tokenName?: string;
   symbol?: string;
   quantity?: string;
   value?: string;
-  wallet?: string;
+  walletName?: string;
   network?: string;
   onClick$?: QRL<() => void>;
 }
@@ -23,7 +23,7 @@ export const TokenRow = component$<TokenRowProps>((props) => {
             {props.icon && <img src={props.icon} width="20" height="20" />}
           </div>
           <div class="flex h-full items-center gap-1 overflow-x-auto">
-            <p>{props.name}</p>
+            <p>{props.tokenName}</p>
             <span class="custom-text-50">{props.symbol}</span>
           </div>
         </div>
@@ -36,7 +36,9 @@ export const TokenRow = component$<TokenRowProps>((props) => {
           <span class="text-customGreen">3,6%</span>
           <IconGraph />
         </div>
-        <div class="flex h-full items-center overflow-auto">{props.wallet}</div>
+        <div class="flex h-full items-center overflow-auto">
+          {props.walletName}
+        </div>
         <div class="flex h-full items-center overflow-auto font-medium">
           {props.network}
         </div>

@@ -50,10 +50,11 @@ type WalletWithBalance = {
   wallet: {
     id: string;
     chainID: number;
-    name: string;
+
     address: string;
     isExecutable: boolean;
   };
+  walletName: string;
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
 };
 type CoinObject = {
@@ -133,18 +134,24 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
-  const resultAddresses: any = await getResultAddresses(db, userId);
-  if (!resultAddresses[0]["->observes_wallet"].out.address.length) {
+  const resultAddresses = await getResultAddresses(db, userId);
+  if (!resultAddresses[0]) {
     return [];
   }
   const walletsWithBalance = [];
   let balanceDetails = [];
 
-  for (const observedWalletAddress of resultAddresses[0]["->observes_wallet"]
-    .out.address) {
-    const walletDetails = await getWalletDetails(db, observedWalletAddress);
+  for (const observedWalletAddress of resultAddresses) {
+    const walletDetails = await getWalletDetails(
+      db,
+      observedWalletAddress.address,
+    );
     const [balances]: any = await db.query(
       `SELECT id, value FROM balance WHERE ->(for_wallet WHERE out = '${walletDetails[0].id}')`,
+    );
+
+    const walletNameResult: any = await db.query(
+      `SELECT VALUE name FROM ${walletDetails[0].id}<-observes_wallet WHERE in = ${userId}`,
     );
 
     for (const balance of balances) {
@@ -167,6 +174,7 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
 
     const walletWithBalance = {
       wallet: walletDetails[0],
+      walletName: walletNameResult,
       balance: balanceDetails,
     };
     balanceDetails = [];
@@ -209,6 +217,10 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
 
         const [wallet] = await db.select<Wallet>(`${walletId[0].out}`);
 
+        const walletNameResult: any = await db.query(
+          `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`,
+        );
+
         const [tokenBalance]: string[] = await db.query(`
         SELECT VALUE value
         FROM balance
@@ -237,7 +249,7 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
         structureTokens.push({
           wallet: {
             id: wallet.id,
-            name: wallet.name,
+            name: walletNameResult,
             chainId: wallet.chainId,
             isExecutable: wallet.isExecutable,
           },
@@ -472,7 +484,7 @@ export default component$(() => {
                 for (const structure of availableStructures.value) {
                   const coins = [];
                   for (const wallet of structure.structureBalance) {
-                    const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.name === wallet.wallet.name)?.wallet.address}`;
+                    const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
                     coins.push({
                       wallet: wallet.wallet.name,
                       address: walletAddress,
@@ -591,7 +603,7 @@ export default component$(() => {
                         for (const structure of availableStructures.value) {
                           const coins = [];
                           for (const wallet of structure.structureBalance) {
-                            const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.name === wallet.wallet.name)?.wallet.address}`;
+                            const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.walletName === wallet.wallet.name)?.wallet.address}`;
                             coins.push({
                               wallet: wallet.wallet.name,
                               address: walletAddress,
@@ -849,7 +861,7 @@ export default component$(() => {
                               class="custom-bg-white custom-border-1 absolute inline-flex min-h-9 w-full cursor-pointer items-center space-x-2 rounded-lg"
                             >
                               <span class="absolute start-9">
-                                {option.wallet.name}
+                                {option.walletName}
                               </span>
                             </label>
                           </div>
@@ -1100,7 +1112,7 @@ function parseWalletsToOptions(
             class="custom-bg-white custom-border-1 absolute inline-flex min-h-9 w-full cursor-pointer items-center space-x-2 rounded-lg"
             key={`${balance.balanceId} - ${balance.tokenId}`}
           >
-            <span class="absolute start-9">{`${balance.tokenSymbol} - ${item.wallet.name}`}</span>
+            <span class="absolute start-9">{`${balance.tokenSymbol} - ${item.walletName}`}</span>
           </label>
         </div>,
       );
