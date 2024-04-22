@@ -23,6 +23,7 @@ function extractData(
   const extractedArray: {
     walletName: string;
     symbol: string;
+    tokenName: string;
     quantity: string;
     networkName: string;
     value: string;
@@ -37,6 +38,7 @@ function extractData(
         networkName:
           chainIdToNetworkName[balanceEntry.wallet.chainId.toString()],
         symbol: balanceEntry.balance.symbol,
+        tokenName:balanceEntry.balance.name,
         quantity: convertWeiToQuantity(
           balanceEntry.balance.balance,
           balanceEntry.balance.decimals,
@@ -52,11 +54,11 @@ function extractData(
     <TokenRow
       key={`${entry.balanceId} - ${index}`}
       icon={`/assets/icons/tokens/${entry.symbol.toLowerCase()}.svg`}
-      name={entry.walletName}
+      tokenName={entry.tokenName}
       symbol={entry.symbol}
       quantity={entry.quantity}
       value={`$${(entry.value * entry.quantity).toFixed(2)}`}
-      wallet={entry.walletName}
+      walletName={entry.walletName}
       network={entry.networkName}
       onClick$={() => {
         tokenStore.balanceId = entry.balanceId;
