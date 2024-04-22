@@ -104,12 +104,20 @@ body {
 .custom-border-b-1 {
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
+.custom-border-b-1-opacity-5 {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .custom-bg-white {
   background: linear-gradient(
     98deg,
     rgba(255, 255, 255, 0.1) 0%,
     rgba(255, 255, 255, 0) 100%
   );
+}
+
+.custom-bg-opacity-5 {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .custom-bg-button {

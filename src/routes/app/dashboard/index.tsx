@@ -1,4 +1,11 @@
-import { $, component$, useSignal, useStore, useTask$ } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  useSignal,
+  useStore,
+  useTask$,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { PortfolioValue } from "~/components/PortfolioValue/PortfolioValue";
 import { ActionAlertMessage } from "~/components/ActionAlertsMessage/ActionAlertsMessage";
 import {
@@ -8,7 +15,7 @@ import {
 import { TokenRow } from "~/components/Tokens/TokenRow";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { connectToDB } from "~/utils/db";
-import { routeAction$, routeLoader$, useNavigate } from "@builder.io/qwik-city";
+import { server$, useNavigate } from "@builder.io/qwik-city";
 import {
   fetchTokenDayData,
   getDBTokenPriceUSD,
@@ -34,6 +41,7 @@ import {
   getSelectedPeriodKey,
 } from "~/utils/timestamps/timestamp";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
+import { Spinner } from "~/components/Spinner/Spinner";
 
 function mapTokenAddress(sepoliaAddress: string): any {
   const tokenMap: any = {
@@ -50,12 +58,13 @@ function mapTokenAddress(sepoliaAddress: string): any {
     return null;
   }
 }
-export const useToggleChart = routeAction$(async (data, requestEvent) => {
+
+export const toggleChart = server$(async function (data) {
   const selectedPeriod: { period: number; interval: number } =
     getSelectedPeriodInHours(data as PeriodState);
-  const db = await connectToDB(requestEvent.env);
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
@@ -68,30 +77,25 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
   const observedWalletsQueryResult = result[0];
 
   const dashboardBalance: { tokenAddress: string; balance: string }[] = [];
-  const ethBlocks = [];
-  const sepBlocks = [];
+  let ethBlocks: number[] = [];
   const chartTimestamps = generateTimestamps(
     selectedPeriod.period,
     selectedPeriod.interval,
   );
   const chartData: number[] = new Array(chartTimestamps.length).fill(0);
 
-  for (const item of chartTimestamps) {
-    try {
-      const blockDetails = await Moralis.EvmApi.block.getDateToBlock({
+  try {
+    const ethPromiseArray = chartTimestamps.map(async (item) => {
+      const ethBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
         chain: EvmChain.ETHEREUM.hex,
         date: item,
       });
-      ethBlocks.push(blockDetails.raw.block);
+      return ethBlockDetails.raw.block;
+    });
 
-      const sepoliaBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
-        chain: EvmChain.SEPOLIA.hex,
-        date: item,
-      });
-      sepBlocks.push(sepoliaBlockDetails.raw.block);
-    } catch (error) {
-      console.error(error);
-    }
+    ethBlocks = await Promise.all(ethPromiseArray);
+  } catch (error) {
+    console.error("Error occurred when fetching Eth block details", error);
   }
 
   for (const observedWallet of observedWalletsQueryResult) {
@@ -120,21 +124,25 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
       }
     }
 
+    let combinedQuery: string = "";
+    for (let i = 0; i < chartTimestamps.length; i++) {
+      const walletBalanceQuery = `
+        SELECT blockNumber, timestamp, 0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709, 0xd418937d10c9cec9d20736b2701e506867ffd85f, 0x054e1324cf61fe915cca47c48625c07400f1b587
+        FROM wallet_balance
+        WHERE '${chartTimestamps[i]}' >= timestamp
+          AND wallwalletAddress = ${wallet.address}
+        ORDER BY timestamp DESC
+          LIMIT 1;
+      `;
+      combinedQuery += walletBalanceQuery;
+    }
+    const walletBalanceAtTimestamp: any = await db.query(combinedQuery);
+
     try {
       for (let i = 0; i < chartTimestamps.length; i++) {
         try {
-          const tokenBalance =
-            await Moralis.EvmApi.token.getWalletTokenBalances({
-              chain: EvmChain.SEPOLIA.hex,
-              toBlock: sepBlocks[i],
-              tokenAddresses: [
-                "0x054E1324CF61fe915cca47C48625C07400F1B587",
-                "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-                "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-              ],
-              address: wallet.address,
-            });
           let partBalance: number = 0;
+
           for (const balanceEntry of dashboardBalance) {
             const ethTokenAddress = mapTokenAddress(balanceEntry.tokenAddress);
             const tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
@@ -143,20 +151,16 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
               address: ethTokenAddress,
             });
 
-            partBalance += tokenBalance.raw
-              .filter((item) => item.symbol === tokenPrice.raw.tokenSymbol)
-              .reduce((sum, currentItem) => {
-                return (
-                  sum +
-                  parseFloat(
-                    convertWeiToQuantity(
-                      currentItem.balance,
-                      currentItem.decimals,
-                    ),
-                  ) *
-                    tokenPrice.raw.usdPrice
-                );
-              }, 0);
+            if (walletBalanceAtTimestamp[i].length > 0) {
+              partBalance +=
+                parseFloat(
+                  walletBalanceAtTimestamp[i][0][
+                    balanceEntry.tokenAddress.toLowerCase()
+                  ],
+                ) * tokenPrice.raw.usdPrice;
+            } else {
+              partBalance += 0;
+            }
           }
           chartData[i] += partBalance;
         } catch (error) {
@@ -197,44 +201,40 @@ export const useToggleChart = routeAction$(async (data, requestEvent) => {
   };
 });
 
-export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
-  const db = await connectToDB(requestEvent.env);
+export const getPortfolio24hChange = server$(async function () {
+  const db = await connectToDB(this.env);
+  const cookie = this.cookie.get("accessToken");
 
-  const cookie = requestEvent.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
-
   const [result]: any = await db.query(
     `SELECT VALUE ->observes_wallet.out FROM ${userId};`,
   );
+
   if (!result) throw new Error("No observed wallets");
 
   const observedWalletsQueryResult = result[0];
   const dashboardBalance: { tokenAddress: string; balance: string }[] = [];
-  const ethBlocks = [];
-  const sepBlocks = [];
   const chartTimestamps = generateTimestamps(24, 4);
   const chartData: number[] = new Array(chartTimestamps.length).fill(0);
+  let ethBlocks: number[] = [];
 
-  for (const item of chartTimestamps) {
-    try {
-      const blockDetails = await Moralis.EvmApi.block.getDateToBlock({
+  try {
+    const ethPromiseArray = chartTimestamps.map(async (item) => {
+      const ethBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
         chain: EvmChain.ETHEREUM.hex,
         date: item,
       });
-      ethBlocks.push(blockDetails.raw.block);
+      return ethBlockDetails.raw.block;
+    });
 
-      const sepoliaBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
-        chain: EvmChain.SEPOLIA.hex,
-        date: item,
-      });
-      sepBlocks.push(sepoliaBlockDetails.raw.block);
-    } catch (error) {
-      console.error(error);
-    }
+    ethBlocks = await Promise.all(ethPromiseArray);
+  } catch (error) {
+    console.error("Error occurred when fetching Eth block details", error);
   }
+
   for (const observedWallet of observedWalletsQueryResult) {
     const [wallet] = await db.select<Wallet>(`${observedWallet}`);
 
@@ -261,21 +261,23 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
       }
     }
 
+    let combinedQuery: string = "";
+    for (let i = 0; i < chartTimestamps.length; i++) {
+      const walletBalanceQuery = `
+        SELECT blockNumber, timestamp, 0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709, 0xd418937d10c9cec9d20736b2701e506867ffd85f, 0x054e1324cf61fe915cca47c48625c07400f1b587
+        FROM wallet_balance
+        WHERE '${chartTimestamps[i]}' >= timestamp
+          AND wallwalletAddress = ${wallet.address}
+        ORDER BY timestamp DESC
+          LIMIT 1;
+      `;
+      combinedQuery += walletBalanceQuery;
+    }
+    const walletBalanceAtTimestamp: any = await db.query(combinedQuery);
+
     try {
       for (let i = 0; i < chartTimestamps.length; i++) {
         try {
-          const tokenBalance =
-            await Moralis.EvmApi.token.getWalletTokenBalances({
-              chain: EvmChain.SEPOLIA.hex,
-              toBlock: sepBlocks[i],
-              tokenAddresses: [
-                "0x054E1324CF61fe915cca47C48625C07400F1B587",
-                "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-                "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-              ],
-              address: wallet.address,
-            });
-
           let partBalance: number = 0;
           for (const balanceEntry of dashboardBalance) {
             const ethTokenAddress = mapTokenAddress(balanceEntry.tokenAddress);
@@ -285,21 +287,14 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
               address: ethTokenAddress,
             });
 
-            partBalance += tokenBalance.raw
-              .filter((item) => item.symbol === tokenPrice.raw.tokenSymbol)
-              .reduce((sum, currentItem) => {
-                return (
-                  sum +
-                  parseFloat(
-                    convertWeiToQuantity(
-                      currentItem.balance,
-                      currentItem.decimals,
-                    ),
-                  ) *
-                    tokenPrice.raw.usdPrice
-                );
-              }, 0);
+            partBalance +=
+              parseFloat(
+                walletBalanceAtTimestamp[i][0][
+                  balanceEntry.tokenAddress.toLowerCase()
+                ],
+              ) * tokenPrice.raw.usdPrice;
           }
+
           chartData[i] += partBalance;
         } catch (error) {
           console.error(error);
@@ -309,6 +304,7 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
       console.error(error);
     }
   }
+
   let totalValueChange = 0;
 
   totalValueChange = getProperTotalValueChange(
@@ -334,18 +330,16 @@ export const usePortfolio24hChange = routeLoader$(async (requestEvent) => {
   };
 });
 
-export const useTotalPortfolioValue = routeLoader$(async (requestEvent) => {
-  const db = await connectToDB(requestEvent.env);
+export const getTotalPortfolioValue = server$(async function () {
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
-  const uniswapSubgraphURL = requestEvent.env.get(
-    "UNIV3_OPTIMIST_SUBGRAPH_URL",
-  );
+  const uniswapSubgraphURL = this.env.get("UNIV3_OPTIMIST_SUBGRAPH_URL");
   if (!uniswapSubgraphURL) {
     throw new Error("Missing UNISWAP_SUBGRAPH_URL");
   }
@@ -424,10 +418,10 @@ export const useTotalPortfolioValue = routeLoader$(async (requestEvent) => {
   return totalValue.toFixed(2);
 });
 
-export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
-  const db = await connectToDB(requestEvent.env);
+export const getFavouriteTokens = server$(async function () {
+  const db = await connectToDB(this.env);
 
-  const cookie = requestEvent.cookie.get("accessToken");
+  const cookie = this.cookie.get("accessToken");
   if (!cookie) {
     throw new Error("No cookie found");
   }
@@ -446,8 +440,12 @@ export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
 
   for (const balance of structureBalances[0]["->structure_balance"].out) {
     const [walletId]: any = await db.query(`
-      SELECT out  FROM for_wallet WHERE in = ${balance}`);
+      SELECT out FROM for_wallet WHERE in = ${balance}`);
     const [wallet] = await db.select<Wallet>(`${walletId[0].out}`);
+
+    const [walletName]: any = await db.query(
+      `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`,
+    );
 
     const [tokenBalance]: any = await db.query(`
       SELECT * FROM balance WHERE id=${balance}`);
@@ -473,7 +471,7 @@ export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
     structureTokens.push({
       wallet: {
         id: wallet.id,
-        name: wallet.name,
+        name: walletName,
         chainId: wallet.chainId,
       },
       balance: tokenWithBalance,
@@ -494,19 +492,29 @@ export const useGetFavoriteTokens = routeLoader$(async (requestEvent) => {
 export default component$(() => {
   const nav = useNavigate();
   const isPortfolioFullScreen = useSignal(false);
-  const totalPortfolioValue = useTotalPortfolioValue();
-  const favoriteTokens = useGetFavoriteTokens();
-  const toggleChart = useToggleChart();
-  const portfolioValueChange = usePortfolio24hChange();
-  const chartDataStore = useStore({
-    data: portfolioValueChange.value.chartData,
+  // const totalPortfolioValue = useTotalPortfolioValue();
+  const totalPortfolioValue = useSignal("0");
+  const totalPortfolioValueLoading = useSignal(true);
+
+  // const portfolioValueChange = usePortfolio24hChange();
+  const portfolioValueChange = useSignal<any>({});
+  const portfolioValueChangeLoading = useSignal(true);
+
+  // const favoriteTokens = useGetFavoriteTokens();
+  const favoriteTokenLoading = useSignal(true);
+  const favoriteTokens = useSignal<any[]>([]);
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async () => {
+    favoriteTokens.value = await getFavouriteTokens();
+    favoriteTokenLoading.value = false;
+
+    totalPortfolioValue.value = await getTotalPortfolioValue();
+    totalPortfolioValueLoading.value = false;
+
+    portfolioValueChange.value = await getPortfolio24hChange();
+    portfolioValueChangeLoading.value = false;
   });
-  const portfolioValueStore = useStore({
-    selectedPeriodLabel: portfolioValueChange.value.period,
-    portfolioValueChange: portfolioValueChange.value.totalValueChange,
-    portfolioPercentageValueChange:
-      portfolioValueChange.value.percentageOfTotalValueChange,
-  });
+
   const changePeriod = useSignal(false);
   const selectedPeriod: PeriodState = useStore({
     "24h": true,
@@ -522,6 +530,9 @@ export default component$(() => {
     selectedPeriod[button] = true;
   });
 
+  const redrawChart = useSignal<boolean>(false);
+  const hideChartWhileLoading = useSignal<boolean>(false);
+
   useTask$(async ({ track }) => {
     track(async () => {
       selectedPeriod["24h"];
@@ -530,53 +541,64 @@ export default component$(() => {
       selectedPeriod["1Y"];
 
       if (changePeriod.value !== false) {
-        const newChartData = await toggleChart.submit(selectedPeriod);
-        chartDataStore.data = newChartData.value.chartData;
-        portfolioValueStore.selectedPeriodLabel = newChartData.value.period;
-        portfolioValueStore.portfolioValueChange =
-          newChartData.value.totalValueChange;
-        portfolioValueStore.portfolioPercentageValueChange =
-          newChartData.value.percentageOfTotalValueChange;
+        hideChartWhileLoading.value = true;
+        const newChartData = await toggleChart(selectedPeriod);
+        portfolioValueChange.value.chartData = newChartData.chartData;
+        portfolioValueChange.value.period = newChartData.period;
+        portfolioValueChange.value.totalValueChange =
+          newChartData.totalValueChange;
+        portfolioValueChange.value.percentageOfTotalValueChange =
+          newChartData.percentageOfTotalValueChange;
+        redrawChart.value = !redrawChart.value;
+        hideChartWhileLoading.value = false;
       }
     });
   });
 
   return isPortfolioFullScreen.value ? (
     <PortfolioValue
+      hideChartWhileLoading={hideChartWhileLoading}
+      redrawChart={redrawChart.value}
+      portfolioValueChangeLoading={portfolioValueChangeLoading}
+      totalPortfolioValueLoading={totalPortfolioValueLoading.value}
       totalPortfolioValue={totalPortfolioValue.value}
       isPortfolioFullScreen={isPortfolioFullScreen}
-      portfolioValueChange={portfolioValueStore.portfolioValueChange}
+      portfolioValueChange={portfolioValueChange.value.totalValueChange}
       portfolioPercentageValueChange={
-        portfolioValueStore.portfolioPercentageValueChange
+        portfolioValueChange.value.percentageOfTotalValueChange
       }
-      chartData={chartDataStore.data}
+      chartData={portfolioValueChange.value.chartData}
       selectedPeriod={selectedPeriod}
-      period={portfolioValueStore.selectedPeriodLabel}
+      period={portfolioValueChange.value.period}
       onClick$={(e: any) => {
         togglePeriod(e.target.name);
         changePeriod.value = true;
       }}
     />
   ) : (
-    <div class="grid grid-rows-[max(330px)_auto] gap-6 p-10">
+    <div class="grid grid-rows-[max(460px)_minmax(250px_auto)] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue
+          hideChartWhileLoading={hideChartWhileLoading}
+          redrawChart={redrawChart.value}
+          portfolioValueChangeLoading={portfolioValueChangeLoading}
+          totalPortfolioValueLoading={totalPortfolioValueLoading.value}
           totalPortfolioValue={totalPortfolioValue.value}
           isPortfolioFullScreen={isPortfolioFullScreen}
-          portfolioValueChange={portfolioValueStore.portfolioValueChange}
+          portfolioValueChange={portfolioValueChange.value.totalValueChange}
           portfolioPercentageValueChange={
-            portfolioValueStore.portfolioPercentageValueChange
+            portfolioValueChange.value.percentageOfTotalValueChange
           }
-          chartData={chartDataStore.data}
+          chartData={portfolioValueChange.value.chartData}
           selectedPeriod={selectedPeriod}
-          period={portfolioValueStore.selectedPeriodLabel}
+          period={portfolioValueChange.value.period}
           onClick$={(e: any) => {
             togglePeriod(e.target.name);
             changePeriod.value = true;
           }}
         />
 
-        <div class="custom-border-1 custom-shadow grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
+        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Alerts</h1>
             <button class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110">
@@ -596,10 +618,18 @@ export default component$(() => {
               title="Bitcoin share exceeded 20%"
               description="6 hours ago"
             />
+            <ActionAlertMessage
+              title="Bitcoin share exceeded 20%"
+              description="6 hours ago"
+            />
+            <ActionAlertMessage
+              title="Bitcoin share exceeded 20%"
+              description="6 hours ago"
+            />
           </div>
         </div>
 
-        <div class="custom-border-1 custom-shadow grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
+        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Actions</h1>
             <button class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110">
@@ -607,8 +637,11 @@ export default component$(() => {
             </button>
           </div>
           <div>
-            <ActionAlertMessage title="DCA" description="1 day ago">
-              <WarningStatus />
+            <ActionAlertMessage
+              title="Automation name #1"
+              description="6 hours ago"
+            >
+              <SuccessStatus />
             </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #2"
@@ -616,17 +649,26 @@ export default component$(() => {
             >
               <SuccessStatus />
             </ActionAlertMessage>
+            <ActionAlertMessage title="DCA" description="1 day ago">
+              <WarningStatus />
+            </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #3"
               description="6 hours ago"
             >
-              <WarningStatus />
+              <SuccessStatus />
+            </ActionAlertMessage>
+            <ActionAlertMessage
+              title="Automation name #4"
+              description="6 hours ago"
+            >
+              <SuccessStatus />
             </ActionAlertMessage>
           </div>
         </div>
       </div>
 
-      <div class="custom-border-1 grid grid-rows-[32px_1fr] gap-6 rounded-2xl p-6">
+      <div class="custom-border-1 custom-shadow custom-bg-opacity-5 grid grid-rows-[32px_1fr] gap-6 rounded-2xl p-6">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold">Favourite Tokens</h1>
           <button
@@ -655,7 +697,16 @@ export default component$(() => {
             <div class=""></div>
           </div>
           <div>
-            {favoriteTokens.value[0] &&
+            {favoriteTokenLoading.value ? (
+              <div class="flex flex-col items-center py-12">
+                <Spinner />
+              </div>
+            ) : favoriteTokens.value.length === 0 ? (
+              <div class="flex flex-col items-center py-12">
+                <span>No Favourite Tokens</span>
+              </div>
+            ) : (
+              favoriteTokens.value[0] &&
               favoriteTokens.value[0].structureBalance.map(
                 async (token: any, index: number) => {
                   const formattedBalance = convertWeiToQuantity(
@@ -679,7 +730,8 @@ export default component$(() => {
                     />
                   );
                 },
-              )}
+              )
+            )}
           </div>
         </div>
       </div>

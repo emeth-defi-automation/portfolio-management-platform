@@ -24,6 +24,7 @@ import { ObservedWallet } from "../Wallets/Observed/ObservedWallet";
 import { type Balance } from "~/interface/balance/Balance";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Spinner } from "../Spinner/Spinner";
+import { z } from "@builder.io/qwik-city";
 
 export const getObservedWallets = server$(async function () {
   const db = await connectToDB(this.env);
@@ -57,27 +58,30 @@ export const getObservedWallets = server$(async function () {
       WHERE address = '${checksumAddress(id as `0x${string}`)}';
     `);
   }
-
-  const [result]: any = await db.query(
-    `SELECT ->observes_wallet.out FROM ${userId};`,
-  );
-  if (!result || !result[0]) return [];
-  const observedWalletsQueryResult = result[0]["->observes_wallet"].out;
-
+  const UserObservedWalletsResult = z.object({
+    name: z.string(),
+    out: z.string(),
+  });
+  type UserObservedWalletsResult = z.infer<typeof UserObservedWalletsResult>;
+  const result = (
+    await db.query(`SELECT out, name FROM ${userId}->observes_wallet;`)
+  ).at(0);
+  if (!result) return [];
+  const observedWalletsQueryResult =
+    UserObservedWalletsResult.array().parse(result);
   const observedWallets: WalletTokensBalances[] = [];
   for (const observedWallet of observedWalletsQueryResult) {
-    const [wallet] = await db.select<Wallet>(`${observedWallet}`);
+    const [wallet] = await db.select<Wallet>(`${observedWallet.out}`);
     const nativeBalance = await testPublicClient.getBalance({
       address: wallet.address as `0x${string}`,
     });
     await db.query(
-      `UPDATE ${observedWallet} SET nativeBalance = '${nativeBalance}';`,
+      `UPDATE ${observedWallet.out} SET nativeBalance = '${nativeBalance}';`,
     );
-
     const walletTokensBalances: WalletTokensBalances = {
       wallet: {
         id: wallet.id,
-        name: wallet.name,
+        name: observedWallet.name,
         chainId: wallet.chainId,
         address: wallet.address,
         nativeBalance: nativeBalance,
@@ -85,7 +89,6 @@ export const getObservedWallets = server$(async function () {
       },
       tokens: [],
     };
-
     // For each token update balance
     const tokens = await db.select<Token>("token");
     for (const token of tokens) {

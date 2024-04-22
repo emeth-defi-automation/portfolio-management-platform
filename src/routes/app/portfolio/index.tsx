@@ -1,5 +1,4 @@
 import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
-import IconEdit from "/public/assets/icons/portfolio/edit.svg?jsx";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import IconClose from "/public/assets/icons/close.svg?jsx";
 import { Group } from "~/components/Groups/Group";
@@ -51,10 +50,11 @@ type WalletWithBalance = {
   wallet: {
     id: string;
     chainID: number;
-    name: string;
+
     address: string;
     isExecutable: boolean;
   };
+  walletName: string;
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
 };
 type CoinObject = {
@@ -134,18 +134,24 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
-  const resultAddresses: any = await getResultAddresses(db, userId);
-  if (!resultAddresses[0]["->observes_wallet"].out.address.length) {
+  const resultAddresses = await getResultAddresses(db, userId);
+  if (!resultAddresses[0]) {
     return [];
   }
   const walletsWithBalance = [];
   let balanceDetails = [];
 
-  for (const observedWalletAddress of resultAddresses[0]["->observes_wallet"]
-    .out.address) {
-    const walletDetails = await getWalletDetails(db, observedWalletAddress);
+  for (const observedWalletAddress of resultAddresses) {
+    const walletDetails = await getWalletDetails(
+      db,
+      observedWalletAddress.address,
+    );
     const [balances]: any = await db.query(
       `SELECT id, value FROM balance WHERE ->(for_wallet WHERE out = '${walletDetails[0].id}')`,
+    );
+
+    const walletNameResult: any = await db.query(
+      `SELECT VALUE name FROM ${walletDetails[0].id}<-observes_wallet WHERE in = ${userId}`,
     );
 
     for (const balance of balances) {
@@ -168,6 +174,7 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
 
     const walletWithBalance = {
       wallet: walletDetails[0],
+      walletName: walletNameResult,
       balance: balanceDetails,
     };
     balanceDetails = [];
@@ -188,7 +195,7 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
   const [result]: any = await db.query(`
     SELECT VALUE ->has_structure.out FROM ${userId}`);
 
-  if (!result) throw new Error("No structures available");
+  if (!result) throw new Error("No structures available"); 
   const createdStructureQueryResult = result[0];
   const availableStructures: any[] = [];
 
@@ -209,6 +216,10 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
         WHERE in = ${balance}`);
 
         const [wallet] = await db.select<Wallet>(`${walletId[0].out}`);
+
+        const walletNameResult: any = await db.query(
+          `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`,
+        );
 
         const [tokenBalance]: string[] = await db.query(`
         SELECT VALUE value
@@ -238,7 +249,7 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
         structureTokens.push({
           wallet: {
             id: wallet.id,
-            name: wallet.name,
+            name: walletNameResult,
             chainId: wallet.chainId,
             isExecutable: wallet.isExecutable,
           },
@@ -399,7 +410,6 @@ export default component$(() => {
 
     try {
       const tokens = await queryTokens();
-      console.log("[MODAL STORE]: ", modalStore);
       if (modalStore.config) {
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
@@ -451,7 +461,7 @@ export default component$(() => {
         });
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "error",
@@ -464,10 +474,7 @@ export default component$(() => {
     <>
       <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
         <div class="flex items-center justify-between">
-          <div class="text flex items-center gap-2 text-2xl font-semibold">
-            <h2>Portfolio Name</h2>
-            <IconEdit />
-          </div>
+          <h2 class="text-2xl font-semibold">Portfolio Name</h2>
           <div class="flex items-center gap-2">
             <ButtonWithIcon
               image="/assets/icons/portfolio/transfer.svg"
@@ -477,12 +484,12 @@ export default component$(() => {
                 for (const structure of availableStructures.value) {
                   const coins = [];
                   for (const wallet of structure.structureBalance) {
-                    const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.name === wallet.wallet.name)?.wallet.address}`;
+                    const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
                     coins.push({
                       wallet: wallet.wallet.name,
                       address: walletAddress,
                       coins: [],
-                      isExecutable: wallet.wallet.isExecutable
+                      isExecutable: wallet.wallet.isExecutable,
                     });
                   }
                   batchTransferFormStore.coinsToTransfer.push({
@@ -505,7 +512,7 @@ export default component$(() => {
           </div>
         </div>
         <div class="grid">
-          <div class="custom-border-1 flex min-h-[260px] flex-col gap-4 rounded-2xl p-6">
+          <div class="custom-border-1 custom-bg-opacity-5 flex min-h-[260px] flex-col gap-6 rounded-2xl p-6">
             <p class="text-xl font-semibold">Token list</p>
             <div class="grid grid-cols-4 gap-2">
               <ButtonWithIcon
@@ -530,7 +537,7 @@ export default component$(() => {
               />
             </div>
             <div class="grid grid-rows-[40px_auto] items-center gap-4 overflow-auto text-left text-sm">
-              <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_16%_3%] items-center text-xs font-normal">
+              <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
                 <div class="">TOKEN NAME</div>
                 <div class="">QUANTITY</div>
                 <div class="">VALUE</div>
@@ -591,17 +598,17 @@ export default component$(() => {
                   <Button
                     class="custom-border-1 w-full bg-transparent  disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
                     onClick$={async () => {
-                      if(stepsCounter.value === 2){
+                      if (stepsCounter.value === 2) {
                         batchTransferFormStore.coinsToTransfer = [];
                         for (const structure of availableStructures.value) {
                           const coins = [];
                           for (const wallet of structure.structureBalance) {
-                            const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.name === wallet.wallet.name)?.wallet.address}`;
+                            const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.walletName === wallet.wallet.name)?.wallet.address}`;
                             coins.push({
                               wallet: wallet.wallet.name,
                               address: walletAddress,
                               coins: [],
-                              isExecutable: wallet.wallet.isExecutable
+                              isExecutable: wallet.wallet.isExecutable,
                             });
                           }
                           batchTransferFormStore.coinsToTransfer.push({
@@ -642,6 +649,13 @@ export default component$(() => {
               <Modal
                 isOpen={isCreateNewStructureModalOpen}
                 title="Create new structure"
+                onClose={$(() => {
+                  isWalletSelected.selection = [];
+                  isTokenSelected.selection = [];
+                  selectedWallets.wallets = [];
+                  selectedTokens.balances = [];
+                  structureStore.name = "";
+                })}
               >
                 <Form
                   action={createStructureAction}
@@ -652,6 +666,7 @@ export default component$(() => {
                       isTokenSelected.selection = [];
                       selectedWallets.wallets = [];
                       selectedTokens.balances = [];
+                      structureStore.name = "";
                     }
                   }}
                   class="mt-8 text-sm"
@@ -846,7 +861,7 @@ export default component$(() => {
                               class="custom-bg-white custom-border-1 absolute inline-flex min-h-9 w-full cursor-pointer items-center space-x-2 rounded-lg"
                             >
                               <span class="absolute start-9">
-                                {option.wallet.name}
+                                {option.walletName}
                               </span>
                             </label>
                           </div>
@@ -979,9 +994,16 @@ export default component$(() => {
                   </div>
                   <div class="flex gap-4">
                     <button
-                      type="submit"
-                      class="custom-border-1 h-12 w-1/2 rounded-10 duration-300 ease-in-out hover:scale-105"
-                      disabled={!isValidName(structureStore.name)}
+                      type="button"
+                      class="custom-border-1 h-12 w-1/2 rounded-10 duration-300 ease-in-out hover:scale-105 "
+                      onClick$={() => {
+                        isCreateNewStructureModalOpen.value = false;
+                        isWalletSelected.selection = [];
+                        isTokenSelected.selection = [];
+                        selectedWallets.wallets = [];
+                        selectedTokens.balances = [];
+                        structureStore.name = "";
+                      }}
                     >
                       Cancel
                     </button>
@@ -1090,7 +1112,7 @@ function parseWalletsToOptions(
             class="custom-bg-white custom-border-1 absolute inline-flex min-h-9 w-full cursor-pointer items-center space-x-2 rounded-lg"
             key={`${balance.balanceId} - ${balance.tokenId}`}
           >
-            <span class="absolute start-9">{`${balance.tokenSymbol} - ${item.wallet.name}`}</span>
+            <span class="absolute start-9">{`${balance.tokenSymbol} - ${item.walletName}`}</span>
           </label>
         </div>,
       );

@@ -67,7 +67,7 @@ export default component$<
 
   const openWeb3Modal = $(async () => {
     const { config, modal } = await setWeb3Modal();
-    await modal.open({view: 'Connect'}); 
+    await modal.open({ view: "Connect" });
     modalStore.config = noSerialize(config);
     watchAccount(config, {
       onChange(data) {

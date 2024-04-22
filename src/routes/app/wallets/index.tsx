@@ -2,13 +2,13 @@ import {
   $,
   component$,
   type NoSerialize,
+  noSerialize,
   useContext,
   useSignal,
   useStore,
-  noSerialize,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { Form, routeAction$, zod$, z, server$ } from "@builder.io/qwik-city";
+import { Form, routeAction$, server$, z, zod$ } from "@builder.io/qwik-city";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { contractABI } from "~/abi/abi";
 import { type Wallet } from "~/interface/auth/Wallet";
@@ -18,8 +18,8 @@ import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type Balance } from "~/interface/balance/Balance";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { isAddress, checksumAddress } from "viem";
-import { isValidName, isValidAddress } from "~/utils/validators/addWallet";
+import { checksumAddress, isAddress } from "viem";
+import { isValidAddress, isValidName } from "~/utils/validators/addWallet";
 import {
   getUsersObservingWallet,
   walletExists,
@@ -41,13 +41,13 @@ import { messagesContext } from "../layout";
 import { Readable } from "node:stream";
 import { type Chain, sepolia } from "viem/chains";
 import {
+  type Config,
   getAccount,
+  readContract,
   simulateContract,
+  waitForTransactionReceipt,
   watchAccount,
   writeContract,
-  type Config,
-  readContract,
-  waitForTransactionReceipt,
   disconnect,
 } from "@wagmi/core";
 import { returnWeb3ModalAndClient } from "~/components/WalletConnect";
@@ -62,11 +62,10 @@ import {
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
+import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
 export const useAddWallet = routeAction$(
   async (data, requestEvent) => {
-    console.log("data", data);
-
     const db = await connectToDB(requestEvent.env);
     await db.query(
       `DEFINE INDEX walletAddressChainIndex ON TABLE wallet COLUMNS address, chainId UNIQUE;`,
@@ -88,7 +87,6 @@ export const useAddWallet = routeAction$(
       const [createWalletQueryResult] = await db.create<Wallet>("wallet", {
         chainId: 1,
         address: data.address.toString(),
-        name: data.name.toString(),
         isExecutable: data.isExecutable === "1" ? true : false,
       });
       walletId = createWalletQueryResult.id;
@@ -123,9 +121,10 @@ export const useAddWallet = routeAction$(
     }
 
     if (!(await getExistingRelation(db, userId, walletId)).at(0)) {
-      await db.query(`RELATE ONLY ${userId}->observes_wallet->${walletId};`);
+      await db.query(
+        `RELATE ONLY ${userId}->observes_wallet->${walletId} SET name = '${data.name}';`,
+      );
     }
-
     return {
       success: true,
       wallet: { id: walletId, chainId: 1, address: data.address },
@@ -140,6 +139,111 @@ export const useAddWallet = routeAction$(
   }),
 );
 
+export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
+  const balanceHistory: any[] = [];
+
+  const walletTransactions = await getErc20TokenTransfers(
+    null,
+    data.address as string,
+  );
+
+  const responses = [];
+  for (const tx of walletTransactions) {
+    balanceHistory.push({
+      blockNumber: tx.block_number,
+      timestamp: tx.block_timestamp,
+    });
+    responses.push(
+      await getWalletBalance(tx.block_number, data.address as string),
+    );
+  }
+
+  const db = await connectToDB(requestEvent.env);
+  const cookie = requestEvent.cookie.get("accessToken");
+
+  if (!cookie) {
+    throw new Error("No cookie found");
+  }
+
+  const tokenAddresses = {
+    GLM: "0x054e1324cf61fe915cca47c48625c07400f1b587",
+    USDC: "0xd418937d10c9cec9d20736b2701e506867ffd85f",
+    USDT: "0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709",
+  };
+
+  for (let i = 0; i < responses.length; i++) {
+    const currentBalance: { [key: string]: string } = {};
+    // @ts-ignore
+    responses[i]?.jsonResponse.forEach((entry: any) => {
+      currentBalance[entry.token_address] = convertWeiToQuantity(
+        entry.balance,
+        parseInt(entry.decimals),
+      );
+    });
+
+    const dbObject = {
+      blockNumber: balanceHistory[i].blockNumber,
+      timestamp: balanceHistory[i].timestamp,
+      walletAddress: data.address,
+      [tokenAddresses.GLM]: currentBalance[tokenAddresses.GLM]
+        ? currentBalance[tokenAddresses.GLM]
+        : "0",
+      [tokenAddresses.USDC]: currentBalance[tokenAddresses.USDC]
+        ? currentBalance[tokenAddresses.USDC]
+        : "0",
+      [tokenAddresses.USDT]: currentBalance[tokenAddresses.USDT]
+        ? currentBalance[tokenAddresses.USDT]
+        : "0",
+    };
+
+    const dbResponse = await db.create("wallet_balance", dbObject);
+    console.log(dbResponse);
+  }
+});
+
+async function getErc20TokenTransfers(cursor: string | null, address: string) {
+  let allEntries: any = [];
+  try {
+    const response = await Moralis.EvmApi.token.getWalletTokenTransfers({
+      chain: EvmChain.SEPOLIA,
+      order: "ASC",
+      cursor: cursor as string,
+      contractAddresses: [
+        "0x054E1324CF61fe915cca47C48625C07400F1B587",
+        "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
+        "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
+      ],
+      address: address,
+    });
+    allEntries = allEntries.concat(response.raw.result);
+
+    if (response.raw.cursor) {
+      allEntries = allEntries.concat(
+        await getErc20TokenTransfers(response.raw.cursor, address),
+      );
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return allEntries;
+}
+
+async function getWalletBalance(block: string, address: string) {
+  try {
+    return Moralis.EvmApi.token.getWalletTokenBalances({
+      chain: EvmChain.SEPOLIA.hex,
+      toBlock: parseInt(block),
+      tokenAddresses: [
+        "0x054E1324CF61fe915cca47C48625C07400F1B587",
+        "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
+        "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
+      ],
+      address: address,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
 export const useRemoveWallet = routeAction$(
   async (wallet, requestEvent) => {
     const db = await connectToDB(requestEvent.env);
@@ -154,7 +258,11 @@ export const useRemoveWallet = routeAction$(
     }
 
     const { userId } = jwt.decode(cookie.value) as JwtPayload;
-    await db.query(`DELETE ${userId}->observes_wallet WHERE out=${wallet.id};`);
+
+    await db.query(`
+    DELETE ${userId}->observes_wallet WHERE out=${wallet.id};
+    LET $wallet_address = SELECT VALUE address FROM ${wallet.id};
+    DELETE wallet_balance WHERE walletAddress = $wallet_address[0]`);
 
     const [usersObservingWallet] = await getUsersObservingWallet(db, wallet.id);
 
@@ -262,9 +370,9 @@ export const dbBalancesStream = server$(async function* () {
   }
 });
 
-export const useMoralisBalance = routeAction$(async (data) => {
+export const getMoralisBalance = server$(async (data) => {
   const walletAddress = data.wallet;
-  console.log(walletAddress);
+
   const response = await Moralis.EvmApi.token.getWalletTokenBalances({
     chain: EvmChain.SEPOLIA.hex,
     tokenAddresses: [
@@ -303,7 +411,8 @@ export default component$(() => {
     coinsToCount: [],
     coinsToApprove: [],
   });
-  const moralisTokenBalancesAction = useMoralisBalance();
+  const getWalletBalanceHistory = useGetBalanceHistory();
+
   const temporaryModalStore = useStore<ModalStore>({
     isConnected: false,
     config: undefined,
@@ -442,8 +551,12 @@ export default component$(() => {
         name: addWalletFormStore.name,
         isExecutable: addWalletFormStore.isExecutable.toString(),
       });
+
       if (success) {
         observedWallets.value = await getObservedWallets();
+        await getWalletBalanceHistory.submit({
+          address: addWalletFormStore.address,
+        });
       }
 
       formMessageProvider.messages.push({
@@ -457,6 +570,10 @@ export default component$(() => {
         streamId,
         addWalletFormStore.address as `0x${string}`,
       );
+      if (temporaryModalStore.config) {
+        await disconnect(temporaryModalStore.config as Config);
+        temporaryModalStore.config = undefined;
+      }
       addWalletFormStore.address = "";
       addWalletFormStore.name = "";
       addWalletFormStore.isExecutable = 0;
@@ -464,8 +581,6 @@ export default component$(() => {
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
       temporaryModalStore.isConnected = false;
-      await disconnect(temporaryModalStore.config as Config);
-      temporaryModalStore.config = undefined;
     } catch (err) {
       console.error("error: ", err);
       formMessageProvider.messages.push({
@@ -478,9 +593,9 @@ export default component$(() => {
   });
 
   const handleReadBalances = $(async (wallet: string) => {
-    const tokenBalances = await moralisTokenBalancesAction.submit({ wallet });
+    const tokenBalances = await getMoralisBalance({ wallet });
 
-    walletTokenBalances.value = tokenBalances.value.tokens;
+    walletTokenBalances.value = tokenBalances.tokens;
   });
 
   const handleTransfer = $(async () => {
@@ -564,7 +679,7 @@ export default component$(() => {
 
   return (
     <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
-      <div class="custom-border-1 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
+      <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
         <div class="flex items-center justify-between gap-2">
           <h1 class="text-xl font-semibold">Wallets</h1>
           <button
@@ -597,7 +712,7 @@ export default component$(() => {
 
       <div class="grid gap-6">
         {/* <PendingAuthorization/> */}
-        <div class="custom-border-1 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
+        <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
           {selectedWallet.value && (
             <SelectedWalletDetails
               key={selectedWallet.value.wallet.address}
@@ -616,15 +731,17 @@ export default component$(() => {
           isOpen={isAddWalletModalOpen}
           title="Add Wallet"
           onClose={$(async () => {
+            if (temporaryModalStore.config) {
+              await disconnect(temporaryModalStore.config as Config);
+              temporaryModalStore.config = undefined;
+            }
             addWalletFormStore.address = "";
             addWalletFormStore.name = "";
             addWalletFormStore.isExecutable = 0;
             addWalletFormStore.coinsToCount = [];
             addWalletFormStore.coinsToApprove = [];
             stepsCounter.value = 1;
-            await disconnect(temporaryModalStore.config as Config);
             temporaryModalStore.isConnected = false;
-            temporaryModalStore.config = undefined;
           })}
         >
           <Form>
@@ -686,9 +803,10 @@ export default component$(() => {
                   class="w-full border-0 bg-customBlue text-white disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
                   onClick$={async () => {
                     if (stepsCounter.value === 1) {
-                      const { address } = await getAccount(
+                      const { address } = getAccount(
                         temporaryModalStore.config as Config,
                       );
+
                       await handleReadBalances(address as `0x${string}`);
                     }
                     if (stepsCounter.value === 2) {
@@ -852,7 +970,7 @@ const isProceedDisabled = (
   !isValidName(addWalletFormStore.name) ||
   !addWalletFormStore.isNameUnique ||
   addWalletFormStore.isNameUniqueLoading ||
-  temporaryModalStore.isConnected === false;
+  !temporaryModalStore.config;
 
 const isExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
   addWalletFormStore.name === "" ||

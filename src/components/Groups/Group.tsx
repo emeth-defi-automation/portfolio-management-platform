@@ -23,6 +23,7 @@ function extractData(
   const extractedArray: {
     walletName: string;
     symbol: string;
+    tokenName: string;
     quantity: string;
     networkName: string;
     value: string;
@@ -37,6 +38,7 @@ function extractData(
         networkName:
           chainIdToNetworkName[balanceEntry.wallet.chainId.toString()],
         symbol: balanceEntry.balance.symbol,
+        tokenName: balanceEntry.balance.name,
         quantity: convertWeiToQuantity(
           balanceEntry.balance.balance,
           balanceEntry.balance.decimals,
@@ -52,11 +54,11 @@ function extractData(
     <TokenRow
       key={`${entry.balanceId} - ${index}`}
       icon={`/assets/icons/tokens/${entry.symbol.toLowerCase()}.svg`}
-      name={entry.name}
+      tokenName={entry.tokenName}
       symbol={entry.symbol}
       quantity={entry.quantity}
       value={`$${(entry.value * entry.quantity).toFixed(2)}`}
-      wallet={entry.walletName}
+      walletName={entry.walletName}
       network={entry.networkName}
       onClick$={() => {
         tokenStore.balanceId = entry.balanceId;
@@ -74,7 +76,9 @@ export const Group = component$<GroupProps>((props) => {
           <div class="flex items-center gap-2">
             <IconArrowDown />
             <h3>{props.createdStructure.structure.name}</h3>
-            <IconDelete />
+            <button class="cursor-pointer" onClick$={props.onClick$}>
+              <IconDelete />
+            </button>
           </div>
           <button class="custom-border-2 rounded-3xl px-4 py-2 text-xs">
             See Performance

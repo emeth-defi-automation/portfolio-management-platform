@@ -13,7 +13,7 @@ export const NavLink = component$<NavLinkProps>(({ href }) => {
   return (
     <a
       href={href}
-      class={`m-2.5 text-white no-underline${isActive ? "" : " opacity-50"}`}
+      class={`text-white no-underline${isActive ? "" : " opacity-50"}`}
     >
       <Slot />
     </a>
