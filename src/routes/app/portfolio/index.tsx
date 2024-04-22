@@ -221,10 +221,6 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
         const [[walletNameResult]]: any = await db.query(
           `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`,
         );
-        console.log(
-          "walletNameResult useAvailableStructures",
-          walletNameResult,
-        );
 
         const [tokenBalance]: string[] = await db.query(`
         SELECT VALUE value
