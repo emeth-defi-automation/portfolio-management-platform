@@ -65,36 +65,32 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                                   "",
                                 );
 
-                                  const x =
-                                    batchTransferFormStore.coinsToTransfer.find(
-                                      (item) => item.name === structure.name,
-                                    );
-                                  const y = x!.coins.find(
-                                    (item) => item.wallet === coinObject.wallet,
+                                const x =
+                                  batchTransferFormStore.coinsToTransfer.find(
+                                    (item) => item.name === structure.name,
                                   );
+                                const y = x!.coins.find(
+                                  (item) => item.wallet === coinObject.wallet,
+                                );
 
-                                  y!.coins.find(
-                                    (c) => c.symbol === coin.symbol,
-                                  )!.amount = target.value;
-                                }}
-                              />
-                            }
-                          />
-                          <span class="block pb-1 text-xs text-white">
-                            {coin.amount.length < 1 &&
-                            coin.amount[0] != "0" &&
-                            !chekckIfProperAmount(
-                              coin.amount,
-                              /^\d*\.?\d*$/,
-                            ) ? (
-                              <span class="text-xs text-red-500">
-                                Invalid amount. There should be only one dot.
-                              </span>
-                            ) : null}
-                          </span>
-                        </>
-                      ),
-                    )}
+                                y!.coins.find(
+                                  (c) => c.symbol === coin.symbol,
+                                )!.amount = target.value;
+                              }}
+                            />
+                          }
+                        />
+                        <span class="block pb-1 text-xs text-white">
+                          {coin.amount.length < 1 &&
+                          coin.amount[0] != "0" &&
+                          !chekckIfProperAmount(coin.amount, /^\d*\.?\d*$/) ? (
+                            <span class="text-xs text-red-500">
+                              Invalid amount. There should be only one dot.
+                            </span>
+                          ) : null}
+                        </span>
+                      </>
+                    ))}
                   </div>
                 ))}
               </div>

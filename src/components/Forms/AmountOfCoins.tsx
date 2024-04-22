@@ -75,25 +75,24 @@ export default component$<AmountOfCoinsProps>(
                       BigInt(chosenTokenBalance.balance) -
                       BigInt(calculation) * BigInt(10 ** decimals);
 
-                      inputTokenValue!.amount = `${calculation}.${denominator}`;
-                    }}
-                  />
-                </div>
-                <span class="block pb-1 text-xs text-white">
-                  {!chekckIfProperAmount(
-                    addWalletFormStore.coinsToApprove.find(
-                      (item) => item.symbol === symbol,
-                    )!.amount,
-                    /^\d*\.?\d*$/,
-                  ) ? (
-                    <span class="text-xs text-red-500">
-                      Invalid amount. There should be only one dot.
-                    </span>
-                  ) : null}
-                </span>
+                    inputTokenValue!.amount = `${calculation}.${denominator}`;
+                  }}
+                />
               </div>
-            ),
-          )}
+              <span class="block pb-1 text-xs text-white">
+                {!chekckIfProperAmount(
+                  addWalletFormStore.coinsToApprove.find(
+                    (item) => item.symbol === symbol,
+                  )!.amount,
+                  /^\d*\.?\d*$/,
+                ) ? (
+                  <span class="text-xs text-red-500">
+                    Invalid amount. There should be only one dot.
+                  </span>
+                ) : null}
+              </span>
+            </div>
+          ))}
         </div>
       </>
     );
