@@ -21,7 +21,7 @@ export default component$<CoinsToApproveProps>(
             <p class="custom-text-50 text-light text-xs uppercase">
               Select tokens
             </p>
-            <div class="relative">
+            {/* <div class="relative">
               <label class="custom-text-50 text-light flex h-6 items-center gap-3 text-xs uppercase">
                 <input
                   type="checkbox"
@@ -29,7 +29,7 @@ export default component$<CoinsToApproveProps>(
                 />
                 <span class="custom-text-50 text-xs uppercase">select all</span>
               </label>
-            </div>
+            </div> */}
           </div>
           {coins.map((symbol: any) => (
             <FormBadge

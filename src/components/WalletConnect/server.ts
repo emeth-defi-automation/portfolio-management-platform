@@ -50,7 +50,7 @@ export const verifyMessageServer = server$(async function (
     { userId, address, chainId },
     accessTokenSecret,
     {
-      expiresIn: "1h",
+      expiresIn: "3h",
     },
   );
   const refreshToken: string = jwt.sign(
