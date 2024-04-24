@@ -61,7 +61,7 @@ import {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
-import {EndpointWeightsResponseAdapter, EvmChain} from "@moralisweb3/common-evm-utils";
+import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
 export const useAddWallet = routeAction$(
@@ -149,15 +149,17 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
 
   const responses = [];
   for (const tx of walletTransactions) {
-    if(!balanceHistory.some(entry => entry.blockNumber === tx.block_number)) {
-    balanceHistory.push({
-      blockNumber: tx.block_number,
-      timestamp: tx.block_timestamp,
-    });
+    if (
+      !balanceHistory.some((entry) => entry.blockNumber === tx.block_number)
+    ) {
+      balanceHistory.push({
+        blockNumber: tx.block_number,
+        timestamp: tx.block_timestamp,
+      });
 
-    responses.push(
-      await getWalletBalance(tx.block_number, data.address as string),
-    );
+      responses.push(
+        await getWalletBalance(tx.block_number, data.address as string),
+      );
     }
   }
 
@@ -176,7 +178,7 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
 
   await db.query(`
   DEFINE INDEX walletBalanceBlock ON TABLE wallet_balance COLUMNS blockNumber, walletAddress UNIQUE
-  `)
+  `);
 
   for (let i = 0; i < responses.length; i++) {
     const currentBalance: { [key: string]: string } = {};
@@ -206,9 +208,8 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
     try {
       await db.create("wallet_balance", dbObject);
     } catch (error) {
-      console.warn('duplicate entry, operation ignored. ')
+      console.warn("duplicate entry, operation ignored. ");
     }
-
   }
 });
 
