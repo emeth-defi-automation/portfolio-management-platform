@@ -50,16 +50,12 @@ import {
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
-import {
-  useAddWallet,
-  useGetBalanceHistory,
-  useRemoveWallet,
-} from "./server/actions/actions";
-export {
-  useAddWallet,
-  useGetBalanceHistory,
-  useRemoveWallet,
-} from "./server/actions/actions";
+import { useAddWallet } from "./server/addWalletAction";
+import { useRemoveWallet } from "./server/removeWalletAction";
+import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
+export { useAddWallet } from "./server/addWalletAction";
+export { useRemoveWallet } from "./server/removeWalletAction";
+export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 
 export const convertToFraction = (numericString: string) => {
   let fractionObject;
