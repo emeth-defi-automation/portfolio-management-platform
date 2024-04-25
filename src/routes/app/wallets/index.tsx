@@ -6,6 +6,7 @@ import {
   useContext,
   useSignal,
   useStore,
+  useTask$,
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { Form, routeAction$, server$, z, zod$ } from "@builder.io/qwik-city";
@@ -387,6 +388,19 @@ export const getMoralisBalance = server$(async (data) => {
   return { tokens: rawResponse };
 });
 
+export const isUserObservingAnyWallets = server$(async function () {
+  const db = await connectToDB(this.env);
+  const cookie = this.cookie.get("accessToken");
+  if (!cookie) {
+    throw new Error("No cookie found");
+  }
+  const { userId } = jwt.decode(cookie.value) as JwtPayload;
+  const [[numberOfObservedWallets]]: any = await db.query(
+    `SELECT VALUE count(out) FROM ${userId}->observes_wallet;`,
+  );
+  return numberOfObservedWallets ? numberOfObservedWallets : 0;
+});
+
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
   const formMessageProvider = useContext(messagesContext);
@@ -418,6 +432,7 @@ export default component$(() => {
     config: undefined,
   });
   const walletTokenBalances = useSignal<any>([]);
+  const numberOfObservedWallets = useSignal(0);
 
   const setWeb3Modal = $(async () => {
     const chains: [Chain, ...Chain[]] = [sepolia];
@@ -442,6 +457,13 @@ export default component$(() => {
     });
   });
   const msg = useSignal("1");
+
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useTask$(async ({ track }) => {
+    track(() => observedWallets.value);
+    numberOfObservedWallets.value = await isUserObservingAnyWallets();
+  });
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     const data = await dbBalancesStream();
@@ -677,14 +699,9 @@ export default component$(() => {
     openWeb3Modal();
   });
 
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(({track}) => {
-    track(() => observedWallets.value);
-    console.log(observedWallets.value)
-  })
   return (
     <>
-      {observedWallets.value.length === 0 ? (
+      {!numberOfObservedWallets.value ? (
         <NoDataAdded
           title="You didn’t add any wallets yet"
           description="Please add your first wallet."
