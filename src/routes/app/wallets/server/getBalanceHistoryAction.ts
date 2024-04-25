@@ -1,5 +1,5 @@
 import { routeAction$ } from "@builder.io/qwik-city";
-import { getErc20TokenTransfers, getWalletBalance } from "~/server/helpers/moralis";
+import { getErc20TokenTransfers, getWalletBalance } from "~/server/moralis";
 import { connectToDB } from "~/utils/db";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
