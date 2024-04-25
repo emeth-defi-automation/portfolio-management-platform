@@ -1,11 +1,7 @@
-import {
-  Button,
-  ButtonTokenList,
-} from "~/components/portfolio/button-master/button";
-import IconEdit from "/public/assets/icons/portfolio/edit.svg?jsx";
+import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import IconClose from "/public/assets/icons/close.svg?jsx";
-import { Group } from "~/components/groups/group";
+import { Group } from "~/components/Groups/Group";
 import {
   $,
   component$,
@@ -15,11 +11,14 @@ import {
   useSignal,
   useStore,
   useTask$,
+  useContext,
 } from "@builder.io/qwik";
+import { messagesContext } from "../layout";
 import {
   Form,
   routeAction$,
   routeLoader$,
+  server$,
   z,
   zod$,
 } from "@builder.io/qwik-city";
@@ -31,14 +30,52 @@ import {
   getWalletDetails,
 } from "~/interface/wallets/observedWallets";
 import { type Wallet } from "~/interface/auth/Wallet";
-import { Modal } from "~/components/modal";
+import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
 import { structureExists } from "~/interface/structure/removeStructure";
+import {
+  simulateContract,
+  writeContract,
+  waitForTransactionReceipt,
+} from "@wagmi/core";
+import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import { emethContractAbi } from "~/abi/emethContractAbi";
+import { getCookie } from "~/utils/refresh";
+import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
+import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
+import Destination from "~/components/Forms/portfolioTransfters/Destination";
+import { convertToFraction } from "../wallets";
+import { NoDataAdded } from "~/components/NoDataAdded/NoDataAdded";
 
 type WalletWithBalance = {
-  wallet: { id: string; chainID: number; name: string };
+  wallet: {
+    id: string;
+    chainID: number;
+
+    address: string;
+    isExecutable: boolean;
+  };
+  walletName: string;
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
 };
+type CoinObject = {
+  symbol: string;
+  amount: string;
+};
+type CoinToApprove = {
+  wallet: string;
+  isExecutable: boolean;
+  address: string;
+  coins: CoinObject[];
+};
+type StructureToApprove = {
+  name: string;
+  coins: CoinToApprove[];
+};
+export interface BatchTransferFormStore {
+  receiverAddress: string;
+  coinsToTransfer: StructureToApprove[];
+}
 export const useDeleteStructure = routeAction$(
   async (structure, requestEvent) => {
     const db = await connectToDB(requestEvent.env);
@@ -98,18 +135,25 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
   }
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
-  const resultAddresses: any = await getResultAddresses(db, userId);
-  if (!resultAddresses[0]["->observes_wallet"].out.address.length) {
+  const resultAddresses = await getResultAddresses(db, userId);
+  if (!resultAddresses[0]) {
     return [];
   }
   const walletsWithBalance = [];
   let balanceDetails = [];
 
-  for (const observedWalletAddress of resultAddresses[0]["->observes_wallet"]
-    .out.address) {
-    const walletDetails = await getWalletDetails(db, observedWalletAddress);
+  for (const observedWalletAddress of resultAddresses) {
+    const walletDetails = await getWalletDetails(
+      db,
+      observedWalletAddress.address,
+      userId,
+    );
     const [balances]: any = await db.query(
-      `SELECT id, value FROM balance WHERE ->(for_wallet WHERE out = '${walletDetails[0].id}')`,
+      `SELECT id, value FROM balance WHERE ->(for_wallet WHERE out = '${walletDetails.id}')`,
+    );
+
+    const walletNameResult: any = await db.query(
+      `SELECT VALUE name FROM ${walletDetails.id}<-observes_wallet WHERE in = ${userId}`,
     );
 
     for (const balance of balances) {
@@ -131,7 +175,8 @@ export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
     }
 
     const walletWithBalance = {
-      wallet: walletDetails[0],
+      wallet: walletDetails,
+      walletName: walletNameResult,
       balance: balanceDetails,
     };
     balanceDetails = [];
@@ -174,6 +219,10 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
 
         const [wallet] = await db.select<Wallet>(`${walletId[0].out}`);
 
+        const [[walletNameResult]]: any = await db.query(
+          `SELECT VALUE name FROM ${wallet.id}<-observes_wallet WHERE in = ${userId}`,
+        );
+
         const [tokenBalance]: string[] = await db.query(`
         SELECT VALUE value
         FROM balance
@@ -202,8 +251,9 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
         structureTokens.push({
           wallet: {
             id: wallet.id,
-            name: wallet.name,
+            name: walletNameResult,
             chainId: wallet.chainId,
+            isExecutable: wallet.isExecutable,
           },
           balance: tokenWithBalance,
         });
@@ -230,10 +280,9 @@ export const useCreateStructure = routeAction$(
     const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
     const db = await connectToDB(requestEvent.env);
-    let [namesList]: any = await db.query(`
-    SELECT name FROM structure GROUP BY name`);
 
-    namesList = namesList.map((item: { name: string }) => item.name.trim());
+    const [namesList]: any = await db.query(`
+    SELECT VALUE out.name FROM ${userId}->has_structure`);
 
     if (namesList.includes(data.name)) {
       return {
@@ -263,13 +312,23 @@ export const useCreateStructure = routeAction$(
     balancesId: z.array(z.string()),
   }),
 );
+const queryTokens = server$(async function () {
+  const db = await connectToDB(this.env);
 
+  const [tokens]: any = await db.query(
+    `SELECT decimals, symbol, address FROM token;`,
+  );
+  return tokens;
+});
 export default component$(() => {
+  const modalStore = useContext(ModalStoreContext);
   const clickedToken = useStore({ balanceId: "", structureId: "" });
   const structureStore = useStore({ name: "" });
   const selectedWallets = useStore({ wallets: [] as any[] });
   const isCreateNewStructureModalOpen = useSignal(false);
+  const isTransferModalOpen = useSignal(false);
   const deleteToken = useDeleteToken();
+  const formMessageProvider = useContext(messagesContext);
   const availableStructures = useAvailableStructures();
   const createStructureAction = useCreateStructure();
   const deleteStructureAction = useDeleteStructure();
@@ -283,7 +342,11 @@ export default component$(() => {
     selection: [] as { balanceId: string; status: boolean }[],
   });
   const availableBalances = useSignal<number>(0);
-
+  const stepsCounter = useSignal(1);
+  const batchTransferFormStore = useStore<BatchTransferFormStore>({
+    receiverAddress: "",
+    coinsToTransfer: [],
+  });
   useTask$(async ({ track }) => {
     track(() => {
       clickedToken.structureId;
@@ -333,82 +396,188 @@ export default component$(() => {
     },
   );
 
+  const handleBatchTransfer = $(async () => {
+    //  watchAccount
+    const cookie = getCookie("accessToken");
+
+    if (!cookie) throw new Error("No accessToken cookie found");
+
+    const emethContractAddress = import.meta.env
+      .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
+
+    if (!emethContractAddress) {
+      throw new Error("Missing PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA");
+    }
+
+    try {
+      const tokens = await queryTokens();
+      if (modalStore.config) {
+        const argsArray = [];
+        for (const cStructure of batchTransferFormStore.coinsToTransfer) {
+          for (const cWallet of cStructure.coins) {
+            for (const cCoin of cWallet.coins) {
+              const chosenToken = tokens.find(
+                (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
+              );
+              const { numerator, denominator } = convertToFraction(
+                cCoin.amount,
+              );
+              const calculation =
+                BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
+                BigInt(denominator);
+              argsArray.push({
+                from: cWallet.address as `0x${string}`,
+                to: batchTransferFormStore.receiverAddress as `0x${string}`,
+                amount: calculation,
+                token: chosenToken.address as `0x${string}`,
+              });
+            }
+          }
+        }
+        const { request } = await simulateContract(modalStore.config, {
+          abi: emethContractAbi,
+          address: emethContractAddress,
+          functionName: "transferBatch",
+          args: [argsArray],
+        });
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "info",
+          message: "Transferring tokens...",
+          isVisible: true,
+        });
+        const transactionHash = await writeContract(modalStore.config, request);
+
+        await waitForTransactionReceipt(modalStore.config, {
+          hash: transactionHash,
+        });
+
+        batchTransferFormStore.receiverAddress = "";
+        batchTransferFormStore.coinsToTransfer = [];
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "success",
+          message: "Success!",
+          isVisible: true,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      formMessageProvider.messages.push({
+        id: formMessageProvider.messages.length,
+        variant: "error",
+        message: "Something went wrong.",
+        isVisible: true,
+      });
+    }
+  });
   return (
     <>
-      <div class="grid grid-rows-[10%_auto] overflow-auto px-[40px] ">
-        <div class="flex items-center justify-between py-[32px]">
-          <div class="flex items-center gap-[8px] text-[24px] font-semibold">
-            <h2>Portfolio Name</h2>
-            <IconEdit />
-          </div>
-          <div class="flex items-center gap-[8px]">
-            <Button
-              image="/assets/icons/portfolio/dca.svg"
-              text="DCA"
+      <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-semibold">Portfolio Name</h2>
+          <div class="flex items-center gap-2">
+            <ButtonWithIcon
+              image="/assets/icons/portfolio/transfer.svg"
+              text="Transfer"
               class="custom-border-2"
+              onClick$={async () => {
+                for (const structure of availableStructures.value) {
+                  const coins = [];
+                  for (const wallet of structure.structureBalance) {
+                    const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
+                    coins.push({
+                      wallet: wallet.wallet.name,
+                      address: walletAddress,
+                      coins: [],
+                      isExecutable: wallet.wallet.isExecutable,
+                    });
+                  }
+                  batchTransferFormStore.coinsToTransfer.push({
+                    name: structure.structure.name,
+                    coins: coins,
+                  });
+                }
+                isTransferModalOpen.value = true;
+              }}
             />
-            <Button
-              image="/assets/icons/portfolio/structures.svg"
-              text="See All Structures"
-              class="custom-border-2"
-            />
-            <Button
+            <ButtonWithIcon
               image="/assets/icons/portfolio/add.svg"
-              text="Create New Structure"
-              class="bg-[#2196F3]"
-              onClick$={() => {
+              text="Add Sub Portfolio"
+              class="bg-customBlue"
+              onClick$={async () => {
                 isCreateNewStructureModalOpen.value =
                   !isCreateNewStructureModalOpen.value;
               }}
             />
           </div>
         </div>
-        <div class="grid overflow-auto ">
-          <div class=" custom-border-1 flex min-h-[260px] min-w-[580px] flex-col gap-4 overflow-auto rounded-[16px] p-[24px] ">
-            <p class="text-[20px] font-semibold">Token list</p>
-            <div class="grid grid-cols-4 gap-[8px]">
-              <ButtonTokenList
+        <div class="grid">
+          <div class="custom-border-1 custom-bg-opacity-5 grid min-h-[260px] grid-rows-[20px_32px_auto] gap-6 rounded-2xl p-6">
+            <p class="text-xl font-semibold">Token list</p>
+            <div class="grid grid-cols-4 gap-2">
+              <ButtonWithIcon
                 image="/assets/icons/search.svg"
                 text="Search for name"
-                class="flex-row-reverse justify-end text-opacity-50"
+                class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
               />
-              <ButtonTokenList
+              <ButtonWithIcon
                 image="/assets/icons/arrow-down.svg"
                 text="Choose Subportfolio"
-                class=""
+                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
               />
-              <ButtonTokenList
+              <ButtonWithIcon
                 image="/assets/icons/arrow-down.svg"
                 text="Choose Wallet"
-                class=""
+                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
               />
-              <ButtonTokenList
+              <ButtonWithIcon
                 image="/assets/icons/arrow-down.svg"
                 text="Choose Network"
-                class=""
+                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
               />
             </div>
-            <div class="grid grid-rows-[40px_auto] items-center gap-4 overflow-auto text-left text-[14px]">
-              <div
-                style="grid-template-columns: minmax(200px, 400px) minmax(145px, 200px) minmax(200px, 200px) minmax(200px, 300px) repeat(2, minmax(100px, 300px)) minmax(130px, 300px) 40px;"
-                class="grid items-center text-[12px] font-normal text-white text-opacity-[50%]"
-              >
+            <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
+              <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
                 <div class="">TOKEN NAME</div>
                 <div class="">QUANTITY</div>
                 <div class="">VALUE</div>
-                <div class="custom-bg-white custom-border-1 flex h-[32px] w-fit gap-[8px] rounded-lg p-[2px] text-center text-white">
-                  <button class="custom-bg-button rounded-[8px] px-[8px]">
-                    24h
-                  </button>
-                  <button class="px-[8px]">3d</button>
-                  <button class="px-[8px]">30d</button>
+                <div class="custom-bg-white custom-border-1 flex h-8 w-fit gap-2 rounded-lg p-[2px] text-center text-white">
+                  <button class="custom-bg-button rounded-lg px-2">24h</button>
+                  <button class="rounded-lg px-2">3d</button>
+                  <button class="rounded-lg px-2">30d</button>
                 </div>
                 <div class="">WALLET</div>
                 <div class="">NETWORK</div>
                 <div class=""></div>
               </div>
 
-              {availableStructures.value.map((createdStructures) => (
+              {availableStructures.value.length === 0 ? (
+                <NoDataAdded
+                  title="You didn't add any Sub Portfolio yet"
+                  description="Please add your first Sub Portfolio"
+                  buttonText="Add Sub Portfolio"
+                  buttonOnClick$={async () => {
+                    isCreateNewStructureModalOpen.value =
+                      !isCreateNewStructureModalOpen.value;
+                  }}
+                />
+              ) : (
+                availableStructures.value.map((createdStructures) => (
+                  <Group
+                    key={createdStructures.structure.name}
+                    createdStructure={createdStructures}
+                    tokenStore={clickedToken}
+                    onClick$={async () => {
+                      await deleteStructureAction.submit({
+                        id: createdStructures.structure.id,
+                      });
+                    }}
+                  />
+                ))
+              )}
+
+              {/* {availableStructures.value.map((createdStructures) => (
                 <Group
                   key={createdStructures.structure.name}
                   createdStructure={createdStructures}
@@ -419,13 +588,100 @@ export default component$(() => {
                     });
                   }}
                 />
-              ))}
+              ))} */}
             </div>
-
+            {isTransferModalOpen.value ? (
+              <Modal
+                title="Transfer Funds"
+                isOpen={isTransferModalOpen}
+                onClose={$(() => {
+                  batchTransferFormStore.receiverAddress = "";
+                  batchTransferFormStore.coinsToTransfer = [];
+                  stepsCounter.value = 1;
+                })}
+              >
+                <div class="mb-4 flex flex-col overflow-y-scroll">
+                  {stepsCounter.value === 1 ? (
+                    <CoinsToTransfer
+                      availableStructures={availableStructures}
+                      batchTransferFormStore={batchTransferFormStore}
+                    />
+                  ) : null}
+                  {stepsCounter.value === 2 ? (
+                    <CoinsAmounts
+                      availableStructures={availableStructures}
+                      batchTransferFormStore={batchTransferFormStore}
+                    />
+                  ) : null}
+                  {stepsCounter.value === 3 ? (
+                    <Destination
+                      availableStructures={availableStructures}
+                      batchTransferFormStore={batchTransferFormStore}
+                    />
+                  ) : null}
+                </div>
+                <div class="flex gap-4">
+                  <Button
+                    class="custom-border-1 w-full bg-transparent  disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
+                    onClick$={async () => {
+                      if (stepsCounter.value === 2) {
+                        batchTransferFormStore.coinsToTransfer = [];
+                        for (const structure of availableStructures.value) {
+                          const coins = [];
+                          for (const wallet of structure.structureBalance) {
+                            const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.walletName === wallet.wallet.name)?.wallet.address}`;
+                            coins.push({
+                              wallet: wallet.wallet.name,
+                              address: walletAddress,
+                              coins: [],
+                              isExecutable: wallet.wallet.isExecutable,
+                            });
+                          }
+                          batchTransferFormStore.coinsToTransfer.push({
+                            name: structure.structure.name,
+                            coins: coins,
+                          });
+                        }
+                      }
+                      if (stepsCounter.value > 1) {
+                        stepsCounter.value = stepsCounter.value - 1;
+                      } else {
+                        batchTransferFormStore.receiverAddress = "";
+                        batchTransferFormStore.coinsToTransfer = [];
+                        stepsCounter.value = 1;
+                        isTransferModalOpen.value = false;
+                      }
+                    }}
+                    type="button"
+                    text={stepsCounter.value === 1 ? "Cancel" : "Back"}
+                  />
+                  <Button
+                    class="w-full border-0 bg-customBlue disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
+                    onClick$={async () => {
+                      if (stepsCounter.value === 3) {
+                        isTransferModalOpen.value = false;
+                        stepsCounter.value = 1;
+                        await handleBatchTransfer();
+                      } else {
+                        stepsCounter.value = stepsCounter.value + 1;
+                      }
+                    }}
+                    text={stepsCounter.value === 3 ? "Send" : "Next"}
+                  />
+                </div>
+              </Modal>
+            ) : null}
             {isCreateNewStructureModalOpen.value && (
               <Modal
                 isOpen={isCreateNewStructureModalOpen}
                 title="Create new structure"
+                onClose={$(() => {
+                  isWalletSelected.selection = [];
+                  isTokenSelected.selection = [];
+                  selectedWallets.wallets = [];
+                  selectedTokens.balances = [];
+                  structureStore.name = "";
+                })}
               >
                 <Form
                   action={createStructureAction}
@@ -436,6 +692,7 @@ export default component$(() => {
                       isTokenSelected.selection = [];
                       selectedWallets.wallets = [];
                       selectedTokens.balances = [];
+                      structureStore.name = "";
                     }
                   }}
                   class="mt-8 text-sm"
@@ -458,7 +715,7 @@ export default component$(() => {
                     }}
                   />
                   {!isValidName(structureStore.name) && (
-                    <p class="mb-4 text-red-500">Invalid name</p>
+                    <p class="mb-4 text-red-500">Name too short</p>
                   )}
 
                   <label
@@ -480,7 +737,7 @@ export default component$(() => {
                       class="walletLabel custom-border-1 relative block h-12 w-full cursor-pointer rounded-lg bg-transparent outline-none"
                     >
                       {selectedWallets.wallets.length > 0 && (
-                        <div class="custom-bg-button absolute start-2 top-[0.45rem] flex h-8 w-fit gap-2 rounded-[6px] px-3 py-1.5">
+                        <div class="custom-bg-button absolute start-2 top-[0.45rem] flex h-8 w-fit gap-2 rounded-md px-3 py-1.5">
                           <p>{selectedWallets.wallets.length} selections</p>
                           <button
                             class="cursor-pointer"
@@ -507,86 +764,90 @@ export default component$(() => {
                         <p class="text-xs uppercase text-white">
                           <span class="bg-gradient-to-r from-red-600 via-orange-400 to-pink-500 bg-clip-text font-semibold text-transparent">
                             {selectedWallets.wallets.length} wallets
-                          </span>{" "}
-                          selected{" "}
-                        </p>
-                        <label class="flex h-6 items-center gap-3">
-                          <input
-                            type="checkbox"
-                            class="custom-bg-white custom-border-1 relative h-5 w-5 appearance-none rounded checked:after:absolute checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-[0.1rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                            checked={isSelectAllChecked.wallets}
-                            onClick$={(e) => {
-                              isSelectAllChecked.wallets = true;
-                              const { checked } = e.target as HTMLInputElement;
-                              if (checked) {
-                                observedWalletsWithBalance.value.map(
-                                  (wallet) => {
-                                    if (
-                                      !selectedWallets.wallets.find(
-                                        (item) =>
-                                          item.wallet.id === wallet.wallet.id,
-                                      )
-                                    ) {
-                                      selectedWallets.wallets.push(wallet);
-                                      wallet.balance.map((balance) =>
-                                        isTokenSelected.selection.push({
-                                          balanceId: balance.balanceId,
-                                          status: false,
-                                        }),
-                                      );
-                                    }
-
-                                    const selectedIndex =
-                                      isWalletSelected.selection.findIndex(
-                                        (item) =>
-                                          item.walletId === wallet.wallet.id,
-                                      );
-
-                                    if (selectedIndex === -1) {
-                                      isWalletSelected.selection.push({
-                                        walletId: wallet.wallet.id,
-                                        status: true,
-                                      });
-                                    } else {
-                                      isWalletSelected.selection[
-                                        selectedIndex
-                                      ].status = true;
-                                    }
-                                  },
-                                );
-                              } else {
-                                isSelectAllChecked.wallets = false;
-                                isSelectAllChecked.tokens = false;
-                                isWalletSelected.selection = [];
-                                selectedWallets.wallets = [];
-                                isTokenSelected.selection.map(
-                                  (balance) => (balance.status = false),
-                                );
-                                selectedTokens.balances = [];
-                              }
-                            }}
-                          />
-                          <span class="custom-text-50 text-xs uppercase">
-                            select all
                           </span>
-                        </label>
+                          selected
+                        </p>
+                        <div class="relative">
+                          <label class="flex h-6 items-center gap-3">
+                            <input
+                              type="checkbox"
+                              class="border-gradient custom-border-1 custom-bg-white checked:after:border-bg z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:ms-2 checked:after:mt-1 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                              checked={isSelectAllChecked.wallets}
+                              onClick$={(e) => {
+                                isSelectAllChecked.wallets = true;
+                                const { checked } =
+                                  e.target as HTMLInputElement;
+                                if (checked) {
+                                  observedWalletsWithBalance.value.map(
+                                    (wallet) => {
+                                      if (
+                                        !selectedWallets.wallets.find(
+                                          (item) =>
+                                            item.wallet.id === wallet.wallet.id,
+                                        )
+                                      ) {
+                                        selectedWallets.wallets.push(wallet);
+                                        wallet.balance.map((balance) =>
+                                          isTokenSelected.selection.push({
+                                            balanceId: balance.balanceId,
+                                            status: false,
+                                          }),
+                                        );
+                                      }
+
+                                      const selectedIndex =
+                                        isWalletSelected.selection.findIndex(
+                                          (item) =>
+                                            item.walletId === wallet.wallet.id,
+                                        );
+
+                                      if (selectedIndex === -1) {
+                                        isWalletSelected.selection.push({
+                                          walletId: wallet.wallet.id,
+                                          status: true,
+                                        });
+                                      } else {
+                                        isWalletSelected.selection[
+                                          selectedIndex
+                                        ].status = true;
+                                      }
+                                    },
+                                  );
+                                } else {
+                                  isSelectAllChecked.wallets = false;
+                                  isSelectAllChecked.tokens = false;
+                                  isWalletSelected.selection = [];
+                                  selectedWallets.wallets = [];
+                                  isTokenSelected.selection.map(
+                                    (balance) => (balance.status = false),
+                                  );
+                                  selectedTokens.balances = [];
+                                }
+                              }}
+                            />
+                            <span class="custom-text-50 text-xs uppercase">
+                              select all
+                            </span>
+                          </label>
+                        </div>
                       </div>
                       {/* div strikte z opcjami */}
-                      <div class="flex max-h-[180px] w-[98%] flex-col gap-2 overflow-auto">
+                      <div class="scrollbar m-1 flex max-h-[80px] flex-col gap-2 overflow-auto">
                         {observedWalletsWithBalance.value.map((option) => (
-                          <label
-                            class="custom-border-1 custom-bg-white inline-flex min-h-9 cursor-pointer items-center space-x-2 rounded-lg p-2"
+                          <div
+                            class="relative mr-2 min-h-9"
                             key={option.wallet.id}
                           >
                             <input
                               type="checkbox"
                               name="walletsId[]"
+                              id={option.wallet.id}
                               checked={isWalletSelected.selection.some(
                                 (item) =>
                                   option.wallet.id === item.walletId &&
                                   item.status,
                               )}
-                              class="custom-bg-white custom-border-1 relative h-5 w-5 appearance-none rounded checked:after:absolute checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-[0.1rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                              class="border-gradient custom-border-1 custom-bg-white checked:after:border-bg absolute start-2 top-2 z-10 h-5 w-5 appearance-none rounded checked:after:absolute checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
                               value={option.wallet.id}
                               onClick$={(e) => {
                                 handleCheckboxChange(
@@ -624,8 +885,15 @@ export default component$(() => {
                                 }
                               }}
                             />
-                            <span>{option.wallet.name}</span>
-                          </label>
+                            <label
+                              for={option.wallet.id}
+                              class="custom-bg-white custom-border-1 absolute inline-flex min-h-9 w-full cursor-pointer items-center space-x-2 rounded-lg"
+                            >
+                              <span class="absolute start-9">
+                                {option.walletName}
+                              </span>
+                            </label>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -650,7 +918,7 @@ export default component$(() => {
                       class="tokenLabel custom-border-1 relative block h-12 w-full cursor-pointer rounded-lg bg-transparent outline-none"
                     >
                       {selectedTokens.balances.length > 0 && (
-                        <div class="custom-bg-button absolute start-2 top-[0.45rem] flex h-8 w-fit gap-2 rounded-[6px] px-3 py-1.5">
+                        <div class="custom-bg-button absolute start-2 top-[0.45rem] flex h-8 w-fit gap-2 rounded-md px-3 py-1.5">
                           <p>{selectedTokens.balances.length} selections</p>
                           <button
                             class="cursor-pointer"
@@ -678,67 +946,71 @@ export default component$(() => {
                         <p class="text-xs uppercase text-white">
                           <span class="bg-gradient-to-r from-red-600 via-orange-400 to-pink-500 bg-clip-text font-semibold text-transparent">
                             {selectedTokens.balances.length} tokens
-                          </span>{" "}
-                          selected{" "}
-                        </p>
-                        <label class="flex h-6 items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={isSelectAllChecked.tokens}
-                            class="custom-bg-white custom-border-1 relative h-5 w-5 appearance-none rounded checked:after:absolute checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-[0.1rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                            onClick$={(e) => {
-                              isSelectAllChecked.tokens = true;
-
-                              const { checked } = e.target as HTMLInputElement;
-
-                              if (checked) {
-                                selectedWallets.wallets.map((wallet) => {
-                                  wallet.balance.map((balance: any) => {
-                                    if (
-                                      !selectedTokens.balances.find(
-                                        (balanceId) =>
-                                          balanceId === balance.balanceId,
-                                      )
-                                    ) {
-                                      selectedTokens.balances.push(
-                                        balance.balanceId,
-                                      );
-                                    }
-
-                                    const selectedIndex =
-                                      isTokenSelected.selection.findIndex(
-                                        (item) =>
-                                          item.balanceId === balance.balanceId,
-                                      );
-
-                                    if (selectedIndex === -1) {
-                                      isTokenSelected.selection.push({
-                                        balanceId: wallet.balanceId,
-                                        status: true,
-                                      });
-                                    } else {
-                                      isTokenSelected.selection[
-                                        selectedIndex
-                                      ].status = true;
-                                    }
-                                  });
-                                });
-                              } else {
-                                isSelectAllChecked.tokens = false;
-                                isTokenSelected.selection.map(
-                                  (balance) => (balance.status = false),
-                                );
-                                selectedTokens.balances = [];
-                              }
-                            }}
-                          />
-                          <span class="custom-text-50 text-xs uppercase">
-                            select all
                           </span>
-                        </label>
+                          selected
+                        </p>
+                        <div class="">
+                          <label class="flex h-6 items-center gap-3">
+                            <input
+                              type="checkbox"
+                              checked={isSelectAllChecked.tokens}
+                              class="border-gradient custom-border-1 custom-bg-white checked:after:border-bg  z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:ms-2 checked:after:mt-1 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                              onClick$={(e) => {
+                                isSelectAllChecked.tokens = true;
+
+                                const { checked } =
+                                  e.target as HTMLInputElement;
+
+                                if (checked) {
+                                  selectedWallets.wallets.map((wallet) => {
+                                    wallet.balance.map((balance: any) => {
+                                      if (
+                                        !selectedTokens.balances.find(
+                                          (balanceId) =>
+                                            balanceId === balance.balanceId,
+                                        )
+                                      ) {
+                                        selectedTokens.balances.push(
+                                          balance.balanceId,
+                                        );
+                                      }
+
+                                      const selectedIndex =
+                                        isTokenSelected.selection.findIndex(
+                                          (item) =>
+                                            item.balanceId ===
+                                            balance.balanceId,
+                                        );
+
+                                      if (selectedIndex === -1) {
+                                        isTokenSelected.selection.push({
+                                          balanceId: wallet.balanceId,
+                                          status: true,
+                                        });
+                                      } else {
+                                        isTokenSelected.selection[
+                                          selectedIndex
+                                        ].status = true;
+                                      }
+                                    });
+                                  });
+                                } else {
+                                  isSelectAllChecked.tokens = false;
+                                  isTokenSelected.selection.map(
+                                    (balance) => (balance.status = false),
+                                  );
+                                  selectedTokens.balances = [];
+                                }
+                              }}
+                            />
+                            <span class="custom-text-50 text-xs uppercase">
+                              select all
+                            </span>
+                          </label>
+                        </div>
                       </div>
                       {/* div strikte z opcjami */}
-                      <div class="flex max-h-[180px] w-[98%] flex-col gap-2 overflow-auto">
+                      <div class="scrollbar flex max-h-[80px] flex-col gap-2 overflow-auto">
                         {parseWalletsToOptions(
                           selectedWallets.wallets,
                           selectedTokens,
@@ -751,15 +1023,22 @@ export default component$(() => {
                   </div>
                   <div class="flex gap-4">
                     <button
-                      type="submit"
-                      class="custom-border-1 h-12 w-[50%] rounded-[48px] duration-300 ease-in-out hover:scale-105"
-                      disabled={!isValidName(structureStore.name)}
+                      type="button"
+                      class="custom-border-1 h-12 w-1/2 rounded-10 duration-300 ease-in-out hover:scale-105 "
+                      onClick$={() => {
+                        isCreateNewStructureModalOpen.value = false;
+                        isWalletSelected.selection = [];
+                        isTokenSelected.selection = [];
+                        selectedWallets.wallets = [];
+                        selectedTokens.balances = [];
+                        structureStore.name = "";
+                      }}
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      class=" h-12 w-[50%] rounded-[48px] bg-blue-500 duration-300 ease-in-out hover:scale-105"
+                      class=" h-12 w-1/2 rounded-10 bg-blue-500 duration-300 ease-in-out hover:scale-105"
                       disabled={!isValidName(structureStore.name)}
                     >
                       Add token
@@ -769,8 +1048,8 @@ export default component$(() => {
               </Modal>
             )}
           </div>
-          {/* <div class="custom-border-1 custom-bg-white flex w-[322px] flex-col gap-[24px] overflow-auto rounded-[16px] p-[24px]">
-            <div class="flex h-[32px] items-center justify-between">
+          {/* <div class="custom-border-1 custom-bg-white flex w-[322px] flex-col gap-6 overflow-auto rounded-2xl p-6">
+            <div class="flex h-8 items-center justify-between">
               <p class="text-[20px] font-semibold">Details</p>
               <Button
                 image="/assets/icons/portfolio/rebalance.svg"
@@ -778,28 +1057,28 @@ export default component$(() => {
                 class="custom-border-2"
               />
             </div>
-            <div class="flex h-auto items-center gap-[16px]">
-              <div class="custom-border-1 flex h-[44px] w-[44px] items-center justify-center rounded-[8px]">
-                <IconBtc width={24} height={24} class="min-w-[24px]" />
+            <div class="flex h-auto items-center gap-4">
+              <div class="custom-border-1 flex h-11 w-11 items-center justify-center rounded-lg">
+                <IconBtc width={24} height={24} class="min-w-6" />
               </div>
-              <div class="flex flex-col gap-[8px]">
-                <h4 class="text-[14px] font-medium">Bitcoin</h4>
-                <p class="text-[12px] text-white text-opacity-50">BTC</p>
+              <div class="flex flex-col gap-2">
+                <h4 class="text-sm font-medium">Bitcoin</h4>
+                <p class="text-xs text-white text-opacity-50">BTC</p>
               </div>
             </div>
             <p class="text-[16px] font-medium">$82 617,96</p>
-            <div class="custom-border-1  custom-bg-white grid grid-cols-4 items-center rounded-[8px] px-[4px] py-[3.5px] text-[12px] font-normal">
-              <button class="custom-bg-button rounded-[6px] p-[8px]">
+            <div class="custom-border-1  custom-bg-white grid grid-cols-4 items-center rounded-lg px-1 py-1 text-xs font-normal">
+              <button class="custom-bg-button rounded-md p-2">
                 Hour
               </button>
-              <button class="rounded-[6px] p-[8px]">Day</button>
-              <button class="rounded-[6px] p-[8px]">Month</button>
-              <button class="rounded-[6px] p-[8px]">Year</button>
+              <button class="rounded-md p-2">Day</button>
+              <button class="rounded-md p-2">Month</button>
+              <button class="rounded-md p-2">Year</button>
             </div>
             <ImgChart />
-            <div class="flex flex-col gap-[16px]">
-              <h4 class="text-[14px] font-medium">Market data</h4>
-              <p class="text-[12px] font-thin leading-[180%]">
+            <div class="flex flex-col gap-4">
+              <h4 class="text-sm font-medium">Market data</h4>
+              <p class="text-xs font-thin leading-[180%]">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                 Pellentesque quis rutrum mi. Fusce elit est, condimentum eget
                 various et, tempor in erat. Fusce vulputate faucibus arcu id
@@ -831,15 +1110,13 @@ function parseWalletsToOptions(
     item.balance.forEach((balance) => {
       totalBalances += 1;
       options.push(
-        <label
-          class="custom-border-1 custom-bg-white inline-flex min-h-9 items-center space-x-2 rounded-lg p-2"
-          key={`${balance.balanceId} - ${balance.tokenId}`}
-        >
+        <div class="relative mr-2 min-h-9">
           <input
             key={balance.balanceId}
+            id={balance.balanceId}
             type="checkbox"
             name="balancesId[]"
-            class="custom-bg-white custom-border-1 relative h-5 w-5 appearance-none rounded checked:after:absolute checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-[0.1rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+            class="border-gradient custom-border-1 custom-bg-white checked:after:border-bg absolute start-2 top-2 z-10 h-5 w-5 appearance-none rounded checked:after:absolute checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
             value={balance.balanceId}
             checked={isTokenSelected.selection.some(
               (item) => balance.balanceId === item.balanceId && item.status,
@@ -859,8 +1136,14 @@ function parseWalletsToOptions(
               }
             }}
           />
-          <span>{`${balance.tokenSymbol} - ${item.wallet.name}`}</span>
-        </label>,
+          <label
+            for={balance.balanceId}
+            class="custom-bg-white custom-border-1 absolute inline-flex min-h-9 w-full cursor-pointer items-center space-x-2 rounded-lg"
+            key={`${balance.balanceId} - ${balance.tokenId}`}
+          >
+            <span class="absolute start-9">{`${balance.tokenSymbol} - ${item.walletName}`}</span>
+          </label>
+        </div>,
       );
     });
   });

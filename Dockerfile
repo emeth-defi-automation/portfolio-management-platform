@@ -1,4 +1,4 @@
-ARG NODE_VERSION=21.6.2
+ARG NODE_VERSION=21.7.3
 
 ################################################################################
 # Use node image for base image for all stages.
@@ -56,4 +56,4 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/server ./server
 
 # Run the application.
-ENTRYPOINT [ "node", "server/entry.fastify" ]
+ENTRYPOINT [ "node", "server/entry.express" ]

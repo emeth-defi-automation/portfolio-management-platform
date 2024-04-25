@@ -6,7 +6,6 @@ export const ExistingWalletResult = z.object({
   id: z.string(),
   chainId: z.number(),
   address: z.string(),
-  name: z.string(),
   nativeBalance: z.string().optional(),
 });
 export type ExistingWalletResult = z.infer<typeof ExistingWalletResult>;
@@ -18,7 +17,6 @@ export const getExistingWallet = async (db: Surreal, address: string) => {
       { addr: address },
     )
   ).at(0);
-  console.log("getExistingWallet", existingWallet);
   return ExistingWalletResult.array().parse(existingWallet);
 };
 
@@ -33,7 +31,6 @@ export const getTokenByAddress = async (db: Surreal, address: string) => {
       `SELECT id FROM token where address = '${getAddress(address)}'`,
     )
   ).at(0);
-  console.log("token", tokenQueryResult);
   return TokenResult.array().parse(tokenQueryResult);
 };
 
@@ -41,6 +38,7 @@ export const ExistingRelationResult = z.object({
   id: z.string(),
   in: z.string(),
   out: z.string(),
+  name: z.string(),
 });
 export type ExistingRelationResult = z.infer<typeof ExistingRelationResult>;
 
@@ -54,7 +52,6 @@ export const getExistingRelation = async (
       `SELECT * FROM ${userId}->observes_wallet WHERE out = ${walletId};`,
     )
   ).at(0);
-  console.log("existingRelation", existingRelationQueryResult);
   return ExistingRelationResult.array().parse(existingRelationQueryResult);
 };
 

@@ -8,21 +8,24 @@ import {
 } from "@builder.io/qwik";
 import { type RequestHandler } from "@builder.io/qwik-city";
 import jwt from "jsonwebtoken";
-import { Message } from "~/components/message/Message";
-import { Navbar } from "~/components/navbar/navbar";
-import { NavbarContent } from "~/components/navbar/navbar-content";
+import { Message } from "~/components/Message/Message";
+import { Navbar } from "~/components/Navbar/Navbar";
+import { NavbarContent } from "~/components/Navbar/NavbarContent";
 
-export const onRequest: RequestHandler = ({ json, cookie, env }) => {
+export const onRequest: RequestHandler = ({ redirect, cookie, env }) => {
   const accessToken = cookie.get("accessToken");
   if (!accessToken) {
-    json(401, { message: "Unauthorized - No Access Token" });
-    return;
+    throw redirect(307, "/?sessionExpired=true");
   }
   const secret = env.get("ACCESS_TOKEN_SECRET");
   if (!secret) throw new Error("No secret");
-  if (!jwt.verify(accessToken.value, secret)) {
-    json(401, { message: "Unauthorized - Token Not Verified" });
-    return;
+  try {
+    jwt.verify(accessToken.value, secret);
+  } catch (err) {
+    if (err instanceof jwt.TokenExpiredError) {
+      throw redirect(307, "/?sessionExpired=true");
+    }
+    throw err;
   }
 };
 interface Message {
@@ -47,7 +50,7 @@ export default component$(() => {
   const messagesProvider = useContext(messagesContext);
   return (
     <>
-      <div class="relative z-0 grid h-screen grid-rows-[auto_1fr] bg-black font-['Sora']">
+      <div class="scrollbar relative z-0 grid h-screen grid-rows-[auto_1fr] bg-black font-['Sora']">
         <div class="gradient absolute left-1/4 top-0 h-1/5 w-6/12 rounded-full"></div>
         <Navbar>
           <NavbarContent />

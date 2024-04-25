@@ -16,7 +16,7 @@ Create account on [Ngrok](https://ngrok.com/) and install it.
 # macOS
 brew install ngrok/ngrok/ngrok
 
-# linux
+# Linux
 curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok
 ```
 
@@ -41,7 +41,7 @@ PUBLIC_PROJECT_ID=
 PUBLIC_METADATA_NAME=emeth
 PUBLIC_METADATA_DESCRIPTION=emeth
 PUBLIC_EMETH_CONTRACT_ADDRESS=0x075FbeB3802AfdCDe6DDEB1d807E4805ed719eca
-PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA=0x9B2985a026c243A5133AaE819544ADb213366D7F
+PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA=0xfC11321e66Cb526c4a9c14295Fff03FC3FC637F2
 
 PW_BASE_URL=
 ```
@@ -77,7 +77,7 @@ Install `podman`:
 # macOS
 brew install podman
 
-# linux
+# Linux
 sudo apt-get update
 sudo apt-get -y install podman
 ```
@@ -88,7 +88,7 @@ Install `surreal`:
 # macOS
 brew install surrealdb/tap/surreal
 
-# linux
+# Linux
 curl -sSf https://install.surrealdb.com | sh
 ```
 
@@ -118,7 +118,15 @@ Last step is run the app (in dev mode):
 npm run dev
 ```
 
-## Build
+## Build & serve
+
+Firstly, run ngrok tunnel (and copy https url to `.env.local` into `NGROK_WEBHOOK_URL`):
+
+```bash
+npm run ngrok
+```
+
+Export all variables from `.env` and `.env.local` files to your shell.
 
 Start database and provision it with data (as above) - `production` build require database up and running.
 
@@ -177,3 +185,13 @@ After that, please add second rich wallet account to your Metamask wallet (ask o
 As next step, you need to install [`SubWallet` extension](https://www.subwallet.app/) in your browser and create new wallet account.
 
 Please select `EVM` network account, turn off all enabled networks and turn on `Sepolia` network.
+
+## Express Server
+
+This app has a minimal [Express server](https://expressjs.com/) implementation. After running a full build, you can preview the build using the command:
+
+```
+npm run serve
+```
+
+Then visit [http://localhost:8080/](http://localhost:8080/)

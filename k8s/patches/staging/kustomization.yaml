@@ -5,7 +5,7 @@ namespace: emeth-staging
 
 resources:
   - ../../resources
-  - routes.yaml
+  - ingress.yaml
 
 patches:
   - path: pull.patch.yaml
