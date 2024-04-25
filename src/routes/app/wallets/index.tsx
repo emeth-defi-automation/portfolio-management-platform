@@ -8,32 +8,21 @@ import {
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { Form, routeAction$, server$, z, zod$ } from "@builder.io/qwik-city";
-import jwt, { type JwtPayload } from "jsonwebtoken";
+import { Form, server$ } from "@builder.io/qwik-city";
+import { type JwtPayload } from "jsonwebtoken";
 import { contractABI } from "~/abi/abi";
-import { type Wallet } from "~/interface/auth/Wallet";
 import { connectToDB } from "~/utils/db";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
-import { type Balance } from "~/interface/balance/Balance";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { checksumAddress, isAddress } from "viem";
+import { checksumAddress } from "viem";
 import { isValidAddress, isValidName } from "~/utils/validators/addWallet";
-import {
-  getUsersObservingWallet,
-  walletExists,
-} from "~/interface/wallets/removeWallet";
-import {
-  getExistingRelation,
-  getExistingWallet,
-} from "~/interface/wallets/addWallet";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
 import { type Token } from "~/interface/token/Token";
-import { testPublicClient } from "./testconfig";
 import Moralis from "moralis";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
@@ -55,231 +44,18 @@ import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
 import CoinsToApprove from "~/components/Forms/CoinsToApprove";
 import AmountOfCoins from "~/components/Forms/AmountOfCoins";
 import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
-// import { PendingAuthorization } from "~/components/PendingAuthorization/PendingAuthorization";
 import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
 import {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
-import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
-
-export const useAddWallet = routeAction$(
-  async (data, requestEvent) => {
-    const db = await connectToDB(requestEvent.env);
-    await db.query(
-      `DEFINE INDEX walletAddressChainIndex ON TABLE wallet COLUMNS address, chainId UNIQUE;`,
-    );
-
-    const cookie = requestEvent.cookie.get("accessToken");
-    if (!cookie) {
-      throw new Error("No cookie found");
-    }
-
-    const { userId } = jwt.decode(cookie.value) as JwtPayload;
-
-    const existingWallet = await getExistingWallet(db, data.address.toString());
-
-    let walletId;
-    if (existingWallet.at(0)) {
-      walletId = existingWallet[0].id;
-    } else {
-      const [createWalletQueryResult] = await db.create<Wallet>("wallet", {
-        chainId: 1,
-        address: data.address.toString(),
-        isExecutable: data.isExecutable === "1" ? true : false,
-      });
-      walletId = createWalletQueryResult.id;
-      const nativeBalance = await testPublicClient.getBalance({
-        address: createWalletQueryResult.address as `0x${string}`,
-      });
-      await db.query(
-        `UPDATE ${walletId} SET nativeBalance = '${nativeBalance}';`,
-      );
-
-      // create balances for tokens
-      const tokens = await db.select<Token>("token");
-      for (const token of tokens) {
-        const readBalance = await testPublicClient.readContract({
-          address: token.address as `0x${string}`,
-          abi: contractABI,
-          functionName: "balanceOf",
-          args: [createWalletQueryResult.address as `0x${string}`],
-        });
-        if (readBalance < 0) {
-          continue;
-        }
-        const [balance] = await db.create<Balance>(`balance`, {
-          value: readBalance.toString(),
-        });
-        // balance -> token && balance -> wallet
-        await db.query(`RELATE ONLY ${balance.id}->for_token->${token.id}`);
-        await db.query(
-          `RELATE ONLY ${balance.id}->for_wallet->${createWalletQueryResult.id}`,
-        );
-      }
-    }
-
-    if (!(await getExistingRelation(db, userId, walletId)).at(0)) {
-      await db.query(
-        `RELATE ONLY ${userId}->observes_wallet->${walletId} SET name = '${data.name}';`,
-      );
-    }
-    return {
-      success: true,
-      wallet: { id: walletId, chainId: 1, address: data.address },
-    };
-  },
-  zod$({
-    address: z.string().refine((address) => isAddress(address), {
-      message: "Invalid address",
-    }),
-    name: z.string(),
-    isExecutable: z.string(),
-  }),
-);
-
-export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
-  const balanceHistory: any[] = [];
-
-  const walletTransactions = await getErc20TokenTransfers(
-    null,
-    data.address as string,
-  );
-
-  const responses = [];
-  for (const tx of walletTransactions) {
-    balanceHistory.push({
-      blockNumber: tx.block_number,
-      timestamp: tx.block_timestamp,
-    });
-    responses.push(
-      await getWalletBalance(tx.block_number, data.address as string),
-    );
-  }
-
-  const db = await connectToDB(requestEvent.env);
-  const cookie = requestEvent.cookie.get("accessToken");
-
-  if (!cookie) {
-    throw new Error("No cookie found");
-  }
-
-  const tokenAddresses = {
-    GLM: "0x054e1324cf61fe915cca47c48625c07400f1b587",
-    USDC: "0xd418937d10c9cec9d20736b2701e506867ffd85f",
-    USDT: "0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709",
-  };
-
-  for (let i = 0; i < responses.length; i++) {
-    const currentBalance: { [key: string]: string } = {};
-    // @ts-ignore
-    responses[i]?.jsonResponse.forEach((entry: any) => {
-      currentBalance[entry.token_address] = convertWeiToQuantity(
-        entry.balance,
-        parseInt(entry.decimals),
-      );
-    });
-
-    const dbObject = {
-      blockNumber: balanceHistory[i].blockNumber,
-      timestamp: balanceHistory[i].timestamp,
-      walletAddress: data.address,
-      [tokenAddresses.GLM]: currentBalance[tokenAddresses.GLM]
-        ? currentBalance[tokenAddresses.GLM]
-        : "0",
-      [tokenAddresses.USDC]: currentBalance[tokenAddresses.USDC]
-        ? currentBalance[tokenAddresses.USDC]
-        : "0",
-      [tokenAddresses.USDT]: currentBalance[tokenAddresses.USDT]
-        ? currentBalance[tokenAddresses.USDT]
-        : "0",
-    };
-
-    await db.create("wallet_balance", dbObject);
-  }
-});
-
-async function getErc20TokenTransfers(cursor: string | null, address: string) {
-  let allEntries: any = [];
-  try {
-    const response = await Moralis.EvmApi.token.getWalletTokenTransfers({
-      chain: EvmChain.SEPOLIA,
-      order: "ASC",
-      cursor: cursor as string,
-      contractAddresses: [
-        "0x054E1324CF61fe915cca47C48625C07400F1B587",
-        "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-        "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-      ],
-      address: address,
-    });
-    allEntries = allEntries.concat(response.raw.result);
-
-    if (response.raw.cursor) {
-      allEntries = allEntries.concat(
-        await getErc20TokenTransfers(response.raw.cursor, address),
-      );
-    }
-  } catch (error) {
-    console.error(error);
-  }
-  return allEntries;
-}
-
-async function getWalletBalance(block: string, address: string) {
-  try {
-    return Moralis.EvmApi.token.getWalletTokenBalances({
-      chain: EvmChain.SEPOLIA.hex,
-      toBlock: parseInt(block),
-      tokenAddresses: [
-        "0x054E1324CF61fe915cca47C48625C07400F1B587",
-        "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-        "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-      ],
-      address: address,
-    });
-  } catch (error) {
-    console.error(error);
-  }
-}
-export const useRemoveWallet = routeAction$(
-  async (wallet, requestEvent) => {
-    const db = await connectToDB(requestEvent.env);
-
-    const cookie = requestEvent.cookie.get("accessToken");
-    if (!cookie) {
-      throw new Error("No cookie found");
-    }
-
-    if (!(await walletExists(db, wallet.id))) {
-      throw new Error("Wallet does not exist");
-    }
-
-    const { userId } = jwt.decode(cookie.value) as JwtPayload;
-
-    await db.query(`
-    DELETE ${userId}->observes_wallet WHERE out=${wallet.id};
-    LET $wallet_address = SELECT VALUE address FROM ${wallet.id};
-    DELETE wallet_balance WHERE walletAddress = $wallet_address[0]`);
-
-    const [usersObservingWallet] = await getUsersObservingWallet(db, wallet.id);
-
-    if (!usersObservingWallet["<-observes_wallet"].in.length) {
-      await db.query(`
-        BEGIN TRANSACTION;
-        FOR $balance IN (SELECT VALUE in FROM for_wallet WHERE out = ${wallet.id}) {
-          DELETE balance WHERE id = $balance.id};
-        DELETE wallet WHERE id = ${wallet.id};
-        COMMIT TRANSACTION`);
-    }
-
-    return { success: true };
-  },
-  zod$({
-    id: z.string(),
-  }),
-);
+import { useAddWallet } from "./server/addWalletAction";
+import { useRemoveWallet } from "./server/removeWalletAction";
+import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
+export { useAddWallet } from "./server/addWalletAction";
+export { useRemoveWallet } from "./server/removeWalletAction";
+export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 
 export const convertToFraction = (numericString: string) => {
   let fractionObject;
@@ -390,6 +166,7 @@ export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
   const formMessageProvider = useContext(messagesContext);
   const { streamId } = useContext(StreamStoreContext);
+  const walletTokenBalances = useSignal<any>([]);
   const addWalletAction = useAddWallet();
   const removeWalletAction = useRemoveWallet();
   const observedWallets = useSignal<WalletTokensBalances[]>([]);
@@ -416,7 +193,6 @@ export default component$(() => {
     isConnected: false,
     config: undefined,
   });
-  const walletTokenBalances = useSignal<any>([]);
 
   const setWeb3Modal = $(async () => {
     const chains: [Chain, ...Chain[]] = [sepolia];
