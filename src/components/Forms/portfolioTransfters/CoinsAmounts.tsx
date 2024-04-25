@@ -18,7 +18,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
           console.log("s: ", s);
           if (!s.length) return null;
           return (
-            <div></div>
+            <div>{structure.name}</div>
             // <div
             //   class="scrollbar mb-4 flex max-h-[250px] flex-col overflow-auto"
             //   key={`${structure.name}${index}`}
