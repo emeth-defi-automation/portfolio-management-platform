@@ -1,4 +1,4 @@
-import { component$, type QRL } from "@builder.io/qwik";
+import { type QRL, component$ } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
 export interface ButtonProps {
