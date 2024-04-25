@@ -1,6 +1,16 @@
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import Moralis from "moralis";
 
+/**
+ * This asynchronous function retrieves ERC20 token transfers for a given wallet address.
+ * It uses the Moralis EvmApi to fetch the transfers, and concatenates the results to an array.
+ * If a cursor is provided in the response, the function calls itself recursively with the new cursor to fetch more transfers.
+ * 
+ * @param {string | null} cursor - The cursor for pagination, or null for the first page.
+ * @param {string} address - The wallet address to fetch transfers for.
+ * @returns {Promise<any[]>} A promise that resolves to an array of all token transfers.
+ * @throws {Error} If an error occurs during the API call, it is logged to the console.
+ */
 export async function getErc20TokenTransfers(
   cursor: string | null,
   address: string,
@@ -31,6 +41,14 @@ export async function getErc20TokenTransfers(
   return allEntries;
 }
 
+/**
+ * This asynchronous function retrieves the token balances of a wallet at a specific block.
+ * It uses the Moralis EvmApi to fetch the balances for specific tokens (identified by their contract addresses).
+ * 
+ * @param {string} block - The block number at which to fetch the balances.
+ * @param {string} address - The wallet address to fetch balances for.
+ * @returns {Promise<any> | undefined} A promise that resolves to the wallet's token balances at the specified block, or undefined if an error occurs.
+ */
 export async function getWalletBalance(block: string, address: string) {
   try {
     return Moralis.EvmApi.token.getWalletTokenBalances({

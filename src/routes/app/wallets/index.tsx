@@ -54,12 +54,12 @@ import {
   useAddWallet,
   useGetBalanceHistory,
   useRemoveWallet,
-} from "./functions/actions/actions";
+} from "./server/actions/actions";
 export {
   useAddWallet,
   useGetBalanceHistory,
   useRemoveWallet,
-} from "./functions/actions/actions";
+} from "./server/actions/actions";
 
 export const convertToFraction = (numericString: string) => {
   let fractionObject;
