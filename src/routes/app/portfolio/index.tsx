@@ -58,15 +58,13 @@ type WalletWithBalance = {
   walletName: string;
   balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
 };
-type CoinObject = {
-  symbol: string;
-  amount: string;
-};
 type CoinToApprove = {
   wallet: string;
-  isExecutable: boolean;
+  isExecutable: string;
   address: string;
-  coins: CoinObject[];
+  symbol: string;
+  amount: string;
+  isChecked: boolean;
 };
 type StructureToApprove = {
   name: string;
@@ -482,15 +480,18 @@ export default component$(() => {
               text="Transfer"
               class="custom-border-2"
               onClick$={async () => {
+                console.log("structures: ", availableStructures.value);
                 for (const structure of availableStructures.value) {
                   const coins = [];
                   for (const wallet of structure.structureBalance) {
                     const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
                     coins.push({
                       wallet: wallet.wallet.name,
-                      address: walletAddress,
-                      coins: [],
                       isExecutable: wallet.wallet.isExecutable,
+                      address: walletAddress,
+                      symbol: wallet.balance.symbol,
+                      amount: "0",
+                      isChecked: false,
                     });
                   }
                   batchTransferFormStore.coinsToTransfer.push({
@@ -624,25 +625,6 @@ export default component$(() => {
                   <Button
                     class="custom-border-1 w-full bg-transparent  disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
                     onClick$={async () => {
-                      if (stepsCounter.value === 2) {
-                        batchTransferFormStore.coinsToTransfer = [];
-                        for (const structure of availableStructures.value) {
-                          const coins = [];
-                          for (const wallet of structure.structureBalance) {
-                            const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.walletName === wallet.wallet.name)?.wallet.address}`;
-                            coins.push({
-                              wallet: wallet.wallet.name,
-                              address: walletAddress,
-                              coins: [],
-                              isExecutable: wallet.wallet.isExecutable,
-                            });
-                          }
-                          batchTransferFormStore.coinsToTransfer.push({
-                            name: structure.structure.name,
-                            coins: coins,
-                          });
-                        }
-                      }
                       if (stepsCounter.value > 1) {
                         stepsCounter.value = stepsCounter.value - 1;
                       } else {
