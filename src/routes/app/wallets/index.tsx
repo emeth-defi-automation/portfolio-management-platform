@@ -53,6 +53,7 @@ import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 import { balancesLiveStream } from "./server/balancesLiveStream";
 import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import { fetchTokens } from "~/database/token/fetchTokens";
+import { replaceNonMatching } from "~/utils/replaceNonMatching";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
@@ -73,17 +74,6 @@ export const convertToFraction = (numericString: string) => {
   }
   return fractionObject;
 };
-
-export function replaceNonMatching(
-  inputString: string,
-  regex: RegExp,
-  replacement: string,
-): string {
-  return inputString.replace(
-    new RegExp(`[^${regex.source}]`, "g"),
-    replacement,
-  );
-}
 
 export const chekckIfProperAmount = (input: string, regex: RegExp) => {
   return regex.test(input);
