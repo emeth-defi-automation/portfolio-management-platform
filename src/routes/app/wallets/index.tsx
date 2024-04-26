@@ -55,6 +55,7 @@ import { useRemoveWallet } from "./server/removeWalletAction";
 import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 import { balancesLiveStream } from "./server/balancesLiveStream";
 import { addAddressToStreamConfig } from "~/server/moralis";
+import { fetchTokens } from "~/database/tokens/fetchTokens";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
@@ -108,11 +109,6 @@ export interface transferredCoinInterface {
   symbol: string;
   address: string;
 }
-
-const fetchTokens = server$(async function () {
-  const db = await connectToDB(this.env);
-  return await db.select<Token>("token");
-});
 
 interface ModalStore {
   isConnected?: boolean;
