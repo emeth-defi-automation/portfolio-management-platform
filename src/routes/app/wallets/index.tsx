@@ -16,7 +16,6 @@ import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { checksumAddress } from "viem";
-import { isValidAddress, isValidName } from "~/utils/validators/addWallet";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
@@ -50,15 +49,20 @@ import { useRemoveWallet } from "./server/removeWalletAction";
 import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 import { balancesLiveStream } from "./server/balancesLiveStream";
 import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
-import { fetchTokens } from "~/database/token/fetchTokens";
 import { replaceNonMatching } from "~/utils/replaceNonMatching";
 import { convertToFraction } from "~/utils/convertToFraction";
 import { checkIfStringMatchesPattern } from "~/utils/checkIfStringMatchesPattern";
+import { fetchTokens } from "~/database/tokens/fetchTokens";
+import {
+  isExecutableDisabled,
+  isNotExecutableDisabled,
+  isProceedDisabled,
+} from "~/utils/validators/addWallet";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 
-export interface addWalletFormStore {
+export interface AddWalletFormStore {
   name: string;
   address: string;
   isExecutable: number;
@@ -71,12 +75,12 @@ export interface addWalletFormStore {
   }[];
 }
 
-export interface transferredCoinInterface {
+export interface TransferredCoinInterface {
   symbol: string;
   address: string;
 }
 
-interface ModalStore {
+export interface ModalStore {
   isConnected?: boolean;
   config?: NoSerialize<Config>;
 }
@@ -98,7 +102,7 @@ export default component$(() => {
   const transferredTokenAmount = useSignal("");
   const stepsCounter = useSignal(1);
   const msg = useSignal("1");
-  const addWalletFormStore = useStore<addWalletFormStore>({
+  const addWalletFormStore = useStore<AddWalletFormStore>({
     name: "",
     address: "",
     isExecutable: 0,
@@ -656,27 +660,3 @@ export default component$(() => {
     </div>
   );
 });
-
-const isProceedDisabled = (
-  addWalletFormStore: addWalletFormStore,
-  temporaryModalStore: ModalStore,
-) =>
-  addWalletFormStore.name === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading ||
-  !temporaryModalStore.config;
-
-const isExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
-  addWalletFormStore.name === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
-
-const isNotExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
-  addWalletFormStore.name === "" ||
-  addWalletFormStore.address === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !isValidAddress(addWalletFormStore.address) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
