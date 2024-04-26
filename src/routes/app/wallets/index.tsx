@@ -8,7 +8,7 @@ import {
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { Form, server$ } from "@builder.io/qwik-city";
+import { Form } from "@builder.io/qwik-city";
 import { type JwtPayload } from "jsonwebtoken";
 import { contractABI } from "~/abi/abi";
 import { chainIdToNetworkName } from "~/utils/chains";
@@ -21,7 +21,6 @@ import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
-import Moralis from "moralis";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
 import { messagesContext } from "../layout";
@@ -46,7 +45,6 @@ import {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
-import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { useAddWallet } from "./server/addWalletAction";
 import { useRemoveWallet } from "./server/removeWalletAction";
 import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
@@ -57,23 +55,6 @@ import { replaceNonMatching } from "~/utils/replaceNonMatching";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
-
-export const convertToFraction = (numericString: string) => {
-  let fractionObject;
-  if (!numericString.includes(".")) {
-    fractionObject = {
-      numerator: BigInt(numericString),
-      denominator: BigInt(1),
-    };
-  } else {
-    const fractionArray = numericString.split(".");
-    fractionObject = {
-      numerator: BigInt(`${fractionArray[0]}${fractionArray[1]}`),
-      denominator: BigInt(Math.pow(10, fractionArray[1].length)),
-    };
-  }
-  return fractionObject;
-};
 
 export const chekckIfProperAmount = (input: string, regex: RegExp) => {
   return regex.test(input);
