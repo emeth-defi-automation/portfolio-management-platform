@@ -51,7 +51,7 @@ import { useAddWallet } from "./server/addWalletAction";
 import { useRemoveWallet } from "./server/removeWalletAction";
 import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 import { balancesLiveStream } from "./server/balancesLiveStream";
-import { addAddressToStreamConfig } from "~/server/moralis";
+import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import { fetchTokens } from "~/database/token/fetchTokens";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
@@ -111,23 +111,6 @@ interface ModalStore {
   isConnected?: boolean;
   config?: NoSerialize<Config>;
 }
-
-export const getMoralisBalance = server$(async (data) => {
-  const walletAddress = data.wallet;
-
-  const response = await Moralis.EvmApi.token.getWalletTokenBalances({
-    chain: EvmChain.SEPOLIA.hex,
-    tokenAddresses: [
-      "0x054E1324CF61fe915cca47C48625C07400F1B587",
-      "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-      "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-    ],
-    address: `${walletAddress}`,
-  });
-
-  const rawResponse = response.raw;
-  return { tokens: rawResponse };
-});
 
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
