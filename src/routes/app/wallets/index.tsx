@@ -11,7 +11,6 @@ import {
 import { Form, server$ } from "@builder.io/qwik-city";
 import { type JwtPayload } from "jsonwebtoken";
 import { contractABI } from "~/abi/abi";
-import { connectToDB } from "~/utils/db";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
@@ -22,12 +21,10 @@ import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
-import { type Token } from "~/interface/token/Token";
 import Moralis from "moralis";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
 import { messagesContext } from "../layout";
-import { Readable } from "node:stream";
 import { type Chain, sepolia } from "viem/chains";
 import {
   type Config,
@@ -55,7 +52,7 @@ import { useRemoveWallet } from "./server/removeWalletAction";
 import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 import { balancesLiveStream } from "./server/balancesLiveStream";
 import { addAddressToStreamConfig } from "~/server/moralis";
-import { fetchTokens } from "~/database/tokens/fetchTokens";
+import { fetchTokens } from "~/database/token/fetchTokens";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
