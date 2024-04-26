@@ -14,12 +14,12 @@
  * console.log(result); // Output: "***123***456***"
  */
 export function replaceNonMatching(
-    inputString: string,
-    regex: RegExp,
-    replacement: string,
+  inputString: string,
+  regex: RegExp,
+  replacement: string,
 ): string {
-    return inputString.replace(
-        new RegExp(`[^${regex.source}]`, "g"),
-        replacement,
-    );
+  return inputString.replace(
+    new RegExp(`[^${regex.source}]`, "g"),
+    replacement,
+  );
 }

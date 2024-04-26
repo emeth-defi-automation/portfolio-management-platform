@@ -10,18 +10,18 @@
  * console.log(fractionObject); // Output: { numerator: 314159, denominator: 100000 }
  */
 export const convertToFraction = (numericString: string) => {
-    let fractionObject;
-    if (!numericString.includes(".")) {
-        fractionObject = {
-            numerator: BigInt(numericString),
-            denominator: BigInt(1),
-        };
-    } else {
-        const fractionArray = numericString.split(".");
-        fractionObject = {
-            numerator: BigInt(`${fractionArray[0]}${fractionArray[1]}`),
-            denominator: BigInt(Math.pow(10, fractionArray[1].length)),
-        };
-    }
-    return fractionObject;
+  let fractionObject;
+  if (!numericString.includes(".")) {
+    fractionObject = {
+      numerator: BigInt(numericString),
+      denominator: BigInt(1),
+    };
+  } else {
+    const fractionArray = numericString.split(".");
+    fractionObject = {
+      numerator: BigInt(`${fractionArray[0]}${fractionArray[1]}`),
+      denominator: BigInt(Math.pow(10, fractionArray[1].length)),
+    };
+  }
+  return fractionObject;
 };

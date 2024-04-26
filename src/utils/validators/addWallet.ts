@@ -92,7 +92,9 @@ export const isExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
  * @param addWalletFormStore The store containing the data of the add wallet form.
  * @returns True if the action should be disabled, otherwise false.
  */
-export const isNotExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
+export const isNotExecutableDisabled = (
+  addWalletFormStore: AddWalletFormStore,
+) =>
   addWalletFormStore.name === "" ||
   addWalletFormStore.address === "" ||
   !isValidName(addWalletFormStore.name) ||
