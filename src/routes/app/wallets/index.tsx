@@ -53,13 +53,10 @@ import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import { fetchTokens } from "~/database/token/fetchTokens";
 import { replaceNonMatching } from "~/utils/replaceNonMatching";
 import { convertToFraction } from "~/utils/convertToFraction";
+import { checkIfStringMatchesPattern } from "~/utils/checkIfStringMatchesPattern";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
-
-export const chekckIfProperAmount = (input: string, regex: RegExp) => {
-  return regex.test(input);
-};
 
 export interface addWalletFormStore {
   name: string;
@@ -316,7 +313,7 @@ export default component$(() => {
       to === "" ||
       token === "" ||
       amount === "" ||
-      !chekckIfProperAmount(transferredTokenAmount.value, /^\d*\.?\d*$/)
+      !checkIfStringMatchesPattern(transferredTokenAmount.value, /^\d*\.?\d*$/)
     ) {
       return {
         error: "Values cant be empty",
@@ -637,7 +634,7 @@ export default component$(() => {
                 }}
               />
               <span class="block pb-1 text-xs text-white">
-                {!chekckIfProperAmount(
+                {!checkIfStringMatchesPattern(
                   transferredTokenAmount.value,
                   /^\d*\.?\d*$/,
                 ) ? (
