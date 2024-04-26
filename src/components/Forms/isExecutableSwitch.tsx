@@ -1,6 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-// import { Select } from "~/components/select/select";
-import { type AddWalletFormStore } from "~/routes/app/wallets";
+import { type AddWalletFormStore } from "~/interface/wallets/addWalletFormStore";
 
 export interface AddWalletFormProps {
   addWalletFormStore: AddWalletFormStore;

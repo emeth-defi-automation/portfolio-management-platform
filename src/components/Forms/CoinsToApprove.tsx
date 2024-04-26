@@ -1,7 +1,6 @@
 import { type Signal, component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
-
-import { type AddWalletFormStore } from "~/routes/app/wallets";
+import { type AddWalletFormStore } from "~/interface/wallets/addWalletFormStore";
 
 export interface CoinsToApproveProps {
   addWalletFormStore: AddWalletFormStore;

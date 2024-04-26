@@ -58,22 +58,10 @@ import {
   isNotExecutableDisabled,
   isProceedDisabled,
 } from "~/utils/validators/addWallet";
+import { type AddWalletFormStore } from "~/interface/wallets/addWalletFormStore";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
-
-export interface AddWalletFormStore {
-  name: string;
-  address: string;
-  isExecutable: number;
-  isNameUnique: boolean;
-  isNameUniqueLoading: boolean;
-  coinsToCount: string[];
-  coinsToApprove: {
-    symbol: string;
-    amount: string;
-  }[];
-}
 
 export interface TransferredCoinInterface {
   symbol: string;
