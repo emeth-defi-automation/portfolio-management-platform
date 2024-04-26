@@ -53,6 +53,7 @@ import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { useAddWallet } from "./server/addWalletAction";
 import { useRemoveWallet } from "./server/removeWalletAction";
 import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
+import { balancesLiveStream } from "./server/balancesLiveStream";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
@@ -124,27 +125,6 @@ interface ModalStore {
   config?: NoSerialize<Config>;
 }
 
-export const dbBalancesStream = server$(async function* () {
-  const db = await connectToDB(this.env);
-
-  const resultsStream = new Readable({
-    objectMode: true,
-    read() {},
-  });
-
-  await db.live("balance", ({ action, result }) => {
-    if (action === "CLOSE") {
-      resultsStream.push(null);
-      return;
-    }
-    resultsStream.push(result);
-  });
-
-  for await (const result of resultsStream) {
-    yield result;
-  }
-});
-
 export const getMoralisBalance = server$(async (data) => {
   const walletAddress = data.wallet;
 
@@ -178,6 +158,7 @@ export default component$(() => {
   const receivingWalletAddress = useSignal("");
   const transferredTokenAmount = useSignal("");
   const stepsCounter = useSignal(1);
+  const msg = useSignal("1");
   const addWalletFormStore = useStore<addWalletFormStore>({
     name: "",
     address: "",
@@ -216,10 +197,10 @@ export default component$(() => {
       },
     });
   });
-  const msg = useSignal("1");
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
-    const data = await dbBalancesStream();
+    const data = await balancesLiveStream();
     for await (const value of data) {
       msg.value = value;
     }
