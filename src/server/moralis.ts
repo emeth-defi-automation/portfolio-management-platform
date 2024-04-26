@@ -1,3 +1,4 @@
+import { server$ } from "@builder.io/qwik-city";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import Moralis from "moralis";
 
@@ -65,3 +66,16 @@ export async function getWalletBalance(block: string, address: string) {
     console.error(error);
   }
 }
+
+/**
+ * Adds an address to the stream configuration.
+ *
+ * @param streamId The ID of the stream to which the address should be added.
+ * @param address The address to add to the stream configuration.
+ */
+export const addAddressToStreamConfig = server$(async function (
+  streamId: string,
+  address: string,
+) {
+  await Moralis.Streams.addAddress({ address, id: streamId });
+});
