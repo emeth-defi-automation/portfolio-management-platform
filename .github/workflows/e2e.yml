@@ -114,7 +114,7 @@ jobs:
           wait-on: http-get://localhost:${{ env.APP_PORT }}
 
       - name: Run tests
-        run: npm run test.e2e
+        run: npm run test.e2e.ci
 
       - name: Save results artifact
         if: failure()
