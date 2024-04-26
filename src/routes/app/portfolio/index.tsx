@@ -412,8 +412,7 @@ export default component$(() => {
       if (modalStore.config) {
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
-          for (const cWallet of cStructure.coins) {
-            for (const cCoin of cWallet.coins) {
+            for (const cCoin of cStructure.coins) {
               const chosenToken = tokens.find(
                 (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
               );
@@ -424,13 +423,13 @@ export default component$(() => {
                 BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
                 BigInt(denominator);
               argsArray.push({
-                from: cWallet.address as `0x${string}`,
+                from: cCoin.address as `0x${string}`,
                 to: batchTransferFormStore.receiverAddress as `0x${string}`,
                 amount: calculation,
                 token: chosenToken.address as `0x${string}`,
               });
             }
-          }
+          
         }
         const { request } = await simulateContract(modalStore.config, {
           abi: emethContractAbi,
