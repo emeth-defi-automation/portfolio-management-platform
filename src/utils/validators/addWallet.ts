@@ -2,8 +2,8 @@ import { isAddress, getAddress } from "viem";
 import { connectToDB } from "../db";
 import { server$, z } from "@builder.io/qwik-city";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import { type ModalStore } from "~/routes/app/wallets";
 import { type AddWalletFormStore } from "~/interface/wallets/addWalletFormStore";
+import { type ModalStore } from "~/interface/web3modal/ModalStore";
 
 export function isValidName(name: string): boolean {
   return name.length > 0 ? name.trim().length > 3 : true;

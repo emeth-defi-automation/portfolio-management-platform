@@ -1,4 +1,4 @@
 export interface TransferredCoinInterface {
-    symbol: string;
-    address: string;
+  symbol: string;
+  address: string;
 }

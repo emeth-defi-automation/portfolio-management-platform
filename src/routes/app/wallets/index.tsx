@@ -1,7 +1,6 @@
 import {
   $,
   component$,
-  type NoSerialize,
   noSerialize,
   useContext,
   useSignal,
@@ -21,7 +20,10 @@ import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import {
+  type ModalStore,
+  ModalStoreContext,
+} from "~/interface/web3modal/ModalStore";
 import { messagesContext } from "../layout";
 import { type Chain, sepolia } from "viem/chains";
 import {
@@ -62,11 +64,6 @@ import { type AddWalletFormStore } from "~/interface/wallets/addWalletFormStore"
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
-
-export interface ModalStore {
-  isConnected?: boolean;
-  config?: NoSerialize<Config>;
-}
 
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
