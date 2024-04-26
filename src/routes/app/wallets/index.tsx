@@ -63,11 +63,6 @@ export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 
-export interface TransferredCoinInterface {
-  symbol: string;
-  address: string;
-}
-
 export interface ModalStore {
   isConnected?: boolean;
   config?: NoSerialize<Config>;
