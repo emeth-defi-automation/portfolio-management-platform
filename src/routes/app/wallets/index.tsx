@@ -52,6 +52,7 @@ import { balancesLiveStream } from "./server/balancesLiveStream";
 import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import { fetchTokens } from "~/database/token/fetchTokens";
 import { replaceNonMatching } from "~/utils/replaceNonMatching";
+import { convertToFraction } from "~/utils/convertToFraction";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
