@@ -10,21 +10,28 @@ export const onPost: RequestHandler = async ({ request, env, json }) => {
   try {
     const db = await connectToDB(env);
     const webhook = await request.json();
+    const emethContractAddress = (import.meta.env
+      .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA).toUpperCase()
+
+
     const transfers = webhook["erc20Transfers"];
+    const {number, timestamp} = webhook["block"]
     if (transfers) {
       for (const transfer of transfers) {
-        const { transactionHash, from, to, tokenSymbol, triggers } = transfer;
-        for (const trigger of triggers) {
-          if (trigger.name === "fromBalance") {
-            if(from !== process.env["export PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA"]) {
-              await updateBalanceIfExists(db, from, tokenSymbol, trigger.value);
-              await updateBalance(db, transactionHash, from)
-            }
-          } else {
-            if(to !== process.env["export PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA"]) {
-              await updateBalance(db, transactionHash, to)
-              await updateBalanceIfExists(db, to, tokenSymbol, trigger.value);
-            }
+
+        const { from, to, tokenSymbol, triggers } = transfer;
+        for(const trigger of triggers.filter((trigger:any) => trigger.value !== '0'))
+        {
+          console.log('******************************************')
+          console.log(transfer)
+          console.log('******************************************')
+          if(from.toUpperCase() !== emethContractAddress) {
+            await updateBalanceIfExists(db, from, tokenSymbol, trigger.value);
+            await updateBalance(db, from, number, timestamp)
+          }
+          else if(to.toUpperCase() !== emethContractAddress) {
+            await updateBalance(db, to, number, timestamp)
+            await updateBalanceIfExists(db, to, tokenSymbol, trigger.value);
           }
         }
       }
@@ -34,7 +41,7 @@ export const onPost: RequestHandler = async ({ request, env, json }) => {
     console.error(err);
   }
 };
-// //TODO ta funkcja jest do rozbudowy.
+
 const updateBalanceIfExists = server$(async function (
   db: WebSocketStrategy,
   address: string,
@@ -47,20 +54,30 @@ const updateBalanceIfExists = server$(async function (
   );
 });
 
-const updateBalance = server$(async function (db: WebSocketStrategy, tx: string, walletAddress: string) {
-  console.log(tx)
-  const response: any = await Moralis.EvmApi.transaction.getTransaction({
-    chain: EvmChain.SEPOLIA,
-    transactionHash: tx
-  })
+const updateBalance = server$(async function (db: WebSocketStrategy, walletAddress: string, blockNumber: string, timestamp: number) {
+
+  const checksumWalletAddress = checksumAddress(walletAddress as `0x${string}`)
+
+    const [isWalletObserved] = await db.query(`
+      RETURN array::any(SELECT VALUE COUNT(address) FROM wallet WHERE address = '${checksumWalletAddress}')
+    `)
+  if(!isWalletObserved) {
+    return
+  }
+
+  const tokenAddresses = {
+    GLM: "0x054e1324cf61fe915cca47c48625c07400f1b587",
+    USDC: "0xd418937d10c9cec9d20736b2701e506867ffd85f",
+    USDT: "0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709",
+  };
 
     const blockResponse: any = await Moralis.EvmApi.token.getWalletTokenBalances({
     chain: EvmChain.SEPOLIA.hex,
-    toBlock: parseInt(response.raw.block_number),
+    toBlock: parseInt(blockNumber),
     tokenAddresses: [
-      "0x054E1324CF61fe915cca47C48625C07400F1B587",
-      "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-      "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
+      tokenAddresses.GLM,
+      tokenAddresses.USDC,
+      tokenAddresses.USDT
     ],
     address: walletAddress,
   });
@@ -75,15 +92,9 @@ const updateBalance = server$(async function (db: WebSocketStrategy, tx: string,
     );
   });
 
-  const tokenAddresses = {
-    GLM: "0x054e1324cf61fe915cca47c48625c07400f1b587",
-    USDC: "0xd418937d10c9cec9d20736b2701e506867ffd85f",
-    USDT: "0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709",
-  };
-
   const dbObject = {
-    blockNumber: response.raw.block_number,
-    timestamp: response.raw.block_timestamp,
+    blockNumber: blockNumber,
+    timestamp: new Date(timestamp * 1000),
     walletAddress: walletAddress,
     [tokenAddresses.GLM]: currentBalance[tokenAddresses.GLM]
       ? currentBalance[tokenAddresses.GLM]
