@@ -36,7 +36,7 @@ export default component$<CoinsToTransferProps>(
                           item.wallet === balance.wallet.name &&
                           item.symbol === balance.balance.symbol,
                       );
- 
+
                       return balance.wallet.isExecutable ? (
                         <FormBadge
                           key={index}

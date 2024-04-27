@@ -412,30 +412,27 @@ export default component$(() => {
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
           for (const cCoin of cStructure.coins) {
-              const chosenToken = tokens.find(
-                (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
-              );
-              const { numerator, denominator } = convertToFraction(
-                cCoin.amount,
-              );
-              const calculation =
-                BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
-                BigInt(denominator);
-                argsArray.push({
-                  from: cCoin.address as `0x${string}`,
-                  to: batchTransferFormStore.receiverAddress as `0x${string}`,
-                  amount: calculation,
-                  token: chosenToken.address as `0x${string}`,
-                });
-              }
-              
-            }
-            const { request } = await simulateContract(modalStore.config, {
-              abi: emethContractAbi,
-              address: emethContractAddress,
-              functionName: "transferBatch",
-              args: [argsArray],
+            const chosenToken = tokens.find(
+              (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
+            );
+            const { numerator, denominator } = convertToFraction(cCoin.amount);
+            const calculation =
+              BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
+              BigInt(denominator);
+            argsArray.push({
+              from: cCoin.address as `0x${string}`,
+              to: batchTransferFormStore.receiverAddress as `0x${string}`,
+              amount: calculation,
+              token: chosenToken.address as `0x${string}`,
             });
+          }
+        }
+        const { request } = await simulateContract(modalStore.config, {
+          abi: emethContractAbi,
+          address: emethContractAddress,
+          functionName: "transferBatch",
+          args: [argsArray],
+        });
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "info",
@@ -626,7 +623,7 @@ export default component$(() => {
                         symbol: wallet.balance.symbol,
                         amount: "0",
                         isChecked: false,
-                      });  
+                      });
                     }
                     batchTransferFormStore.coinsToTransfer.push({
                       name: structure.structure.name,
@@ -652,7 +649,7 @@ export default component$(() => {
                 if (stepsCounter.value === 3) {
                   isTransferModalOpen.value = false;
                   stepsCounter.value = 1;
-                  
+
                   await handleBatchTransfer();
                 } else {
                   stepsCounter.value = stepsCounter.value + 1;
