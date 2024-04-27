@@ -21,9 +21,6 @@ export const onPost: RequestHandler = async ({ request, env, json }) => {
         for (const trigger of triggers.filter(
           (trigger: any) => trigger.value !== "0",
         )) {
-          console.log("******************************************");
-          console.log(transfer);
-          console.log("******************************************");
           if (from.toUpperCase() !== emethContractAddress) {
             await updateBalanceIfExists(db, from, tokenSymbol, trigger.value);
             await updateBalance(db, from, number, timestamp);
