@@ -15,14 +15,17 @@ import { NavbarContent } from "~/components/Navbar/NavbarContent";
 export const onRequest: RequestHandler = ({ redirect, cookie, env }) => {
   const accessToken = cookie.get("accessToken");
   if (!accessToken) {
-    redirect(302, "/");
-    return;
+    throw redirect(307, "/?sessionExpired=true");
   }
   const secret = env.get("ACCESS_TOKEN_SECRET");
   if (!secret) throw new Error("No secret");
-  if (!jwt.verify(accessToken.value, secret)) {
-    redirect(302, "/");
-    return;
+  try {
+    jwt.verify(accessToken.value, secret);
+  } catch (err) {
+    if (err instanceof jwt.TokenExpiredError) {
+      throw redirect(307, "/?sessionExpired=true");
+    }
+    throw err;
   }
 };
 interface Message {

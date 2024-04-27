@@ -42,6 +42,7 @@ import {
 } from "~/utils/timestamps/timestamp";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { Spinner } from "~/components/Spinner/Spinner";
+import { NoDataAdded } from "~/components/NoDataAdded/NoDataAdded";
 
 function mapTokenAddress(sepoliaAddress: string): any {
   const tokenMap: any = {
@@ -576,7 +577,7 @@ export default component$(() => {
       }}
     />
   ) : (
-    <div class="grid grid-rows-[max(460px)_minmax(50%,auto)] gap-6 p-10">
+    <div class="grid grid-rows-[max(460px)_auto] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue
           hideChartWhileLoading={hideChartWhileLoading}
@@ -681,59 +682,61 @@ export default component$(() => {
           </button>
         </div>
 
-        <div class="grid grid-rows-[32px_auto] gap-4">
-          <div class="custom-text-50 grid grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2 text-xs font-normal uppercase">
-            <div class="">Token name</div>
-            <div class="">Quantity</div>
-            <div class="">Value</div>
-            <div class="custom-border-1 flex h-8 w-fit gap-2 rounded-lg bg-white bg-opacity-5 p-1 text-white">
-              <button class="custom-bg-button rounded-lg px-2">24h</button>
-              <button class="rounded-lg px-2">3d</button>
-              <button class="rounded-lg px-2">30d</button>
+        {favoriteTokenLoading.value ? (
+          <div class="flex h-full flex-col items-center justify-center">
+            <Spinner />
+          </div>
+        ) : favoriteTokens.value.length === 0 ? (
+          <NoDataAdded
+            title="You didn’t choose your favourite tokens"
+            description="To display tokens, choose your favorite tokens from the list."
+            buttonText="Add Favourite Tokens"
+          />
+        ) : (
+          <div class="grid grid-rows-[32px_auto] gap-4">
+            <div class="custom-text-50 grid grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2 text-xs font-normal uppercase">
+              <div class="">Token name</div>
+              <div class="">Quantity</div>
+              <div class="">Value</div>
+              <div class="custom-border-1 flex h-8 w-fit gap-2 rounded-lg bg-white bg-opacity-5 p-1 text-white">
+                <button class="custom-bg-button rounded-lg px-2">24h</button>
+                <button class="rounded-lg px-2">3d</button>
+                <button class="rounded-lg px-2">30d</button>
+              </div>
+              <div class="">Wallet</div>
+              <div class="">Network</div>
+              <div class="">Subportfolio</div>
+              <div class=""></div>
             </div>
-            <div class="">Wallet</div>
-            <div class="">Network</div>
-            <div class="">Subportfolio</div>
-            <div class=""></div>
+            <div>
+              {favoriteTokens.value[0] &&
+                favoriteTokens.value[0].structureBalance.map(
+                  async (token: any, index: number) => {
+                    const formattedBalance = convertWeiToQuantity(
+                      token.balance.balance.toString(),
+                      parseInt(token.balance.decimals),
+                    );
+                    return (
+                      <TokenRow
+                        key={`id_${index}_${token.balance.name}`}
+                        subportfolio={favoriteTokens.value[0].structure.name}
+                        tokenName={token.balance.name}
+                        tokenSymbol={token.balance.symbol}
+                        quantity={formattedBalance}
+                        value={(
+                          Number(formattedBalance) *
+                          Number(token.balance.balanceValueUSD)
+                        ).toFixed(2)}
+                        wallet={token.wallet.name}
+                        networkName={chainIdToNetworkName[token.wallet.chainId]}
+                        imagePath={token.balance.imagePath}
+                      />
+                    );
+                  },
+                )}
+            </div>
           </div>
-          <div>
-            {favoriteTokenLoading.value ? (
-              <div class="flex h-full flex-col items-center justify-center">
-                <Spinner />
-              </div>
-            ) : favoriteTokens.value.length === 0 ? (
-              <div class="flex h-full items-center justify-center">
-                <span>No Favourite Tokens</span>
-              </div>
-            ) : (
-              favoriteTokens.value[0] &&
-              favoriteTokens.value[0].structureBalance.map(
-                async (token: any, index: number) => {
-                  const formattedBalance = convertWeiToQuantity(
-                    token.balance.balance.toString(),
-                    parseInt(token.balance.decimals),
-                  );
-                  return (
-                    <TokenRow
-                      key={`id_${index}_${token.balance.name}`}
-                      subportfolio={favoriteTokens.value[0].structure.name}
-                      tokenName={token.balance.name}
-                      tokenSymbol={token.balance.symbol}
-                      quantity={formattedBalance}
-                      value={(
-                        Number(formattedBalance) *
-                        Number(token.balance.balanceValueUSD)
-                      ).toFixed(2)}
-                      wallet={token.wallet.name}
-                      networkName={chainIdToNetworkName[token.wallet.chainId]}
-                      imagePath={token.balance.imagePath}
-                    />
-                  );
-                },
-              )
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
