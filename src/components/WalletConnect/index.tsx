@@ -1,10 +1,10 @@
-import { component$, $, useContext, noSerialize } from "@builder.io/qwik";
-import { type Chain } from "viem/chains";
+import { $, component$, noSerialize, useContext } from "@builder.io/qwik";
+import { useNavigate } from "@builder.io/qwik-city";
 import { reconnect, watchAccount } from "@wagmi/core";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi";
-import { useNavigate } from "@builder.io/qwik-city";
-import { ConnectButton, type ButtonProps } from "../Buttons/Buttons";
+import { type Chain } from "viem/chains";
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import { ConnectButton, type ButtonProps } from "../Buttons/Buttons";
 
 const metadata = {
   name: "Web3Modal",
@@ -46,6 +46,7 @@ export default component$<
     enableInjected: boolean;
     enableCoinbase: boolean;
     chains: [Chain, ...Chain[]];
+    dataTestId?: string;
   }
 >((props) => {
   const nav = useNavigate();
@@ -83,6 +84,7 @@ export default component$<
       text={props.text}
       image={props.image}
       class={props.class}
+      dataTestId={props.dataTestId}
     ></ConnectButton>
   );
 });

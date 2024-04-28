@@ -6,6 +6,7 @@ import { metamaskOptions, sepoliaNetwork } from "../config/wallet";
 
 let sharedContext: BrowserContext;
 
+// Create extended test function with shared context and already connected wallet.
 export const test = baseTest.extend<{
   context: BrowserContext;
   wallet: Dappwright;

@@ -8,28 +8,32 @@ class LoginPage extends BasePage {
     super({
       page,
       route: routes.login,
-      selectors: {
-        title: "h1",
-        useMetamaskButton: 'button[data-test="use-metamask-button"]',
-        useWalletConnectButton: 'button[data-test="use-walletconnect-button"]',
-        howToUseWalletButton: 'button[data-test="how-to-use-wallet-button"]',
+      locators: {
+        title: page.locator("h1"),
+        useMetamaskButton: page.locator(
+          "button[data-testid='use-metamask-button']",
+        ),
+        useWalletConnectButton: page.locator(
+          "button[data-testid='use-walletconnect-button']",
+        ),
+        howToUseWalletButton: page.locator(
+          "button[data-testid='how-to-use-wallet-button']",
+        ),
       },
     });
   }
 
   async verifyTitle() {
-    const title = this.page.locator(this.selectors.title);
+    await expect(this.locators.title).toBeVisible();
+    await expect(this.locators.title).toHaveText(loginFixture.title);
+  }
 
-    await expect(title).toBeVisible();
-    await expect(title).toHaveText(loginFixture.title);
+  async useMetamask() {
+    await this.locators.useMetamaskButton.click();
   }
 
   async useWalletConnect() {
-    const useWalletConnectButton = this.page.locator(
-      this.selectors.useWalletConnect,
-    );
-
-    await useWalletConnectButton.click();
+    await this.locators.useWalletConnectButton.click();
   }
 }
 

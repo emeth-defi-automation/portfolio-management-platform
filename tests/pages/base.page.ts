@@ -1,20 +1,20 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 interface BasePageProps {
   page: Page;
   route: string;
-  selectors: { [key: string]: string };
+  locators: { [key: string]: Locator };
 }
 
 class BasePage {
   readonly page: Page;
   protected route: string;
-  selectors: { [key: string]: string };
+  locators: { [key: string]: Locator };
 
-  constructor({ page, route, selectors }: BasePageProps) {
+  constructor({ page, route, locators }: BasePageProps) {
     this.page = page;
     this.route = route;
-    this.selectors = selectors;
+    this.locators = locators;
   }
 
   async navigate() {
