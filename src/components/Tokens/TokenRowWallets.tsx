@@ -6,8 +6,7 @@ import {
   type ImageTransformerProps,
   useImageProvider,
 } from "qwik-image";
-import { type TransferredCoinInterface } from "~/interface/token/TransferredCoin";
-
+import { type transferredCoinInterface } from "~/routes/app/wallets";
 type TokenRowWalletsProps = {
   name: string;
   symbol: string;
@@ -16,7 +15,7 @@ type TokenRowWalletsProps = {
   balanceValueUSD: string;
   isTransferModalOpen: Signal<boolean>;
   address: string;
-  transferredCoin: TransferredCoinInterface;
+  transferredCoin: transferredCoinInterface;
   allowance: string;
   isExecutable: boolean | undefined;
 };

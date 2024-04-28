@@ -44,8 +44,8 @@ import { getCookie } from "~/utils/refresh";
 import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
 import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
 import Destination from "~/components/Forms/portfolioTransfters/Destination";
+import { convertToFraction } from "../wallets";
 import { NoDataAdded } from "~/components/NoDataAdded/NoDataAdded";
-import { convertToFraction } from "~/utils/convertToFraction";
 
 type WalletWithBalance = {
   wallet: {

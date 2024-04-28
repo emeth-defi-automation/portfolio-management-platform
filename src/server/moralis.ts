@@ -1,4 +1,3 @@
-import { server$ } from "@builder.io/qwik-city";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import Moralis from "moralis";
 
@@ -66,41 +65,3 @@ export async function getWalletBalance(block: string, address: string) {
     console.error(error);
   }
 }
-
-/**
- * Adds an address to the stream configuration.
- *
- * @param streamId The ID of the stream to which the address should be added.
- * @param address The address to add to the stream configuration.
- */
-export const addAddressToStreamConfig = server$(async function (
-  streamId: string,
-  address: string,
-) {
-  await Moralis.Streams.addAddress({ address, id: streamId });
-});
-
-
-/**
- * Retrieves the balance of Moralis tokens associated with a specific wallet address.
- *
- * @param data The data object containing the wallet address.
- * @param data.wallet The wallet address for which to retrieve the Moralis token balances.
- * @returns An object containing information about the Moralis token balances.
- */
-export const getMoralisBalance = server$(async (data) => {
-  const walletAddress = data.wallet;
-
-  const response = await Moralis.EvmApi.token.getWalletTokenBalances({
-    chain: EvmChain.SEPOLIA.hex,
-    tokenAddresses: [
-      "0x054E1324CF61fe915cca47C48625C07400F1B587",
-      "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-      "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-    ],
-    address: `${walletAddress}`,
-  });
-
-  const rawResponse = response.raw;
-  return { tokens: rawResponse };
-});
