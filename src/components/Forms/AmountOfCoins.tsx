@@ -1,9 +1,12 @@
 import { type Signal, component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
 
-import { type addWalletFormStore } from "~/routes/app/wallets";
+import {
+  chekckIfProperAmount,
+  replaceNonMatching,
+  type addWalletFormStore,
+} from "~/routes/app/wallets";
 import { Button } from "../Buttons/Buttons";
-import { chekckIfProperAmount, replaceNonMatching } from "~/utils/fractions";
 
 export interface AmountOfCoinsProps {
   addWalletFormStore: addWalletFormStore;

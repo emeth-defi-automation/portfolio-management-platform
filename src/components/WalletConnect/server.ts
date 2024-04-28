@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { SiweMessage, generateNonce } from "siwe";
 import { server$, z } from "@builder.io/qwik-city";
-import { connectToDB } from "~/database/db";
+import { connectToDB } from "~/utils/db";
 import {
   createNonce,
   deleteExpiredNonces,

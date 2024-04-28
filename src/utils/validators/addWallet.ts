@@ -1,5 +1,5 @@
 import { isAddress, getAddress } from "viem";
-import { connectToDB } from "../../database/db";
+import { connectToDB } from "../db";
 import { server$, z } from "@builder.io/qwik-city";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 

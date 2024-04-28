@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
+import { type BatchTransferFormStore } from "~/routes/app/portfolio";
 import ImgBtc from "../../../../public/assets/icons/tokens/btc.svg?jsx";
-import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 
 export interface TransferSummeryProps {
   batchTransferFormStore: BatchTransferFormStore;
