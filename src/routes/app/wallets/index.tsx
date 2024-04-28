@@ -22,7 +22,7 @@ import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
-import { type Token } from "~/interface/token/Token";
+
 import Moralis from "moralis";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
@@ -50,40 +50,15 @@ import {
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
-import { useAddWallet } from "./server/addWalletAction";
-import { useRemoveWallet } from "./server/removeWalletAction";
-import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 import {
   chekckIfProperAmount,
   convertToFraction,
   replaceNonMatching,
 } from "~/utils/fractions";
-export { useAddWallet } from "./server/addWalletAction";
-export { useRemoveWallet } from "./server/removeWalletAction";
-export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
-
-export interface addWalletFormStore {
-  name: string;
-  address: string;
-  isExecutable: number;
-  isNameUnique: boolean;
-  isNameUniqueLoading: boolean;
-  coinsToCount: string[];
-  coinsToApprove: {
-    symbol: string;
-    amount: string;
-  }[];
-}
-
-export interface transferredCoinInterface {
-  symbol: string;
-  address: string;
-}
-
-const fetchTokens = server$(async function () {
-  const db = await connectToDB(this.env);
-  return await db.select<Token>("token");
-});
+import { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
+export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
+import { type AddWalletFormStore } from "./interface";
+import { fetchTokens } from "~/database/tokens";
 
 const addAddressToStreamConfig = server$(async function (
   streamId: string,
@@ -151,7 +126,7 @@ export default component$(() => {
   const receivingWalletAddress = useSignal("");
   const transferredTokenAmount = useSignal("");
   const stepsCounter = useSignal(1);
-  const addWalletFormStore = useStore<addWalletFormStore>({
+  const addWalletFormStore = useStore<AddWalletFormStore>({
     name: "",
     address: "",
     isExecutable: 0,
@@ -714,7 +689,7 @@ export default component$(() => {
 });
 
 const isProceedDisabled = (
-  addWalletFormStore: addWalletFormStore,
+  addWalletFormStore: AddWalletFormStore,
   temporaryModalStore: ModalStore,
 ) =>
   addWalletFormStore.name === "" ||
@@ -723,13 +698,13 @@ const isProceedDisabled = (
   addWalletFormStore.isNameUniqueLoading ||
   !temporaryModalStore.config;
 
-const isExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
+const isExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
   addWalletFormStore.name === "" ||
   !isValidName(addWalletFormStore.name) ||
   !addWalletFormStore.isNameUnique ||
   addWalletFormStore.isNameUniqueLoading;
 
-const isNotExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
+const isNotExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
   addWalletFormStore.name === "" ||
   addWalletFormStore.address === "" ||
   !isValidName(addWalletFormStore.name) ||

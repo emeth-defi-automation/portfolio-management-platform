@@ -5,14 +5,14 @@ import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconWallet from "/public/assets/icons/wallets/wallet.svg?jsx";
 // import IconLoading from "/public/assets/icons/wallets/loading.svg?jsx";
 import { TokenRowWallets } from "~/components/Tokens/TokenRowWallets";
-import { type transferredCoinInterface } from "~/routes/app/wallets";
+import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
 
 interface SelectedWalletProps {
   selectedWallet: Signal<WalletTokensBalances | null>;
   chainIdToNetworkName: { [key: string]: string };
   isDeleteModalopen: Signal<boolean>;
   isTransferModalOpen: Signal<boolean>;
-  transferredCoin: transferredCoinInterface;
+  transferredCoin: TransferredCoinInterface;
 }
 
 export const SelectedWalletDetails = component$<SelectedWalletProps>(

@@ -1,7 +1,7 @@
 import { type QRL, component$, $ } from "@builder.io/qwik";
 import { getAddress } from "viem";
 import { Input } from "~/components/Input/Input";
-import { type addWalletFormStore } from "~/routes/app/wallets";
+
 import { useDebouncer } from "~/utils/debouncer";
 import {
   isCheckSum,
@@ -12,9 +12,10 @@ import {
 import IconSuccess from "/public/assets/icons/dashboard/success.svg?jsx";
 import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
 import { Button } from "../Buttons/Buttons";
+import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 
 export interface AddWalletFormFieldsProps {
-  addWalletFormStore: addWalletFormStore;
+  addWalletFormStore: AddWalletFormStore;
   onConnectWalletClick: QRL<() => void>;
   isWalletConnected: boolean | undefined;
 }
