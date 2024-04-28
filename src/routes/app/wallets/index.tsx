@@ -1,7 +1,6 @@
 import {
   $,
   component$,
-  type NoSerialize,
   noSerialize,
   useContext,
   useSignal,
@@ -16,7 +15,6 @@ import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { checksumAddress } from "viem";
-import { isValidAddress, isValidName } from "~/utils/validators/addWallet";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
@@ -46,7 +44,7 @@ import {
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import {
-  chekckIfProperAmount,
+  checkPattern,
   convertToFraction,
   replaceNonMatching,
 } from "~/utils/fractions";
@@ -294,7 +292,7 @@ export default component$(() => {
       to === "" ||
       token === "" ||
       amount === "" ||
-      !chekckIfProperAmount(transferredTokenAmount.value, /^\d*\.?\d*$/)
+      !checkPattern(transferredTokenAmount.value, /^\d*\.?\d*$/)
     ) {
       return {
         error: "Values cant be empty",
@@ -617,7 +615,7 @@ export default component$(() => {
                 }}
               />
               <span class="block pb-1 text-xs text-white">
-                {!chekckIfProperAmount(
+                {!checkPattern(
                   transferredTokenAmount.value,
                   /^\d*\.?\d*$/,
                 ) ? (

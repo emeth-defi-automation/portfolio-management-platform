@@ -1,7 +1,7 @@
 import { type Signal, component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
 import { Button } from "../Buttons/Buttons";
-import { chekckIfProperAmount, replaceNonMatching } from "~/utils/fractions";
+import { checkPattern, replaceNonMatching } from "~/utils/fractions";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 
 export interface AmountOfCoinsProps {
@@ -79,7 +79,7 @@ export default component$<AmountOfCoinsProps>(
                 />
               </div>
               <span class="block pb-1 text-xs text-white">
-                {!chekckIfProperAmount(
+                {!checkPattern(
                   addWalletFormStore.coinsToApprove.find(
                     (item) => item.symbol === symbol,
                   )!.amount,

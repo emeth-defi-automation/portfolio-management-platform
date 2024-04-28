@@ -61,6 +61,6 @@ export function replaceNonMatching(
  * @returns True if the input string matches the regular expression pattern, otherwise false.
  */
 
-export const chekckIfProperAmount = (input: string, regex: RegExp) => {
+export const checkPattern = (input: string, regex: RegExp) => {
   return regex.test(input);
 };

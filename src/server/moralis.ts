@@ -67,12 +67,27 @@ export async function getWalletBalance(block: string, address: string) {
   }
 }
 
+/**
+ * Adds an address to the stream configuration.
+ *
+ * @param streamId The ID of the stream to which the address should be added.
+ * @param address The address to add to the stream configuration.
+ */
+
 export const addAddressToStreamConfig = server$(async function (
   streamId: string,
   address: string,
 ) {
   await Moralis.Streams.addAddress({ address, id: streamId });
 });
+
+/**
+ * Retrieves the balance of Moralis tokens associated with a specific wallet address.
+ *
+ * @param data The data object containing the wallet address.
+ * @param data.wallet The wallet address for which to retrieve the Moralis token balances.
+ * @returns An object containing information about the Moralis token balances.
+ */
 
 export const getMoralisBalance = server$(async (data) => {
   const walletAddress = data.wallet;
