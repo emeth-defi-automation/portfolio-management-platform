@@ -1,15 +1,12 @@
 import { type Signal, component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
-
-import {
-  chekckIfProperAmount,
-  replaceNonMatching,
-  type addWalletFormStore,
-} from "~/routes/app/wallets";
 import { Button } from "../Buttons/Buttons";
+import { replaceNonMatching } from "~/utils/replaceNonMatching";
+import { checkIfStringMatchesPattern } from "~/utils/checkIfStringMatchesPattern";
+import { type AddWalletFormStore } from "~/interface/wallets/addWalletFormStore";
 
 export interface AmountOfCoinsProps {
-  addWalletFormStore: addWalletFormStore;
+  addWalletFormStore: AddWalletFormStore;
   walletTokenBalances: Signal<any>;
 }
 
@@ -83,7 +80,7 @@ export default component$<AmountOfCoinsProps>(
                 />
               </div>
               <span class="block pb-1 text-xs text-white">
-                {!chekckIfProperAmount(
+                {!checkIfStringMatchesPattern(
                   addWalletFormStore.coinsToApprove.find(
                     (item) => item.symbol === symbol,
                   )!.amount,

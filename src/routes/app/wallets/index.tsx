@@ -1,33 +1,30 @@
 import {
   $,
   component$,
-  type NoSerialize,
   noSerialize,
   useContext,
   useSignal,
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { Form, server$ } from "@builder.io/qwik-city";
+import { Form } from "@builder.io/qwik-city";
 import { type JwtPayload } from "jsonwebtoken";
 import { contractABI } from "~/abi/abi";
-import { connectToDB } from "~/utils/db";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { checksumAddress } from "viem";
-import { isValidAddress, isValidName } from "~/utils/validators/addWallet";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
-import { type Token } from "~/interface/token/Token";
-import Moralis from "moralis";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import {
+  type ModalStore,
+  ModalStoreContext,
+} from "~/interface/web3modal/ModalStore";
 import { messagesContext } from "../layout";
-import { Readable } from "node:stream";
 import { type Chain, sepolia } from "viem/chains";
 import {
   type Config,
@@ -49,118 +46,24 @@ import {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
-import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { useAddWallet } from "./server/addWalletAction";
 import { useRemoveWallet } from "./server/removeWalletAction";
 import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
+import { balancesLiveStream } from "./server/balancesLiveStream";
+import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
+import { replaceNonMatching } from "~/utils/replaceNonMatching";
+import { convertToFraction } from "~/utils/convertToFraction";
+import { checkIfStringMatchesPattern } from "~/utils/checkIfStringMatchesPattern";
+import { fetchTokens } from "~/database/tokens/fetchTokens";
+import {
+  isExecutableDisabled,
+  isNotExecutableDisabled,
+  isProceedDisabled,
+} from "~/utils/validators/addWallet";
+import { type AddWalletFormStore } from "~/interface/wallets/addWalletFormStore";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
-
-export const convertToFraction = (numericString: string) => {
-  let fractionObject;
-  if (!numericString.includes(".")) {
-    fractionObject = {
-      numerator: BigInt(numericString),
-      denominator: BigInt(1),
-    };
-  } else {
-    const fractionArray = numericString.split(".");
-    fractionObject = {
-      numerator: BigInt(`${fractionArray[0]}${fractionArray[1]}`),
-      denominator: BigInt(Math.pow(10, fractionArray[1].length)),
-    };
-  }
-  return fractionObject;
-};
-
-export function replaceNonMatching(
-  inputString: string,
-  regex: RegExp,
-  replacement: string,
-): string {
-  return inputString.replace(
-    new RegExp(`[^${regex.source}]`, "g"),
-    replacement,
-  );
-}
-
-export const chekckIfProperAmount = (input: string, regex: RegExp) => {
-  return regex.test(input);
-};
-
-export interface addWalletFormStore {
-  name: string;
-  address: string;
-  isExecutable: number;
-  isNameUnique: boolean;
-  isNameUniqueLoading: boolean;
-  coinsToCount: string[];
-  coinsToApprove: {
-    symbol: string;
-    amount: string;
-  }[];
-}
-
-export interface transferredCoinInterface {
-  symbol: string;
-  address: string;
-}
-
-const fetchTokens = server$(async function () {
-  const db = await connectToDB(this.env);
-  return await db.select<Token>("token");
-});
-
-const addAddressToStreamConfig = server$(async function (
-  streamId: string,
-  address: string,
-) {
-  await Moralis.Streams.addAddress({ address, id: streamId });
-});
-
-interface ModalStore {
-  isConnected?: boolean;
-  config?: NoSerialize<Config>;
-}
-
-export const dbBalancesStream = server$(async function* () {
-  const db = await connectToDB(this.env);
-
-  const resultsStream = new Readable({
-    objectMode: true,
-    read() {},
-  });
-
-  await db.live("balance", ({ action, result }) => {
-    if (action === "CLOSE") {
-      resultsStream.push(null);
-      return;
-    }
-    resultsStream.push(result);
-  });
-
-  for await (const result of resultsStream) {
-    yield result;
-  }
-});
-
-export const getMoralisBalance = server$(async (data) => {
-  const walletAddress = data.wallet;
-
-  const response = await Moralis.EvmApi.token.getWalletTokenBalances({
-    chain: EvmChain.SEPOLIA.hex,
-    tokenAddresses: [
-      "0x054E1324CF61fe915cca47C48625C07400F1B587",
-      "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-      "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-    ],
-    address: `${walletAddress}`,
-  });
-
-  const rawResponse = response.raw;
-  return { tokens: rawResponse };
-});
 
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
@@ -178,7 +81,8 @@ export default component$(() => {
   const receivingWalletAddress = useSignal("");
   const transferredTokenAmount = useSignal("");
   const stepsCounter = useSignal(1);
-  const addWalletFormStore = useStore<addWalletFormStore>({
+  const msg = useSignal("1");
+  const addWalletFormStore = useStore<AddWalletFormStore>({
     name: "",
     address: "",
     isExecutable: 0,
@@ -216,10 +120,10 @@ export default component$(() => {
       },
     });
   });
-  const msg = useSignal("1");
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
-    const data = await dbBalancesStream();
+    const data = await balancesLiveStream();
     for await (const value of data) {
       msg.value = value;
     }
@@ -393,7 +297,7 @@ export default component$(() => {
       to === "" ||
       token === "" ||
       amount === "" ||
-      !chekckIfProperAmount(transferredTokenAmount.value, /^\d*\.?\d*$/)
+      !checkIfStringMatchesPattern(transferredTokenAmount.value, /^\d*\.?\d*$/)
     ) {
       return {
         error: "Values cant be empty",
@@ -714,7 +618,7 @@ export default component$(() => {
                 }}
               />
               <span class="block pb-1 text-xs text-white">
-                {!chekckIfProperAmount(
+                {!checkIfStringMatchesPattern(
                   transferredTokenAmount.value,
                   /^\d*\.?\d*$/,
                 ) ? (
@@ -736,37 +640,3 @@ export default component$(() => {
     </div>
   );
 });
-
-const isProceedDisabled = (
-  addWalletFormStore: addWalletFormStore,
-  temporaryModalStore: ModalStore,
-) =>
-  addWalletFormStore.name === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading ||
-  !temporaryModalStore.config;
-
-const isExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
-  addWalletFormStore.name === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
-
-const isNotExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
-  addWalletFormStore.name === "" ||
-  addWalletFormStore.address === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !isValidAddress(addWalletFormStore.address) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
-
-// const isExecutableClass = (addWalletFormStore: addWalletFormStore) =>
-//   isExecutableDisabled(addWalletFormStore)
-//     ? "bg-modal-button text-gray-400"
-//     : "bg-black";
-
-// const isNotExecutableClass = (addWalletFormStore: addWalletFormStore) =>
-//   isNotExecutableDisabled(addWalletFormStore)
-//     ? "bg-modal-button text-gray-400"
-//     : "bg-black";
