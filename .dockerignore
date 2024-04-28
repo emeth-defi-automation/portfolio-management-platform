@@ -68,6 +68,6 @@ lerna-debug.log*
 
 # Playwright
 /test-results
-/playwright-report
+/test-report
 /blob-report
 /playwright/.cache

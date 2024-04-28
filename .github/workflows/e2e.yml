@@ -12,6 +12,7 @@ env:
   APP_DATABASE_PORT: 8000
   APP_PORT: 3000
   PLAYWRIGHT_TEST_RESULTS_RELATIVE_PATH: test-results/
+  PLAYWRIGHT_TEST_REPORT_RELATIVE_PATH: test-report/
   PLAYWRIGHT_TEST_RESULTS_ARTIFACT_RETENTION_DAYS: 7
   PLAYWRIGHT_VERSION:
   # App config context variables
@@ -121,5 +122,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-test-results
-          path: ${{ env.PLAYWRIGHT_TEST_RESULTS_RELATIVE_PATH }}
+          path: |
+            ${{ env.PLAYWRIGHT_TEST_RESULTS_RELATIVE_PATH }}
+            ${{ env.PLAYWRIGHT_TEST_REPORT_RELATIVE_PATH}}
           retention-days: ${{ env.PLAYWRIGHT_TEST_RESULTS_ARTIFACT_RETENTION_DAYS }}
