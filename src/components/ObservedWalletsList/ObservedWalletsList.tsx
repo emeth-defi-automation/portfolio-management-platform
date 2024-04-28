@@ -5,7 +5,7 @@ import {
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
-import { connectToDB } from "~/database/db";
+import { connectToDB } from "~/utils/db";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import {
   fetchTokenDayData,

@@ -1,6 +1,6 @@
 import { $, component$ } from "@builder.io/qwik";
 import { Input } from "~/components/Input/Input";
-import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
+import { type BatchTransferFormStore } from "~/routes/app/portfolio";
 
 export interface DestinationProps {
   batchTransferFormStore: BatchTransferFormStore;

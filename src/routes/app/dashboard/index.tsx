@@ -14,7 +14,7 @@ import {
 } from "~/components/ActionAlertsMessage/ActionStatus";
 import { TokenRow } from "~/components/Tokens/TokenRow";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import { connectToDB } from "~/database/db";
+import { connectToDB } from "~/utils/db";
 import { server$, useNavigate } from "@builder.io/qwik-city";
 import {
   fetchTokenDayData,
