@@ -8,10 +8,9 @@ import {
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { Form, server$ } from "@builder.io/qwik-city";
+import { Form } from "@builder.io/qwik-city";
 import { type JwtPayload } from "jsonwebtoken";
 import { contractABI } from "~/abi/abi";
-import { connectToDB } from "~/database/db";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
@@ -22,12 +21,9 @@ import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
-
-import Moralis from "moralis";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import { ModalStore, ModalStoreContext } from "~/interface/web3modal/ModalStore";
 import { messagesContext } from "../layout";
-import { Readable } from "node:stream";
 import { type Chain, sepolia } from "viem/chains";
 import {
   type Config,
@@ -49,7 +45,6 @@ import {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
-import { EvmChain } from "@moralisweb3/common-evm-utils";
 import {
   chekckIfProperAmount,
   convertToFraction,
@@ -59,36 +54,8 @@ import { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
 export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
 import { type AddWalletFormStore } from "./interface";
 import { fetchTokens } from "~/database/tokens";
-
-
-
-interface ModalStore {
-  isConnected?: boolean;
-  config?: NoSerialize<Config>;
-}
-
-export const dbBalancesStream = server$(async function* () {
-  const db = await connectToDB(this.env);
-
-  const resultsStream = new Readable({
-    objectMode: true,
-    read() {},
-  });
-
-  await db.live("balance", ({ action, result }) => {
-    if (action === "CLOSE") {
-      resultsStream.push(null);
-      return;
-    }
-    resultsStream.push(result);
-  });
-
-  for await (const result of resultsStream) {
-    yield result;
-  }
-});
-
-
+import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
+import { balancesLiveStream } from "./server/balancesLiveStream";
 
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
@@ -148,7 +115,7 @@ export default component$(() => {
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
-    const data = await dbBalancesStream();
+    const data = await balancesLiveStream();
     for await (const value of data) {
       msg.value = value;
     }
