@@ -12,5 +12,4 @@ export const metamaskOptions: OfficialOptions = {
   wallet: "metamask",
   version: MetaMaskWallet.recommendedVersion,
   seed: "test test test test test test test test test test test junk",
-  headless: false,
 };
