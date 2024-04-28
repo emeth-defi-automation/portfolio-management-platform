@@ -20,7 +20,10 @@ import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { ModalStore, ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import {
+  type ModalStore,
+  ModalStoreContext,
+} from "~/interface/web3modal/ModalStore";
 import { messagesContext } from "../layout";
 import { type Chain, sepolia } from "viem/chains";
 import {
@@ -615,10 +618,7 @@ export default component$(() => {
                 }}
               />
               <span class="block pb-1 text-xs text-white">
-                {!checkPattern(
-                  transferredTokenAmount.value,
-                  /^\d*\.?\d*$/,
-                ) ? (
+                {!checkPattern(transferredTokenAmount.value, /^\d*\.?\d*$/) ? (
                   <span class="text-xs text-red-500">
                     Invalid amount. There should be only one dot.
                   </span>
@@ -637,8 +637,6 @@ export default component$(() => {
     </>
   );
 });
-
-
 
 // const isExecutableClass = (addWalletFormStore: addWalletFormStore) =>
 //   isExecutableDisabled(addWalletFormStore)

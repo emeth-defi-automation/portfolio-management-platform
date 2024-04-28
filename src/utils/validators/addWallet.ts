@@ -2,8 +2,8 @@ import { isAddress, getAddress } from "viem";
 import { connectToDB } from "../../database/db";
 import { server$, z } from "@builder.io/qwik-city";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import { ModalStore } from "~/interface/web3modal/ModalStore";
-import { AddWalletFormStore } from "~/routes/app/wallets/interface";
+import { type ModalStore } from "~/interface/web3modal/ModalStore";
+import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 
 export function isValidName(name: string): boolean {
   return name.length > 0 ? name.trim().length > 3 : true;
@@ -96,7 +96,9 @@ export const isExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
  * @returns True if the action should be disabled, otherwise false.
  */
 
-export const isNotExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
+export const isNotExecutableDisabled = (
+  addWalletFormStore: AddWalletFormStore,
+) =>
   addWalletFormStore.name === "" ||
   addWalletFormStore.address === "" ||
   !isValidName(addWalletFormStore.name) ||
