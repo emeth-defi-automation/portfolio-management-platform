@@ -58,6 +58,14 @@ export const isNameUnique = server$(async function (name: string) {
   return true;
 });
 
+/**
+ * Checks if the proceed action should be disabled based on the state of the add wallet form and temporary modal.
+ *
+ * @param addWalletFormStore The store containing the data of the add wallet form.
+ * @param temporaryModalStore The store containing the data of the temporary modal.
+ * @returns True if the proceed action should be disabled, otherwise false.
+ */
+
 export const isProceedDisabled = (
   addWalletFormStore: AddWalletFormStore,
   temporaryModalStore: ModalStore,
@@ -68,11 +76,25 @@ export const isProceedDisabled = (
   addWalletFormStore.isNameUniqueLoading ||
   !temporaryModalStore.config;
 
+/**
+ * Checks if the execute action should be disabled based on the state of the add wallet form.
+ *
+ * @param addWalletFormStore The store containing the data of the add wallet form.
+ * @returns True if the execute action should be disabled, otherwise false.
+ */
+
 export const isExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
   addWalletFormStore.name === "" ||
   !isValidName(addWalletFormStore.name) ||
   !addWalletFormStore.isNameUnique ||
   addWalletFormStore.isNameUniqueLoading;
+
+/**
+ * Checks if the action should be disabled based on the state of the add wallet form for a non-executable action.
+ *
+ * @param addWalletFormStore The store containing the data of the add wallet form.
+ * @returns True if the action should be disabled, otherwise false.
+ */
 
 export const isNotExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
   addWalletFormStore.name === "" ||
