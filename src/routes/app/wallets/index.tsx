@@ -53,13 +53,14 @@ import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { useAddWallet } from "./server/addWalletAction";
 import { useRemoveWallet } from "./server/removeWalletAction";
 import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
-import { chekckIfProperAmount, convertToFraction, replaceNonMatching } from "~/utils/fractions";
+import {
+  chekckIfProperAmount,
+  convertToFraction,
+  replaceNonMatching,
+} from "~/utils/fractions";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
-
-
-
 
 export interface addWalletFormStore {
   name: string;

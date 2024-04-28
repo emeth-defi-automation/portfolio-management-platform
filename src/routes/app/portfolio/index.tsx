@@ -14,9 +14,7 @@ import {
   useContext,
 } from "@builder.io/qwik";
 import { messagesContext } from "../layout";
-import {
-  Form,
-} from "@builder.io/qwik-city";
+import { Form } from "@builder.io/qwik-city";
 
 import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
@@ -33,8 +31,20 @@ import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTrans
 import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
 import Destination from "~/components/Forms/portfolioTransfters/Destination";
 import { NoDataAdded } from "~/components/NoDataAdded/NoDataAdded";
-import { useDeleteStructure, useDeleteToken, useCreateStructure, useObservedWalletBalances, useAvailableStructures } from './server';
-export { useDeleteStructure, useDeleteToken, useCreateStructure, useObservedWalletBalances, useAvailableStructures } from './server';
+import {
+  useDeleteStructure,
+  useDeleteToken,
+  useCreateStructure,
+  useObservedWalletBalances,
+  useAvailableStructures,
+} from "./server";
+export {
+  useDeleteStructure,
+  useDeleteToken,
+  useCreateStructure,
+  useObservedWalletBalances,
+  useAvailableStructures,
+} from "./server";
 import { queryTokens } from "~/database/tokens";
 import { convertToFraction } from "~/utils/fractions";
 
