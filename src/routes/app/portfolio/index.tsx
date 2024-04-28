@@ -38,34 +38,6 @@ export { useDeleteStructure, useDeleteToken, useCreateStructure, useObservedWall
 import { queryTokens } from "~/database/tokens";
 import { convertToFraction } from "~/utils/fractions";
 
-type WalletWithBalance = {
-  wallet: {
-    id: string;
-    chainID: number;
-
-    address: string;
-    isExecutable: boolean;
-  };
-  walletName: string;
-  balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
-};
-type CoinToApprove = {
-  wallet: string;
-  isExecutable: string;
-  address: string;
-  symbol: string;
-  amount: string;
-  isChecked: boolean;
-};
-type StructureToApprove = {
-  name: string;
-  coins: CoinToApprove[];
-};
-export interface BatchTransferFormStore {
-  receiverAddress: string;
-  coinsToTransfer: StructureToApprove[];
-}
-
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
   const clickedToken = useStore({ balanceId: "", structureId: "" });
