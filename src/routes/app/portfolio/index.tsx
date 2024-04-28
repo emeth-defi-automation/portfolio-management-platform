@@ -47,6 +47,10 @@ export {
 } from "./server";
 import { queryTokens } from "~/database/tokens";
 import { convertToFraction } from "~/utils/fractions";
+import {
+  type WalletWithBalance,
+  type BatchTransferFormStore,
+} from "./interface";
 
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);

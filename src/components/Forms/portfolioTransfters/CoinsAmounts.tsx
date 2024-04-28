@@ -1,8 +1,8 @@
 import { component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
-import { type BatchTransferFormStore } from "~/routes/app/portfolio";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import { chekckIfProperAmount, replaceNonMatching } from "~/utils/fractions";
+import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 
 export interface CoinsAmountsProps {
   batchTransferFormStore: BatchTransferFormStore;
