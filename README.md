@@ -166,6 +166,12 @@ After every run you can serve report to your browser:
 npm run test.e2e.report
 ```
 
+For debugging purposes, you can run UI version:
+
+```bash
+npm run test.e2e.ui
+```
+
 ## Wallet
 
 #### Development setup
