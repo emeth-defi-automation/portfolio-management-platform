@@ -5,7 +5,7 @@ import { contractABI } from "~/abi/abi";
 import { Wallet } from "~/interface/auth/Wallet";
 import { Balance } from "~/interface/balance/Balance";
 import { getExistingWallet, getExistingRelation } from "~/interface/wallets/addWallet";
-import { connectToDB } from "~/utils/db";
+import { connectToDB } from "~/database/db";
 import { testPublicClient } from "../testconfig";
 import { Token } from "~/interface/token/Token";
 

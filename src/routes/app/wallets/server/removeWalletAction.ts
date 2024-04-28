@@ -1,7 +1,7 @@
 import { routeAction$, zod$, z } from "@builder.io/qwik-city";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { walletExists, getUsersObservingWallet } from "~/interface/wallets/removeWallet";
-import { connectToDB } from "~/utils/db";
+import { connectToDB } from "~/database/db";
 
 /**
  * This function is used to remove relation between user and wallet.

@@ -1,7 +1,7 @@
 import { server$, type RequestHandler } from "@builder.io/qwik-city";
 import type WebSocketStrategy from "surrealdb.js";
 import { checksumAddress } from "viem";
-import { connectToDB } from "~/utils/db";
+import { connectToDB } from "~/database/db";
 
 export const onPost: RequestHandler = async ({ request, env, json }) => {
   try {

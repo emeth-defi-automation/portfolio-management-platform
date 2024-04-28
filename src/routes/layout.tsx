@@ -8,7 +8,7 @@ import {
   useTask$,
   useContext,
 } from "@builder.io/qwik";
-import type { RequestHandler } from "@builder.io/qwik-city";
+import { useLocation, type RequestHandler } from "@builder.io/qwik-city";
 import { reconnect, watchAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { type Chain, mainnet, sepolia } from "viem/chains";
@@ -48,6 +48,7 @@ export default component$(() => {
   });
 
   useContextProvider(StreamStoreContext, { streamId: "" });
+  const location = useLocation();
   const streamStore = useContext(StreamStoreContext);
 
   useTask$(async function () {
@@ -58,6 +59,12 @@ export default component$(() => {
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
+    const queryParams = new URLSearchParams(location.url.search);
+    const sessionExpired = queryParams.get("sessionExpired");
+
+    if (sessionExpired === "true") {
+      alert("Session expired");
+    }
     const chains: [Chain, ...Chain[]] = [mainnet, sepolia];
     const projectId = import.meta.env.PUBLIC_PROJECT_ID;
     if (!projectId || typeof projectId !== "string") {

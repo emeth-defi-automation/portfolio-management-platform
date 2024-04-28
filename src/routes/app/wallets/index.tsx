@@ -11,7 +11,7 @@ import {
 import { Form, server$ } from "@builder.io/qwik-city";
 import { type JwtPayload } from "jsonwebtoken";
 import { contractABI } from "~/abi/abi";
-import { connectToDB } from "~/utils/db";
+import { connectToDB } from "~/database/db";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
@@ -53,41 +53,14 @@ import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { useAddWallet } from "./server/addWalletAction";
 import { useRemoveWallet } from "./server/removeWalletAction";
 import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
+import {
+  chekckIfProperAmount,
+  convertToFraction,
+  replaceNonMatching,
+} from "~/utils/fractions";
 export { useAddWallet } from "./server/addWalletAction";
 export { useRemoveWallet } from "./server/removeWalletAction";
 export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
-
-export const convertToFraction = (numericString: string) => {
-  let fractionObject;
-  if (!numericString.includes(".")) {
-    fractionObject = {
-      numerator: BigInt(numericString),
-      denominator: BigInt(1),
-    };
-  } else {
-    const fractionArray = numericString.split(".");
-    fractionObject = {
-      numerator: BigInt(`${fractionArray[0]}${fractionArray[1]}`),
-      denominator: BigInt(Math.pow(10, fractionArray[1].length)),
-    };
-  }
-  return fractionObject;
-};
-
-export function replaceNonMatching(
-  inputString: string,
-  regex: RegExp,
-  replacement: string,
-): string {
-  return inputString.replace(
-    new RegExp(`[^${regex.source}]`, "g"),
-    replacement,
-  );
-}
-
-export const chekckIfProperAmount = (input: string, regex: RegExp) => {
-  return regex.test(input);
-};
 
 export interface addWalletFormStore {
   name: string;
@@ -217,6 +190,7 @@ export default component$(() => {
     });
   });
   const msg = useSignal("1");
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     const data = await dbBalancesStream();
@@ -453,51 +427,53 @@ export default component$(() => {
   });
 
   return (
-    <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
-      <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
-        <div class="flex items-center justify-between gap-2">
-          <h1 class="text-xl font-semibold">Wallets</h1>
-          <button
-            class="custom-border-opacity-30 h-8 cursor-pointer text-nowrap rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110"
-            onClick$={() => {
-              isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
-            }}
-          >
-            Add New Wallet
-          </button>
-        </div>
+    <>
+      <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
+        <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
+          <div class="flex items-center justify-between gap-2">
+            <h1 class="text-xl font-semibold">Wallets</h1>
+            <button
+              class="custom-border-opacity-30 h-8 cursor-pointer text-nowrap rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110"
+              onClick$={() => {
+                isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
+              }}
+            >
+              Add New Wallet
+            </button>
+          </div>
 
-        <div class="grid w-full gap-2">
-          <ButtonWithIcon
-            image="/assets/icons/search.svg"
-            text="Search for wallet"
-            class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
-          />
-          <ButtonWithIcon
-            image="/assets/icons/arrow-down.svg"
-            text="Choose Network"
-            class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
-          />
-        </div>
-        <ObservedWalletsList
-          observedWallets={observedWallets}
-          selectedWallet={selectedWallet}
-        />
-      </div>
-
-      <div class="grid gap-6">
-        {/* <PendingAuthorization/> */}
-        <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
-          {selectedWallet.value && (
-            <SelectedWalletDetails
-              key={selectedWallet.value.wallet.address}
-              selectedWallet={selectedWallet}
-              chainIdToNetworkName={chainIdToNetworkName}
-              isDeleteModalopen={isDeleteModalOpen}
-              isTransferModalOpen={isTransferModalOpen}
-              transferredCoin={transferredCoin}
+          <div class="grid w-full gap-2">
+            <ButtonWithIcon
+              image="/assets/icons/search.svg"
+              text="Search for wallet"
+              class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
             />
-          )}
+            <ButtonWithIcon
+              image="/assets/icons/arrow-down.svg"
+              text="Choose Network"
+              class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+            />
+          </div>
+          <ObservedWalletsList
+            observedWallets={observedWallets}
+            selectedWallet={selectedWallet}
+          />
+        </div>
+
+        <div class="grid gap-6">
+          {/* <PendingAuthorization/> */}
+          <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
+            {selectedWallet.value && (
+              <SelectedWalletDetails
+                key={selectedWallet.value.wallet.address}
+                selectedWallet={selectedWallet}
+                chainIdToNetworkName={chainIdToNetworkName}
+                isDeleteModalopen={isDeleteModalOpen}
+                isTransferModalOpen={isTransferModalOpen}
+                transferredCoin={transferredCoin}
+              />
+            )}
+          </div>
         </div>
       </div>
 
@@ -733,7 +709,7 @@ export default component$(() => {
           </Form>
         </Modal>
       ) : null}
-    </div>
+    </>
   );
 });
 
