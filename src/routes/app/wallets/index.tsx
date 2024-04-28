@@ -50,6 +50,11 @@ import {
   convertToFraction,
   replaceNonMatching,
 } from "~/utils/fractions";
+import {
+  isExecutableDisabled,
+  isNotExecutableDisabled,
+  isProceedDisabled,
+} from "~/utils/validators/addWallet";
 import { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
 export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
 import { type AddWalletFormStore } from "./interface";
@@ -635,29 +640,7 @@ export default component$(() => {
   );
 });
 
-const isProceedDisabled = (
-  addWalletFormStore: AddWalletFormStore,
-  temporaryModalStore: ModalStore,
-) =>
-  addWalletFormStore.name === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading ||
-  !temporaryModalStore.config;
 
-const isExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
-  addWalletFormStore.name === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
-
-const isNotExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
-  addWalletFormStore.name === "" ||
-  addWalletFormStore.address === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !isValidAddress(addWalletFormStore.address) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
 
 // const isExecutableClass = (addWalletFormStore: addWalletFormStore) =>
 //   isExecutableDisabled(addWalletFormStore)

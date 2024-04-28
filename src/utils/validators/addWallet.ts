@@ -2,6 +2,8 @@ import { isAddress, getAddress } from "viem";
 import { connectToDB } from "../../database/db";
 import { server$, z } from "@builder.io/qwik-city";
 import jwt, { type JwtPayload } from "jsonwebtoken";
+import { ModalStore } from "~/interface/web3modal/ModalStore";
+import { AddWalletFormStore } from "~/routes/app/wallets/interface";
 
 export function isValidName(name: string): boolean {
   return name.length > 0 ? name.trim().length > 3 : true;
@@ -55,3 +57,27 @@ export const isNameUnique = server$(async function (name: string) {
   }
   return true;
 });
+
+export const isProceedDisabled = (
+  addWalletFormStore: AddWalletFormStore,
+  temporaryModalStore: ModalStore,
+) =>
+  addWalletFormStore.name === "" ||
+  !isValidName(addWalletFormStore.name) ||
+  !addWalletFormStore.isNameUnique ||
+  addWalletFormStore.isNameUniqueLoading ||
+  !temporaryModalStore.config;
+
+export const isExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
+  addWalletFormStore.name === "" ||
+  !isValidName(addWalletFormStore.name) ||
+  !addWalletFormStore.isNameUnique ||
+  addWalletFormStore.isNameUniqueLoading;
+
+export const isNotExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
+  addWalletFormStore.name === "" ||
+  addWalletFormStore.address === "" ||
+  !isValidName(addWalletFormStore.name) ||
+  !isValidAddress(addWalletFormStore.address) ||
+  !addWalletFormStore.isNameUnique ||
+  addWalletFormStore.isNameUniqueLoading;
