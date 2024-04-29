@@ -2,9 +2,9 @@ name: Check
 
 on:
   push:
-    branches: ["master"]
+    branches: ["master", "dev"]
   pull_request:
-    branches: ["master"]
+    branches: ["master", "dev"]
 
 env:
   NODE_VERSION: "21.7.3"
