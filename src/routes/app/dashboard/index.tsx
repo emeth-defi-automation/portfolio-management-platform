@@ -35,15 +35,10 @@ export {
 export default component$(() => {
   const nav = useNavigate();
   const isPortfolioFullScreen = useSignal(false);
-  // const totalPortfolioValue = useTotalPortfolioValue();
   const totalPortfolioValue = useSignal("0");
   const totalPortfolioValueLoading = useSignal(true);
-
-  // const portfolioValueChange = usePortfolio24hChange();
   const portfolioValueChange = useSignal<any>({});
   const portfolioValueChangeLoading = useSignal(true);
-
-  // const favoriteTokens = useGetFavoriteTokens();
   const favoriteTokenLoading = useSignal(true);
   const favoriteTokens = useSignal<any[]>([]);
   // eslint-disable-next-line qwik/no-use-visible-task
