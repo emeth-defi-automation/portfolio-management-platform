@@ -7,7 +7,7 @@ import { convertWeiToQuantity, getPercentageOfTotalValueChange, getProperTotalVa
 import { testPublicClient } from "../../wallets/testconfig";
 import { Token } from "~/interface/token/Token";
 import { contractABI } from "~/abi/abi";
-import { Wallet } from "~/interface/auth/Wallet";
+import { type Wallet } from "~/interface/auth/Wallet";
 import { generateTimestamps } from "~/utils/timestamps/timestamp";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 
