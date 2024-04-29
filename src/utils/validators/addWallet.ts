@@ -2,6 +2,8 @@ import { isAddress, getAddress } from "viem";
 import { connectToDB } from "../../database/db";
 import { server$, z } from "@builder.io/qwik-city";
 import jwt, { type JwtPayload } from "jsonwebtoken";
+import { type ModalStore } from "~/interface/web3modal/ModalStore";
+import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 
 export function isValidName(name: string): boolean {
   return name.length > 0 ? name.trim().length > 3 : true;
@@ -55,3 +57,51 @@ export const isNameUnique = server$(async function (name: string) {
   }
   return true;
 });
+
+/**
+ * Checks if the proceed action should be disabled based on the state of the add wallet form and temporary modal.
+ *
+ * @param addWalletFormStore The store containing the data of the add wallet form.
+ * @param temporaryModalStore The store containing the data of the temporary modal.
+ * @returns True if the proceed action should be disabled, otherwise false.
+ */
+
+export const isProceedDisabled = (
+  addWalletFormStore: AddWalletFormStore,
+  temporaryModalStore: ModalStore,
+) =>
+  addWalletFormStore.name === "" ||
+  !isValidName(addWalletFormStore.name) ||
+  !addWalletFormStore.isNameUnique ||
+  addWalletFormStore.isNameUniqueLoading ||
+  !temporaryModalStore.config;
+
+/**
+ * Checks if the execute action should be disabled based on the state of the add wallet form.
+ *
+ * @param addWalletFormStore The store containing the data of the add wallet form.
+ * @returns True if the execute action should be disabled, otherwise false.
+ */
+
+export const isExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
+  addWalletFormStore.name === "" ||
+  !isValidName(addWalletFormStore.name) ||
+  !addWalletFormStore.isNameUnique ||
+  addWalletFormStore.isNameUniqueLoading;
+
+/**
+ * Checks if the action should be disabled based on the state of the add wallet form for a non-executable action.
+ *
+ * @param addWalletFormStore The store containing the data of the add wallet form.
+ * @returns True if the action should be disabled, otherwise false.
+ */
+
+export const isNotExecutableDisabled = (
+  addWalletFormStore: AddWalletFormStore,
+) =>
+  addWalletFormStore.name === "" ||
+  addWalletFormStore.address === "" ||
+  !isValidName(addWalletFormStore.name) ||
+  !isValidAddress(addWalletFormStore.address) ||
+  !addWalletFormStore.isNameUnique ||
+  addWalletFormStore.isNameUniqueLoading;

@@ -1,33 +1,30 @@
 import {
   $,
   component$,
-  type NoSerialize,
   noSerialize,
   useContext,
   useSignal,
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { Form, server$ } from "@builder.io/qwik-city";
+import { Form } from "@builder.io/qwik-city";
 import { type JwtPayload } from "jsonwebtoken";
 import { contractABI } from "~/abi/abi";
-import { connectToDB } from "~/database/db";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { checksumAddress } from "viem";
-import { isValidAddress, isValidName } from "~/utils/validators/addWallet";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
-import { type Token } from "~/interface/token/Token";
-import Moralis from "moralis";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import {
+  type ModalStore,
+  ModalStoreContext,
+} from "~/interface/web3modal/ModalStore";
 import { messagesContext } from "../layout";
-import { Readable } from "node:stream";
 import { type Chain, sepolia } from "viem/chains";
 import {
   type Config,
@@ -38,6 +35,9 @@ import {
   watchAccount,
   writeContract,
   disconnect,
+  getConnectors,
+  getConnections,
+  getClient
 } from "@wagmi/core";
 import { returnWeb3ModalAndClient } from "~/components/WalletConnect";
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
@@ -49,91 +49,23 @@ import {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
-import { EvmChain } from "@moralisweb3/common-evm-utils";
-import { useAddWallet } from "./server/addWalletAction";
-import { useRemoveWallet } from "./server/removeWalletAction";
-import { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
 import {
-  chekckIfProperAmount,
+  checkPattern,
   convertToFraction,
   replaceNonMatching,
 } from "~/utils/fractions";
-export { useAddWallet } from "./server/addWalletAction";
-export { useRemoveWallet } from "./server/removeWalletAction";
-export { useGetBalanceHistory } from "./server/getBalanceHistoryAction";
+import {
+  isExecutableDisabled,
+  isNotExecutableDisabled,
+  isProceedDisabled,
+} from "~/utils/validators/addWallet";
+import { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
+export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
+import { type AddWalletFormStore } from "./interface";
+import { fetchTokens } from "~/database/tokens";
+import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
+import { balancesLiveStream } from "./server/balancesLiveStream";
 
-export interface addWalletFormStore {
-  name: string;
-  address: string;
-  isExecutable: number;
-  isNameUnique: boolean;
-  isNameUniqueLoading: boolean;
-  coinsToCount: string[];
-  coinsToApprove: {
-    symbol: string;
-    amount: string;
-  }[];
-}
-
-export interface transferredCoinInterface {
-  symbol: string;
-  address: string;
-}
-
-const fetchTokens = server$(async function () {
-  const db = await connectToDB(this.env);
-  return await db.select<Token>("token");
-});
-
-const addAddressToStreamConfig = server$(async function (
-  streamId: string,
-  address: string,
-) {
-  await Moralis.Streams.addAddress({ address, id: streamId });
-});
-
-interface ModalStore {
-  isConnected?: boolean;
-  config?: NoSerialize<Config>;
-}
-
-export const dbBalancesStream = server$(async function* () {
-  const db = await connectToDB(this.env);
-
-  const resultsStream = new Readable({
-    objectMode: true,
-    read() {},
-  });
-
-  await db.live("balance", ({ action, result }) => {
-    if (action === "CLOSE") {
-      resultsStream.push(null);
-      return;
-    }
-    resultsStream.push(result);
-  });
-
-  for await (const result of resultsStream) {
-    yield result;
-  }
-});
-
-export const getMoralisBalance = server$(async (data) => {
-  const walletAddress = data.wallet;
-
-  const response = await Moralis.EvmApi.token.getWalletTokenBalances({
-    chain: EvmChain.SEPOLIA.hex,
-    tokenAddresses: [
-      "0x054E1324CF61fe915cca47C48625C07400F1B587",
-      "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-      "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-    ],
-    address: `${walletAddress}`,
-  });
-
-  const rawResponse = response.raw;
-  return { tokens: rawResponse };
-});
 
 export default component$(() => {
   const modalStore = useContext(ModalStoreContext);
@@ -151,7 +83,7 @@ export default component$(() => {
   const receivingWalletAddress = useSignal("");
   const transferredTokenAmount = useSignal("");
   const stepsCounter = useSignal(1);
-  const addWalletFormStore = useStore<addWalletFormStore>({
+  const addWalletFormStore = useStore<AddWalletFormStore>({
     name: "",
     address: "",
     isExecutable: 0,
@@ -161,7 +93,7 @@ export default component$(() => {
     coinsToApprove: [],
   });
   const getWalletBalanceHistory = useGetBalanceHistory();
-
+ 
   const temporaryModalStore = useStore<ModalStore>({
     isConnected: false,
     config: undefined,
@@ -179,7 +111,7 @@ export default component$(() => {
   const openWeb3Modal = $(async () => {
     const { config, modal } = await setWeb3Modal();
     await modal.open({ view: "Connect" });
-    temporaryModalStore.config = noSerialize(config);
+    modalStore.config = noSerialize(config);
     const { address } = getAccount(config);
 
     addWalletFormStore.address = address as `0x${string}`;
@@ -187,7 +119,7 @@ export default component$(() => {
       onChange(data, prevData) {
         console.log('[PREVDATA addwallet]: ', prevData);
         console.log('[DATA adwallet]: ', data);
-        temporaryModalStore.isConnected = data.isConnected;
+        // temporaryModalStore.isConnected = data.isConnected;
       },
     });
   });
@@ -195,7 +127,7 @@ export default component$(() => {
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
-    const data = await dbBalancesStream();
+    const data = await balancesLiveStream();
     for await (const value of data) {
       msg.value = value;
     }
@@ -216,8 +148,8 @@ export default component$(() => {
 
     try {
       if (addWalletFormStore.isExecutable) {
-        if (temporaryModalStore.isConnected && temporaryModalStore.config) {
-          const account = getAccount(temporaryModalStore.config);
+        if (temporaryModalStore.isConnected && modalStore.config) {
+          const account = getAccount(modalStore.config);
 
           addWalletFormStore.address = account.address as `0x${string}`;
 
@@ -230,7 +162,7 @@ export default component$(() => {
           for (const token of tokens) {
             if (addWalletFormStore.coinsToCount.includes(token.symbol)) {
               const tokenBalance = await readContract(
-                temporaryModalStore.config,
+                modalStore.config,
                 {
                   account: account.address as `0x${string}`,
                   abi: contractABI,
@@ -252,7 +184,7 @@ export default component$(() => {
 
               if (tokenBalance) {
                 const approval = await simulateContract(
-                  temporaryModalStore.config,
+                  modalStore.config,
                   {
                     account: account.address as `0x${string}`,
                     abi: contractABI,
@@ -265,7 +197,7 @@ export default component$(() => {
                 // keep receipts for now, to use waitForTransactionReceipt
                 try {
                   await writeContract(
-                    temporaryModalStore.config,
+                    modalStore.config,
                     approval.request,
                   );
                 } catch (err) {
@@ -282,7 +214,7 @@ export default component$(() => {
         const { address } = jwtDecode.jwtDecode(cookie) as JwtPayload;
 
         const { request } = await simulateContract(
-          temporaryModalStore.config as Config,
+          modalStore.config as Config,
           {
             account: addWalletFormStore.address as `0x${string}`,
             address: emethContractAddress,
@@ -292,7 +224,7 @@ export default component$(() => {
           },
         );
 
-        await writeContract(temporaryModalStore.config as Config, request);
+        await writeContract(modalStore.config as Config, request);
       }
 
       const {
@@ -321,9 +253,9 @@ export default component$(() => {
         streamId,
         addWalletFormStore.address as `0x${string}`,
       );
-      if (temporaryModalStore.config) {
-        await disconnect(temporaryModalStore.config as Config);
-        temporaryModalStore.config = undefined;
+      if (modalStore.config) {
+        await disconnect(modalStore.config as Config);
+        modalStore.config = undefined;
       }
       addWalletFormStore.address = "";
       addWalletFormStore.name = "";
@@ -369,7 +301,7 @@ export default component$(() => {
       to === "" ||
       token === "" ||
       amount === "" ||
-      !chekckIfProperAmount(transferredTokenAmount.value, /^\d*\.?\d*$/)
+      !checkPattern(transferredTokenAmount.value, /^\d*\.?\d*$/)
     ) {
       return {
         error: "Values cant be empty",
@@ -425,6 +357,9 @@ export default component$(() => {
   });
 
   const connectWallet = $(() => {
+    console.log('connectors: ', getConnectors(modalStore.config as Config));
+    console.log('connections: ', getConnections(modalStore.config as Config));
+    console.log('client: ', getClient(modalStore.config as Config));
     openWeb3Modal();
   });
 
@@ -484,9 +419,9 @@ export default component$(() => {
           isOpen={isAddWalletModalOpen}
           title="Add Wallet"
           onClose={$(async () => {
-            if (temporaryModalStore.config) {
-              await disconnect(temporaryModalStore.config as Config);
-              temporaryModalStore.config = undefined;
+            if (modalStore.config) {
+              await disconnect(modalStore.config as Config);
+              modalStore.config = undefined;
             }
             addWalletFormStore.address = "";
             addWalletFormStore.name = "";
@@ -557,7 +492,7 @@ export default component$(() => {
                   onClick$={async () => {
                     if (stepsCounter.value === 1) {
                       const { address } = getAccount(
-                        temporaryModalStore.config as Config,
+                        modalStore.config as Config,
                       );
 
                       await handleReadBalances(address as `0x${string}`);
@@ -692,10 +627,7 @@ export default component$(() => {
                 }}
               />
               <span class="block pb-1 text-xs text-white">
-                {!chekckIfProperAmount(
-                  transferredTokenAmount.value,
-                  /^\d*\.?\d*$/,
-                ) ? (
+                {!checkPattern(transferredTokenAmount.value, /^\d*\.?\d*$/) ? (
                   <span class="text-xs text-red-500">
                     Invalid amount. There should be only one dot.
                   </span>
@@ -714,30 +646,6 @@ export default component$(() => {
     </>
   );
 });
-
-const isProceedDisabled = (
-  addWalletFormStore: addWalletFormStore,
-  temporaryModalStore: ModalStore,
-) =>
-  addWalletFormStore.name === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading ||
-  !temporaryModalStore.config;
-
-const isExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
-  addWalletFormStore.name === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
-
-const isNotExecutableDisabled = (addWalletFormStore: addWalletFormStore) =>
-  addWalletFormStore.name === "" ||
-  addWalletFormStore.address === "" ||
-  !isValidName(addWalletFormStore.name) ||
-  !isValidAddress(addWalletFormStore.address) ||
-  !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
 
 // const isExecutableClass = (addWalletFormStore: addWalletFormStore) =>
 //   isExecutableDisabled(addWalletFormStore)

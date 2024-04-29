@@ -1,7 +1,7 @@
 import { type QRL, component$, $ } from "@builder.io/qwik";
 import { getAddress } from "viem";
 import { Input } from "~/components/Input/Input";
-import { type addWalletFormStore } from "~/routes/app/wallets";
+
 import { useDebouncer } from "~/utils/debouncer";
 import {
   isCheckSum,
@@ -12,10 +12,11 @@ import {
 import IconSuccess from "/public/assets/icons/dashboard/success.svg?jsx";
 import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
 import { Button } from "../Buttons/Buttons";
+import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 import WalletConnect from "../WalletConnect";
 import { mainnet, sepolia } from "viem/chains";
 export interface AddWalletFormFieldsProps {
-  addWalletFormStore: addWalletFormStore;
+  addWalletFormStore: AddWalletFormStore;
   onConnectWalletClick: QRL<() => void>;
   isWalletConnected: boolean | undefined;
 }
@@ -91,20 +92,20 @@ export default component$<AddWalletFormFieldsProps>(
               </div>
             ) : (
               <div>
-                {/* <button
+                <button
                   onClick$={onConnectWalletClick}
                   class={`h-8 rounded-3xl border-none ${isWalletConnected ? "custom-border-1" : "bg-customBlue"} px-4 text-xs font-semibold text-white duration-300 ease-in-out hover:scale-105`}
                 >
                   {isWalletConnected ? "Disconnect " : "Connect Wallet"}
-                </button> */}
-                <WalletConnect 
+                </button>
+                {/* <WalletConnect 
                   image="/assets/icons/login/walletconnect.svg"
                   text="Use WalletConnect"
                   enableWalletConnect={true}
                   enableInjected={true}
                   enableCoinbase={true}
                   chains={[mainnet, sepolia]}
-                />
+                /> */}
               </div>
             )}
           </label>
