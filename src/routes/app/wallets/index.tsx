@@ -184,7 +184,9 @@ export default component$(() => {
 
     addWalletFormStore.address = address as `0x${string}`;
     watchAccount(config, {
-      onChange(data) {
+      onChange(data, prevData) {
+        console.log('[PREVDATA addwallet]: ', prevData);
+        console.log('[DATA adwallet]: ', data);
         temporaryModalStore.isConnected = data.isConnected;
       },
     });

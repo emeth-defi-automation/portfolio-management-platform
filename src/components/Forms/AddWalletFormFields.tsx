@@ -12,7 +12,8 @@ import {
 import IconSuccess from "/public/assets/icons/dashboard/success.svg?jsx";
 import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
 import { Button } from "../Buttons/Buttons";
-
+import WalletConnect from "../WalletConnect";
+import { mainnet, sepolia } from "viem/chains";
 export interface AddWalletFormFieldsProps {
   addWalletFormStore: addWalletFormStore;
   onConnectWalletClick: QRL<() => void>;
@@ -90,12 +91,20 @@ export default component$<AddWalletFormFieldsProps>(
               </div>
             ) : (
               <div>
-                <button
+                {/* <button
                   onClick$={onConnectWalletClick}
                   class={`h-8 rounded-3xl border-none ${isWalletConnected ? "custom-border-1" : "bg-customBlue"} px-4 text-xs font-semibold text-white duration-300 ease-in-out hover:scale-105`}
                 >
                   {isWalletConnected ? "Disconnect " : "Connect Wallet"}
-                </button>
+                </button> */}
+                <WalletConnect 
+                  image="/assets/icons/login/walletconnect.svg"
+                  text="Use WalletConnect"
+                  enableWalletConnect={true}
+                  enableInjected={true}
+                  enableCoinbase={true}
+                  chains={[mainnet, sepolia]}
+                />
               </div>
             )}
           </label>
