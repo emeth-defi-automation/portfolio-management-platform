@@ -27,25 +27,47 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
 
     const responses: any[] = [];
     for (const tx of walletTransactions) {
+      try {
+
+      // console.log(tx)
+      // console.log('-----------------------------------------')
       const tokenAddress = checksumAddress(tx.address as `0x${string}`)
       const value = tx.to_address.toLowerCase() === walletAddress.toLowerCase() ? parseInt(tx.value_decimal) : -parseInt(tx.value_decimal)
+        console.log(value)
+        // DEFINE INDEX walletTransaction ON TABLE wallet_balance COLUMNS transactionHash UNIQUE;
       const query = await db.query(`
-        LET $value = SELECT VALUE ${tokenAddress} FROM wallet_balance
-        WHERE '${tx.block_timestamp}' >= timestamp AND walletAddress = '${walletAddress}'
+        LET $value =
+        SELECT timestamp, value
+        FROM wallet_balance
+        WHERE id IN (
+          SELECT VALUE in FROM token_balance
+          WHERE out IN (
+            SELECT VALUE id FROM token
+            WHERE address = '${tokenAddress}'))
+        AND id IN (
+          SELECT VALUE in FROM wallet_token_balance
+          WHERE out IN (
+            SELECT VALUE id FROM wallet
+            WHERE address = '${walletAddress}'))
+        AND timestsamp <= '${tx.block_timestamp}'
+        ORDER BY timestamp DESC
         LIMIT 1;
-        RETURN $value;
+
+        RETURN $value[0];
 
         LET $balance = (CREATE wallet_balance SET
         blockNumber = '${tx.block_number}',
         timestamp = '${tx.block_timestamp}',
         transactionHash = '${tx.transaction_hash}',
-        value = IF $value[0] = NONE THEN (RETURN 0) ELSE <float> $value[0] END + ${value});
-        RETURN $balance;
+        value = IF $value[0].value = NONE THEN (RETURN ${value}) ELSE ($value[0].value + ${value}) END);
 
         RELATE ONLY ($balance.id) ->token_balance-> (RETURN SELECT id FROM token WHERE address = '${tokenAddress}');
         RELATE ONLY ($balance.id) ->wallet_token_balance-> (RETURN SELECT id FROM wallet WHERE address = '${walletAddress}');
       `)
-      console.log(query)
+
+      } catch (e) {
+        console.log(e)
+      }
     }
 
     const cookie = requestEvent.cookie.get("accessToken");
