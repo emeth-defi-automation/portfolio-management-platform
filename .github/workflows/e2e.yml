@@ -2,9 +2,9 @@ name: E2E
 
 on:
   push:
-    branches: []
+    branches: ["master", "dev"]
   pull_request:
-    branches: []
+    branches: ["master", "dev"]
 
 env:
   # Workflow context variables
