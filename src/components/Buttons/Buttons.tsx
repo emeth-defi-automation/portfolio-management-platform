@@ -1,4 +1,4 @@
-import { type QRL, component$ } from "@builder.io/qwik";
+import { component$, type QRL } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
 export interface ButtonProps {
@@ -12,6 +12,7 @@ export interface ButtonProps {
   disabled?: boolean;
   type?: "button" | "submit" | "reset" | undefined;
   onClick$?: QRL<() => Promise<void>>;
+  dataTestId?: string;
 }
 
 export const Button = component$<ButtonProps>((props) => {
@@ -21,6 +22,7 @@ export const Button = component$<ButtonProps>((props) => {
       class={twMerge("h-12 cursor-pointer rounded-10 border-2", props.class)}
       disabled={props.disabled}
       type={props.type}
+      data-testid={props.dataTestId}
     >
       <div class={props.divClass}>{props.text}</div>
     </button>
@@ -35,6 +37,7 @@ export const ButtonWithIcon = component$<ButtonProps>((props) => {
         "flex h-8 items-center justify-center gap-2 rounded-10 px-4 text-xs",
         props.class,
       )}
+      data-testid={props.dataTestId}
     >
       {props.image && <img src={props.image} width="16" height="16" />}
       <span>{props.text}</span>
@@ -50,6 +53,7 @@ export const ConnectButton = component$<ButtonProps>((props) => {
         "custom-border-2 flex w-72 items-center justify-between rounded-3xl p-3 text-sm",
         props.class,
       )}
+      data-testid={props.dataTestId}
     >
       <div class="flex items-center gap-4">
         {props.image && <img src={props.image} width="24" height="24" />}

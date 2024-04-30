@@ -1,15 +1,11 @@
 import {
   $,
   component$,
+  useSignal,
+  useVisibleTask$,
   type QRL,
   type Signal,
-  useVisibleTask$,
-  useSignal,
 } from "@builder.io/qwik";
-import IconMaximize from "/public/assets/icons/dashboard/maximize.svg?jsx";
-import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
-import ImgMinimalize from "/public/assets/icons/minimalize.svg?jsx";
-import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import * as d3 from "d3";
 import { type PeriodState } from "~/interface/balance/Balance";
 import {
@@ -17,6 +13,10 @@ import {
   axisYFormatter,
 } from "~/utils/portfolio/axisFormatter";
 import { Spinner } from "../Spinner/Spinner";
+import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
+import IconMaximize from "/public/assets/icons/dashboard/maximize.svg?jsx";
+import ImgMinimalize from "/public/assets/icons/minimalize.svg?jsx";
+import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
 
 export interface PortfolioValueProps {
   hideChartWhileLoading: Signal<boolean>;
@@ -191,7 +191,10 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
           <h1 class="text-xl font-semibold">Portfolio Value</h1>
           <div class="text-right">
-            <h1 class="custom-text-gradient text-xl font-semibold text-transparent">
+            <h1
+              class="custom-text-gradient text-xl font-semibold text-transparent"
+              data-testid="portfolio-value"
+            >
               {totalPortfolioValueLoading ||
               portfolioValueChangeLoading.value ||
               hideChartWhileLoading.value

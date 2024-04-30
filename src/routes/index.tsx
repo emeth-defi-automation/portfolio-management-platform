@@ -46,6 +46,7 @@ export default component$(() => {
               enableInjected={false}
               enableCoinbase={false}
               chains={[mainnet, sepolia]}
+              dataTestId="use-metamask-button"
             />
             <WalletConnect
               image="/assets/icons/login/walletconnect.svg"
@@ -54,6 +55,7 @@ export default component$(() => {
               enableInjected={true}
               enableCoinbase={true}
               chains={[mainnet, sepolia]}
+              dataTestId="use-walletconnect-button"
             />
           </div>
         </div>
@@ -62,6 +64,7 @@ export default component$(() => {
             image="/assets/icons/info-white.svg"
             text="How to use Wallet?"
             class="w-52 !border-0 bg-customBlue py-2 pl-2 pr-3 text-xs"
+            dataTestId="how-to-use-wallet-button"
           />
           <Copyright />
         </div>

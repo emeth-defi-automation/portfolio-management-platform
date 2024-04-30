@@ -45,6 +45,7 @@
     "@storybook/builder-vite": "8.0.8",
     "@storybook/html": "8.0.8",
     "@storybook/html-vite": "8.0.8",
+    "@tenkeylabs/dappwright": "2.8.2",
     "@types/d3": "7.4.3",
     "@types/eslint": "8.56.9",
     "@types/express": "4.17.21",
