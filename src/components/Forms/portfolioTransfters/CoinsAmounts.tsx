@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
-import { chekckIfProperAmount, replaceNonMatching } from "~/utils/fractions";
+import { checkPattern, replaceNonMatching } from "~/utils/fractions";
 import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 
 export interface CoinsAmountsProps {
@@ -41,7 +41,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                         image={`/assets/icons/tokens/${coin.symbol.toLowerCase()}.svg`}
                         for={`${coin.symbol}${coin.wallet}Amount`}
                         hasImg={
-                          chekckIfProperAmount(coin.amount, /^\d*\.?\d*$/) &&
+                          checkPattern(coin.amount, /^\d*\.?\d*$/) &&
                           coin.amount != "0" &&
                           coin.amount.length > 0 &&
                           coin.amount[0] != "0"
@@ -54,7 +54,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                             name={`${coin.symbol}${coin.wallet}Amount`}
                             id={`${coin.symbol}${coin.wallet}Amount`}
                             class={`custom-border-1 absolute end-4 block h-8 w-1/2 rounded-lg bg-transparent p-3 text-sm  placeholder-white placeholder-opacity-50
-                              ${chekckIfProperAmount(coin.amount, /^\d*\.?\d*$/) && coin.amount != "0" && coin.amount.length > 0 && coin.amount[0] != "0" ? "border-[#24a148] text-[#24a148] focus:border-[#24a148]" : ""}`}
+                              ${checkPattern(coin.amount, /^\d*\.?\d*$/) && coin.amount != "0" && coin.amount.length > 0 && coin.amount[0] != "0" ? "border-[#24a148] text-[#24a148] focus:border-[#24a148]" : ""}`}
                             placeholder={`${coin.symbol} approval limit`}
                             value={coin.amount}
                             onInput$={(e) => {
@@ -84,7 +84,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                       <span class="block pb-1 text-xs text-white">
                         {coin.amount.length < 1 &&
                         coin.amount[0] != "0" &&
-                        !chekckIfProperAmount(coin.amount, /^\d*\.?\d*$/) ? (
+                        !checkPattern(coin.amount, /^\d*\.?\d*$/) ? (
                           <span class="text-xs text-red-500">
                             Invalid amount. There should be only one dot.
                           </span>
