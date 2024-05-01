@@ -3,10 +3,16 @@ import { twMerge } from "tailwind-merge";
 
 export interface ButtonProps {
   text?: string;
-  variant?: "blue" | "red" | "transparent" | "gradient" | "iconBox" | "onlyIcon";
+  variant?:
+    | "blue"
+    | "red"
+    | "transparent"
+    | "gradient"
+    | "iconBox"
+    | "onlyIcon";
   class?: string;
   leftIcon?: JSXOutput | null;
-  size?: "small" | "large"
+  size?: "small" | "large";
 }
 
 export const Button = component$<ButtonProps>((props) => {
@@ -27,11 +33,12 @@ export const Button = component$<ButtonProps>((props) => {
                   : props.variant === "iconBox"
                     ? "custom-border-1 custom-bg-white rounded-lg px-2 py-2"
                     : props.variant == "onlyIcon"
-                    ? "p-0" : "" 
+                      ? "p-0"
+                      : ""
         }
         ${
-            props.size === "small" 
-            ? "text-xs font-semibold" 
+          props.size === "small"
+            ? "text-xs font-semibold"
             : "text-sm font-medium"
         }`,
         props.class,

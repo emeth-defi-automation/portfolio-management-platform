@@ -27,7 +27,7 @@ BlueIcon.args = {
   variant: "blue",
   leftIcon: <IconAdd class="h-4 w-4" />,
   class: "",
-  size: "small"
+  size: "small",
 };
 
 Red.args = {
