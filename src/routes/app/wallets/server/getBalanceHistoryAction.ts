@@ -28,13 +28,8 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
     const responses: any[] = [];
     for (const tx of walletTransactions) {
       try {
-
-      // console.log(tx)
-      // console.log('-----------------------------------------')
       const tokenAddress = checksumAddress(tx.address as `0x${string}`)
       const value = tx.to_address.toLowerCase() === walletAddress.toLowerCase() ? parseInt(tx.value_decimal) : -parseInt(tx.value_decimal)
-        console.log(value)
-        // DEFINE INDEX walletTransaction ON TABLE wallet_balance COLUMNS transactionHash UNIQUE;
       const query = await db.query(`
         LET $value =
         SELECT timestamp, value
@@ -52,8 +47,6 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
         AND timestsamp <= '${tx.block_timestamp}'
         ORDER BY timestamp DESC
         LIMIT 1;
-
-        RETURN $value[0];
 
         LET $balance = (CREATE wallet_balance SET
         blockNumber = '${tx.block_number}',
