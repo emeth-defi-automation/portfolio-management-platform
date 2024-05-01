@@ -10,7 +10,8 @@ export default {
       colors: {
         customBlue: "#2196F3",
         customWarning: "#ffc107",
-        customGreen: "#4CAF50"
+        customGreen: "#4CAF50",
+        customRed: "#DA1E28"
       },
       borderRadius: {
         10: "40px",
