@@ -66,8 +66,7 @@ import { type AddWalletFormStore } from "./interface";
 import { fetchTokens } from "~/database/tokens";
 import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import { balancesLiveStream } from "./server/balancesLiveStream";
-import { createWeb3Modal } from "@web3modal/wagmi";
-import { openWeb3Modal } from "~/utils/walletConnections";
+import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -227,8 +226,7 @@ export default component$(() => {
         addWalletFormStore.address as `0x${string}`,
       );
       if (wagmiConfig.config) {
-        await disconnect(wagmiConfig.config as Config);
-        wagmiConfig.config = undefined;
+        await disconnectWallets(wagmiConfig.config);
       }
       addWalletFormStore.address = "";
       addWalletFormStore.name = "";
@@ -236,7 +234,6 @@ export default component$(() => {
       addWalletFormStore.coinsToCount = [];
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
-      // temporaryModalStore.isConnected = false;
     } catch (err) {
       console.error("error: ", err);
       formMessageProvider.messages.push({
@@ -329,7 +326,7 @@ export default component$(() => {
     }
   });
 
-  const connectWallet = $(() => {
+  const connectWallet = $(async () => {
     await openWeb3Modal(wagmiConfig!.config);
   });
 
@@ -390,8 +387,7 @@ export default component$(() => {
           title="Add Wallet"
           onClose={$(async () => {
             if (wagmiConfig.config) {
-              await disconnect(wagmiConfig.config as Config);
-              wagmiConfig.config = undefined;
+              await disconnectWallets(wagmiConfig.config);
             }
             addWalletFormStore.address = "";
             addWalletFormStore.name = "";

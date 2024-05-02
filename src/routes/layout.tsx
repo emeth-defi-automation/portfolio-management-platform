@@ -76,15 +76,15 @@ export default component$(() => {
     
     if(wagmiConfig.config){
       reconnect(wagmiConfig.config);
-      
+       
       watchAccount(wagmiConfig.config!, {  
           onChange(account, prevAccount) {
-          console.log('[perv]: ', prevAccount);
-          console.log('[not a perv]: ', account);
-          console.log('connectors: ', getConnectors(wagmiConfig.config as Config));
+          // console.log('[perv]: ', prevAccount);
+          // console.log('[not a perv]: ', account);
+          // console.log('connectors: ', getConnectors(wagmiConfig.config as Config));
           console.log('connections: ', getConnections(wagmiConfig.config as Config));
-          // console.log('client: ', getClient(wagmiConfig.config as Config));
-          console.log('dane: ',account.address, account.chainId)
+          // // console.log('client: ', getClient(wagmiConfig.config as Config));
+          // console.log('dane: ',account.address, account.chainId)
           login.account = noSerialize(account);
           login.address.value = account.address;
           login.chainId.value = account.chainId;

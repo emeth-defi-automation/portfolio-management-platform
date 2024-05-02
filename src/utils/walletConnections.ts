@@ -1,6 +1,7 @@
 import { $, NoSerialize } from "@builder.io/qwik";
-import { Config, getConnections, getConnectors, reconnect } from "@wagmi/core";
+import { Config, getConnections, disconnect, getConnectors, reconnect } from "@wagmi/core";
 import { createWeb3Modal } from "@web3modal/wagmi";
+
 
 export const openWeb3Modal = async (config: NoSerialize<Config>) => {
     const projectId = import.meta.env.PUBLIC_PROJECT_ID;
@@ -15,12 +16,25 @@ export const openWeb3Modal = async (config: NoSerialize<Config>) => {
     await modal.open({ view: "Connect" });
 };
 
-export const disconnectWallets = (config: NoSerialize<Config>, loginWalletAddress?: string) => {
-    console.log('connectors: ', getConnectors(config as Config));
-    console.log('connections: ', getConnections(config as Config));
-    // console.log('client: ', getClient(wagmiConfig.config as Config));
+export const disconnectWallets = async (config: NoSerialize<Config>, loginWalletAddress?: string) => {
     const subik = '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87';
-    const connectors = getConnectors(config as Config);
+    // console.log('connectors: ', getConnectors(config as Config));
+    console.log('connections: ', await getConnections(config as Config));
+    // console.log('connectorClient: ', await getConnectorClient(config as Config, {
+    //     account: subik
+    // })); 
+    // console.log('client: ', getClient(wagmiConfig.config as Config));
+    const connectors = await getConnectors(config as Config);
     console.log(connectors);
+    for (const connector of connectors) {
+        const accounts = await connector.getAccounts();
+        if (accounts.indexOf(subik) < 0) {
+            console.log(`disconnecting ${connector.name}`)
+            await disconnect(config as Config, { connector })
+            console.log('done')
+        }
+        // console.log(`connector: ${connector.name}`, await connector.getAccounts())
+    }
 
-}
+    console.log('connections: ', await getConnections(config as Config));
+} 
