@@ -11,15 +11,7 @@ export function PopUp(args: InputProps) {
   return <Input {...args} />;
 }
 
-export function AddWallet(args: InputProps) {
-  return <Input {...args} />;
-}
-
 export function PortfolioSearch(args: InputProps) {
-  return <Input {...args} />;
-}
-
-export function WalletsSearch(args: InputProps) {
   return <Input {...args} />;
 }
 
@@ -35,20 +27,8 @@ PopUp.args = {
   placeholder: "Type or paste deposit address here",
   size: "large",
 };
-
-AddWallet.args = {
-  placeholder: "Enter wallet name ...",
-  size: "large",
-};
-
 PortfolioSearch.args = {
   placeholder: "Search for name",
-  variant: "search",
-  size: "small",
-};
-
-WalletsSearch.args = {
-  placeholder: "Search for wallet",
   variant: "search",
   size: "small",
 };
