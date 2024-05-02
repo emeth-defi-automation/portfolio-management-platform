@@ -10,7 +10,7 @@ export function CheckBoxSmall(args: CheckboxProps) {
   return <Checkbox {...args} />;
 }
 
-export function ToogleTick(args: CheckboxProps) {
+export function ToggleTick(args: CheckboxProps) {
   return <Checkbox {...args} />;
 }
 
@@ -24,7 +24,7 @@ CheckBoxSmall.args = {
   size: "small",
 };
 
-ToogleTick.args = {
+ToggleTick.args = {
   variant: "toggleTick",
   isToggle: true,
   checked: true,
