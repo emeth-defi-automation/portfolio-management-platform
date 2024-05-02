@@ -3,6 +3,7 @@ import { getErc20TokenTransfers, getWalletBalance } from "~/server/moralis";
 import { connectToDB } from "~/database/db";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import {checksumAddress} from "viem";
+import {indexWalletBalance} from "~/database/balanceHistory";
 
 /**
  * This function is used to get the balance history of a wallet. It fetches the ERC20 token transfers
@@ -16,8 +17,6 @@ import {checksumAddress} from "viem";
  */
 // eslint-disable-next-line qwik/loader-location
 export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
-    const balanceHistory: any[] = [];
-
     const walletTransactions = await getErc20TokenTransfers(
         null,
         data.address as string,
@@ -25,81 +24,10 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
     const walletAddress = checksumAddress(data.address as `0x${string}`)
     const db = await connectToDB(requestEvent.env);
 
-    const responses: any[] = [];
     for (const tx of walletTransactions) {
-      try {
       const tokenAddress = checksumAddress(tx.address as `0x${string}`)
       const value = tx.to_address.toLowerCase() === walletAddress.toLowerCase() ? parseInt(tx.value_decimal) : -parseInt(tx.value_decimal)
-      const query = await db.query(`
-        LET $value =
-        SELECT timestamp, value
-        FROM wallet_balance
-        WHERE id IN (
-          SELECT VALUE in FROM token_balance
-          WHERE out IN (
-            SELECT VALUE id FROM token
-            WHERE address = '${tokenAddress}'))
-        AND id IN (
-          SELECT VALUE in FROM wallet_token_balance
-          WHERE out IN (
-            SELECT VALUE id FROM wallet
-            WHERE address = '${walletAddress}'))
-        AND timestsamp <= '${tx.block_timestamp}'
-        ORDER BY timestamp DESC
-        LIMIT 1;
-
-        LET $balance = (CREATE wallet_balance SET
-        blockNumber = '${tx.block_number}',
-        timestamp = '${tx.block_timestamp}',
-        transactionHash = '${tx.transaction_hash}',
-        value = IF $value[0].value = NONE THEN (RETURN ${value}) ELSE ($value[0].value + ${value}) END);
-
-        RELATE ONLY ($balance.id) ->token_balance-> (RETURN SELECT id FROM token WHERE address = '${tokenAddress}');
-        RELATE ONLY ($balance.id) ->wallet_token_balance-> (RETURN SELECT id FROM wallet WHERE address = '${walletAddress}');
-      `)
-
-      } catch (e) {
-        console.log(e)
-      }
+      await indexWalletBalance(db, tokenAddress, walletAddress, tx.block_timestamp, tx.block_number, tx.transaction_hash, value)
     }
 
-    const cookie = requestEvent.cookie.get("accessToken");
-
-    // if (!cookie) {
-    //     throw new Error("No cookie found");
-    // }
-
-    // const tokenAddresses = {
-    //     GLM: "0x054e1324cf61fe915cca47c48625c07400f1b587",
-    //     USDC: "0xd418937d10c9cec9d20736b2701e506867ffd85f",
-    //     USDT: "0x9d16475f4d36dd8fc5fe41f74c9f44c7eccd0709",
-    // };
-
-    // for (let i = 0; i < responses.length; i++) {
-    //     const currentBalance: { [key: string]: string } = {};
-    //     // @ts-ignore
-    //     responses[i]?.jsonResponse.forEach((entry: any) => {
-    //         currentBalance[entry.token_address] = convertWeiToQuantity(
-    //             entry.balance,
-    //             parseInt(entry.decimals),
-    //         );
-    //     });
-    //
-    //     const dbObject = {
-    //         blockNumber: balanceHistory[i].blockNumber,
-    //         timestamp: balanceHistory[i].timestamp,
-    //         walletAddress: data.address,
-    //         [tokenAddresses.GLM]: currentBalance[tokenAddresses.GLM]
-    //             ? currentBalance[tokenAddresses.GLM]
-    //             : "0",
-    //         [tokenAddresses.USDC]: currentBalance[tokenAddresses.USDC]
-    //             ? currentBalance[tokenAddresses.USDC]
-    //             : "0",
-    //         [tokenAddresses.USDT]: currentBalance[tokenAddresses.USDT]
-    //             ? currentBalance[tokenAddresses.USDT]
-    //             : "0",
-    //     };
-    //
-    //     await db.create("wallet_balance", dbObject);
-    // }
 });
