@@ -1,6 +1,6 @@
 import { type NoSerialize, createContextId, type Signal } from "@builder.io/qwik";
-import { GetAccountReturnType, type Config } from "@wagmi/core";
-import { Address } from "viem";
+import { type Config } from "@wagmi/core";
+
 
 export interface ModalStore {
   isConnected?: boolean;
@@ -10,11 +10,3 @@ export interface ModalStore {
 export const ModalStoreContext = createContextId<ModalStore>(
   "modal-store-context",
 );
-
-export interface Login {
-  account: NoSerialize<GetAccountReturnType>;
-  address: Signal<Address | undefined>;
-  chainId: Signal<number | undefined>;
-}
-
-export const LoginContext = createContextId<Login>("login-context");

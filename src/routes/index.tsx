@@ -1,32 +1,41 @@
 import { HeroText } from "~/components/HeroText/HeroText";
 import {
   component$,
-  // useContext,
-  // useVisibleTask$,
+  noSerialize,
+  useContext,
+  useVisibleTask$,
 } from "@builder.io/qwik";
 import { ConnectButton } from "~/components/Buttons/Buttons";
 import WalletConnect from "~/components/WalletConnect";
 import { Copyright } from "~/components/Paragraph/Paragraph";
-import { mainnet, sepolia } from "viem/chains";
 import IconLogo from "/public/assets/icons/logo.svg?jsx";
-// import { disconnect, Config } from "@wagmi/core";
-// import {
-//   ModalStoreContext,
-// } from "~/interface/web3modal/ModalStore";
+import { Config, getClient, getConnections, getConnectors, reconnect, watchAccount } from "@wagmi/core";
+import { LoginContext, WagmiConfigContext } from "~/components/WalletConnect/context";
+import { defaultWagmiConfig } from "@web3modal/wagmi";
+import { type Chain, mainnet, sepolia } from "viem/chains";
+import { useNavigate } from "@builder.io/qwik-city";
 
 export default component$(() => {
-  // const modalStore = useContext(ModalStoreContext);
+  const wagmiConfig = useContext(WagmiConfigContext);
+  const login = useContext(LoginContext);
+  const nav = useNavigate();
+  
+  const metadata = {   
+    name: import.meta.env.PUBLIC_METADATA_NAME,
+    description: import.meta.env.PUBLIC_METADATA_DESCRIPTION,
+    url: "https://web3modal.com",
+    icons: ["https://avatars.githubusercontent.com/u/37784886"],
+  };
 
-  // useVisibleTask$(async () => {
-  //   console.log("elo ");
-  //   console.log(modalStore )
-  //   if (modalStore.config) {
-  //     console.log("rozlaczam");
-  //     await disconnect(modalStore.config as Config);
-  //     console.log("rozlaczylemm");
-  //   }
-  // });
 
+  useVisibleTask$(async ({track}) => {
+    track(() => login.address.value)
+    console.log('login index: ',login)
+
+    if(login.address.value){
+      await nav('/signin')
+    }
+  });
   return (
     <>
       <div class="background-container"></div>
@@ -42,18 +51,10 @@ export default component$(() => {
             <WalletConnect
               image="/assets/icons/login/metamask.svg"
               text="Use Metamask"
-              enableWalletConnect={false}
-              enableInjected={false}
-              enableCoinbase={false}
-              chains={[mainnet, sepolia]}
             />
             <WalletConnect
               image="/assets/icons/login/walletconnect.svg"
               text="Use WalletConnect"
-              enableWalletConnect={true}
-              enableInjected={true}
-              enableCoinbase={true}
-              chains={[mainnet, sepolia]}
             />
           </div>
         </div>

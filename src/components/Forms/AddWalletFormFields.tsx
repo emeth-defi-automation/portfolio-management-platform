@@ -13,8 +13,6 @@ import IconSuccess from "/public/assets/icons/dashboard/success.svg?jsx";
 import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
 import { Button } from "../Buttons/Buttons";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
-import WalletConnect from "../WalletConnect";
-import { mainnet, sepolia } from "viem/chains";
 export interface AddWalletFormFieldsProps {
   addWalletFormStore: AddWalletFormStore;
   onConnectWalletClick: QRL<() => void>;

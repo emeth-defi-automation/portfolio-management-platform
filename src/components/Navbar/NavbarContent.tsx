@@ -1,14 +1,15 @@
 import { component$, useContext } from "@builder.io/qwik";
 import ImgAvatar from "/public/assets/images/avatar.png?jsx";
 import IconLogout from "/public/assets/icons/logout.svg?jsx";
-import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+// import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+import { WagmiConfigContext } from "../WalletConnect/context";
 import { type Config, disconnect, getAccount } from "@wagmi/core";
 import { NavLink } from "./NavLink";
 import { useNavigate } from "@builder.io/qwik-city";
 
 export const NavbarContent = component$(() => {
   const nav = useNavigate();
-  const modalStore = useContext(ModalStoreContext);
+  const modalStore = useContext(WagmiConfigContext);
   let address;
   modalStore.config &&
     (({ address } = getAccount(modalStore.config)),
