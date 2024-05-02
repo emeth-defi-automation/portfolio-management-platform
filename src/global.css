@@ -114,7 +114,7 @@ body {
 
 .custom-bg-white {
   background: linear-gradient(
-    98deg,
+    45deg,
     rgba(255, 255, 255, 0.1) 0%,
     rgba(255, 255, 255, 0) 100%
   );
@@ -319,4 +319,31 @@ body {
 .scrollbar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
+}
+
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 99px;
+  padding: 2px;
+  background: linear-gradient(
+    130deg,
+    #da301f 0.24%,
+    #f48946 18.43%,
+    #ee3560 35.57%,
+    #fa4784 51.68%,
+    #ff48c0 66.75%,
+    #8e38b5 81.82%,
+    #5542bb 89.09%,
+    #0051c3 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
