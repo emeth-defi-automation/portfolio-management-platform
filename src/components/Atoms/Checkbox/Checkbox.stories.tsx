@@ -1,4 +1,4 @@
-import Checkbox, { type CheckboxProps } from "./Checkobox";
+import Checkbox, { type CheckboxProps } from "./Checkbox";
 
 export default { title: "atoms/checkbox", component: Checkbox };
 
