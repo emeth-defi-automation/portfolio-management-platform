@@ -2,17 +2,17 @@ import {
   component$,
   Slot,
   useContextProvider,
-  useStore,
+
   noSerialize,
   useVisibleTask$,
   useTask$,
   useContext,
   useSignal
 } from "@builder.io/qwik";
-import { useLocation, type RequestHandler } from "@builder.io/qwik-city";
-import { Config, getClient, getConnections, getConnectors, reconnect, watchAccount } from "@wagmi/core";
+import {  type RequestHandler } from "@builder.io/qwik-city";
+import { Config, getConnections, getConnectors, reconnect, watchAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
-import { type Chain, mainnet, sepolia } from "viem/chains";
+import { mainnet, sepolia } from "viem/chains";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import {
   LoginContext,
@@ -73,30 +73,29 @@ export default component$(() => {
     wagmiConfig.config = noSerialize(wconfig);
 
     console.log('wagmi config: ', wagmiConfig.config);  
-    
+
     if(wagmiConfig.config){
       reconnect(wagmiConfig.config);
        
       watchAccount(wagmiConfig.config!, {  
-          onChange(account, prevAccount) {
-          // console.log('[perv]: ', prevAccount);
-          // console.log('[not a perv]: ', account);
-          // console.log('connectors: ', getConnectors(wagmiConfig.config as Config));
+          onChange(account) {
+
           console.log('connections: ', getConnections(wagmiConfig.config as Config));
-          // // console.log('client: ', getClient(wagmiConfig.config as Config));
-          // console.log('dane: ',account.address, account.chainId)
-          login.account = noSerialize(account);
-          login.address.value = account.address;
-          login.chainId.value = account.chainId;
+            // po podpieciu drugiego walleta login zostaje zmieniony na adress nowego walleta
+            if(login.address.value === undefined){
+              login.account = noSerialize(account);
+              login.address.value = account.address;
+              login.chainId.value = account.chainId;
+            }
+         
+
+          console.log(login.address.value)
       },
     });
   }
   })
 
- 
-
   useContextProvider(StreamStoreContext, { streamId: "" });
-  const location = useLocation();
   const streamStore = useContext(StreamStoreContext);
 
   useTask$(async function () {

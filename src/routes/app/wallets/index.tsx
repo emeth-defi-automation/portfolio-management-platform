@@ -70,6 +70,7 @@ import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
+  const login = useContext(LoginContext);
   const formMessageProvider = useContext(messagesContext);
   const { streamId } = useContext(StreamStoreContext);
   const walletTokenBalances = useSignal<any>([]);
@@ -221,7 +222,7 @@ export default component$(() => {
         isVisible: true,
       });
 
-      await addAddressToStreamConfig(
+      await addAddressToStreamConfig( 
         streamId,
         addWalletFormStore.address as `0x${string}`,
       );
@@ -245,6 +246,10 @@ export default component$(() => {
     }
   });
 
+  useVisibleTask$(({track}) => {
+    track(() => login.address.value)
+    console.log('tutej: ', login.address.value) 
+  })
   const handleReadBalances = $(async (wallet: string) => {
     const tokenBalances = await getMoralisBalance({ wallet });
 
@@ -325,7 +330,10 @@ export default component$(() => {
       }
     }
   });
-
+  const checkConnections = $(async() => {
+        const connections = await getConnections(wagmiConfig.config as Config);
+        return connections.length > 1
+  })
   const connectWallet = $(async () => {
     await openWeb3Modal(wagmiConfig!.config);
   });
