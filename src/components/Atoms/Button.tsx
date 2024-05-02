@@ -1,51 +1,61 @@
-import { type JSXOutput, component$ } from "@builder.io/qwik";
+import { type JSXOutput } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
+import { cva, type VariantProps } from "class-variance-authority";
 
 export interface ButtonProps {
   text?: string;
-  variant?:
-    | "blue"
-    | "red"
-    | "transparent"
-    | "gradient"
-    | "iconBox"
-    | "onlyIcon";
   class?: string;
   leftIcon?: JSXOutput | null;
-  size?: "small" | "large";
+  rightIcon?: JSXOutput | null;
 }
 
-export const Button = component$<ButtonProps>((props) => {
+const buttonStyles = cva(
+  [
+    "font-['Sora'] pointer flex items-center gap-2 text-nowrap rounded-full px-4 py-4",
+    // TODO change hover states while designed
+    "hover:backdrop-brightness-150",
+    "hover:brightness-125",
+  ],
+  {
+    variants: {
+      variant: {
+        blue: ["bg-customBlue"],
+        transparent: ["custom-border-2 bg-transparent"],
+        red: ["bg-customRed"],
+        danger: ["bg-customRed/20 text-customRed"],
+        gradient: ["gradient-border"],
+        iconBox: ["custom-border-1 custom-bg-white rounded-lg px-2 py-2"],
+        onlyIcon: ["p-0 gap-0"],
+      },
+      size: {
+        small: ["text-xs font-semibold"],
+        large: ["text-sm"],
+      },
+    },
+    defaultVariants: {
+      variant: "blue",
+      size: "large",
+    },
+  },
+);
+
+export type buttonType = VariantProps<typeof buttonStyles> & ButtonProps;
+
+const Button = ({ variant, size, ...props }: buttonType) => {
   return (
     <button
       {...props}
-      class={twMerge(
-        `pointer flex items-center justify-center gap-2 text-nowrap rounded-full px-10 py-4
-        ${
-          props.variant === "blue"
-            ? "bg-customBlue"
-            : props.variant === "transparent"
-              ? "custom-border-2 bg-transparent"
-              : props.variant === "red"
-                ? "bg-customRed"
-                : props.variant === "gradient"
-                  ? "gradient-border"
-                  : props.variant === "iconBox"
-                    ? "custom-border-1 custom-bg-white rounded-lg px-2 py-2"
-                    : props.variant == "onlyIcon"
-                      ? "p-0"
-                      : ""
-        }
-        ${
-          props.size === "small"
-            ? "text-xs font-semibold"
-            : "text-sm font-medium"
-        }`,
-        props.class,
-      )}
+      class={twMerge(buttonStyles({ variant, size }), props.class)}
     >
-      {props.leftIcon ? props.leftIcon : null}
-      {props.text ? <span>{props.text}</span> : null}
+      {props.leftIcon ? <span class="grow-0">{props.leftIcon}</span> : null}
+      {props.text ? (
+        <span class={props.rightIcon ? "grow text-left" : ""}>
+          {props.text}
+        </span>
+      ) : null}
+      {props.rightIcon ? <span class="grow-0">{props.rightIcon}</span> : null}
     </button>
   );
-});
+};
+
+export default Button;
