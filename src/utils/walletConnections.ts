@@ -18,34 +18,19 @@ export const openWeb3Modal = async (config: NoSerialize<Config>) => {
 
 export const disconnectWallets = async (config: NoSerialize<Config>, loginWalletAddress?: string) => {
     const subik = '0x8545845EF4BD63c9481Ae424F8147a6635dcEF87';
-    // console.log('connectors: ', getConnectors(config as Config));
+
     console.log('connections: ', await getConnections(config as Config));
-    // console.log('connectorClient: ', await getConnectorClient(config as Config, {
-    //     account: subik
-    // })); 
-    // console.log('client: ', getClient(wagmiConfig.config as Config));
+
     const connectors = await getConnectors(config as Config);
     console.log(connectors);
-    // for (const connector of connectors) {
-    //     console.log('bump')
-    //     const accounts = await connector.getAccounts();
-    //     if (accounts.indexOf(subik) < 0) {
-    //         console.log(`disconnecting ${connector.name}`)
-    //         await disconnect(config as Config, { connector })
-    //         console.log('done')
-    //     } 
-
-    // }
-    for (let i = 0; i < connectors.length; i++) {
-        console.log('bump')
-        const accounts = await connectors[i].getAccounts();
+    for (const connector of connectors) {
+        const accounts = await connector.getAccounts();
         if (accounts.indexOf(subik) < 0) {
-            console.log(`disconnecting ${connectors[i].name}`)
-            await disconnect(config as Config, { connector: connectors[i] })
+            console.log(`disconnecting ${connector.name}`)
+            await disconnect(config as Config, { connector })
             console.log('done')
         }
+
     }
-    // why that does not show, is the function blocking threads somehow?
-    console.log('elo elo 3 2 0')
     console.log('connections: ', await getConnections(config as Config));
 } 
