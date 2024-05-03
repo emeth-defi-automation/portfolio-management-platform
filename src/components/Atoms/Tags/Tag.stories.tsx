@@ -48,7 +48,7 @@ export function WalletNotConnected(args: TagProps) {
 }
 
 Default.args = {
-isBorder: false,
+  isBorder: false,
   text: "Ethereum",
   variant: "default",
   class: "",
