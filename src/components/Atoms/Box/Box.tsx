@@ -29,7 +29,7 @@ export type BoxType = VariantProps<typeof BoxStyles> & BoxProps;
 const Box = ({ variant, ...props }: BoxType) => {
   return (
     <div {...props} class={twMerge(BoxStyles({ variant }), props.customClass)}>
-      <Slot/>
+      <Slot />
     </div>
   );
 };
