@@ -5,10 +5,6 @@ export default {
   component: Box,
 };
 
-export function BoxPopUp(args: BoxProps) {
-  return <Box {...args} />;
-}
-
 export function BoxComponent(args: BoxProps) {
   return <Box {...args} />;
 }
@@ -17,12 +13,8 @@ export function BoxNavbar(args: BoxProps) {
   return <Box {...args} />;
 }
 
-BoxPopUp.args = {
-  variant: "popUp",
-};
-
 BoxComponent.args = {
-  variant: "mainWindow",
+  variant: "box",
 };
 
 BoxNavbar.args = {
