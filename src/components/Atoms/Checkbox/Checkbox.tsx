@@ -1,4 +1,4 @@
-import { cva, VariantProps } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 import { type QRL } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
