@@ -5,7 +5,6 @@ import { twMerge } from "tailwind-merge";
 export interface InputProps {
   placeholder?: string;
   name?: string;
-  type?: "text" | "checkbox";
   value?: string;
   onInput?: QRL<(value: any) => void>;
   customClass?: string;
@@ -48,7 +47,7 @@ const Input = ({ variant, size, ...props }: InputType) => {
         {...props}
         class={twMerge(InputStyles({ variant, size }), props.customClass)}
         placeholder={props.placeholder}
-        type={props.type}
+        type="text"
         name={props.name}
         value={props.value}
         onInput$={props.onInput}

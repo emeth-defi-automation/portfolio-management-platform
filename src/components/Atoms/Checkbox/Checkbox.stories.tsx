@@ -26,6 +26,5 @@ CheckBoxSmall.args = {
 
 ToggleTick.args = {
   variant: "toggleTick",
-  isToggle: true,
   checked: true,
 };
