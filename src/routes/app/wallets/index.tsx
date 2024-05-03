@@ -1,7 +1,6 @@
 import {
   $,
   component$,
-  noSerialize,
   useContext,
   useSignal,
   useStore,
@@ -32,15 +31,11 @@ import {
   readContract,
   simulateContract,
   waitForTransactionReceipt,
-  watchAccount,
   writeContract,
-  disconnect,
-  getConnectors,
   getConnections,
-  getClient,
-  reconnect
+  watchAccount,
 } from "@wagmi/core";
-// import { returnWeb3ModalAndClient } from "~/components/WalletConnect";
+
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
 import CoinsToApprove from "~/components/Forms/CoinsToApprove";
 import AmountOfCoins from "~/components/Forms/AmountOfCoins";
@@ -84,6 +79,7 @@ export default component$(() => {
   const selectedWallet = useSignal<WalletTokensBalances | null>(null);
   const receivingWalletAddress = useSignal("");
   const transferredTokenAmount = useSignal("");
+  const isSecondWalletConnected = useSignal(false);
   const stepsCounter = useSignal(1);
   const addWalletFormStore = useStore<AddWalletFormStore>({
     name: "",
@@ -246,9 +242,18 @@ export default component$(() => {
     }
   });
 
-  useVisibleTask$(({track}) => {
-    track(() => login.address.value)
-    console.log('tutej: ', login.address.value) 
+  useVisibleTask$(async ({track}) => {
+    track(() => wagmiConfig.config)
+    watchAccount(wagmiConfig.config!, {
+      onChange(account) {
+        const connections = getConnections(wagmiConfig.config as Config);
+        if(connections.length > 1){
+          isSecondWalletConnected.value = true
+        } else {
+          isSecondWalletConnected.value = false
+        }
+      }
+    })
   })
   const handleReadBalances = $(async (wallet: string) => {
     const tokenBalances = await getMoralisBalance({ wallet });
@@ -330,10 +335,7 @@ export default component$(() => {
       }
     }
   });
-  const checkConnections = $(async() => {
-        const connections = await getConnections(wagmiConfig.config as Config);
-        return connections.length > 1
-  })
+
   const connectWallet = $(async () => {
     await openWeb3Modal(wagmiConfig!.config);
   });
@@ -485,7 +487,7 @@ export default component$(() => {
                     stepsCounter.value = stepsCounter.value + 1;
                   }}
                   disabled={isProceedDisabled(
-                    addWalletFormStore, {}
+                    addWalletFormStore, isSecondWalletConnected
                   )}
                   text="Proceed"
                 />
