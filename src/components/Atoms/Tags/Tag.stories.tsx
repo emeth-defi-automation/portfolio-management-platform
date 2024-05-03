@@ -48,6 +48,7 @@ export function WalletNotConnected(args: TagProps) {
 }
 
 Default.args = {
+isBorder: false,
   text: "Ethereum",
   variant: "default",
   class: "",
@@ -56,7 +57,7 @@ Default.args = {
 };
 
 Executable.args = {
-  isBorder: true,
+  isBorder: false,
   text: "Executable",
   variant: "gradient",
   class: "font-normal",
@@ -64,6 +65,7 @@ Executable.args = {
 };
 
 Grey.args = {
+  isBorder: false,
   text: "Pending",
   variant: "greyText",
   class: "",
@@ -72,7 +74,7 @@ Grey.args = {
 };
 
 Blue.args = {
-  isBorder: true,
+  isBorder: false,
   text: "In Progress",
   variant: "blueText",
   class: "",
@@ -81,7 +83,7 @@ Blue.args = {
 };
 
 Error.args = {
-  isBorder: true,
+  isBorder: false,
   text: "Error",
   variant: "error",
   class: "",
@@ -90,7 +92,7 @@ Error.args = {
 };
 
 Warning.args = {
-  isBorder: true,
+  isBorder: false,
   text: "Warning",
   variant: "warning",
   class: "",
@@ -99,7 +101,7 @@ Warning.args = {
 };
 
 Success.args = {
-  isBorder: true,
+  isBorder: false,
   text: "Success",
   variant: "success",
   class: "",
@@ -108,7 +110,7 @@ Success.args = {
 };
 
 WalletConnected.args = {
-  isBorder: true,
+  isBorder: false,
   text: "Success",
   variant: "success",
   class: "",
@@ -117,7 +119,7 @@ WalletConnected.args = {
 };
 
 WalletNotConnected.args = {
-  isBorder: true,
+  isBorder: false,
   text: "Wallet Not Connected",
   variant: "warning",
   class: "",
