@@ -73,7 +73,7 @@ export default component$(() => {
   const observedWallets = useSignal<WalletTokensBalances[]>([]);
   const isAddWalletModalOpen = useSignal(false);
   const isDeleteModalOpen = useSignal(false);
-  const transferredCoin = useStore({ symbol: "", address: "" });  
+  const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
   const selectedWallet = useSignal<WalletTokensBalances | null>(null);
   const receivingWalletAddress = useSignal("");
@@ -100,13 +100,14 @@ export default component$(() => {
     for await (const value of data) {
       msg.value = value;
     }
-
-   
   });
- useVisibleTask$(({track}) => {
-  track(() => wagmiConfig.config);
-  console.log('[LOGIN ADDRESS Wallets]: ',login.address.value)
- })
+  useVisibleTask$(() => {
+    console.log("[LOGIN ADDRESS Wallets]: ", login.address.value);
+    console.log(
+      "[LOGIN ADDRESS Wallets storage]: ",
+      localStorage.getItem("emmethUserWalletAddress"),
+    );
+  });
   const handleAddWallet = $(async () => {
     isAddWalletModalOpen.value = false;
 
@@ -135,16 +136,13 @@ export default component$(() => {
 
           for (const token of tokens) {
             if (addWalletFormStore.coinsToCount.includes(token.symbol)) {
-              const tokenBalance = await readContract(
-                wagmiConfig.config,
-                {
-                  account: account.address as `0x${string}`,
-                  abi: contractABI,
-                  address: checksumAddress(token.address as `0x${string}`),
-                  functionName: "balanceOf",
-                  args: [account.address as `0x${string}`],
-                },
-              );
+              const tokenBalance = await readContract(wagmiConfig.config, {
+                account: account.address as `0x${string}`,
+                abi: contractABI,
+                address: checksumAddress(token.address as `0x${string}`),
+                functionName: "balanceOf",
+                args: [account.address as `0x${string}`],
+              });
 
               const amount = addWalletFormStore.coinsToApprove.find(
                 (item) => item.symbol === token.symbol,
@@ -157,23 +155,17 @@ export default component$(() => {
                 BigInt(denominator);
 
               if (tokenBalance) {
-                const approval = await simulateContract(
-                  wagmiConfig.config,
-                  {
-                    account: account.address as `0x${string}`,
-                    abi: contractABI,
-                    address: checksumAddress(token.address as `0x${string}`),
-                    functionName: "approve",
-                    args: [emethContractAddress, BigInt(calculation)],
-                  },
-                );
+                const approval = await simulateContract(wagmiConfig.config, {
+                  account: account.address as `0x${string}`,
+                  abi: contractABI,
+                  address: checksumAddress(token.address as `0x${string}`),
+                  functionName: "approve",
+                  args: [emethContractAddress, BigInt(calculation)],
+                });
 
                 // keep receipts for now, to use waitForTransactionReceipt
                 try {
-                  await writeContract(
-                    wagmiConfig.config,
-                    approval.request,
-                  );
+                  await writeContract(wagmiConfig.config, approval.request);
                 } catch (err) {
                   console.error("Error: ", err);
                 }
@@ -223,7 +215,7 @@ export default component$(() => {
         isVisible: true,
       });
 
-      await addAddressToStreamConfig( 
+      await addAddressToStreamConfig(
         streamId,
         addWalletFormStore.address as `0x${string}`,
       );
@@ -234,7 +226,7 @@ export default component$(() => {
       addWalletFormStore.coinsToCount = [];
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
-      
+
       if (wagmiConfig.config) {
         await disconnectWallets(wagmiConfig.config);
       }
@@ -249,19 +241,19 @@ export default component$(() => {
     }
   });
 
-  useVisibleTask$(async ({track}) => {
-    track(() => wagmiConfig.config)
+  useVisibleTask$(async ({ track }) => {
+    track(() => wagmiConfig.config);
     watchAccount(wagmiConfig.config!, {
       onChange(account) {
         const connections = getConnections(wagmiConfig.config as Config);
-        if(connections.length > 1){
-          isSecondWalletConnected.value = true
+        if (connections.length > 1) {
+          isSecondWalletConnected.value = true;
         } else {
-          isSecondWalletConnected.value = false
+          isSecondWalletConnected.value = false;
         }
-      }
-    })
-  })
+      },
+    });
+  });
   const handleReadBalances = $(async (wallet: string) => {
     const tokenBalances = await getMoralisBalance({ wallet });
 
@@ -319,7 +311,10 @@ export default component$(() => {
           isVisible: true,
         });
 
-        const transactionHash = await writeContract(wagmiConfig.config, request);
+        const transactionHash = await writeContract(
+          wagmiConfig.config,
+          request,
+        );
 
         await waitForTransactionReceipt(wagmiConfig.config, {
           hash: transactionHash,
@@ -495,7 +490,8 @@ export default component$(() => {
                     stepsCounter.value = stepsCounter.value + 1;
                   }}
                   disabled={isProceedDisabled(
-                    addWalletFormStore, isSecondWalletConnected
+                    addWalletFormStore,
+                    isSecondWalletConnected,
                   )}
                   text="Proceed"
                 />

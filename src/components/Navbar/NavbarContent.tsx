@@ -41,8 +41,7 @@ export const NavbarContent = component$(() => {
             document.cookie =
               "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/app;";
 
-    
-            await disconnectWallets(wagmiConfig.config);
+            await disconnectWallets(wagmiConfig.config, true);
             login.account = undefined;
             login.address.value = undefined;
             login.chainId.value = undefined;

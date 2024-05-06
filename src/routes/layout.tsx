@@ -2,15 +2,20 @@ import {
   component$,
   Slot,
   useContextProvider,
-
   noSerialize,
   useVisibleTask$,
   useTask$,
   useContext,
-  useSignal
+  useSignal,
 } from "@builder.io/qwik";
-import {  type RequestHandler } from "@builder.io/qwik-city";
-import { Config, getConnections, getConnectors, reconnect, watchAccount } from "@wagmi/core";
+import { type RequestHandler } from "@builder.io/qwik-city";
+import {
+  Config,
+  getConnections,
+  getConnectors,
+  reconnect,
+  watchAccount,
+} from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, sepolia } from "viem/chains";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
@@ -43,7 +48,7 @@ export const onGet: RequestHandler = async ({ cacheControl }) => {
 };
 
 export default component$(() => {
-  const metadata = {   
+  const metadata = {
     name: import.meta.env.PUBLIC_METADATA_NAME,
     description: import.meta.env.PUBLIC_METADATA_DESCRIPTION,
     url: "https://web3modal.com",
@@ -51,7 +56,7 @@ export default component$(() => {
   };
 
   useContextProvider(WagmiConfigContext, {
-    config: undefined
+    config: undefined,
   });
 
   useContextProvider(LoginContext, {
@@ -65,41 +70,46 @@ export default component$(() => {
 
   useVisibleTask$(() => {
     const wconfig = defaultWagmiConfig({
-      chains: [mainnet, sepolia], 
+      chains: [mainnet, sepolia],
       projectId: import.meta.env.PUBLIC_PROJECT_ID,
       metadata,
     });
 
     wagmiConfig.config = noSerialize(wconfig);
 
-    console.log('wagmi config: ', wagmiConfig.config);   
-    console.log('loc: ', window.location.pathname);
-    console.log('loc full: ', window.location);
+    console.log("wagmi config: ", wagmiConfig.config);
+    console.log("loc: ", window.location.pathname);
+    console.log("loc full: ", window.location);
 
-    if(wagmiConfig.config){
-    
-       
-      watchAccount(wagmiConfig.config!, {  
-          onChange(account) {
+    if (wagmiConfig.config) {
+      watchAccount(wagmiConfig.config!, {
+        onChange(account) {
+          console.log(
+            "connections: ",
+            getConnections(wagmiConfig.config as Config),
+          );
+          // po podpieciu drugiego walleta login zostaje zmieniony na adress nowego walleta
+          if (
+            window.location.pathname === "/" ||
+            window.location.pathname === "/signin"
+          ) {
+            console.log("location action");
+            localStorage.setItem(
+              "emmethUserWalletAddress",
+              `${account.address}`,
+            );
+            login.account = noSerialize(account);
+            login.address.value = account.address;
+            login.chainId.value = account.chainId;
+          } else {
+            reconnect(wagmiConfig.config as Config);
+          }
 
-          console.log('connections: ', getConnections(wagmiConfig.config as Config));
-            // po podpieciu drugiego walleta login zostaje zmieniony na adress nowego walleta
-            if(window.location.pathname === '/' || window.location.pathname === '/signin'){
-              console.log('location action');
-              localStorage.setItem('emmethUserWalletAddress', `${account.address}`);
-              login.account = noSerialize(account); 
-              login.address.value = account.address;
-              login.chainId.value = account.chainId;
-            } else {
-              reconnect(wagmiConfig.config as Config);
-            }
-         
-
-          console.log('[LOGIN ADDRESS LAYOUT]: ',login.address.value)
-      },
-    });
-  }
-  })
+          console.log("[LOGIN ADDRESS LAYOUT]: ", login.address.value);
+        },
+      });
+    }
+  });
 
   useContextProvider(StreamStoreContext, { streamId: "" });
   const streamStore = useContext(StreamStoreContext);
@@ -109,7 +119,7 @@ export default component$(() => {
     const stream = await getStream();
     streamStore.streamId = stream["jsonResponse"]["id"];
   });
- 
+
   // eslint-disable-next-line qwik/no-use-visible-task
 
   useTask$(async function () {
@@ -118,7 +128,6 @@ export default component$(() => {
     streamStore.streamId = stream["jsonResponse"]["id"];
   });
 
-  
   return (
     <>
       <main class="h-screen overflow-auto bg-black font-['Sora'] text-white">

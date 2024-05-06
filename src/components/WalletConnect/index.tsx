@@ -23,4 +23,3 @@ export default component$<ButtonProps>((props) => {
     ></ConnectButton>
   );
 });
-

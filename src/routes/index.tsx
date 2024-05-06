@@ -1,9 +1,5 @@
 import { HeroText } from "~/components/HeroText/HeroText";
-import {
-  component$,
-  useContext,
-  useVisibleTask$,
-} from "@builder.io/qwik";
+import { component$, useContext, useVisibleTask$ } from "@builder.io/qwik";
 import { ConnectButton } from "~/components/Buttons/Buttons";
 import WalletConnect from "~/components/WalletConnect";
 import { Copyright } from "~/components/Paragraph/Paragraph";
@@ -14,13 +10,12 @@ import { useNavigate } from "@builder.io/qwik-city";
 export default component$(() => {
   const login = useContext(LoginContext);
   const nav = useNavigate();
-  
-  useVisibleTask$(async ({track}) => {
-    track(() => login.address.value)
-    console.log('login index: ',login)
 
-    if(login.address.value){
-      await nav('/signin')
+  useVisibleTask$(async ({ track }) => {
+    track(() => login.address.value);
+
+    if (login.address.value) {
+      await nav("/signin");
     }
   });
   return (

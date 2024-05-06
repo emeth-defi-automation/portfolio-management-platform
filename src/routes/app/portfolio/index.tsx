@@ -174,7 +174,10 @@ export default component$(() => {
           message: "Transferring tokens...",
           isVisible: true,
         });
-        const transactionHash = await writeContract(wagmiConfig.config, request);
+        const transactionHash = await writeContract(
+          wagmiConfig.config,
+          request,
+        );
 
         await waitForTransactionReceipt(wagmiConfig.config, {
           hash: transactionHash,

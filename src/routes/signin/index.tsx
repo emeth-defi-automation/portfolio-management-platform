@@ -23,7 +23,7 @@ export default component$(() => {
   const login = useContext(LoginContext);
 
   const signInHandler = $(async () => {
-    console.log('login: ', login)
+    console.log("login: ", login);
     if (login.address.value && login.chainId.value) {
       const address = login.address.value;
       const chainId = login.chainId.value;
@@ -54,7 +54,7 @@ export default component$(() => {
   });
 
   const cancelHandler = $(async () => {
-    await disconnectWallets(wagmiConfig.config);
+    await disconnectWallets(wagmiConfig.config, true);
     login.account = undefined;
     login.address.value = undefined;
     login.chainId.value = undefined;
