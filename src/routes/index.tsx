@@ -4,13 +4,22 @@ import { ConnectButton } from "~/components/Buttons/Buttons";
 import WalletConnect from "~/components/WalletConnect";
 import { Copyright } from "~/components/Paragraph/Paragraph";
 import IconLogo from "/public/assets/icons/logo.svg?jsx";
-import { LoginContext } from "~/components/WalletConnect/context";
+import {
+  LoginContext,
+  WagmiConfigContext,
+} from "~/components/WalletConnect/context";
 import { useNavigate } from "@builder.io/qwik-city";
+import { disconnectWallets } from "~/utils/walletConnections";
+import { Config } from "@wagmi/core";
 
 export default component$(() => {
   const login = useContext(LoginContext);
   const nav = useNavigate();
+  const wagmiConfig = useContext(WagmiConfigContext);
 
+  useVisibleTask$(async () => {
+    await disconnectWallets(wagmiConfig.config);
+  });
   useVisibleTask$(async ({ track }) => {
     track(() => login.address.value);
 
