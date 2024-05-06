@@ -90,7 +90,8 @@ export default component$(() => {
     coinsToApprove: [],
   });
   const getWalletBalanceHistory = useGetBalanceHistory();
- 
+  const login = useContext(LoginContext);
+
   const msg = useSignal("1");
 
   // eslint-disable-next-line qwik/no-use-visible-task
@@ -99,8 +100,13 @@ export default component$(() => {
     for await (const value of data) {
       msg.value = value;
     }
-  });
 
+   
+  });
+ useVisibleTask$(({track}) => {
+  track(() => wagmiConfig.config);
+  console.log('[LOGIN ADDRESS]: ', login.address);
+ })
   const handleAddWallet = $(async () => {
     isAddWalletModalOpen.value = false;
 

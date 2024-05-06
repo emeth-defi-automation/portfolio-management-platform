@@ -14,6 +14,7 @@ import { disconnect, signMessage } from "@wagmi/core";
 import { SiweMessage } from "siwe";
 import { HeroText } from "~/components/HeroText/HeroText";
 import IconHandshake from "/public/assets/icons/signin/handshake.svg?jsx";
+import { disconnectWallets } from "~/utils/walletConnections";
 
 export default component$(() => {
   const nav = useNavigate();
@@ -53,7 +54,10 @@ export default component$(() => {
   });
 
   const cancelHandler = $(async () => {
-    await disconnect(wagmiConfig.config!);
+    await disconnectWallets(wagmiConfig.config);
+    login.account = undefined;
+    login.address.value = undefined;
+    login.chainId.value = undefined;
     await nav("/");
   });
 

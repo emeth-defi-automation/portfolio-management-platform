@@ -65,27 +65,33 @@ export default component$(() => {
 
   useVisibleTask$(() => {
     const wconfig = defaultWagmiConfig({
-      chains: [mainnet, sepolia],
+      chains: [mainnet, sepolia], 
       projectId: import.meta.env.PUBLIC_PROJECT_ID,
       metadata,
     });
 
     wagmiConfig.config = noSerialize(wconfig);
 
-    console.log('wagmi config: ', wagmiConfig.config);  
+    console.log('wagmi config: ', wagmiConfig.config);   
+    console.log('loc: ', window.location.pathname);
+    console.log('loc full: ', window.location);
 
     if(wagmiConfig.config){
-      reconnect(wagmiConfig.config);
+    
        
       watchAccount(wagmiConfig.config!, {  
           onChange(account) {
 
           console.log('connections: ', getConnections(wagmiConfig.config as Config));
             // po podpieciu drugiego walleta login zostaje zmieniony na adress nowego walleta
-            if(login.address.value === undefined){
-              login.account = noSerialize(account);
+            if(window.location.pathname === '/' || window.location.pathname === '/signin'){
+              console.log('location action');
+              localStorage.setItem('emmethUserWalletAddress', `${account.address}`);
+              login.account = noSerialize(account); 
               login.address.value = account.address;
               login.chainId.value = account.chainId;
+            } else {
+              reconnect(wagmiConfig.config as Config);
             }
          
 

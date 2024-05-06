@@ -1,18 +1,19 @@
 import { component$, useContext } from "@builder.io/qwik";
 import ImgAvatar from "/public/assets/images/avatar.png?jsx";
 import IconLogout from "/public/assets/icons/logout.svg?jsx";
-// import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
-import { WagmiConfigContext } from "../WalletConnect/context";
+import { LoginContext, WagmiConfigContext } from "../WalletConnect/context";
 import { type Config, disconnect, getAccount } from "@wagmi/core";
 import { NavLink } from "./NavLink";
 import { useNavigate } from "@builder.io/qwik-city";
+import { disconnectWallets } from "~/utils/walletConnections";
 
 export const NavbarContent = component$(() => {
   const nav = useNavigate();
-  const modalStore = useContext(WagmiConfigContext);
+  const login = useContext(LoginContext);
+  const wagmiConfig = useContext(WagmiConfigContext);
   let address;
-  modalStore.config &&
-    (({ address } = getAccount(modalStore.config)),
+  wagmiConfig.config &&
+    (({ address } = getAccount(wagmiConfig.config)),
     address && (address = address.slice(0, 4) + "..." + address.slice(-4)));
   return (
     <>
@@ -40,7 +41,11 @@ export const NavbarContent = component$(() => {
             document.cookie =
               "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/app;";
 
-            await disconnect(modalStore.config as Config);
+    
+            await disconnectWallets(wagmiConfig.config);
+            login.account = undefined;
+            login.address.value = undefined;
+            login.chainId.value = undefined;
             await nav("/");
           }}
         >
