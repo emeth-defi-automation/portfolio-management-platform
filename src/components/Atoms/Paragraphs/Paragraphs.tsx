@@ -11,7 +11,6 @@ const ParagraphStyles = cva(["font-['Sora']"], {
     variant: {
       primaryText: ["color-white"],
       secondaryText: ["custom-text-50"],
-      greenText: ["color-customGreen"],
       gradientText: ["custom-text-gradient text-transparent"],
     },
     size: {
