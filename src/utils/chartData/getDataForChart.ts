@@ -2,10 +2,10 @@ import { server$ } from "@builder.io/qwik-city";
 import { generateTimestamps } from "../timestamps/timestamp";
 import { getTokenBalancesForChart } from "./getTokenBalancesForChart";
 import { getTokenPricesForCharts } from "./getTokenPricesForChart";
-import { getBlockNumbersFromTimestamps } from "./getBlockNumbersFromTimestamps";
+import { getEthBlockNumbersFromTimestamps, getSepBlockNumbersFromTimestamps } from "./getBlockNumbersFromTimestamps";
 import { convertWeiToQuantity } from "../formatBalances/formatTokenBalance";
 
-interface ChartData {
+export interface ChartData {
   value: number;
   timestamp: string;
 }
@@ -16,11 +16,13 @@ export const getDataForChart = server$(async function (
 ): Promise<ChartData[]> {
   const chartData: ChartData[] = [];
   const timestamps: string[] = generateTimestamps(period, interval);
-  const blockNumbers: number[] =
-    await getBlockNumbersFromTimestamps(timestamps);
-  for (let i = 0; i < blockNumbers.length; i++) {
-    const tokensBalances = await getTokenBalancesForChart(blockNumbers[i]);
-    const tokensPrices = await getTokenPricesForCharts(blockNumbers[i]);
+  const ethBlockNumbers: number[] =
+    await getEthBlockNumbersFromTimestamps(timestamps);
+const sepBlockNumbers: number[] = 
+    await getSepBlockNumbersFromTimestamps(timestamps);
+  for (let i = 0; i < ethBlockNumbers.length; i++) {
+    const tokensBalances = await getTokenBalancesForChart(sepBlockNumbers[i]);
+    const tokensPrices = await getTokenPricesForCharts(ethBlockNumbers[i]);
     let partialSum = 0;
     for (const token of tokensBalances) {
       const tokenPrice =

@@ -33,7 +33,7 @@ export const getBalanceHistory = server$(async function (
         for (const transaction of filteredHistory) {
           const newRecord = {
             timestamp: transaction.block_timestamp,
-            blockNumber: transaction.block_number,
+            blockNumber: Number(transaction.block_number),
             value: token.balance,
             walletId: walletId,
             tokenSymbol: token.symbol,
@@ -57,4 +57,5 @@ export const getBalanceHistory = server$(async function (
   } catch (err) {
     console.log("Nasz error");
   }
+  console.log("Done")
 });
