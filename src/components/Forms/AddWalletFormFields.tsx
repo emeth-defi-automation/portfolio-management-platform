@@ -1,4 +1,4 @@
-import { type QRL, component$, $, type Signal } from "@builder.io/qwik";
+import { type QRL, component$, $ } from "@builder.io/qwik";
 import { getAddress } from "viem";
 import { Input } from "~/components/Input/Input";
 
@@ -16,7 +16,7 @@ import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 export interface AddWalletFormFieldsProps {
   addWalletFormStore: AddWalletFormStore;
   onConnectWalletClick: QRL<() => void>;
-  isWalletConnected: Signal<boolean | undefined>;
+  isWalletConnected: boolean | undefined;
 }
 
 export default component$<AddWalletFormFieldsProps>(
