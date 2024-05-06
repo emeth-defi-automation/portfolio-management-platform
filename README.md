@@ -154,6 +154,8 @@ npm run test.e2e.setup
 
 #### Run
 
+Verify e2e environment variables (starting with `PW_` prefix) in `.env` and `.env.local` files. Check on what destination tests will be run against (`PW_BASE_URL`). In case of running against local environment, you need to run the whole local setup before (as above).
+
 Run e2e scenarios:
 
 ```bash
