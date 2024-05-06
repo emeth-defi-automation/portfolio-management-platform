@@ -1,6 +1,6 @@
 import { $, component$, useContext } from "@builder.io/qwik";
 import { useLocation, useNavigate } from "@builder.io/qwik-city";
-import { disconnect, getAccount, signMessage } from "@wagmi/core";
+import { signMessage } from "@wagmi/core";
 import { SiweMessage } from "siwe";
 import { Button } from "~/components/Buttons/Buttons";
 import { HeroText } from "~/components/HeroText/HeroText";
@@ -13,9 +13,7 @@ import {
   getNonceServer,
   verifyMessageServer,
 } from "~/components/WalletConnect/server";
-import { signMessage } from "@wagmi/core";
-import { SiweMessage } from "siwe";
-import { HeroText } from "~/components/HeroText/HeroText";
+
 import IconHandshake from "/public/assets/icons/signin/handshake.svg?jsx";
 import { disconnectWallets } from "~/utils/walletConnections";
 
@@ -37,7 +35,7 @@ export default component$(() => {
         domain: loc.url.host,
         uri: loc.url.origin,
         address,
-        chainId,
+        chainId, 
         nonce,
         // Human-readable ASCII assertion that the user will sign, and it must not contain `\n`.
         statement: "Sign to continue...",

@@ -39,7 +39,7 @@ export default component$(() => {
               image="/assets/icons/login/walletconnect.svg"
               text="Use WalletConnect"
               dataTestId="use-walletconnect-button"
-                />
+            />
           </div>
         </div>
         <div class="grid h-full items-end justify-items-center gap-6 pb-10">
