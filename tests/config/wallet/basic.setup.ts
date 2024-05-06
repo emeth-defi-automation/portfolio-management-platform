@@ -5,7 +5,8 @@ const SEED_PHRASE =
 const PASSWORD = "Password123";
 
 export default defineWalletSetup(PASSWORD, async (context, walletPage) => {
-  const metamask = new MetaMask(context, walletPage, PASSWORD);
+  // TODO: Remove `as any`
+  const metamask = new MetaMask(context as any, walletPage as any, PASSWORD);
 
   await metamask.importWallet(SEED_PHRASE);
 });
