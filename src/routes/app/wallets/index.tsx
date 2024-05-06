@@ -19,10 +19,7 @@ import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import {
-  LoginContext,
-  WagmiConfigContext,
-} from "~/components/WalletConnect/context";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
 
 import {
@@ -90,7 +87,6 @@ export default component$(() => {
     coinsToApprove: [],
   });
   const getWalletBalanceHistory = useGetBalanceHistory();
-  const login = useContext(LoginContext);
 
   const msg = useSignal("1");
 
@@ -238,7 +234,7 @@ export default component$(() => {
   useVisibleTask$(async ({ track }) => {
     track(() => wagmiConfig.config);
     watchAccount(wagmiConfig.config!, {
-      onChange(account) {
+      onChange() {
         const connections = getConnections(wagmiConfig.config as Config);
         if (connections.length > 1) {
           isSecondWalletConnected.value = true;

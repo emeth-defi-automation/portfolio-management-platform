@@ -9,13 +9,7 @@ import {
   useSignal,
 } from "@builder.io/qwik";
 import { type RequestHandler } from "@builder.io/qwik-city";
-import {
-  Config,
-  getConnections,
-  getConnectors,
-  reconnect,
-  watchAccount,
-} from "@wagmi/core";
+import { type Config, reconnect, watchAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, sepolia } from "viem/chains";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
@@ -80,13 +74,8 @@ export default component$(() => {
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {
         onChange(account) {
-         
-          if (
-            window.location.pathname === "/" 
-
-          ) {
-          
-            localStorage.setItem( 
+          if (window.location.pathname === "/") {
+            localStorage.setItem(
               "emmethUserWalletAddress",
               `${account.address}`,
             );
@@ -96,8 +85,6 @@ export default component$(() => {
           } else {
             reconnect(wagmiConfig.config as Config);
           }
-
-         
         },
       });
     }

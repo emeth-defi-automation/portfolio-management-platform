@@ -1,4 +1,4 @@
-import { component$, $, useContext, QRL } from "@builder.io/qwik";
+import { component$, $, useContext, type QRL } from "@builder.io/qwik";
 import { ConnectButton, type ButtonProps } from "../Buttons/Buttons";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { openWeb3Modal } from "~/utils/walletConnections";

@@ -1,8 +1,4 @@
-import {
-  type NoSerialize,
-  createContextId,
-  type Signal,
-} from "@builder.io/qwik";
+import { type NoSerialize, createContextId } from "@builder.io/qwik";
 import { type Config } from "@wagmi/core";
 
 export interface ModalStore {

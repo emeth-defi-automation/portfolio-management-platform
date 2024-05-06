@@ -2,7 +2,7 @@ import { component$, useContext } from "@builder.io/qwik";
 import ImgAvatar from "/public/assets/images/avatar.png?jsx";
 import IconLogout from "/public/assets/icons/logout.svg?jsx";
 import { LoginContext, WagmiConfigContext } from "../WalletConnect/context";
-import { type Config, disconnect, getAccount } from "@wagmi/core";
+import { getAccount } from "@wagmi/core";
 import { NavLink } from "./NavLink";
 import { useNavigate } from "@builder.io/qwik-city";
 import { disconnectWallets } from "~/utils/walletConnections";
@@ -41,11 +41,11 @@ export const NavbarContent = component$(() => {
             document.cookie =
               "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/app;";
 
-              login.account = undefined;
-              login.address.value = undefined;
-              login.chainId.value = undefined;
-              await disconnectWallets(wagmiConfig.config, true);
-              await nav("/");   
+            login.account = undefined;
+            login.address.value = undefined;
+            login.chainId.value = undefined;
+            await disconnectWallets(wagmiConfig.config, true);
+            await nav("/");
           }}
         >
           <IconLogout />

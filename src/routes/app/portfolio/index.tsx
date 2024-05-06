@@ -24,7 +24,6 @@ import {
   writeContract,
   waitForTransactionReceipt,
 } from "@wagmi/core";
-import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import { getCookie } from "~/utils/refresh";
 import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";

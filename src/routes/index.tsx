@@ -14,13 +14,9 @@ export default component$(() => {
   useVisibleTask$(async ({ track }) => {
     track(() => login.address.value);
 
-    if (localStorage.getItem('emmethUserWalletAddress')) {
-      console.log('local address: ',localStorage.getItem('emmethUserWalletAddress'))  
-      await nav("/signin"); 
+    if (localStorage.getItem("emmethUserWalletAddress")) {
+      await nav("/signin");
     }
-    // if (login.address.value) {
-    //   await nav("/signin");   
-    // }
   });
   return (
     <>
