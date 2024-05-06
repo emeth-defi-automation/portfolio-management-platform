@@ -27,7 +27,7 @@ export const disconnectWallets = async (
     logout?: boolean,
 ) => {
     if (!logout) {
-        console.log("connections: ", await getConnections(config as Config));
+
 
         const loginAddress = localStorage.getItem("emmethUserWalletAddress");
         const connectors = await getConnectors(config as Config);
@@ -35,11 +35,13 @@ export const disconnectWallets = async (
         for (const connector of connectors) {
             const accounts = await connector.getAccounts();
             if (accounts.indexOf(loginAddress as `0x${string}`) < 0) {
+
+
                 await disconnect(config as Config, { connector });
             }
         }
 
-        console.log("connections: ", await getConnections(config as Config));
+
 
     } else {
         const connectors = await getConnectors(config as Config);
@@ -47,10 +49,11 @@ export const disconnectWallets = async (
         for (const connector of connectors) {
             await disconnect(config as Config, { connector });
         }
+
+        if (localStorage.getItem("emmethUserWalletAddress")) {
+            localStorage.removeItem("emmethUserWalletAddress");
+        }
+
         await disconnect(config as Config);
-
-        localStorage.removeItem("emmethUserWalletAddress");
-
-        console.log("connections: ", await getConnections(config as Config));
     }
 };

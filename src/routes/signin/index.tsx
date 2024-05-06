@@ -23,7 +23,6 @@ export default component$(() => {
   const login = useContext(LoginContext);
 
   const signInHandler = $(async () => {
-    console.log("login: ", login);
     if (login.address.value && login.chainId.value) {
       const address = login.address.value;
       const chainId = login.chainId.value;

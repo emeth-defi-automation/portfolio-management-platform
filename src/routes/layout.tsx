@@ -77,24 +77,16 @@ export default component$(() => {
 
     wagmiConfig.config = noSerialize(wconfig);
 
-    console.log("wagmi config: ", wagmiConfig.config);
-    console.log("loc: ", window.location.pathname);
-    console.log("loc full: ", window.location);
-
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {
         onChange(account) {
-          console.log(
-            "connections: ",
-            getConnections(wagmiConfig.config as Config),
-          );
-          // po podpieciu drugiego walleta login zostaje zmieniony na adress nowego walleta
+         
           if (
-            window.location.pathname === "/" ||
-            window.location.pathname === "/signin"
+            window.location.pathname === "/" 
+
           ) {
-            console.log("location action");
-            localStorage.setItem(
+          
+            localStorage.setItem( 
               "emmethUserWalletAddress",
               `${account.address}`,
             );
@@ -105,7 +97,7 @@ export default component$(() => {
             reconnect(wagmiConfig.config as Config);
           }
 
-          console.log("[LOGIN ADDRESS LAYOUT]: ", login.address.value);
+         
         },
       });
     }

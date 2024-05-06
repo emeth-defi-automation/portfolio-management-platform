@@ -101,13 +101,7 @@ export default component$(() => {
       msg.value = value;
     }
   });
-  useVisibleTask$(() => {
-    console.log("[LOGIN ADDRESS Wallets]: ", login.address.value);
-    console.log(
-      "[LOGIN ADDRESS Wallets storage]: ",
-      localStorage.getItem("emmethUserWalletAddress"),
-    );
-  });
+
   const handleAddWallet = $(async () => {
     isAddWalletModalOpen.value = false;
 
