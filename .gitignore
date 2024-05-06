@@ -53,3 +53,6 @@ lerna-debug.log*
 /test-report
 /blob-report
 /playwright/.cache
+
+# Synpress
+.cache-synpress
