@@ -35,7 +35,7 @@ export default component$(() => {
         domain: loc.url.host,
         uri: loc.url.origin,
         address,
-        chainId, 
+        chainId,
         nonce,
         // Human-readable ASCII assertion that the user will sign, and it must not contain `\n`.
         statement: "Sign to continue...",

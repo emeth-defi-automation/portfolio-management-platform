@@ -407,7 +407,7 @@ export default component$(() => {
                 <AddWalletFormFields
                   addWalletFormStore={addWalletFormStore}
                   onConnectWalletClick={connectWallet}
-                  isWalletConnected={false}
+                  isWalletConnected={isSecondWalletConnected}
                 />
               </>
             ) : null}
@@ -614,13 +614,3 @@ export default component$(() => {
     </>
   );
 });
-
-// const isExecutableClass = (addWalletFormStore: addWalletFormStore) =>
-//   isExecutableDisabled(addWalletFormStore)
-//     ? "bg-modal-button text-gray-400"
-//     : "bg-black";
-
-// const isNotExecutableClass = (addWalletFormStore: addWalletFormStore) =>
-//   isNotExecutableDisabled(addWalletFormStore)
-//     ? "bg-modal-button text-gray-400"
-//     : "bg-black";
