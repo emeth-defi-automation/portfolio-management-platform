@@ -1,6 +1,9 @@
 import { $, component$, useContext } from "@builder.io/qwik";
 import { useLocation, useNavigate } from "@builder.io/qwik-city";
+import { disconnect, getAccount, signMessage } from "@wagmi/core";
+import { SiweMessage } from "siwe";
 import { Button } from "~/components/Buttons/Buttons";
+import { HeroText } from "~/components/HeroText/HeroText";
 import { Copyright } from "~/components/Paragraph/Paragraph";
 import {
   LoginContext,
@@ -76,12 +79,14 @@ export default component$(() => {
               onClick$={cancelHandler}
               text="Cancel"
               class="custom-border-2 w-full"
+              dataTestId="cancel-button"
             />
             <Button
               onClick$={signInHandler}
               text="Accept and Sign"
               class="custom-btn-gradient w-full border-none p-[2px]"
               divClass="rounded-10 bg-black py-[14px]"
+              dataTestId="accept-and-sign-button"
             />
           </div>
         </div>

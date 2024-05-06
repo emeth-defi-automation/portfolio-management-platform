@@ -20,6 +20,7 @@ export default component$<ButtonProps>((props) => {
       text={props.text}
       image={props.image}
       class={props.class}
+      dataTestId={props.dataTestId}
     ></ConnectButton>
   );
 });

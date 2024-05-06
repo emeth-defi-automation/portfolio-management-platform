@@ -33,11 +33,13 @@ export default component$(() => {
             <WalletConnect
               image="/assets/icons/login/metamask.svg"
               text="Use Metamask"
+              dataTestId="use-metamask-button"
             />
             <WalletConnect
               image="/assets/icons/login/walletconnect.svg"
               text="Use WalletConnect"
-            />
+              dataTestId="use-walletconnect-button"
+                />
           </div>
         </div>
         <div class="grid h-full items-end justify-items-center gap-6 pb-10">
@@ -45,6 +47,7 @@ export default component$(() => {
             image="/assets/icons/info-white.svg"
             text="How to use Wallet?"
             class="w-52 !border-0 bg-customBlue py-2 pl-2 pr-3 text-xs"
+            dataTestId="how-to-use-wallet-button"
           />
           <Copyright />
         </div>
