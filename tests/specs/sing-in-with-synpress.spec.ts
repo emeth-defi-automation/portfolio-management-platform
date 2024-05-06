@@ -12,7 +12,7 @@ test.describe('sign in', () => {
     await loginPage.navigate();
   });
 
-  test.only("should allow user to connect wallet with 'Use Metamask' flow", async ({ context, page, extensionId }) => {
+  test("should allow user to connect wallet with 'Use Metamask' flow", async ({ context, page, extensionId }) => {
     const metamask = new MetaMask(context, page, basicSetup.walletPassword, extensionId);
 
     const loginPage = new LoginPage(page);
