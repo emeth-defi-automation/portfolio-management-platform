@@ -57,7 +57,7 @@ jobs:
       - name: Get Playwright version
         id: playwright-version
         run: |
-          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright/test | sed 's/.*@//;s/ deduped//')
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright/test | sed 's/.*@//;s/ deduped//' | sort | uniq)
           echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
 
       - name: Cache Playwright dependencies
