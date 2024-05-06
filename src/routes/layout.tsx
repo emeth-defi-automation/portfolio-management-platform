@@ -95,7 +95,7 @@ export default component$(() => {
             }
          
 
-          console.log(login.address.value)
+          console.log('[LOGIN ADDRESS LAYOUT]: ',login.address.value)
       },
     });
   }

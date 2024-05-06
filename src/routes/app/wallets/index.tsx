@@ -105,7 +105,7 @@ export default component$(() => {
   });
  useVisibleTask$(({track}) => {
   track(() => wagmiConfig.config);
-  console.log('[LOGIN ADDRESS]: ', login.address);
+  console.log('[LOGIN ADDRESS Wallets]: ',login.address.value)
  })
   const handleAddWallet = $(async () => {
     isAddWalletModalOpen.value = false;
