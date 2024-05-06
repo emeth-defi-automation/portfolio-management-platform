@@ -1,6 +1,6 @@
 import Checkbox, { type CheckboxProps } from "./Checkbox";
 
-export default { title: "atoms/checkbox", component: Checkbox };
+export default { title: "atoms/Checkbox", component: Checkbox };
 
 export function CheckBoxLarge(args: CheckboxProps) {
   return <Checkbox {...args} />;

@@ -15,7 +15,8 @@ const CheckboxStyles = cva(["cursor-pointer"], {
   variants: {
     variant: {
       checkTick: [
-        "border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg relative z-10 appearance-none rounded checked:after:absolute checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]",
+        // "checked:before:custom-btn-gradient custom-border-1 custom-bg-white checked checked:after:border-bg relative z-10 appearance-none rounded checked:after:absolute checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]",
+        'appearance-none custom-border-1 rounded custom-bg-white checkbox-gradient-border'
       ],
       toggleTick: ["opacity-0 w-8 h-5 absolute"],
     },
@@ -24,7 +25,8 @@ const CheckboxStyles = cva(["cursor-pointer"], {
         "h-5 w-5 checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5",
       ],
       large: [
-        "h-6 w-6 checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2",
+        // "h-6 w-6 checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2",
+        'h-6 w-6'
       ],
     },
     defaultVariant: {

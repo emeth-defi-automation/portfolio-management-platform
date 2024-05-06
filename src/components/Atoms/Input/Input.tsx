@@ -14,14 +14,14 @@ export interface InputProps {
 
 const InputStyles = cva(
   [
-    "custom-border-1 w-full cursor-pointer rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora']",
+    "custom-border-1 min-w-[20rem] w-full cursor-pointer rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora']",
   ],
   {
     variants: {
       variant: {
-        search: ["background-search px-10"],
+        search: ["bg-[url('/assets/icons/search.svg')] bg-no-repeat bg-[position:12px_50%] pl-10"],
         checked: [
-          "background-checked text-customGreen !border-customGreen placeholder:text-opacity-50",
+          "bg-[url('/assets/icons/dashboard/success.svg')] bg-[size:16px_16px] bg-no-repeat bg-[position:right_12px_top_50%] text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
         ],
       },
       size: {
@@ -45,7 +45,7 @@ const Input = ({ variant, size, ...props }: InputType) => {
     <>
       <input
         {...props}
-        class={twMerge(InputStyles({ variant, size }), props.customClass)}
+        class={twMerge(InputStyles({ variant, size }), props.subValue ? "pr-[80px]": null, props.customClass)}
         placeholder={props.placeholder}
         type="text"
         name={props.name}
