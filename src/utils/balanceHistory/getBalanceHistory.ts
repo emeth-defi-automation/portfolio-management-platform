@@ -57,5 +57,5 @@ export const getBalanceHistory = server$(async function (
   } catch (err) {
     console.log("Nasz error");
   }
-  console.log("Done")
+  console.log("Done");
 });

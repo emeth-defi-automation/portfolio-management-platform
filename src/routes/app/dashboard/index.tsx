@@ -71,7 +71,7 @@ export default component$(() => {
   });
 
   const togglePeriod = $(function togglePeriod(button: string) {
-    console.log("changed period")
+    console.log("changed period");
     for (const key in selectedPeriod) {
       selectedPeriod[key] = false;
     }
@@ -91,13 +91,13 @@ export default component$(() => {
       if (changePeriod.value !== false) {
         hideChartWhileLoading.value = true;
         const newChartData = await toggleChart(selectedPeriod);
-        console.log("New Chart", newChartData)
+        console.log("New Chart", newChartData);
         portfolioValueChange.value = newChartData;
-        //portfolioValueChange.value.period = newChartData.period;
-        //portfolioValueChange.value.totalValueChange =
-        //  newChartData.totalValueChange;
-        //portfolioValueChange.value.percentageOfTotalValueChange =
-        // newChartData.percentageOfTotalValueChange;
+        portfolioValueChange.value.period = newChartData.period;
+        portfolioValueChange.value.totalValueChange =
+          newChartData.totalValueChange;
+        portfolioValueChange.value.percentageOfTotalValueChange =
+          newChartData.percentageOfTotalValueChange;
         redrawChart.value = !redrawChart.value;
         hideChartWhileLoading.value = false;
       }
@@ -122,7 +122,7 @@ export default component$(() => {
       onClick$={(e: any) => {
         togglePeriod(e.target.name);
         changePeriod.value = true;
-        console.log("Period")
+        console.log("Period");
       }}
     />
   ) : (
@@ -135,7 +135,9 @@ export default component$(() => {
           totalPortfolioValueLoading={totalPortfolioValueLoading.value}
           totalPortfolioValue={totalPortfolioValue.value}
           isPortfolioFullScreen={isPortfolioFullScreen}
-          portfolioValueChange={portfolioValueChange.value?.totalValueChange ?? ""} 
+          portfolioValueChange={
+            portfolioValueChange.value?.totalValueChange ?? ""
+          }
           portfolioPercentageValueChange={
             portfolioValueChange.value?.percentageOfTotalValueChange ?? ""
           }

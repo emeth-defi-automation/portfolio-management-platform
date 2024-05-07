@@ -5,48 +5,50 @@ import { getUsersObservedWallets } from "../balanceHistory/getUsersObservedWalle
 import { type Token } from "~/interface/token/Token";
 
 interface TokenBalances {
-    tokenSymbol: string;
-    value: string;
-    tokenDecimals: number;
+  tokenSymbol: string;
+  value: string;
+  tokenDecimals: number;
 }
 
 export const TokenBalancecQueryResult = z.object({
-    tokenSymbol: z.string(),
-    value: z.string(),
-    blockNumber: z.number(),
+  tokenSymbol: z.string(),
+  value: z.string(),
+  blockNumber: z.number(),
 });
 export type TokenBalancecQueryResult = z.infer<typeof TokenBalancecQueryResult>;
 
 export const getTokenBalancesForChart = server$(async function (
-    blockNumber: number,
+  blockNumber: number,
 ): Promise<TokenBalances[]> {
-    const db = await connectToDB(this.env);
-    const userId = await getUserId();
-    const observedWallets = await getUsersObservedWallets(db, userId);
-    const tokens = await db.select<Token>("token");
-    const tokenBalances: TokenBalances[] = [];
-    for (const token of tokens) {
-        let partTokenBalance: bigint = 0n;
-        for (const wallet of observedWallets) {
-            const result = (await db.query(`
+  const db = await connectToDB(this.env);
+  const userId = await getUserId();
+  const observedWallets = await getUsersObservedWallets(db, userId);
+  const tokens = await db.select<Token>("token");
+  const tokenBalances: TokenBalances[] = [];
+  for (const token of tokens) {
+    let partTokenBalance: bigint = 0n;
+    for (const wallet of observedWallets) {
+      const result = (
+        await db.query(`
             SELECT tokenSymbol, value, blockNumber 
             FROM wallet_balance_history 
             WHERE walletId = '${wallet.walletId}' AND blockNumber <= ${blockNumber} AND tokenSymbol = '${token.symbol}'
             ORDER BY blockNumber DESC
             LIMIT 1;
-            `)).at(0);
-            const balances = TokenBalancecQueryResult.array().parse(result);
-            if (!result || balances.length === 0) {
-                continue
-            } else {
-                partTokenBalance += BigInt(balances[0].value);
-            }
-        }
-        tokenBalances.push({
-            value: partTokenBalance.toString(),
-            tokenSymbol: token.symbol,
-            tokenDecimals: token.decimals,
-        });
+            `)
+      ).at(0);
+      const balances = TokenBalancecQueryResult.array().parse(result);
+      if (!result || balances.length === 0) {
+        continue;
+      } else {
+        partTokenBalance += BigInt(balances[0].value);
+      }
     }
-    return tokenBalances;
+    tokenBalances.push({
+      value: partTokenBalance.toString(),
+      tokenSymbol: token.symbol,
+      tokenDecimals: token.decimals,
+    });
+  }
+  return tokenBalances;
 });

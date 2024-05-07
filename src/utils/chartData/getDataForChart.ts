@@ -2,7 +2,10 @@ import { server$ } from "@builder.io/qwik-city";
 import { generateTimestamps } from "../timestamps/timestamp";
 import { getTokenBalancesForChart } from "./getTokenBalancesForChart";
 import { getTokenPricesForCharts } from "./getTokenPricesForChart";
-import { getEthBlockNumbersFromTimestamps, getSepBlockNumbersFromTimestamps } from "./getBlockNumbersFromTimestamps";
+import {
+  getEthBlockNumbersFromTimestamps,
+  getSepBlockNumbersFromTimestamps,
+} from "./getBlockNumbersFromTimestamps";
 import { convertWeiToQuantity } from "../formatBalances/formatTokenBalance";
 
 export interface ChartData {
@@ -18,7 +21,7 @@ export const getDataForChart = server$(async function (
   const timestamps: string[] = generateTimestamps(period, interval);
   const ethBlockNumbers: number[] =
     await getEthBlockNumbersFromTimestamps(timestamps);
-const sepBlockNumbers: number[] = 
+  const sepBlockNumbers: number[] =
     await getSepBlockNumbersFromTimestamps(timestamps);
   for (let i = 0; i < ethBlockNumbers.length; i++) {
     const tokensBalances = await getTokenBalancesForChart(sepBlockNumbers[i]);
