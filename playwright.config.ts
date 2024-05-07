@@ -21,7 +21,6 @@ const config: PlaywrightTestConfig = {
   use: {
     baseURL: process.env.PW_BASE_URL,
     trace: "on-first-retry",
-    headless: process.env.CI ? true : undefined,
   },
   projects: [
     {

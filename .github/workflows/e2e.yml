@@ -100,11 +100,11 @@ jobs:
         id: synpress-wallets-cache
         with:
           path: ./.cache-synpress
-          key: ${{ runner.os }}-synpress-wallets-${{ hashFiles('.cache-synpress/**') }}
+          key: ${{ runner.os }}-synpress-wallets-${{ hashFiles('**/.cache-synpress/**') }}
 
       - name: Run synpress build
         if: steps.synpress-wallets-cache.outputs.cache-hit != 'true'
-        run: npm run test.e2e.build
+        run: npm run test.e2e.build.ci
 
       - name: Cache app build
         uses: actions/cache@v4
@@ -126,7 +126,7 @@ jobs:
           wait-on: http-get://localhost:${{ env.APP_PORT }}
 
       - name: Run tests
-        run: npm run test.e2e
+        run: npm run test.e2e.ci
 
       - name: Save results artifact
         if: ${{ !cancelled() }}
