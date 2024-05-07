@@ -23,7 +23,7 @@ test.describe('sign in', () => {
     await loginPage.useMetamask();
 
     // TODO: Temporary for debugging GitHub Actions run
-    // await signInPage.useMetamaskWithConnectWalletModal();
+    await signInPage.useMetamaskWithConnectWalletModal();
     // await metamask.connectToDapp();
     // await signInPage.acceptAndSign();
 
