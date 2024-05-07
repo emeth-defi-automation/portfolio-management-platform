@@ -39,6 +39,9 @@ export const disconnectWallets = async (
     if (localStorage.getItem("emmethUserWalletAddress")) {
       localStorage.removeItem("emmethUserWalletAddress");
     }
+    if (localStorage.getItem("refreshToken")) {
+      localStorage.removeItem("refreshToken");
+    }
 
     await disconnect(config as Config);
   }

@@ -10,7 +10,7 @@ import {
 } from "~/components/WalletConnect/context";
 import { useNavigate } from "@builder.io/qwik-city";
 import { disconnectWallets } from "~/utils/walletConnections";
-import { Config } from "@wagmi/core";
+
 
 export default component$(() => {
   const login = useContext(LoginContext);
