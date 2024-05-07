@@ -17,6 +17,7 @@ import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import IconMaximize from "/public/assets/icons/dashboard/maximize.svg?jsx";
 import ImgMinimalize from "/public/assets/icons/minimalize.svg?jsx";
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
+import { type ChartData } from "~/utils/chartData/getDataForChart";
 
 export interface PortfolioValueProps {
   hideChartWhileLoading: Signal<boolean>;
@@ -25,7 +26,7 @@ export interface PortfolioValueProps {
   isPortfolioFullScreen: Signal<boolean>;
   portfolioValueChange: string;
   portfolioPercentageValueChange: string;
-  chartData: [string, number][] | undefined;
+  chartData: ChartData[] | undefined;
   onClick$?: QRL<(e: any) => void>;
   selectedPeriod: PeriodState;
   period: string;
@@ -54,7 +55,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       const data: [Date, number][] = [];
 
       chartData.forEach((d) => {
-        data.push([new Date(d[0]), d[1]]);
+        data.push([new Date(d.timestamp), d.value]);
       });
 
       const max =

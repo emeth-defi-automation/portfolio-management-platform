@@ -8,6 +8,8 @@ import { getExistingWallet, getExistingRelation } from "~/interface/wallets/addW
 import { connectToDB } from "~/database/db";
 import { testPublicClient } from "../testconfig";
 import { Token } from "~/interface/token/Token";
+import { getBalanceHistory } from "~/utils/balanceHistory/getBalanceHistory";
+import { getCurrentBalance } from "~/utils/balanceHistory/getCurrentBalance";
 
 /**
  * This function is used to add a wallet, create balances for tokens, and create a relations.
@@ -73,6 +75,8 @@ export const useAddWallet = routeAction$(
                     `RELATE ONLY ${balance.id}->for_wallet->${createWalletQueryResult.id}`,
                 );
             }
+            const currentBalance = await getCurrentBalance(data.address.toString());
+            getBalanceHistory(currentBalance, data.address.toString(), walletId);
         }
 
         if (!(await getExistingRelation(db, userId, walletId)).at(0)) {

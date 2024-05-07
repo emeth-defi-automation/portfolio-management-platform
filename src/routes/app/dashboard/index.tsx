@@ -25,6 +25,7 @@ import {
   toggleChart,
 } from "./server";
 import { type PeriodState } from "~/interface/balance/Balance";
+import { type ChartData } from "~/utils/chartData/getDataForChart";
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -32,12 +33,19 @@ export {
   toggleChart,
 } from "./server";
 
+interface PortfolioValueChange {
+  percentageOfTotalValueChange: string;
+  totalValueChange: string;
+  period: string;
+  chartData: ChartData[];
+}
+
 export default component$(() => {
   const nav = useNavigate();
   const isPortfolioFullScreen = useSignal(false);
   const totalPortfolioValue = useSignal("0");
   const totalPortfolioValueLoading = useSignal(true);
-  const portfolioValueChange = useSignal<any>({});
+  const portfolioValueChange = useSignal<PortfolioValueChange | undefined>();
   const portfolioValueChangeLoading = useSignal(true);
   const favoriteTokenLoading = useSignal(true);
   const favoriteTokens = useSignal<any[]>([]);
@@ -81,7 +89,7 @@ export default component$(() => {
       if (changePeriod.value !== false) {
         hideChartWhileLoading.value = true;
         const newChartData = await toggleChart(selectedPeriod);
-        portfolioValueChange.value.chartData = newChartData.chartData;
+        portfolioValueChange.value = newChartData;
         portfolioValueChange.value.period = newChartData.period;
         portfolioValueChange.value.totalValueChange =
           newChartData.totalValueChange;
@@ -101,16 +109,17 @@ export default component$(() => {
       totalPortfolioValueLoading={totalPortfolioValueLoading.value}
       totalPortfolioValue={totalPortfolioValue.value}
       isPortfolioFullScreen={isPortfolioFullScreen}
-      portfolioValueChange={portfolioValueChange.value.totalValueChange}
+      portfolioValueChange={portfolioValueChange.value?.totalValueChange ?? ""}
       portfolioPercentageValueChange={
-        portfolioValueChange.value.percentageOfTotalValueChange
+        portfolioValueChange.value?.percentageOfTotalValueChange ?? ""
       }
-      chartData={portfolioValueChange.value.chartData}
+      chartData={portfolioValueChange.value?.chartData}
       selectedPeriod={selectedPeriod}
-      period={portfolioValueChange.value.period}
+      period={portfolioValueChange.value?.period ?? "24h"}
       onClick$={(e: any) => {
         togglePeriod(e.target.name);
         changePeriod.value = true;
+        console.log("Period");
       }}
     />
   ) : (
@@ -123,13 +132,15 @@ export default component$(() => {
           totalPortfolioValueLoading={totalPortfolioValueLoading.value}
           totalPortfolioValue={totalPortfolioValue.value}
           isPortfolioFullScreen={isPortfolioFullScreen}
-          portfolioValueChange={portfolioValueChange.value.totalValueChange}
-          portfolioPercentageValueChange={
-            portfolioValueChange.value.percentageOfTotalValueChange
+          portfolioValueChange={
+            portfolioValueChange.value?.totalValueChange ?? ""
           }
-          chartData={portfolioValueChange.value.chartData}
+          portfolioPercentageValueChange={
+            portfolioValueChange.value?.percentageOfTotalValueChange ?? ""
+          }
+          chartData={portfolioValueChange.value?.chartData}
           selectedPeriod={selectedPeriod}
-          period={portfolioValueChange.value.period}
+          period={portfolioValueChange.value?.period ?? "24h"}
           onClick$={(e: any) => {
             togglePeriod(e.target.name);
             changePeriod.value = true;
