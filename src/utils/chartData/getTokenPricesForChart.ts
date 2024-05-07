@@ -38,6 +38,5 @@ export const getTokenPricesForCharts = server$(async function (
       usdPrice: result.raw[i].usdPrice,
     });
   }
-  console.log("Prices", tokenPrices);
   return tokenPrices;
 });
