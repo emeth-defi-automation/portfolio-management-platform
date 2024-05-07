@@ -1,32 +1,32 @@
 import { HeroText } from "~/components/HeroText/HeroText";
-import { component$, useContext, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  component$,
+  // useContext,
+  // useVisibleTask$,
+} from "@builder.io/qwik";
 import { ConnectButton } from "~/components/Buttons/Buttons";
 import WalletConnect from "~/components/WalletConnect";
 import { Copyright } from "~/components/Paragraph/Paragraph";
+import { mainnet, sepolia } from "viem/chains";
 import IconLogo from "/public/assets/icons/logo.svg?jsx";
-import {
-  LoginContext,
-  WagmiConfigContext,
-} from "~/components/WalletConnect/context";
-import { useNavigate } from "@builder.io/qwik-city";
-import { disconnectWallets } from "~/utils/walletConnections";
-import { Config } from "@wagmi/core";
+// import { disconnect, Config } from "@wagmi/core";
+// import {
+//   ModalStoreContext,
+// } from "~/interface/web3modal/ModalStore";
 
 export default component$(() => {
-  const login = useContext(LoginContext);
-  const nav = useNavigate();
-  const wagmiConfig = useContext(WagmiConfigContext);
+  // const modalStore = useContext(ModalStoreContext);
 
-  useVisibleTask$(async () => {
-    await disconnectWallets(wagmiConfig.config);
-  });
-  useVisibleTask$(async ({ track }) => {
-    track(() => login.address.value);
+  // useVisibleTask$(async () => {
+  //   console.log("elo ");
+  //   console.log(modalStore )
+  //   if (modalStore.config) {
+  //     console.log("rozlaczam");
+  //     await disconnect(modalStore.config as Config);
+  //     console.log("rozlaczylemm");
+  //   }
+  // });
 
-    if (localStorage.getItem("emmethUserWalletAddress")) {
-      await nav("/signin");
-    }
-  });
   return (
     <>
       <div class="background-container"></div>
@@ -42,11 +42,19 @@ export default component$(() => {
             <WalletConnect
               image="/assets/icons/login/metamask.svg"
               text="Use Metamask"
+              enableWalletConnect={false}
+              enableInjected={false}
+              enableCoinbase={false}
+              chains={[mainnet, sepolia]}
               dataTestId="use-metamask-button"
             />
             <WalletConnect
               image="/assets/icons/login/walletconnect.svg"
               text="Use WalletConnect"
+              enableWalletConnect={true}
+              enableInjected={true}
+              enableCoinbase={true}
+              chains={[mainnet, sepolia]}
               dataTestId="use-walletconnect-button"
             />
           </div>
