@@ -19,7 +19,9 @@ const InputStyles = cva(
   {
     variants: {
       variant: {
-        search: ["bg-[url('/assets/icons/search.svg')] bg-no-repeat bg-[position:12px_50%] pl-10"],
+        search: [
+          "bg-[url('/assets/icons/search.svg')] bg-no-repeat bg-[position:12px_50%] pl-10",
+        ],
         checked: [
           "bg-[url('/assets/icons/dashboard/success.svg')] bg-[size:16px_16px] bg-no-repeat bg-[position:right_12px_top_50%] text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
         ],
@@ -45,7 +47,11 @@ const Input = ({ variant, size, ...props }: InputType) => {
     <>
       <input
         {...props}
-        class={twMerge(InputStyles({ variant, size }), props.subValue ? "pr-[80px]": null, props.customClass)}
+        class={twMerge(
+          InputStyles({ variant, size }),
+          props.subValue ? "pr-[80px]" : null,
+          props.customClass,
+        )}
         placeholder={props.placeholder}
         type="text"
         name={props.name}

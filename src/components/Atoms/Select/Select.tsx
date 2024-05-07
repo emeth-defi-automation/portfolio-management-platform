@@ -22,7 +22,7 @@ const SelectStyles = cva(
   {
     variants: {
       variant: {
-        smallArrow: ["bg-[position:right_8px_center] bg-white bg-opacity-5"],
+        smallArrow: ["bg-[position:right_6px_center] bg-white bg-opacity-5"],
         largeArrow: ["bg-[position:right_16px_center]"],
       },
       size: {

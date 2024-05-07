@@ -353,14 +353,8 @@ body {
 }
 
 .checkbox-gradient-border:checked::before {
-  content: "";
-  position: absolute;
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
   top: -1px;
   left: -1px;
-  border-radius: 4px;
-  padding: 2px;
   background: linear-gradient(
     130deg,
     #da301f 0.24%,
@@ -377,4 +371,20 @@ body {
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
+}
+
+.border-grd:checked::after {
+  border: 1px solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(
+    90deg,
+    #da301f 0.24%,
+    #f48946 18.43%,
+    #ee3560 45%,
+    #fa4784 75%,
+    #ff48c0 80%,
+    #8e38b5 100%
+  );
+  border-top: 0px;
+  border-left: 0px;
 }
