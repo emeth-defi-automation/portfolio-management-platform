@@ -24,7 +24,6 @@ import {
   writeContract,
   waitForTransactionReceipt,
 } from "@wagmi/core";
-import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import { getCookie } from "~/utils/refresh";
 import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
@@ -51,9 +50,10 @@ import {
   type WalletWithBalance,
   type BatchTransferFormStore,
 } from "./interface";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 
 export default component$(() => {
-  const modalStore = useContext(ModalStoreContext);
+  const wagmiConfig = useContext(WagmiConfigContext);
   const clickedToken = useStore({ balanceId: "", structureId: "" });
   const structureStore = useStore({ name: "" });
   const selectedWallets = useStore({ wallets: [] as any[] });
@@ -142,7 +142,7 @@ export default component$(() => {
 
     try {
       const tokens = await queryTokens();
-      if (modalStore.config) {
+      if (wagmiConfig.config) {
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
           for (const cCoin of cStructure.coins) {
@@ -161,7 +161,7 @@ export default component$(() => {
             });
           }
         }
-        const { request } = await simulateContract(modalStore.config, {
+        const { request } = await simulateContract(wagmiConfig.config, {
           abi: emethContractAbi,
           address: emethContractAddress,
           functionName: "transferBatch",
@@ -173,9 +173,12 @@ export default component$(() => {
           message: "Transferring tokens...",
           isVisible: true,
         });
-        const transactionHash = await writeContract(modalStore.config, request);
+        const transactionHash = await writeContract(
+          wagmiConfig.config,
+          request,
+        );
 
-        await waitForTransactionReceipt(modalStore.config, {
+        await waitForTransactionReceipt(wagmiConfig.config, {
           hash: transactionHash,
         });
 
