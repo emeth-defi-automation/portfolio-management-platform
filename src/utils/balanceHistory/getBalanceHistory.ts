@@ -61,6 +61,6 @@ export const getBalanceHistory = server$(async function (
       );
     } while (cursor != null && cursor != "");
   } catch (err) {
-    console.error(`Error in getBalanceHistory occured ${err}`);
+    console.error(`Error in getBalanceHistory occurred ${err}`);
   }
 });
