@@ -1,27 +1,32 @@
 import { $, component$, useContext } from "@builder.io/qwik";
 import { useLocation, useNavigate } from "@builder.io/qwik-city";
-import { disconnect, getAccount, signMessage } from "@wagmi/core";
+import { signMessage } from "@wagmi/core";
 import { SiweMessage } from "siwe";
 import { Button } from "~/components/Buttons/Buttons";
 import { HeroText } from "~/components/HeroText/HeroText";
 import { Copyright } from "~/components/Paragraph/Paragraph";
 import {
+  LoginContext,
+  WagmiConfigContext,
+} from "~/components/WalletConnect/context";
+import {
   getNonceServer,
   verifyMessageServer,
 } from "~/components/WalletConnect/server";
-import { ModalStoreContext } from "~/interface/web3modal/ModalStore";
+
 import IconHandshake from "/public/assets/icons/signin/handshake.svg?jsx";
+import { disconnectWallets } from "~/utils/walletConnections";
 
 export default component$(() => {
   const nav = useNavigate();
   const loc = useLocation();
-  const modalStore = useContext(ModalStoreContext);
+  const wagmiConfig = useContext(WagmiConfigContext);
+  const login = useContext(LoginContext);
 
   const signInHandler = $(async () => {
-    if (modalStore.isConnected && modalStore.config) {
-      const { address, chainId } = getAccount(modalStore.config);
-
-      // const chainId = getChainId(modalStore.config);
+    if (login.address.value && login.chainId.value) {
+      const address = login.address.value;
+      const chainId = login.chainId.value;
 
       const { nonce } = await getNonceServer();
 
@@ -36,7 +41,7 @@ export default component$(() => {
         statement: "Sign to continue...",
       }).prepareMessage();
 
-      const signature = await signMessage(modalStore.config, {
+      const signature = await signMessage(wagmiConfig.config!, {
         message,
       });
 
@@ -49,10 +54,11 @@ export default component$(() => {
   });
 
   const cancelHandler = $(async () => {
-    if (modalStore.isConnected && modalStore.config) {
-      await disconnect(modalStore.config);
-      await nav("/");
-    }
+    await disconnectWallets(wagmiConfig.config, true);
+    login.account = undefined;
+    login.address.value = undefined;
+    login.chainId.value = undefined;
+    await nav("/");
   });
 
   return (
