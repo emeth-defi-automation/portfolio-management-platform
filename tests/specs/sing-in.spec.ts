@@ -3,7 +3,7 @@ import basicSetup from '../config/wallet/basic.setup';
 import DashboardPage from '../pages/app/dashboard.page';
 import LoginPage from '../pages/login.page';
 import SignInPage from '../pages/signin.page';
-import { test } from '../util/test-synpress';
+import { test } from '../util/test';
 
 test.describe('sign in', () => {
   test.beforeEach(async ({ page }) => {

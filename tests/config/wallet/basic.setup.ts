@@ -1,12 +1,26 @@
-import { MetaMask, defineWalletSetup } from "@synthetixio/synpress";
+import type { BrowserContext, Page } from "@playwright/test";
+import {
+  MetaMask,
+  defineWalletSetup,
+  getExtensionId,
+} from "@synthetixio/synpress";
+import { SEED_PHRASE, WALLET_PASSWORD } from "../../data/wallet";
 
-const SEED_PHRASE =
-  "test test test test test test test test test test test junk";
-const PASSWORD = "Password123";
+export default defineWalletSetup(
+  WALLET_PASSWORD,
+  async (context, walletPage) => {
+    const extensionId = await getExtensionId(
+      context as BrowserContext,
+      "MetaMask",
+    );
 
-export default defineWalletSetup(PASSWORD, async (context, walletPage) => {
-  // TODO: Remove `as any`
-  const metamask = new MetaMask(context as any, walletPage as any, PASSWORD);
+    const metamask = new MetaMask(
+      context as BrowserContext,
+      walletPage as Page,
+      WALLET_PASSWORD,
+      extensionId,
+    );
 
-  await metamask.importWallet(SEED_PHRASE);
-});
+    await metamask.importWallet(SEED_PHRASE);
+  },
+);
