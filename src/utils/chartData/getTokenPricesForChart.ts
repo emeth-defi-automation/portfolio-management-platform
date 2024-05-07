@@ -13,7 +13,7 @@ export const getTokenPricesForCharts = server$(async function (
   const tokenPrices: TokenPrices[] = [];
   const result = await Moralis.EvmApi.token.getMultipleTokenPrices(
     {
-      chain: EvmChain.ETHEREUM,
+      chain: EvmChain.ETHEREUM.hex,
     },
     {
       tokens: [

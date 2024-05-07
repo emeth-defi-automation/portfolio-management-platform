@@ -40,9 +40,8 @@ export const getTokenBalancesForChart = server$(async function (
       const balances = TokenBalancecQueryResult.array().parse(result);
       if (!result || balances.length === 0) {
         continue;
-      } else {
-        partTokenBalance += BigInt(balances[0].value);
       }
+      partTokenBalance += BigInt(balances[0].value);
     }
     tokenBalances.push({
       value: partTokenBalance.toString(),

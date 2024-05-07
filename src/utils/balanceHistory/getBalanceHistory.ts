@@ -7,7 +7,7 @@ import {
   type GetWalletTokenTransfersResponseAdapter,
 } from "@moralisweb3/common-evm-utils";
 import Moralis from "moralis";
-//check if wallet exists
+
 export const getBalanceHistory = server$(async function (
   currentTokenBalance: TokenBalance[],
   walletAddress: string,
@@ -16,11 +16,17 @@ export const getBalanceHistory = server$(async function (
   const db = await connectToDB(this.env);
   try {
     const dateNow = new Date();
-    const timestamp = await Moralis.EvmApi.block.getDateToBlock({
-      chain: EvmChain.SEPOLIA,
-      date: dateNow,
-    });
-    const startingBlock = timestamp.raw.block;
+    const startingBlock = (
+      await Moralis.EvmApi.block.getDateToBlock({
+        chain: EvmChain.SEPOLIA.hex,
+        date: dateNow,
+      })
+    ).raw.block;
+    //const timestamp = await Moralis.EvmApi.block.getDateToBlock({
+    //  chain: EvmChain.SEPOLIA,
+    //  date: dateNow,
+    //});
+    //const startingBlock = timestamp.raw.block;
     let cursor = null;
     do {
       const recordList = [];
@@ -55,7 +61,6 @@ export const getBalanceHistory = server$(async function (
       );
     } while (cursor != null && cursor != "");
   } catch (err) {
-    console.log("Nasz error");
+    console.error(`Error in getBalanceHistory occured ${err}`);
   }
-  console.log("Done");
 });

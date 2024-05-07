@@ -23,7 +23,6 @@ import {
   getTotalPortfolioValue,
   getPortfolio24hChange,
   toggleChart,
-  //toggleChart,
 } from "./server";
 import { type PeriodState } from "~/interface/balance/Balance";
 import { type ChartData } from "~/utils/chartData/getDataForChart";
@@ -71,7 +70,6 @@ export default component$(() => {
   });
 
   const togglePeriod = $(function togglePeriod(button: string) {
-    console.log("changed period");
     for (const key in selectedPeriod) {
       selectedPeriod[key] = false;
     }
@@ -91,7 +89,6 @@ export default component$(() => {
       if (changePeriod.value !== false) {
         hideChartWhileLoading.value = true;
         const newChartData = await toggleChart(selectedPeriod);
-        console.log("New Chart", newChartData);
         portfolioValueChange.value = newChartData;
         portfolioValueChange.value.period = newChartData.period;
         portfolioValueChange.value.totalValueChange =

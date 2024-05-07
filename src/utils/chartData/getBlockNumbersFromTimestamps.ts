@@ -28,7 +28,7 @@ export const getSepBlockNumbersFromTimestamps = server$(async function (
   try {
     const sepPromiseArray = timestamps.map(async (item) => {
       const sepBlockDetails = await Moralis.EvmApi.block.getDateToBlock({
-        chain: EvmChain.SEPOLIA,
+        chain: EvmChain.SEPOLIA.hex,
         date: item,
       });
       return sepBlockDetails.raw.block;

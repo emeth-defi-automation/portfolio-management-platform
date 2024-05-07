@@ -25,7 +25,7 @@ export const getCurrentBalance = server$(async function (
       });
     }
   } catch (err) {
-    console.log("Error in getCurrentBalance:", err);
+    console.error("Error in getCurrentBalance:", err);
   }
   return tokensBalance;
 });
