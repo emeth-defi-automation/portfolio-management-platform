@@ -1,7 +1,6 @@
 import {
   $,
   component$,
-  noSerialize,
   useContext,
   useSignal,
   useStore,
@@ -20,23 +19,20 @@ import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import {
-  type ModalStore,
-  ModalStoreContext,
-} from "~/interface/web3modal/ModalStore";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
-import { type Chain, sepolia } from "viem/chains";
+
 import {
   type Config,
   getAccount,
   readContract,
   simulateContract,
   waitForTransactionReceipt,
-  watchAccount,
   writeContract,
-  disconnect,
+  getConnections,
+  watchAccount,
 } from "@wagmi/core";
-import { returnWeb3ModalAndClient } from "~/components/WalletConnect";
+
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
 import CoinsToApprove from "~/components/Forms/CoinsToApprove";
 import AmountOfCoins from "~/components/Forms/AmountOfCoins";
@@ -62,9 +58,10 @@ import { type AddWalletFormStore } from "./interface";
 import { fetchTokens } from "~/database/tokens";
 import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import { balancesLiveStream } from "./server/balancesLiveStream";
+import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 
 export default component$(() => {
-  const modalStore = useContext(ModalStoreContext);
+  const wagmiConfig = useContext(WagmiConfigContext);
   const formMessageProvider = useContext(messagesContext);
   const { streamId } = useContext(StreamStoreContext);
   const walletTokenBalances = useSignal<any>([]);
@@ -78,6 +75,7 @@ export default component$(() => {
   const selectedWallet = useSignal<WalletTokensBalances | null>(null);
   const receivingWalletAddress = useSignal("");
   const transferredTokenAmount = useSignal("");
+  const isSecondWalletConnected = useSignal(false);
   const stepsCounter = useSignal(1);
   const addWalletFormStore = useStore<AddWalletFormStore>({
     name: "",
@@ -90,33 +88,6 @@ export default component$(() => {
   });
   const getWalletBalanceHistory = useGetBalanceHistory();
 
-  const temporaryModalStore = useStore<ModalStore>({
-    isConnected: false,
-    config: undefined,
-  });
-
-  const setWeb3Modal = $(async () => {
-    const chains: [Chain, ...Chain[]] = [sepolia];
-    const projectId = import.meta.env.PUBLIC_PROJECT_ID;
-    if (!projectId || typeof projectId !== "string") {
-      throw new Error("Missing project ID");
-    }
-    return returnWeb3ModalAndClient(projectId, true, true, true, chains);
-  });
-
-  const openWeb3Modal = $(async () => {
-    const { config, modal } = await setWeb3Modal();
-    await modal.open({ view: "Connect" });
-    temporaryModalStore.config = noSerialize(config);
-    const { address } = getAccount(config);
-
-    addWalletFormStore.address = address as `0x${string}`;
-    watchAccount(config, {
-      onChange(data) {
-        temporaryModalStore.isConnected = data.isConnected;
-      },
-    });
-  });
   const msg = useSignal("1");
 
   // eslint-disable-next-line qwik/no-use-visible-task
@@ -142,8 +113,8 @@ export default component$(() => {
 
     try {
       if (addWalletFormStore.isExecutable) {
-        if (temporaryModalStore.isConnected && temporaryModalStore.config) {
-          const account = getAccount(temporaryModalStore.config);
+        if (wagmiConfig.config) {
+          const account = getAccount(wagmiConfig.config);
 
           addWalletFormStore.address = account.address as `0x${string}`;
 
@@ -155,16 +126,13 @@ export default component$(() => {
 
           for (const token of tokens) {
             if (addWalletFormStore.coinsToCount.includes(token.symbol)) {
-              const tokenBalance = await readContract(
-                temporaryModalStore.config,
-                {
-                  account: account.address as `0x${string}`,
-                  abi: contractABI,
-                  address: checksumAddress(token.address as `0x${string}`),
-                  functionName: "balanceOf",
-                  args: [account.address as `0x${string}`],
-                },
-              );
+              const tokenBalance = await readContract(wagmiConfig.config, {
+                account: account.address as `0x${string}`,
+                abi: contractABI,
+                address: checksumAddress(token.address as `0x${string}`),
+                functionName: "balanceOf",
+                args: [account.address as `0x${string}`],
+              });
 
               const amount = addWalletFormStore.coinsToApprove.find(
                 (item) => item.symbol === token.symbol,
@@ -177,23 +145,17 @@ export default component$(() => {
                 BigInt(denominator);
 
               if (tokenBalance) {
-                const approval = await simulateContract(
-                  temporaryModalStore.config,
-                  {
-                    account: account.address as `0x${string}`,
-                    abi: contractABI,
-                    address: checksumAddress(token.address as `0x${string}`),
-                    functionName: "approve",
-                    args: [emethContractAddress, BigInt(calculation)],
-                  },
-                );
+                const approval = await simulateContract(wagmiConfig.config, {
+                  account: account.address as `0x${string}`,
+                  abi: contractABI,
+                  address: checksumAddress(token.address as `0x${string}`),
+                  functionName: "approve",
+                  args: [emethContractAddress, BigInt(calculation)],
+                });
 
                 // keep receipts for now, to use waitForTransactionReceipt
                 try {
-                  await writeContract(
-                    temporaryModalStore.config,
-                    approval.request,
-                  );
+                  await writeContract(wagmiConfig.config, approval.request);
                 } catch (err) {
                   console.error("Error: ", err);
                 }
@@ -208,7 +170,7 @@ export default component$(() => {
         const { address } = jwtDecode.jwtDecode(cookie) as JwtPayload;
 
         const { request } = await simulateContract(
-          temporaryModalStore.config as Config,
+          wagmiConfig.config as Config,
           {
             account: addWalletFormStore.address as `0x${string}`,
             address: emethContractAddress,
@@ -218,7 +180,7 @@ export default component$(() => {
           },
         );
 
-        await writeContract(temporaryModalStore.config as Config, request);
+        await writeContract(wagmiConfig.config as Config, request);
       }
 
       const {
@@ -247,17 +209,17 @@ export default component$(() => {
         streamId,
         addWalletFormStore.address as `0x${string}`,
       );
-      if (temporaryModalStore.config) {
-        await disconnect(temporaryModalStore.config as Config);
-        temporaryModalStore.config = undefined;
-      }
+
       addWalletFormStore.address = "";
       addWalletFormStore.name = "";
       addWalletFormStore.isExecutable = 0;
       addWalletFormStore.coinsToCount = [];
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
-      temporaryModalStore.isConnected = false;
+
+      if (wagmiConfig.config) {
+        await disconnectWallets(wagmiConfig.config);
+      }
     } catch (err) {
       console.error("error: ", err);
       formMessageProvider.messages.push({
@@ -269,6 +231,19 @@ export default component$(() => {
     }
   });
 
+  useVisibleTask$(async ({ track }) => {
+    track(() => wagmiConfig.config);
+    watchAccount(wagmiConfig.config!, {
+      onChange() {
+        const connections = getConnections(wagmiConfig.config as Config);
+        if (connections.length > 1) {
+          isSecondWalletConnected.value = true;
+        } else {
+          isSecondWalletConnected.value = false;
+        }
+      },
+    });
+  });
   const handleReadBalances = $(async (wallet: string) => {
     const tokenBalances = await getMoralisBalance({ wallet });
 
@@ -276,7 +251,7 @@ export default component$(() => {
   });
 
   const handleTransfer = $(async () => {
-    if (!selectedWallet.value || !modalStore.config) {
+    if (!selectedWallet.value || !wagmiConfig.config) {
       return { error: "no chosen wallet" };
     }
 
@@ -307,7 +282,7 @@ export default component$(() => {
       const emethContractAddress = import.meta.env
         .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
       try {
-        const { request } = await simulateContract(modalStore.config, {
+        const { request } = await simulateContract(wagmiConfig.config, {
           abi: emethContractAbi,
           address: emethContractAddress,
           functionName: "transferToken",
@@ -326,9 +301,12 @@ export default component$(() => {
           isVisible: true,
         });
 
-        const transactionHash = await writeContract(modalStore.config, request);
+        const transactionHash = await writeContract(
+          wagmiConfig.config,
+          request,
+        );
 
-        await waitForTransactionReceipt(modalStore.config, {
+        await waitForTransactionReceipt(wagmiConfig.config, {
           hash: transactionHash,
         });
 
@@ -350,8 +328,8 @@ export default component$(() => {
     }
   });
 
-  const connectWallet = $(() => {
-    openWeb3Modal();
+  const connectWallet = $(async () => {
+    await openWeb3Modal(wagmiConfig!.config);
   });
 
   return (
@@ -410,17 +388,16 @@ export default component$(() => {
           isOpen={isAddWalletModalOpen}
           title="Add Wallet"
           onClose={$(async () => {
-            if (temporaryModalStore.config) {
-              await disconnect(temporaryModalStore.config as Config);
-              temporaryModalStore.config = undefined;
-            }
             addWalletFormStore.address = "";
             addWalletFormStore.name = "";
             addWalletFormStore.isExecutable = 0;
             addWalletFormStore.coinsToCount = [];
             addWalletFormStore.coinsToApprove = [];
             stepsCounter.value = 1;
-            temporaryModalStore.isConnected = false;
+
+            if (wagmiConfig.config) {
+              await disconnectWallets(wagmiConfig.config);
+            }
           })}
         >
           <Form>
@@ -430,7 +407,7 @@ export default component$(() => {
                 <AddWalletFormFields
                   addWalletFormStore={addWalletFormStore}
                   onConnectWalletClick={connectWallet}
-                  isWalletConnected={temporaryModalStore.isConnected}
+                  isWalletConnected={false}
                 />
               </>
             ) : null}
@@ -483,7 +460,7 @@ export default component$(() => {
                   onClick$={async () => {
                     if (stepsCounter.value === 1) {
                       const { address } = getAccount(
-                        temporaryModalStore.config as Config,
+                        wagmiConfig.config as Config,
                       );
 
                       await handleReadBalances(address as `0x${string}`);
@@ -504,7 +481,7 @@ export default component$(() => {
                   }}
                   disabled={isProceedDisabled(
                     addWalletFormStore,
-                    temporaryModalStore,
+                    isSecondWalletConnected,
                   )}
                   text="Proceed"
                 />
@@ -637,13 +614,3 @@ export default component$(() => {
     </>
   );
 });
-
-// const isExecutableClass = (addWalletFormStore: addWalletFormStore) =>
-//   isExecutableDisabled(addWalletFormStore)
-//     ? "bg-modal-button text-gray-400"
-//     : "bg-black";
-
-// const isNotExecutableClass = (addWalletFormStore: addWalletFormStore) =>
-//   isNotExecutableDisabled(addWalletFormStore)
-//     ? "bg-modal-button text-gray-400"
-//     : "bg-black";
