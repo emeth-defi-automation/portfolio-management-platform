@@ -2,8 +2,8 @@ import { isAddress, getAddress } from "viem";
 import { connectToDB } from "../../database/db";
 import { server$, z } from "@builder.io/qwik-city";
 import jwt, { type JwtPayload } from "jsonwebtoken";
+import { type ModalStore } from "~/interface/web3modal/ModalStore";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
-import { type Signal } from "@builder.io/qwik";
 
 export function isValidName(name: string): boolean {
   return name.length > 0 ? name.trim().length > 3 : true;
@@ -68,13 +68,13 @@ export const isNameUnique = server$(async function (name: string) {
 
 export const isProceedDisabled = (
   addWalletFormStore: AddWalletFormStore,
-  isSecondWalletConnected: Signal<boolean>,
+  temporaryModalStore: ModalStore,
 ) =>
   addWalletFormStore.name === "" ||
   !isValidName(addWalletFormStore.name) ||
   !addWalletFormStore.isNameUnique ||
   addWalletFormStore.isNameUniqueLoading ||
-  !isSecondWalletConnected;
+  !temporaryModalStore.config;
 
 /**
  * Checks if the execute action should be disabled based on the state of the add wallet form.

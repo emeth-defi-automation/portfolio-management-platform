@@ -2,21 +2,21 @@ import {
   component$,
   Slot,
   useContextProvider,
+  useStore,
   noSerialize,
   useVisibleTask$,
   useTask$,
   useContext,
-  useSignal,
 } from "@builder.io/qwik";
-import { type RequestHandler } from "@builder.io/qwik-city";
-import { type Config, reconnect, watchAccount } from "@wagmi/core";
+import { useLocation, type RequestHandler } from "@builder.io/qwik-city";
+import { reconnect, watchAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
-import { mainnet, sepolia } from "viem/chains";
+import { type Chain, mainnet, sepolia } from "viem/chains";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import {
-  LoginContext,
-  WagmiConfigContext,
-} from "~/components/WalletConnect/context";
+  type ModalStore,
+  ModalStoreContext,
+} from "~/interface/web3modal/ModalStore";
 import {
   getStream,
   initializeStreamIfNeeded,
@@ -42,55 +42,13 @@ export const onGet: RequestHandler = async ({ cacheControl }) => {
 };
 
 export default component$(() => {
-  const metadata = {
-    name: import.meta.env.PUBLIC_METADATA_NAME,
-    description: import.meta.env.PUBLIC_METADATA_DESCRIPTION,
-    url: "https://web3modal.com",
-    icons: ["https://avatars.githubusercontent.com/u/37784886"],
-  };
-
-  useContextProvider(WagmiConfigContext, {
+  const modalStore = useStore<ModalStore>({
+    isConnected: undefined,
     config: undefined,
   });
 
-  useContextProvider(LoginContext, {
-    account: undefined,
-    address: useSignal(undefined),
-    chainId: useSignal(undefined),
-  });
-
-  const wagmiConfig = useContext(WagmiConfigContext);
-  const login = useContext(LoginContext);
-
-  useVisibleTask$(() => {
-    const wconfig = defaultWagmiConfig({
-      chains: [mainnet, sepolia],
-      projectId: import.meta.env.PUBLIC_PROJECT_ID,
-      metadata,
-    });
-
-    wagmiConfig.config = noSerialize(wconfig);
-
-    if (wagmiConfig.config) {
-      watchAccount(wagmiConfig.config!, {
-        onChange(account) {
-          if (window.location.pathname === "/") {
-            localStorage.setItem(
-              "emmethUserWalletAddress",
-              `${account.address}`,
-            );
-            login.account = noSerialize(account);
-            login.address.value = account.address;
-            login.chainId.value = account.chainId;
-          } else {
-            reconnect(wagmiConfig.config as Config);
-          }
-        },
-      });
-    }
-  });
-
   useContextProvider(StreamStoreContext, { streamId: "" });
+  const location = useLocation();
   const streamStore = useContext(StreamStoreContext);
 
   useTask$(async function () {
@@ -100,12 +58,40 @@ export default component$(() => {
   });
 
   // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async () => {
+    const queryParams = new URLSearchParams(location.url.search);
+    const sessionExpired = queryParams.get("sessionExpired");
 
-  useTask$(async function () {
-    await initializeStreamIfNeeded(setupStream);
-    const stream = await getStream();
-    streamStore.streamId = stream["jsonResponse"]["id"];
+    if (sessionExpired === "true") {
+      alert("Session expired");
+    }
+    const chains: [Chain, ...Chain[]] = [mainnet, sepolia];
+    const projectId = import.meta.env.PUBLIC_PROJECT_ID;
+    if (!projectId || typeof projectId !== "string") {
+      throw new Error("Missing project ID");
+    }
+    const config2 = defaultWagmiConfig({
+      chains, // required
+      projectId, // required
+      metadata, // required
+      enableWalletConnect: true, // Optional - true by default
+      enableInjected: true, // Optional - true by default
+      enableEIP6963: true, // Optional - true by default
+      enableCoinbase: true, // Optional - true by default
+    });
+    await reconnect(config2);
+
+    modalStore.config = noSerialize(config2);
+    if (modalStore.config) {
+      watchAccount(modalStore.config, {
+        onChange(data) {
+          modalStore.isConnected = data.isConnected;
+        },
+      });
+    }
   });
+
+  useContextProvider(ModalStoreContext, modalStore);
 
   return (
     <>
