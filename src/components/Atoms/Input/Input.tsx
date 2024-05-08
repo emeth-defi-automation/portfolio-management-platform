@@ -14,7 +14,7 @@ export interface InputProps {
 
 const InputStyles = cva(
   [
-    "custom-border-1 min-w-[20rem] w-full cursor-pointer rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora']",
+    "custom-border-1 min-w-[20rem] w-full cursor-pointer rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm",
   ],
   {
     variants: {
@@ -28,14 +28,13 @@ const InputStyles = cva(
       },
       size: {
         xs: ["h-8 text-xs"],
-        small: ["h-10 text-sm placeholder:text-opacity-50"],
+        small: ["h-10 text-xs placeholder:text-opacity-50"],
         medium: ["h-11"],
         large: ["h-12"],
       },
-      defaultVariant: {
-        variant: "",
-        size: "large",
-      },
+    },
+    defaultVariants: {
+      size: "large",
     },
   },
 );

@@ -27,12 +27,13 @@ const SelectStyles = cva(
       },
       size: {
         small: ["w-14 px-1.5 h-8"],
-        large: ["w-full h-10 pr-10"],
+        medium: ["w-full h-10 pr-10"],
+        large: ["w-full h-12 pr-10 text-sm"],
       },
-      defaultVariant: {
-        variant: "largeArrow",
-        size: "large",
-      },
+    },
+    defaultVariants: {
+      variant: "largeArrow",
+      size: "large",
     },
   },
 );

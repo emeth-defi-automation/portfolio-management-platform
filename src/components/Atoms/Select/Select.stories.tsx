@@ -11,6 +11,10 @@ export function Portfolio(args: SelectProps) {
   return <Select {...args} />;
 }
 
+export function Modal(args: SelectProps) {
+  return <Select {...args} />;
+}
+
 export function Dashboard(args: SelectProps) {
   return <Select {...args} />;
 }
@@ -21,6 +25,15 @@ Portfolio.args = {
     { value: "Ethereum", text: "Ethereum" },
   ],
   size: "large",
+  variant: "largeArrow",
+};
+
+Modal.args = {
+  options: [
+    { value: "", text: "Choose Network" },
+    { value: "Ethereum", text: "Ethereum" },
+  ],
+  size: "medium",
   variant: "largeArrow",
 };
 
