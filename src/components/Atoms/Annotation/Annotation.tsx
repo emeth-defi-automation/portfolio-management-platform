@@ -1,12 +1,12 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
-export interface SpanTextProps {
+export interface AnnotationProps {
   text?: string;
   class?: string;
 }
 
-const SpanTextStyles = cva(["font-['Sora'] custom-text-50 text-xs"], {
+const AnnotationStyles = cva(["font-['Sora'] custom-text-50 text-xs"], {
   variants: {
     transform: {
       upper: ["uppercase"],
@@ -18,17 +18,18 @@ const SpanTextStyles = cva(["font-['Sora'] custom-text-50 text-xs"], {
   },
 });
 
-export type SpanTextType = VariantProps<typeof SpanTextStyles> & SpanTextProps;
+export type AnnotationType = VariantProps<typeof AnnotationStyles> &
+  AnnotationProps;
 
-const SpanText = ({ transform, ...props }: SpanTextType) => {
+const Annotation = ({ transform, ...props }: AnnotationType) => {
   return (
     <span
       {...props}
-      class={twMerge(SpanTextStyles({ transform }), props.class)}
+      class={twMerge(AnnotationStyles({ transform }), props.class)}
     >
       {props.text}
     </span>
   );
 };
 
-export default SpanText;
+export default Annotation;

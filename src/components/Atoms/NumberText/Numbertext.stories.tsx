@@ -19,15 +19,15 @@ export function NumberTextLow(args: NumberTextProps) {
 
 NumberTextNormal.args = {
   text: "0,00%",
-  color: "norlam",
+  color: "white",
 };
 
 NumberTextHigh.args = {
   text: "+3,36%",
-  color: "high",
+  color: "green",
 };
 
 NumberTextLow.args = {
   text: "-2.27%",
-  color: "low",
+  color: "red",
 };

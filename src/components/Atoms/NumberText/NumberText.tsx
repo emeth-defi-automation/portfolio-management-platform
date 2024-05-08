@@ -9,13 +9,13 @@ export interface NumberTextProps {
 const NumberTextStyles = cva(["font-['Sora'] text-xs"], {
   variants: {
     color: {
-      high: ["text-customGreen"],
-      low: ["text-customRed"],
-      normal: ["white"],
+      green: ["text-customGreen"],
+      red: ["text-customRed"],
+      white: ["white"],
     },
   },
   defaultVariants: {
-    color: "normal",
+    color: "white",
   },
 });
 
