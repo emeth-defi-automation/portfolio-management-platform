@@ -59,6 +59,7 @@ export default component$(() => {
   const selectedWallets = useStore({ wallets: [] as any[] });
   const isCreateNewStructureModalOpen = useSignal(false);
   const isTransferModalOpen = useSignal(false);
+  const isSwapModalOpen = useSignal<boolean>(false);
   const deleteToken = useDeleteToken();
   const formMessageProvider = useContext(messagesContext);
   const availableStructures = useAvailableStructures();
@@ -306,6 +307,7 @@ export default component$(() => {
                         id: createdStructures.structure.id,
                       });
                     }}
+                    isSwapModalOpen={isSwapModalOpen}
                   />
                 ))}
               </div>
@@ -759,6 +761,9 @@ export default component$(() => {
           </Form>
         </Modal>
       )}
+      {isSwapModalOpen.value ? (
+        <Modal isOpen={isSwapModalOpen} title="Swap Token"></Modal>
+      ) : null}
     </>
   );
 });

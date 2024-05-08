@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import type { QRL } from "@builder.io/qwik";
+import type { QRL, Signal } from "@builder.io/qwik";
 import IconDelete from "/public/assets/icons/delete-white.svg?jsx";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
 import { ButtonWithIcon } from "../Buttons/Buttons";
@@ -13,6 +13,7 @@ export interface TokenRowProps {
   walletName?: string;
   network?: string;
   onClick$?: QRL<() => void>;
+  isSwapModalOpen: Signal<boolean>;
 }
 export const TokenRow = component$<TokenRowProps>((props) => {
   return (
@@ -42,7 +43,14 @@ export const TokenRow = component$<TokenRowProps>((props) => {
         <div class="flex h-full items-center overflow-auto font-medium">
           {props.network}
         </div>
-        <div class="flex h-full items-center overflow-auto font-medium">
+        <div
+          class="flex h-full items-center overflow-auto font-medium"
+          onClick$={() => {
+            console.log("Swap Token", props.tokenName, props.walletName);
+            console.log("isSwapModalOpen", props.isSwapModalOpen.value);
+            props.isSwapModalOpen.value = !props.isSwapModalOpen.value;
+          }}
+        >
           <ButtonWithIcon
             text="Swap Token"
             image="/assets/icons/portfolio/swap.svg?jsx"

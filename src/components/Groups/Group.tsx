@@ -1,5 +1,5 @@
 import { component$, type JSXOutput } from "@builder.io/qwik";
-import type { QRL } from "@builder.io/qwik";
+import type { QRL, Signal } from "@builder.io/qwik";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import {
   type Structure,
@@ -14,11 +14,13 @@ export interface GroupProps {
   createdStructure: Structure;
   onClick$?: QRL<() => void>;
   tokenStore: { balanceId: string; structureId: string };
+  isSwapModalOpen: Signal<boolean>;
 }
 
 function extractData(
   createdStructure: Structure,
   tokenStore: { balanceId: string; structureId: string },
+  isSwapModalOpen: Signal<boolean>,
 ): JSXOutput[] {
   const extractedArray: {
     walletName: string;
@@ -64,6 +66,7 @@ function extractData(
         tokenStore.balanceId = entry.balanceId;
         tokenStore.structureId = entry.structureId;
       }}
+      isSwapModalOpen={isSwapModalOpen}
     />
   ));
 }
@@ -84,7 +87,13 @@ export const Group = component$<GroupProps>((props) => {
             See Performance
           </button>
         </div>
-        <div>{extractData(props.createdStructure, props.tokenStore)}</div>
+        <div>
+          {extractData(
+            props.createdStructure,
+            props.tokenStore,
+            props.isSwapModalOpen,
+          )}
+        </div>
       </div>
     </>
   );
