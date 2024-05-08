@@ -6,7 +6,7 @@ export interface HeaderProps {
   class?: string;
 }
 
-const HeaderStyles = cva(["font-['Sora']"], {
+const HeaderStyles = cva(["font-['Sora'] font-semibold"], {
   variants: {
     variant: {
       h1: ["text-4xl"],
@@ -14,12 +14,6 @@ const HeaderStyles = cva(["font-['Sora']"], {
       h3: ["text-xl"],
       h4: ["text-base"],
       h5: ["text-sm"],
-      h6: ["text-xs"],
-    },
-    weight: {
-      normal: ["font-normal"],
-      medium: ["font-medium"],
-      semiBold: ["font-semibold"],
     },
   },
   defaultVariants: {},
@@ -27,61 +21,37 @@ const HeaderStyles = cva(["font-['Sora']"], {
 
 export type HeaderType = VariantProps<typeof HeaderStyles> & HeaderProps;
 
-const Header = ({ variant, weight, ...props }: HeaderType) => {
+const Header = ({ variant, ...props }: HeaderType) => {
   switch (variant) {
     case "h1":
       return (
-        <h1
-          {...props}
-          class={twMerge(HeaderStyles({ variant, weight }), props.class)}
-        >
+        <h1 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
           {props.text}
         </h1>
       );
     case "h2":
       return (
-        <h2
-          {...props}
-          class={twMerge(HeaderStyles({ variant, weight }), props.class)}
-        >
+        <h2 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
           {props.text}
         </h2>
       );
     case "h3":
       return (
-        <h3
-          {...props}
-          class={twMerge(HeaderStyles({ variant, weight }), props.class)}
-        >
+        <h3 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
           {props.text}
         </h3>
       );
     case "h4":
       return (
-        <h4
-          {...props}
-          class={twMerge(HeaderStyles({ variant, weight }), props.class)}
-        >
+        <h4 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
           {props.text}
         </h4>
       );
     case "h5":
       return (
-        <h5
-          {...props}
-          class={twMerge(HeaderStyles({ variant, weight }), props.class)}
-        >
+        <h5 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
           {props.text}
         </h5>
-      );
-    case "h6":
-      return (
-        <h6
-          {...props}
-          class={twMerge(HeaderStyles({ variant, weight }), props.class)}
-        >
-          {props.text}
-        </h6>
       );
   }
 };

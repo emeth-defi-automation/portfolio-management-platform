@@ -20,42 +20,30 @@ export function Header4SemiBold(args: HeaderProps) {
 export function Header5Medium(args: HeaderProps) {
   return <Header {...args} />;
 }
-export function Header5(args: HeaderProps) {
-  return <Header {...args} />;
-}
 
 Header1Medium.args = {
   text: "Login to Emeth",
   variant: "h1",
-  weight: "medium",
+  class: "font-medium",
 };
 
 Header2SemiBold.args = {
   text: "Portfolio Name",
   variant: "h2",
-  weight: "semiBold",
 };
 
 Header3SemiBold.args = {
   text: "Portfolio Value",
   variant: "h3",
-  weight: "semiBold",
 };
 
 Header4SemiBold.args = {
   text: "Subportfolios",
   variant: "h4",
-  weight: "semiBold",
 };
 
 Header5Medium.args = {
-  text: "Treasury WBTC",
+  text: "Bitcoin share exceeded 20%",
   variant: "h5",
-  weight: "medium",
-};
-
-Header5.args = {
-  text: "Investment",
-  variant: "h5",
-  weight: "normal",
+  class: "font-medium",
 };
