@@ -35,3 +35,15 @@ export const getTokenDecimals = async (db: Surreal, address: string) => {
     throw e;
   }
 };
+
+export const getTokenDecimalsServer = server$(async function (
+  tokenAddress: string,
+) {
+  try {
+    const db = await connectToDB(this.env);
+    return await getTokenDecimals(db, tokenAddress);
+  } catch (e) {
+    console.error("Error in getTokenDecimalsServer: ", e);
+    throw e;
+  }
+});

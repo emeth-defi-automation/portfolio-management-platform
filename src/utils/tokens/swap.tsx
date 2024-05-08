@@ -1,11 +1,9 @@
-import { server$ } from "@builder.io/qwik-city";
 import { readContract, writeContract } from "@wagmi/core";
 import { simulateContract } from "viem/actions";
 import { uniswapRouterAbi } from "~/abi/UniswapRouterAbi";
-import { connectToDB } from "~/database/db";
-import { getTokenDecimals } from "~/database/tokens";
+import { getTokenDecimalsServer } from "~/database/tokens";
 
-export const swapTokens = server$(async function (
+export const swapTokens = async function (
   firstTokenAddress: string,
   secondTokenAddress: string,
   amount: string,
@@ -20,8 +18,7 @@ export const swapTokens = server$(async function (
       address: routerContractAddress as `0x${string}`,
       functionName: "WETH",
     });
-    const db = await connectToDB(this.env);
-    const tokenDecimals = await getTokenDecimals(db, firstTokenAddress);
+    const tokenDecimals = await getTokenDecimalsServer(firstTokenAddress);
     const amountIn = BigInt(
       parseFloat(amount) * 10 ** parseInt(tokenDecimals.decimals),
     );
@@ -92,4 +89,4 @@ export const swapTokens = server$(async function (
   } catch (e) {
     console.error("Error in swap: ", e);
   }
-});
+};
