@@ -8,19 +8,16 @@ export const swapTokens = async (
   firstTokenAddress: string,
   secondTokenAddress: string,
   amount: string,
-  routerContractAddress: string,
   accountAddress: string,
   wagmiConfig: any,
 ) => {
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 200000);
   try {
-    const wrappedEtherAddress = await readContract(wagmiConfig.config, {
-      abi: uniswapRouterAbi,
-      address: routerContractAddress as `0x${string}`,
-      functionName: "WETH",
-    });
+    const wrappedEtherAddress = import.meta.env.PUBLIC_ROUTER_CONTRACT_ADDRESS;
+    const routerContractAddress = import.meta.env.PUBLIC_WETH_CONTRACT_ADDRESS;
 
     const tokenDecimals = await getTokenDecimalsServer(firstTokenAddress);
+
     const amountIn = BigInt(
       parseFloat(amount) * 10 ** parseInt(tokenDecimals.decimals),
     );
@@ -33,6 +30,7 @@ export const swapTokens = async (
     });
     await writeContract(wagmiConfig.config, request);
 
+    // TODO: POSSIBLY LOWER IT BY 0.5% ON MAINNET - SLEEPAGE
     const amountOutMin = await readContract(wagmiConfig.config, {
       abi: uniswapRouterAbi,
       address: routerContractAddress as `0x${string}`,
@@ -46,6 +44,7 @@ export const swapTokens = async (
       ],
     });
 
+    // TODO" WETH SWAP - check if is ETH "address"
     if (firstTokenAddress === wrappedEtherAddress) {
       const { request } = await simulateContract(wagmiConfig.config, {
         abi: uniswapRouterAbi,
