@@ -61,7 +61,7 @@ export default component$(() => {
 
   const wagmiConfig = useContext(WagmiConfigContext);
   const login = useContext(LoginContext);
-
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
     const wconfig = defaultWagmiConfig({
       chains: [mainnet, sepolia],
