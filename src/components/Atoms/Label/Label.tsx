@@ -1,4 +1,3 @@
-import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
 export interface LabelProps {
@@ -6,16 +5,15 @@ export interface LabelProps {
   name: string;
 }
 
-const LabelStyles = cva(["uppercase custom-text-50 text-xs font-['Sora']"]);
-
-export type LabelType = VariantProps<typeof LabelStyles> & LabelProps;
-
-const Label = ({ ...props }: LabelType) => {
+const Label = ({ ...props }: LabelProps) => {
   return (
     <label
       {...props}
       for={props.name}
-      class={twMerge(LabelStyles(), props.class)}
+      class={twMerge(
+        "custom-text-50 font-['Sora'] text-xs uppercase",
+        props.class,
+      )}
     >
       {props.name}
     </label>
