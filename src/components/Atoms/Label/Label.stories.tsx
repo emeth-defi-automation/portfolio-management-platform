@@ -10,5 +10,5 @@ export function Default(args: LabelProps) {
 }
 
 Default.args = {
-  text: "Type",
+  name: "Type",
 };
