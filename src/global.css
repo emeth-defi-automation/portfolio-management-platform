@@ -171,16 +171,17 @@ body {
 
 .custom-text-gradient {
   background: linear-gradient(
-    95deg,
-    #da301f,
-    #f48946,
-    #ee3560,
-    #fa4784,
-    #ff48c0,
-    #8e38b5,
-    #5542bb,
-    #0051c3
+    120deg,
+    #da301f 0%,
+    #f48946 1%,
+    #ee3560 2%,
+    #fa4784 3%,
+    #ff48c0 6%,
+    #8e38b5 9%,
+    #5542bb 11%,
+    #0051c4 100%
   );
+
   background-clip: text;
 }
 
