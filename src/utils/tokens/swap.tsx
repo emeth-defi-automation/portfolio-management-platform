@@ -3,14 +3,14 @@ import { simulateContract } from "viem/actions";
 import { uniswapRouterAbi } from "~/abi/UniswapRouterAbi";
 import { getTokenDecimalsServer } from "~/database/tokens";
 
-export const swapTokens = async function (
+export const swapTokens = async (
   firstTokenAddress: string,
   secondTokenAddress: string,
   amount: string,
   routerContractAddress: string,
   accountAddress: string,
   wagmiConfig: any,
-) {
+) => {
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 200000);
   try {
     const wrappedEtherAddress = await readContract(wagmiConfig.config, {
