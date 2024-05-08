@@ -17,22 +17,23 @@ export interface SelectProps {
 
 const SelectStyles = cva(
   [
-    "custom-border-1 w-full cursor-pointer rounded-lg bg-transparent px-4 text-white classic text-xs font-['Sora']",
+    "custom-border-1 min-w-max w-full cursor-pointer rounded-lg bg-transparent px-4 text-white  text-xs font-['Sora'] appearance-none bg-[url('/assets/icons/arrow-down.svg')] bg-no-repeat bg-auto",
   ],
   {
     variants: {
       variant: {
-        smallArrow: ["classic-second-position bg-white bg-opacity-5"],
-        largeArrow: ["classic-first-position"],
+        smallArrow: ["bg-[position:right_6px_center] bg-white bg-opacity-5"],
+        largeArrow: ["bg-[position:right_16px_center]"],
       },
       size: {
         small: ["w-14 px-1.5 h-8"],
-        large: ["w-full h-10"],
+        medium: ["w-full h-10 pr-10"],
+        large: ["w-full h-12 pr-10 text-sm"],
       },
-      defaultVariant: {
-        variant: "largeArrow",
-        size: "large",
-      },
+    },
+    defaultVariants: {
+      variant: "largeArrow",
+      size: "large",
     },
   },
 );
