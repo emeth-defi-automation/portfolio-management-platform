@@ -1,5 +1,6 @@
 import { readContract, writeContract } from "@wagmi/core";
 import { simulateContract } from "viem/actions";
+import { contractABI } from "~/abi/abi";
 import { uniswapRouterAbi } from "~/abi/UniswapRouterAbi";
 import { getTokenDecimalsServer } from "~/database/tokens";
 
@@ -18,10 +19,20 @@ export const swapTokens = async (
       address: routerContractAddress as `0x${string}`,
       functionName: "WETH",
     });
+
     const tokenDecimals = await getTokenDecimalsServer(firstTokenAddress);
     const amountIn = BigInt(
       parseFloat(amount) * 10 ** parseInt(tokenDecimals.decimals),
     );
+
+    const { request } = await simulateContract(wagmiConfig.config, {
+      abi: contractABI,
+      address: firstTokenAddress as `0x${string}`,
+      functionName: "approve",
+      args: [routerContractAddress as `0x${string}`, amountIn],
+    });
+    await writeContract(wagmiConfig.config, request);
+
     const amountOutMin = await readContract(wagmiConfig.config, {
       abi: uniswapRouterAbi,
       address: routerContractAddress as `0x${string}`,
@@ -34,6 +45,7 @@ export const swapTokens = async (
         ],
       ],
     });
+
     if (firstTokenAddress === wrappedEtherAddress) {
       const { request } = await simulateContract(wagmiConfig.config, {
         abi: uniswapRouterAbi,
