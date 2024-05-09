@@ -22,6 +22,10 @@ export const useDeleteToken = routeAction$(
         if (balanceCount === 0) {
             await db.delete(data.structureId as string);
         }
+
+        return {
+            success: true,
+        }
     },
     zod$({
         structureId: z.string(),

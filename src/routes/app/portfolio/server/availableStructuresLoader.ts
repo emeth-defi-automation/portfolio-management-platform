@@ -1,12 +1,12 @@
-import { routeLoader$ } from "@builder.io/qwik-city";
+import { routeLoader$, server$ } from "@builder.io/qwik-city";
 import { getDBTokenPriceUSD } from "~/interface/wallets/observedWallets";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { connectToDB } from "~/database/db";
 import { Wallet } from "~/interface/auth/Wallet";
 
-export const useAvailableStructures = routeLoader$(async (requestEvent) => {
-    const db = await connectToDB(requestEvent.env);
-    const cookie = requestEvent.cookie.get("accessToken");
+export const getAvailableStructures = server$(async function () {
+    const db = await connectToDB(this.env);
+    const cookie = this.cookie.get("accessToken");
     if (!cookie) {
         throw new Error("No cookie found");
     }
@@ -86,6 +86,9 @@ export const useAvailableStructures = routeLoader$(async (requestEvent) => {
             });
         }
     }
-
-    return availableStructures;
+    console.log(availableStructures, false)
+    return {
+        structures: availableStructures,
+        isLoading: false,
+    };
 });

@@ -12,6 +12,7 @@ import {
   useStore,
   useTask$,
   useContext,
+  useVisibleTask$,
 } from "@builder.io/qwik";
 import { messagesContext } from "../layout";
 import { Form } from "@builder.io/qwik-city";
@@ -34,15 +35,15 @@ import {
   useDeleteStructure,
   useDeleteToken,
   useCreateStructure,
-  useObservedWalletBalances,
-  useAvailableStructures,
+  getObservedWalletBalances,
+  getAvailableStructures,
 } from "./server";
 export {
   useDeleteStructure,
   useDeleteToken,
   useCreateStructure,
-  useObservedWalletBalances,
-  useAvailableStructures,
+  getObservedWalletBalances,
+  getAvailableStructures,
 } from "./server";
 import { queryTokens } from "~/database/tokens";
 import { convertToFraction } from "~/utils/fractions";
@@ -51,6 +52,7 @@ import {
   type BatchTransferFormStore,
 } from "./interface";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import { Spinner } from "~/components/Spinner/Spinner";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -61,10 +63,8 @@ export default component$(() => {
   const isTransferModalOpen = useSignal(false);
   const deleteToken = useDeleteToken();
   const formMessageProvider = useContext(messagesContext);
-  const availableStructures = useAvailableStructures();
   const createStructureAction = useCreateStructure();
   const deleteStructureAction = useDeleteStructure();
-  const observedWalletsWithBalance = useObservedWalletBalances();
   const isWalletSelected = useStore({
     selection: [] as { walletId: string; status: boolean }[],
   });
@@ -78,7 +78,13 @@ export default component$(() => {
   const batchTransferFormStore = useStore<BatchTransferFormStore>({
     receiverAddress: "",
     coinsToTransfer: [],
+  });  
+  const observedWalletsWithBalance = useSignal<any>([]); 
+  const availableStructures = useSignal<any>({
+    structures: [],
+    isLoading:true
   });
+
   useTask$(async ({ track }) => {
     track(() => {
       clickedToken.structureId;
@@ -110,6 +116,20 @@ export default component$(() => {
       }
     });
   });
+ 
+  useVisibleTask$(async () => { 
+    availableStructures.value = await getAvailableStructures();
+    observedWalletsWithBalance.value = await getObservedWalletBalances();
+  })
+  useVisibleTask$(async ({track}) => {
+    track(() => {
+      createStructureAction.value;
+      deleteToken.value;
+      deleteStructureAction.value;
+    })
+
+    availableStructures.value = await getAvailableStructures();
+  })
 
   const handleCheckboxChange = $(
     (category: any, objectId: string, key: string) => {
@@ -173,7 +193,7 @@ export default component$(() => {
           message: "Transferring tokens...",
           isVisible: true,
         });
-        const transactionHash = await writeContract(
+        const transactionHash = await writeContract( 
           wagmiConfig.config,
           request,
         );
@@ -193,26 +213,26 @@ export default component$(() => {
       }
     } catch (err) {
       console.error(err);
-      formMessageProvider.messages.push({
+      formMessageProvider.messages.push({  
         id: formMessageProvider.messages.length,
         variant: "error",
         message: "Something went wrong.",
         isVisible: true,
-      });
-    }
+      }); 
+    }  
   });
   return (
     <>
-      {availableStructures.value.length === 0 ? (
+      {availableStructures.value.isLoading ? <div class="w-full h-full flex flex-col items-center justify-center"> <Spinner /></div> : availableStructures.value.structures.length === 0 ? (
         <NoDataAdded
           title="You didn't add any Sub Portfolio yet"
-          description="Please add your first Sub Portfolio"
+          description="Please add your first Sub Portfolio" 
           buttonText="Add Sub Portfolio"
           buttonOnClick$={async () => {
             isCreateNewStructureModalOpen.value =
               !isCreateNewStructureModalOpen.value;
           }}
-        />
+        />  
       ) : (
         <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
           <div class="flex items-center justify-between">
@@ -223,7 +243,7 @@ export default component$(() => {
                 text="Transfer"
                 class="custom-border-2"
                 onClick$={async () => {
-                  for (const structure of availableStructures.value) {
+                  for (const structure of availableStructures.value.structures) {
                     const coins = [];
                     for (const wallet of structure.structureBalance) {
                       const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
@@ -293,10 +313,10 @@ export default component$(() => {
                     <button class="rounded-lg px-2">30d</button>
                   </div>
                   <div class="">WALLET</div>
-                  <div class="">NETWORK</div>
-                  <div class=""></div>
+                  <div class="">NETWORK</div> 
+                  <div class=""></div>  
                 </div>
-                {availableStructures.value.map((createdStructures) => (
+                {availableStructures.value.structures.map((createdStructures) => (
                   <Group
                     key={createdStructures.structure.name}
                     createdStructure={createdStructures}
@@ -332,13 +352,11 @@ export default component$(() => {
             ) : null}
             {stepsCounter.value === 2 ? (
               <CoinsAmounts
-                availableStructures={availableStructures}
                 batchTransferFormStore={batchTransferFormStore}
               />
             ) : null}
             {stepsCounter.value === 3 ? (
               <Destination
-                availableStructures={availableStructures}
                 batchTransferFormStore={batchTransferFormStore}
               />
             ) : null}
@@ -349,7 +367,7 @@ export default component$(() => {
               onClick$={async () => {
                 if (stepsCounter.value === 2) {
                   batchTransferFormStore.coinsToTransfer = [];
-                  for (const structure of availableStructures.value) {
+                  for (const structure of availableStructures.value.structures) {
                     const coins = [];
                     for (const wallet of structure.structureBalance) {
                       const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.walletName === wallet.wallet.name)?.wallet.address}`;
@@ -816,3 +834,5 @@ function parseWalletsToOptions(
   availableBalances.value = totalBalances;
   return options;
 }
+
+
