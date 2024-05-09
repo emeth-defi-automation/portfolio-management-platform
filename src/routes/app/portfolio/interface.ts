@@ -1,3 +1,5 @@
+export type WalletBalance = [{ balanceId: string; tokenId: string; tokenSymbol: string }];
+
 export type WalletWithBalance = {
   wallet: {
     id: string;
@@ -7,8 +9,9 @@ export type WalletWithBalance = {
     isExecutable: boolean;
   };
   walletName: string;
-  balance: [{ balanceId: string; tokenId: string; tokenSymbol: string }];
+  balance: WalletBalance;
 };
+
 export type CoinToApprove = {
   wallet: string;
   isExecutable: string;

@@ -1,4 +1,4 @@
-import { routeLoader$, server$ } from "@builder.io/qwik-city";
+import { server$ } from "@builder.io/qwik-city";
 import { getDBTokenPriceUSD } from "~/interface/wallets/observedWallets";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { connectToDB } from "~/database/db";
@@ -86,7 +86,6 @@ export const getAvailableStructures = server$(async function () {
             });
         }
     }
-    console.log(availableStructures, false)
     return {
         structures: availableStructures,
         isLoading: false,

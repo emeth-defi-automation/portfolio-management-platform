@@ -9,7 +9,12 @@ import {
   useSignal,
 } from "@builder.io/qwik";
 import { type RequestHandler } from "@builder.io/qwik-city";
-import { type Config, reconnect, watchAccount } from "@wagmi/core";
+import {
+  type Config,
+  reconnect,
+  watchAccount,
+  getConnections,
+} from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, sepolia } from "viem/chains";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
@@ -62,7 +67,7 @@ export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
   const login = useContext(LoginContext);
 
-  useVisibleTask$(() => {
+  useVisibleTask$(async () => {
     const wconfig = defaultWagmiConfig({
       chains: [mainnet, sepolia],
       projectId: import.meta.env.PUBLIC_PROJECT_ID,
@@ -70,23 +75,38 @@ export default component$(() => {
     });
 
     wagmiConfig.config = noSerialize(wconfig);
-
+    console.log("[LOGIN ADDRESS LAYOUT] ", login.address.value);
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {
-        onChange(account) {
+        onChange(account, prevAccount) {
+          // console.log('[PrevAcc]: ', prevAccount)
+          // console.log('[Acc]: ', account)
+          // console.log('[Config]: ', wagmiConfig.config!.state)
           if (window.location.pathname === "/") {
             localStorage.setItem(
               "emmethUserWalletAddress",
               `${account.address}`,
             );
-            login.account = noSerialize(account);
-            login.address.value = account.address;
-            login.chainId.value = account.chainId;
+            // login.account = noSerialize(account);
+            // login.address.value = account.address;
+            // login.chainId.value = account.chainId;
+            // console.log('[INSIDE PATH /]')
           } else {
             reconnect(wagmiConfig.config as Config);
           }
+          login.account = noSerialize(account);
+          login.address.value = account.address;
+          login.chainId.value = account.chainId;
+          console.log(
+            "[LOGIN ADDRESS LAYOUT Watch Account] ",
+            login.address.value,
+          );
         },
       });
+      console.log(
+        "[connections]: ",
+        await getConnections(wagmiConfig.config as Config),
+      );
     }
   });
 

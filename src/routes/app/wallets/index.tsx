@@ -19,7 +19,10 @@ import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import {
+  LoginContext,
+  WagmiConfigContext,
+} from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
 
 import {
@@ -31,7 +34,7 @@ import {
   writeContract,
   getConnections,
   watchAccount,
-} from "@wagmi/core";
+} from "@wagmi/core"; 
 
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
 import CoinsToApprove from "~/components/Forms/CoinsToApprove";
@@ -42,6 +45,14 @@ import {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
+export {
+  getObservedWallets,
+  ObservedWalletsList,
+} from "~/components/ObservedWalletsList/ObservedWalletsList";
+// import {
+//   getObservedWallets,
+//   ObservedWalletsList,
+// } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import {
   checkPattern,
   convertToFraction,
@@ -62,12 +73,12 @@ import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
+  const login = useContext(LoginContext);
   const formMessageProvider = useContext(messagesContext);
   const { streamId } = useContext(StreamStoreContext);
   const walletTokenBalances = useSignal<any>([]);
   const addWalletAction = useAddWallet();
   const removeWalletAction = useRemoveWallet();
-  const observedWallets = useSignal<WalletTokensBalances[]>([]);
   const isAddWalletModalOpen = useSignal(false);
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
@@ -87,6 +98,7 @@ export default component$(() => {
     coinsToApprove: [],
   });
   const getWalletBalanceHistory = useGetBalanceHistory();
+  const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
   const msg = useSignal("1");
 
@@ -96,11 +108,24 @@ export default component$(() => {
     for await (const value of data) {
       msg.value = value;
     }
+    console.log("[Wallet login address] ", login.address.value);
   });
-
+  useVisibleTask$(async ({ track }) => {
+    track(() => wagmiConfig.config);
+    watchAccount(wagmiConfig.config!, {
+      onChange() {
+        const connections = getConnections(wagmiConfig.config as Config);
+        if (connections.length > 1) {
+          isSecondWalletConnected.value = true;
+        } else {
+          isSecondWalletConnected.value = false;
+        }
+      },
+    });
+  });
   const handleAddWallet = $(async () => {
     isAddWalletModalOpen.value = false;
-
+   
     formMessageProvider.messages.push({
       id: formMessageProvider.messages.length,
       variant: "info",
@@ -164,7 +189,9 @@ export default component$(() => {
           }
         }
         // approving logged in user by observed wallet by emeth contract
+        console.log("jebac qwika");
         const cookie = getCookie("accessToken");
+        console.log("ciastko:", cookie);
         if (!cookie) throw new Error("No accessToken cookie found");
 
         const { address } = jwtDecode.jwtDecode(cookie) as JwtPayload;
@@ -231,19 +258,6 @@ export default component$(() => {
     }
   });
 
-  useVisibleTask$(async ({ track }) => {
-    track(() => wagmiConfig.config);
-    watchAccount(wagmiConfig.config!, {
-      onChange() {
-        const connections = getConnections(wagmiConfig.config as Config);
-        if (connections.length > 1) {
-          isSecondWalletConnected.value = true;
-        } else {
-          isSecondWalletConnected.value = false;
-        }
-      },
-    });
-  });
   const handleReadBalances = $(async (wallet: string) => {
     const tokenBalances = await getMoralisBalance({ wallet });
 

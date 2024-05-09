@@ -1,5 +1,10 @@
 import { HeroText } from "~/components/HeroText/HeroText";
-import { component$, useContext, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  component$,
+  noSerialize,
+  useContext,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { ConnectButton } from "~/components/Buttons/Buttons";
 import WalletConnect from "~/components/WalletConnect";
 import { Copyright } from "~/components/Paragraph/Paragraph";
@@ -10,22 +15,36 @@ import {
 } from "~/components/WalletConnect/context";
 import { useNavigate } from "@builder.io/qwik-city";
 import { disconnectWallets } from "~/utils/walletConnections";
-
+import { Config, getConnections, reconnect, watchAccount } from "@wagmi/core";
 
 export default component$(() => {
   const login = useContext(LoginContext);
-  const nav = useNavigate();
+  const nav = useNavigate();  
   const wagmiConfig = useContext(WagmiConfigContext);
 
   useVisibleTask$(async () => {
-    await disconnectWallets(wagmiConfig.config);
+    // console.log('config: ', wagmiConfig)
+    // if(wagmiConfig.config){
+    //   await disconnectWallets(wagmiConfig.config); 
+    // }
+
+    console.log("[LOGIN ADDRESS INDEX] ", login.address.value);
   });
   useVisibleTask$(async ({ track }) => {
     track(() => login.address.value);
 
-    if (localStorage.getItem("emmethUserWalletAddress")) {
+    // if (localStorage.getItem("emmethUserWalletAddress")) {
+    //   await nav("/signin");
+    // }
+    if (login.address.value) {
       await nav("/signin");
     }
+    // const connections = await getConnections(wagmiConfig.config as Config)
+    // console.log('connections: ',connections)
+    // if (connections.length > 0) {
+    //   console.log('[[puk]]')
+    //   await nav("/signin");
+    // }
   });
   return (
     <>
@@ -40,7 +59,7 @@ export default component$(() => {
           </HeroText>
           <div class="grid justify-items-center gap-3">
             <WalletConnect
-              image="/assets/icons/login/metamask.svg"
+              image="/assets/icons/login/metamask.svg" 
               text="Use Metamask"
               dataTestId="use-metamask-button"
             />

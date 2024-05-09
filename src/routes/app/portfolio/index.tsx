@@ -50,9 +50,13 @@ import { convertToFraction } from "~/utils/fractions";
 import {
   type WalletWithBalance,
   type BatchTransferFormStore,
+  WalletBalance,
 } from "./interface";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { Spinner } from "~/components/Spinner/Spinner";
+import { Balance } from "~/interface/balance/Balance";
+import { ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
+
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -249,7 +253,7 @@ export default component$(() => {
                   for (const structure of availableStructures.value.structures) {
                     const coins = [];
                     for (const wallet of structure.structureBalance) {
-                      const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
+                      const walletAddress = `${observedWalletsWithBalance.value.find((item: WalletWithBalance) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
                       coins.push({
                         wallet: wallet.wallet.name,
                         isExecutable: wallet.wallet.isExecutable,
@@ -319,7 +323,7 @@ export default component$(() => {
                   <div class="">NETWORK</div> 
                   <div class=""></div>  
                 </div>
-                {availableStructures.value.structures.map((createdStructures) => (
+                {availableStructures.value.structures.map((createdStructures: any) => (
                   <Group
                     key={createdStructures.structure.name}
                     createdStructure={createdStructures}
@@ -373,7 +377,7 @@ export default component$(() => {
                   for (const structure of availableStructures.value.structures) {
                     const coins = [];
                     for (const wallet of structure.structureBalance) {
-                      const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.walletName === wallet.wallet.name)?.wallet.address}`;
+                      const walletAddress = `${observedWalletsWithBalance.value.find((item: WalletWithBalance) => item.walletName === wallet.wallet.name)?.wallet.address}`;
                       coins.push({
                         wallet: wallet.wallet.name,
                         isExecutable: wallet.wallet.isExecutable,
@@ -524,7 +528,7 @@ export default component$(() => {
                           isSelectAllChecked.wallets = true;
                           const { checked } = e.target as HTMLInputElement;
                           if (checked) {
-                            observedWalletsWithBalance.value.map((wallet) => {
+                            observedWalletsWithBalance.value.map((wallet:WalletWithBalance) => {
                               if (
                                 !selectedWallets.wallets.find(
                                   (item) => item.wallet.id === wallet.wallet.id,
@@ -575,7 +579,7 @@ export default component$(() => {
                 </div>
                 {/* div strikte z opcjami */}
                 <div class="scrollbar m-1 flex max-h-[80px] flex-col gap-2 overflow-auto">
-                  {observedWalletsWithBalance.value.map((option) => (
+                  {observedWalletsWithBalance.value.map((option: any) => (
                     <div class="relative mr-2 min-h-9" key={option.wallet.id}>
                       <input
                         type="checkbox"
@@ -599,13 +603,13 @@ export default component$(() => {
 
                           const selectedWallet =
                             observedWalletsWithBalance.value.find(
-                              (selectedWallet) =>
+                              (selectedWallet: any) =>
                                 selectedWallet.wallet.id === defaultValue,
                             );
                           if (checked) {
                             if (selectedWallet) {
                               selectedWallets.wallets.push(selectedWallet);
-                              selectedWallet.balance.map((balance) =>
+                              selectedWallet.balance.map((balance: ObservedBalanceDetails) =>
                                 isTokenSelected.selection.push({
                                   balanceId: balance.balanceId,
                                   status: false,
