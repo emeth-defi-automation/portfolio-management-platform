@@ -223,7 +223,10 @@ export default component$(() => {
   });
   return (
     <>
-      {availableStructures.value.isLoading ? <div class="w-full h-full flex flex-col items-center justify-center"> <Spinner /></div> : availableStructures.value.structures.length === 0 ? (
+      {availableStructures.value.isLoading ?
+      //  <div class="w-full h-full flex flex-col items-center justify-center"> <Spinner /></div> 
+       <Spinner />
+       : availableStructures.value.structures.length === 0 ? (
         <NoDataAdded
           title="You didn't add any Sub Portfolio yet"
           description="Please add your first Sub Portfolio" 
