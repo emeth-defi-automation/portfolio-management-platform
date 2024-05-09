@@ -257,7 +257,20 @@ export default component$(() => {
       });
     }
   });
-
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async ({ track }) => {
+    track(() => wagmiConfig.config);
+    watchAccount(wagmiConfig.config!, {
+      onChange() {
+        const connections = getConnections(wagmiConfig.config as Config);
+        if (connections.length > 1) {
+          isSecondWalletConnected.value = true;
+        } else {
+          isSecondWalletConnected.value = false;
+        }
+      },
+    });
+  });
   const handleReadBalances = $(async (wallet: string) => {
     const tokenBalances = await getMoralisBalance({ wallet });
 

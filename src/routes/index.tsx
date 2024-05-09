@@ -21,7 +21,7 @@ export default component$(() => {
   const login = useContext(LoginContext);
   const nav = useNavigate();
   const wagmiConfig = useContext(WagmiConfigContext);
-
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     if (wagmiConfig.config) {
       await disconnectWallets(wagmiConfig.config);
@@ -29,6 +29,7 @@ export default component$(() => {
 
     console.log("[LOGIN ADDRESS INDEX] ", login.address.value);
   });
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => login.address.value);
 
