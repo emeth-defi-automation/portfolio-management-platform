@@ -3,17 +3,40 @@ import type { QRL, Signal } from "@builder.io/qwik";
 import IconDelete from "/public/assets/icons/delete-white.svg?jsx";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
 import { ButtonWithIcon } from "../Buttons/Buttons";
+import { server$ } from "@builder.io/qwik-city";
+import { connectToDB } from "~/database/db";
+
+const getWalletAddressById = server$(async function (walletId: string) {
+  const db = await connectToDB(this.env);
+  const [[walletAddress]]: any = await db.query(
+    `SELECT VALUE address from ${walletId}`,
+  );
+  return walletAddress;
+});
+
+const getTokenAddressByTokenSymbol = server$(async function (
+  tokenSymbol: string,
+) {
+  const db = await connectToDB(this.env);
+  const [[tokenAddress]]: any = await db.query(
+    `SELECT VALUE address from token where symbol = '${tokenSymbol}';`,
+  );
+  return tokenAddress;
+});
 
 export interface TokenRowProps {
   icon?: string;
   tokenName?: string;
-  symbol?: string;
+  symbol: string;
   quantity?: string;
   value?: string;
   walletName?: string;
   network?: string;
   onClick$?: QRL<() => void>;
   isSwapModalOpen: Signal<boolean>;
+  walletId: string;
+  walletAddressOfTokenToSwap: Signal<string>;
+  tokenFromAddress: Signal<string>;
 }
 export const TokenRow = component$<TokenRowProps>((props) => {
   return (
@@ -45,10 +68,19 @@ export const TokenRow = component$<TokenRowProps>((props) => {
         </div>
         <div
           class="flex h-full items-center overflow-auto font-medium"
-          onClick$={() => {
-            console.log("Swap Token", props.tokenName, props.walletName);
-            console.log("isSwapModalOpen", props.isSwapModalOpen.value);
+          onClick$={async () => {
             props.isSwapModalOpen.value = !props.isSwapModalOpen.value;
+            props.walletAddressOfTokenToSwap.value = await getWalletAddressById(
+              props.walletId,
+            );
+            console.log(
+              "walletAddressOfTokenToSwap",
+              props.walletAddressOfTokenToSwap.value,
+            );
+            props.tokenFromAddress.value = await getTokenAddressByTokenSymbol(
+              props.symbol,
+            );
+            console.log("tokenFromAddress", props.tokenFromAddress.value);
           }}
         >
           <ButtonWithIcon

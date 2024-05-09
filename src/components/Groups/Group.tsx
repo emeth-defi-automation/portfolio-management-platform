@@ -15,14 +15,19 @@ export interface GroupProps {
   onClick$?: QRL<() => void>;
   tokenStore: { balanceId: string; structureId: string };
   isSwapModalOpen: Signal<boolean>;
+  walletAddressOfTokenToSwap: Signal<string>;
+  tokenFromAddress: Signal<string>;
 }
 
 function extractData(
   createdStructure: Structure,
   tokenStore: { balanceId: string; structureId: string },
   isSwapModalOpen: Signal<boolean>,
+  walletAddressOfTokenToSwap: Signal<string>,
+  tokenFromAddress: Signal<string>,
 ): JSXOutput[] {
   const extractedArray: {
+    walletId: string;
     walletName: string;
     symbol: string;
     tokenName: string;
@@ -32,10 +37,12 @@ function extractData(
     balanceId: string;
     structureId: string;
   }[] = [];
-
+  console.log("createdStructure", createdStructure);
+  console.log(createdStructure.structureBalance[0].wallet);
   createdStructure.structureBalance.forEach(
     (balanceEntry: StructureBalance) => {
       extractedArray.push({
+        walletId: balanceEntry.wallet.id,
         walletName: balanceEntry.wallet.name,
         networkName:
           chainIdToNetworkName[balanceEntry.wallet.chainId.toString()],
@@ -67,6 +74,9 @@ function extractData(
         tokenStore.structureId = entry.structureId;
       }}
       isSwapModalOpen={isSwapModalOpen}
+      walletId={entry.walletId}
+      walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
+      tokenFromAddress={tokenFromAddress}
     />
   ));
 }
@@ -92,6 +102,8 @@ export const Group = component$<GroupProps>((props) => {
             props.createdStructure,
             props.tokenStore,
             props.isSwapModalOpen,
+            props.walletAddressOfTokenToSwap,
+            props.tokenFromAddress,
           )}
         </div>
       </div>

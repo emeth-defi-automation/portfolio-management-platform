@@ -15,7 +15,6 @@ import {
 } from "@builder.io/qwik";
 import { messagesContext } from "../layout";
 import { Form } from "@builder.io/qwik-city";
-
 import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
 
@@ -51,6 +50,7 @@ import {
   type BatchTransferFormStore,
 } from "./interface";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import { swapTokensForTokens } from "~/utils/tokens/swap";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -80,6 +80,14 @@ export default component$(() => {
     receiverAddress: "",
     coinsToTransfer: [],
   });
+  const tokenFromAddress = useSignal("");
+  const tokenFromAmount = useSignal("");
+  // TODO: remove --> currently usdt due to 1 valid pool in our sepolia uniswap
+  const tokenToAddress = useSignal(
+    "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
+  );
+  const accountToAddress = useSignal("");
+  const walletAddressOfTokenToSwap = useSignal("");
   useTask$(async ({ track }) => {
     track(() => {
       clickedToken.structureId;
@@ -308,6 +316,8 @@ export default component$(() => {
                       });
                     }}
                     isSwapModalOpen={isSwapModalOpen}
+                    walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
+                    tokenFromAddress={tokenFromAddress}
                   />
                 ))}
               </div>
@@ -762,8 +772,82 @@ export default component$(() => {
         </Modal>
       )}
       {isSwapModalOpen.value ? (
-        <Modal isOpen={isSwapModalOpen} title="Swap Token"></Modal>
+        <Modal
+          isOpen={isSwapModalOpen}
+          title="Swap Token"
+          onClose={$(() => {
+            tokenFromAddress.value = "";
+            tokenFromAmount.value = "";
+            tokenToAddress.value = "";
+          })}
+        >
+          <div class="flex-column">
+            <div>
+              <label for="tokenFromAddress">Token In Adress</label>
+              <input
+                class="bg-black"
+                type="text"
+                name="tokenFromAddress"
+                placeholder="Provide token from address"
+                bind:value={tokenFromAddress}
+                disabled={true}
+              />
+            </div>
+
+            <div>
+              <label for="amount">Token In Amount</label>
+              <input
+                class="bg-black"
+                type="number"
+                name="amount"
+                placeholder="Provide token from amount"
+                bind:value={tokenFromAmount}
+              />
+            </div>
+            <div>
+              <label for="tokenToAddress">Token Out Adress</label>
+              <input
+                class="bg-black"
+                type="text"
+                name="tokenToAddress"
+                placeholder="Provide token to address"
+                bind:value={tokenToAddress}
+              />
+            </div>
+            <div>
+              <label for="accountToAddress">Account To Address</label>
+              <input
+                class="bg-black"
+                type="text"
+                name="accountToAddress"
+                placeholder="Provide account to address"
+                bind:value={accountToAddress}
+              />
+            </div>
+            <button
+              class="rounded-lg bg-blue-500 p-2 text-white"
+              onClick$={async () => {
+                console.log("before swapTokens");
+                await swapTokensForTokens(
+                  tokenFromAddress.value as `0x${string}`,
+                  tokenToAddress.value as `0x${string}`,
+                  tokenFromAmount.value,
+                  walletAddressOfTokenToSwap.value as `0x${string}`,
+                  accountToAddress.value as `0x${string}`,
+                  wagmiConfig,
+                );
+                console.log("after swapTokens");
+              }}
+            >
+              Swap tokens
+            </button>
+          </div>
+        </Modal>
       ) : null}
+      <h1>
+        {tokenFromAddress.value} -- {tokenFromAmount.value} --{" "}
+        {tokenToAddress.value}
+      </h1>
     </>
   );
 });
