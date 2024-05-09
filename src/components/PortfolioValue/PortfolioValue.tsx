@@ -18,6 +18,8 @@ import IconMaximize from "@material-design-icons/svg/filled/open_in_full.svg?jsx
 import IconMinimalize from "@material-design-icons/svg/filled/close_fullscreen.svg?jsx";
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
+import Box from "../Atoms/Box/Box";
+import Select from "../Atoms/Select/Select";
 
 export interface PortfolioValueProps {
   hideChartWhileLoading: Signal<boolean>;
@@ -186,8 +188,8 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       chart();
     });
     return (
-      <div
-        class={`custom-border-1 custom-bg-opacity-5 ${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
+      <Box
+        customClass={`${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"} h-full ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
       >
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
           <h1 class="text-xl font-semibold">Portfolio Value</h1>
@@ -275,7 +277,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
             <div class="flex items-center gap-2">
               <h2 class="custom-text-50 uppercase lg:hidden">Portfolio</h2>
-              <button class="custom-border-1 custom-bg-opacity-5 flex h-8 items-center gap-2 rounded-lg px-2">
+              {/* <button class="custom-border-1 custom-bg-opacity-5 flex h-8 items-center gap-2 rounded-lg px-2">
                 <p>All</p>
                 <IconArrowDown />
               </button>
@@ -338,7 +340,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
               </div>
             </div>
           )}
-      </div>
+      </Box>
     );
   },
 );

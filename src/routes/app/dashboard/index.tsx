@@ -26,6 +26,7 @@ import {
 } from "./server";
 import { type PeriodState } from "~/interface/balance/Balance";
 import Button from "~/components/Atoms/Buttons/Button";
+import Box from "~/components/Atoms/Box/Box";
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -137,7 +138,7 @@ export default component$(() => {
           }}
         />
 
-        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
+        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Alerts</h1>
             <Button text="See All" variant="transparent" size="small" />
@@ -164,9 +165,9 @@ export default component$(() => {
               description="6 hours ago"
             />
           </div>
-        </div>
+        </Box>
 
-        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
+        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Actions</h1>
             <Button text="See All" variant="transparent" size="small" />
@@ -200,10 +201,10 @@ export default component$(() => {
               <SuccessStatus />
             </ActionAlertMessage>
           </div>
-        </div>
+        </Box>
       </div>
 
-      <div class="custom-border-1 custom-shadow custom-bg-opacity-5 grid grid-rows-[32px_1fr] gap-6 rounded-2xl p-6">
+      <Box customClass="grid grid-row-[32px_1fr] gap-6">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold">Favourite Tokens</h1>
           <Button
@@ -271,7 +272,7 @@ export default component$(() => {
             </div>
           </div>
         )}
-      </div>
+      </Box>
     </div>
   );
 });

@@ -64,6 +64,7 @@ import { Spinner } from "~/components/Spinner/Spinner";
 
 import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { hasExecutableWallet } from "~/utils/validators/availableStructure";
+import Box from "~/components/Atoms/Box/Box";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -312,68 +313,58 @@ export default component$(() => {
               />
             </div>
           </div>
-          <div class="grid">
-            <div class="custom-border-1 custom-bg-opacity-5 grid min-h-[260px] grid-rows-[20px_32px_auto] gap-6 rounded-2xl p-6">
-              <p class="text-xl font-semibold">Token list</p>
-              <div class="grid grid-cols-4 gap-2">
-                <ButtonWithIcon
-                  image="/assets/icons/search.svg"
-                  text="Search for name"
-                  class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
-                />
-                <ButtonWithIcon
-                  image="/assets/icons/arrow-down.svg"
-                  text="Choose Subportfolio"
-                  class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
-                />
-                <ButtonWithIcon
-                  image="/assets/icons/arrow-down.svg"
-                  text="Choose Wallet"
-                  class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
-                />
-                <ButtonWithIcon
-                  image="/assets/icons/arrow-down.svg"
-                  text="Choose Network"
-                  class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
-                />
-              </div>
-              <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
-                <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
-                  <div class="">TOKEN NAME</div>
-                  <div class="">QUANTITY</div>
-                  <div class="">VALUE</div>
-                  <div class="custom-bg-white custom-border-1 flex h-8 w-fit gap-2 rounded-lg p-[2px] text-center text-white">
-                    <button class="custom-bg-button rounded-lg px-2">
-                      24h
-                    </button>
-                    <button class="rounded-lg px-2">3d</button>
-                    <button class="rounded-lg px-2">30d</button>
-                  </div>
-                  <div class="">WALLET</div>
-                  <div class="">NETWORK</div>
-                  <div class=""></div>
-                </div>
-                {availableStructures.value.structures.map(
-                  (createdStructures: any) => (
-                    <Group
-                      key={createdStructures.structure.name}
-                      createdStructure={createdStructures}
-                      tokenStore={clickedToken}
-                      onClick$={async () => {
-                        await deleteStructureAction.submit({
-                          id: createdStructures.structure.id,
-                        });
-                      }}
-                      isSwapModalOpen={isSwapModalOpen}
-                      walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
-                      tokenFromAddress={tokenFromAddress}
-                      tokenFromSymbol={tokenFromSymbol}
-                    />
-                  ),
-                )}
-              </div>
+          <Box customClass="grid min-h-[260px] grid-rows-[20px_32px_auto] gap-6 h-full">
+            <p class="text-xl font-semibold">Token list</p>
+            <div class="grid grid-cols-4 gap-2">
+              <ButtonWithIcon
+                image="/assets/icons/search.svg"
+                text="Search for name"
+                class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
+              />
+              <ButtonWithIcon
+                image="/assets/icons/arrow-down.svg"
+                text="Choose Subportfolio"
+                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+              />
+              <ButtonWithIcon
+                image="/assets/icons/arrow-down.svg"
+                text="Choose Wallet"
+                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+              />
+              <ButtonWithIcon
+                image="/assets/icons/arrow-down.svg"
+                text="Choose Network"
+                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+              />
             </div>
-          </div>
+            <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
+              <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
+                <div class="">TOKEN NAME</div>
+                <div class="">QUANTITY</div>
+                <div class="">VALUE</div>
+                <div class="custom-bg-white custom-border-1 flex h-8 w-fit gap-2 rounded-lg p-[2px] text-center text-white">
+                  <button class="custom-bg-button rounded-lg px-2">24h</button>
+                  <button class="rounded-lg px-2">3d</button>
+                  <button class="rounded-lg px-2">30d</button>
+                </div>
+                <div class="">WALLET</div>
+                <div class="">NETWORK</div>
+                <div class=""></div>
+              </div>
+              {availableStructures.value.map((createdStructures) => (
+                <Group
+                  key={createdStructures.structure.name}
+                  createdStructure={createdStructures}
+                  tokenStore={clickedToken}
+                  onClick$={async () => {
+                    await deleteStructureAction.submit({
+                      id: createdStructures.structure.id,
+                    });
+                  }}
+                />
+              ))}
+            </div>
+          </Box>
         </div>
       )}
       {isTransferModalOpen.value ? (

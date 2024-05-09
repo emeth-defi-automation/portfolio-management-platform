@@ -60,6 +60,7 @@ import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import { balancesLiveStream } from "./server/balancesLiveStream";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 import { getAccessToken } from "~/utils/refresh";
+import Box from "~/components/Atoms/Box/Box";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -269,7 +270,7 @@ export default component$(() => {
   return (
     <>
       <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
-        <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
+        <Box customClass="grid grid-rows-[32px_88px_1fr] gap-6 h-full">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Wallets</h1>
             <Button
@@ -298,11 +299,11 @@ export default component$(() => {
             observedWallets={observedWallets}
             selectedWallet={selectedWallet}
           />
-        </div>
+        </Box>
 
         <div class="grid gap-6">
           {/* <PendingAuthorization/> */}
-          <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
+          <Box customClass="grid grid-rows-[64px_24px_1fr] gap-4 h-full">
             {selectedWallet.value && (
               <SelectedWalletDetails
                 key={selectedWallet.value.wallet.address}
@@ -313,7 +314,7 @@ export default component$(() => {
                 transferredCoin={transferredCoin}
               />
             )}
-          </div>
+          </Box>
         </div>
       </div>
 

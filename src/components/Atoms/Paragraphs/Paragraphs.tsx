@@ -25,11 +25,11 @@ const ParagraphStyles = cva(["font-['Sora'] !leading-none"], {
       medium: ["font-medium"],
       semiBold: ["font-semibold"],
     },
-    defaultVariant: {
-      variant: "primaryText",
-      size: "sm",
-      weight: "regular",
-    },
+  },
+  defaultVariants: {
+    variant: "primaryText",
+    size: "sm",
+    weight: "regular",
   },
 });
 
