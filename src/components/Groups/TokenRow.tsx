@@ -73,14 +73,9 @@ export const TokenRow = component$<TokenRowProps>((props) => {
             props.walletAddressOfTokenToSwap.value = await getWalletAddressById(
               props.walletId,
             );
-            console.log(
-              "walletAddressOfTokenToSwap",
-              props.walletAddressOfTokenToSwap.value,
-            );
             props.tokenFromAddress.value = await getTokenAddressByTokenSymbol(
               props.symbol,
             );
-            console.log("tokenFromAddress", props.tokenFromAddress.value);
           }}
         >
           <ButtonWithIcon

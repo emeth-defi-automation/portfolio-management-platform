@@ -26,7 +26,6 @@ export const getTokenDecimals = async (db: Surreal, address: string) => {
     const queryResult = (
       await db.query(`SELECT VALUE decimals FROM token WHERE address = '${address}';`)
     ).at(0);
-    console.log("tokenDecimals from query", queryResult);
     return GetTokenDecimalsResult.parse(queryResult);
   } catch (e) {
     console.error("Error in getTokenDecimals: ", e);
@@ -40,7 +39,6 @@ export const getTokenDecimalsServer = server$(async function (
   try {
     const db = await connectToDB(this.env);
     const tokenDecimals = await getTokenDecimals(db, tokenAddress);
-    console.log("tokenDecimalsServer: ", tokenDecimals);
     return tokenDecimals;
   } catch (e) {
     console.error("Error in getTokenDecimalsServer: ", e);
