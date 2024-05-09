@@ -1,4 +1,9 @@
-import { component$, useContext, useSignal, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  component$,
+  useContext,
+  useSignal,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import ImgAvatar from "/public/assets/images/avatar.png?jsx";
 import IconLogout from "/public/assets/icons/logout.svg?jsx";
 import { LoginContext, WagmiConfigContext } from "../WalletConnect/context";
@@ -11,14 +16,18 @@ export const NavbarContent = component$(() => {
   const nav = useNavigate();
   const login = useContext(LoginContext);
   const wagmiConfig = useContext(WagmiConfigContext);
-  const address = useSignal('');
+  const address = useSignal("");
 
-  useVisibleTask$(({track}) => {
-    track(() => login.address.value)
+  useVisibleTask$(({ track }) => {
+    track(() => login.address.value);
     wagmiConfig.config &&
-    (login.address.value, 
-    login.address.value && (address.value = login.address.value.slice(0, 4) + "..." + login.address.value.slice(-4)));
-  })
+      (login.address.value,
+      login.address.value &&
+        (address.value =
+          login.address.value.slice(0, 4) +
+          "..." +
+          login.address.value.slice(-4)));
+  });
 
   return (
     <>
