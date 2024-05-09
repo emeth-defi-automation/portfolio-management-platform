@@ -1,5 +1,11 @@
 import { type NoSerialize } from "@builder.io/qwik";
-import { type Config, disconnect, getConnectors, reconnect, getConnections } from "@wagmi/core";
+import {
+  type Config,
+  disconnect,
+  getConnectors,
+  reconnect,
+  getConnections,
+} from "@wagmi/core";
 import { createWeb3Modal } from "@web3modal/wagmi";
 
 export const openWeb3Modal = async (config: NoSerialize<Config>) => {

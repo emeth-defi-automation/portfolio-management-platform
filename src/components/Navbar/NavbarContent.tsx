@@ -7,7 +7,6 @@ import {
 import ImgAvatar from "/public/assets/images/avatar.png?jsx";
 import IconLogout from "/public/assets/icons/logout.svg?jsx";
 import { LoginContext, WagmiConfigContext } from "../WalletConnect/context";
-import { getAccount } from "@wagmi/core";
 import { NavLink } from "./NavLink";
 import { useNavigate } from "@builder.io/qwik-city";
 import { disconnectWallets } from "~/utils/walletConnections";

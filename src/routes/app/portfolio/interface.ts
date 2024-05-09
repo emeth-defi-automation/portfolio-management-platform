@@ -1,4 +1,6 @@
-export type WalletBalance = [{ balanceId: string; tokenId: string; tokenSymbol: string }];
+export type WalletBalance = [
+  { balanceId: string; tokenId: string; tokenSymbol: string },
+];
 
 export type WalletWithBalance = {
   wallet: {

@@ -2,11 +2,11 @@ import { component$ } from "@builder.io/qwik";
 
 export interface SpinnerProps {
   isTextVisible?: boolean;
-} 
+}
 
 export const Spinner = component$<SpinnerProps>(({ isTextVisible = true }) => {
   return (
-    <div class="w-full h-full flex flex-col items-center justify-center">
+    <div class="flex h-full w-full flex-col items-center justify-center">
       <svg
         aria-hidden="true"
         class="h-16 w-16 animate-spin text-gray-200  dark:text-gray-600"

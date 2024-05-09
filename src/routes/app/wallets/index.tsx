@@ -34,7 +34,7 @@ import {
   writeContract,
   getConnections,
   watchAccount,
-} from "@wagmi/core"; 
+} from "@wagmi/core";
 
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
 import CoinsToApprove from "~/components/Forms/CoinsToApprove";
@@ -125,7 +125,7 @@ export default component$(() => {
   });
   const handleAddWallet = $(async () => {
     isAddWalletModalOpen.value = false;
-   
+
     formMessageProvider.messages.push({
       id: formMessageProvider.messages.length,
       variant: "info",

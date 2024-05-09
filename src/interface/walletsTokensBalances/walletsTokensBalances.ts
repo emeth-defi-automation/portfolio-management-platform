@@ -21,6 +21,4 @@ export type ObservedBalanceDetails = {
   balanceId: string;
   tokenId: string;
   tokenSymbol: string;
-}
-
-
+};

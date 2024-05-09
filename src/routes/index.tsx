@@ -19,14 +19,13 @@ import { Config, getConnections, reconnect, watchAccount } from "@wagmi/core";
 
 export default component$(() => {
   const login = useContext(LoginContext);
-  const nav = useNavigate();  
+  const nav = useNavigate();
   const wagmiConfig = useContext(WagmiConfigContext);
 
   useVisibleTask$(async () => {
-    // console.log('config: ', wagmiConfig)
-    // if(wagmiConfig.config){
-    //   await disconnectWallets(wagmiConfig.config); 
-    // }
+    if (wagmiConfig.config) {
+      await disconnectWallets(wagmiConfig.config);
+    }
 
     console.log("[LOGIN ADDRESS INDEX] ", login.address.value);
   });
@@ -59,7 +58,7 @@ export default component$(() => {
           </HeroText>
           <div class="grid justify-items-center gap-3">
             <WalletConnect
-              image="/assets/icons/login/metamask.svg" 
+              image="/assets/icons/login/metamask.svg"
               text="Use Metamask"
               dataTestId="use-metamask-button"
             />

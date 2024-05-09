@@ -50,13 +50,11 @@ import { convertToFraction } from "~/utils/fractions";
 import {
   type WalletWithBalance,
   type BatchTransferFormStore,
-  WalletBalance,
 } from "./interface";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { Spinner } from "~/components/Spinner/Spinner";
-import { Balance } from "~/interface/balance/Balance";
-import { ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 
+import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -82,11 +80,11 @@ export default component$(() => {
   const batchTransferFormStore = useStore<BatchTransferFormStore>({
     receiverAddress: "",
     coinsToTransfer: [],
-  });  
-  const observedWalletsWithBalance = useSignal<any>([]); 
+  });
+  const observedWalletsWithBalance = useSignal<any>([]);
   const availableStructures = useSignal<any>({
     structures: [],
-    isLoading:true
+    isLoading: true,
   });
 
   useTask$(async ({ track }) => {
@@ -120,20 +118,20 @@ export default component$(() => {
       }
     });
   });
- 
-  useVisibleTask$(async () => { 
+
+  useVisibleTask$(async () => {
     availableStructures.value = await getAvailableStructures();
     observedWalletsWithBalance.value = await getObservedWalletBalances();
-  })
-  useVisibleTask$(async ({track}) => {
+  });
+  useVisibleTask$(async ({ track }) => {
     track(() => {
       createStructureAction.value;
       deleteToken.value;
       deleteStructureAction.value;
-    })
+    });
 
     availableStructures.value = await getAvailableStructures();
-  })
+  });
 
   const handleCheckboxChange = $(
     (category: any, objectId: string, key: string) => {
@@ -197,7 +195,7 @@ export default component$(() => {
           message: "Transferring tokens...",
           isVisible: true,
         });
-        const transactionHash = await writeContract( 
+        const transactionHash = await writeContract(
           wagmiConfig.config,
           request,
         );
@@ -217,29 +215,29 @@ export default component$(() => {
       }
     } catch (err) {
       console.error(err);
-      formMessageProvider.messages.push({  
+      formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "error",
         message: "Something went wrong.",
         isVisible: true,
-      }); 
-    }  
+      });
+    }
   });
   return (
     <>
-      {availableStructures.value.isLoading ?
-      //  <div class="w-full h-full flex flex-col items-center justify-center"> <Spinner /></div> 
-       <Spinner />
-       : availableStructures.value.structures.length === 0 ? (
+      {availableStructures.value.isLoading ? (
+        //  <div class="w-full h-full flex flex-col items-center justify-center"> <Spinner /></div>
+        <Spinner />
+      ) : availableStructures.value.structures.length === 0 ? (
         <NoDataAdded
           title="You didn't add any Sub Portfolio yet"
-          description="Please add your first Sub Portfolio" 
+          description="Please add your first Sub Portfolio"
           buttonText="Add Sub Portfolio"
           buttonOnClick$={async () => {
             isCreateNewStructureModalOpen.value =
               !isCreateNewStructureModalOpen.value;
           }}
-        />  
+        />
       ) : (
         <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
           <div class="flex items-center justify-between">
@@ -250,7 +248,8 @@ export default component$(() => {
                 text="Transfer"
                 class="custom-border-2"
                 onClick$={async () => {
-                  for (const structure of availableStructures.value.structures) {
+                  for (const structure of availableStructures.value
+                    .structures) {
                     const coins = [];
                     for (const wallet of structure.structureBalance) {
                       const walletAddress = `${observedWalletsWithBalance.value.find((item: WalletWithBalance) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
@@ -320,21 +319,23 @@ export default component$(() => {
                     <button class="rounded-lg px-2">30d</button>
                   </div>
                   <div class="">WALLET</div>
-                  <div class="">NETWORK</div> 
-                  <div class=""></div>  
+                  <div class="">NETWORK</div>
+                  <div class=""></div>
                 </div>
-                {availableStructures.value.structures.map((createdStructures: any) => (
-                  <Group
-                    key={createdStructures.structure.name}
-                    createdStructure={createdStructures}
-                    tokenStore={clickedToken}
-                    onClick$={async () => {
-                      await deleteStructureAction.submit({
-                        id: createdStructures.structure.id,
-                      });
-                    }}
-                  />
-                ))}
+                {availableStructures.value.structures.map(
+                  (createdStructures: any) => (
+                    <Group
+                      key={createdStructures.structure.name}
+                      createdStructure={createdStructures}
+                      tokenStore={clickedToken}
+                      onClick$={async () => {
+                        await deleteStructureAction.submit({
+                          id: createdStructures.structure.id,
+                        });
+                      }}
+                    />
+                  ),
+                )}
               </div>
             </div>
           </div>
@@ -358,14 +359,10 @@ export default component$(() => {
               />
             ) : null}
             {stepsCounter.value === 2 ? (
-              <CoinsAmounts
-                batchTransferFormStore={batchTransferFormStore}
-              />
+              <CoinsAmounts batchTransferFormStore={batchTransferFormStore} />
             ) : null}
             {stepsCounter.value === 3 ? (
-              <Destination
-                batchTransferFormStore={batchTransferFormStore}
-              />
+              <Destination batchTransferFormStore={batchTransferFormStore} />
             ) : null}
           </div>
           <div class="flex gap-4">
@@ -374,7 +371,8 @@ export default component$(() => {
               onClick$={async () => {
                 if (stepsCounter.value === 2) {
                   batchTransferFormStore.coinsToTransfer = [];
-                  for (const structure of availableStructures.value.structures) {
+                  for (const structure of availableStructures.value
+                    .structures) {
                     const coins = [];
                     for (const wallet of structure.structureBalance) {
                       const walletAddress = `${observedWalletsWithBalance.value.find((item: WalletWithBalance) => item.walletName === wallet.wallet.name)?.wallet.address}`;
@@ -528,37 +526,41 @@ export default component$(() => {
                           isSelectAllChecked.wallets = true;
                           const { checked } = e.target as HTMLInputElement;
                           if (checked) {
-                            observedWalletsWithBalance.value.map((wallet:WalletWithBalance) => {
-                              if (
-                                !selectedWallets.wallets.find(
-                                  (item) => item.wallet.id === wallet.wallet.id,
-                                )
-                              ) {
-                                selectedWallets.wallets.push(wallet);
-                                wallet.balance.map((balance) =>
-                                  isTokenSelected.selection.push({
-                                    balanceId: balance.balanceId,
-                                    status: false,
-                                  }),
-                                );
-                              }
+                            observedWalletsWithBalance.value.map(
+                              (wallet: WalletWithBalance) => {
+                                if (
+                                  !selectedWallets.wallets.find(
+                                    (item) =>
+                                      item.wallet.id === wallet.wallet.id,
+                                  )
+                                ) {
+                                  selectedWallets.wallets.push(wallet);
+                                  wallet.balance.map((balance) =>
+                                    isTokenSelected.selection.push({
+                                      balanceId: balance.balanceId,
+                                      status: false,
+                                    }),
+                                  );
+                                }
 
-                              const selectedIndex =
-                                isWalletSelected.selection.findIndex(
-                                  (item) => item.walletId === wallet.wallet.id,
-                                );
+                                const selectedIndex =
+                                  isWalletSelected.selection.findIndex(
+                                    (item) =>
+                                      item.walletId === wallet.wallet.id,
+                                  );
 
-                              if (selectedIndex === -1) {
-                                isWalletSelected.selection.push({
-                                  walletId: wallet.wallet.id,
-                                  status: true,
-                                });
-                              } else {
-                                isWalletSelected.selection[
-                                  selectedIndex
-                                ].status = true;
-                              }
-                            });
+                                if (selectedIndex === -1) {
+                                  isWalletSelected.selection.push({
+                                    walletId: wallet.wallet.id,
+                                    status: true,
+                                  });
+                                } else {
+                                  isWalletSelected.selection[
+                                    selectedIndex
+                                  ].status = true;
+                                }
+                              },
+                            );
                           } else {
                             isSelectAllChecked.wallets = false;
                             isSelectAllChecked.tokens = false;
@@ -609,11 +611,12 @@ export default component$(() => {
                           if (checked) {
                             if (selectedWallet) {
                               selectedWallets.wallets.push(selectedWallet);
-                              selectedWallet.balance.map((balance: ObservedBalanceDetails) =>
-                                isTokenSelected.selection.push({
-                                  balanceId: balance.balanceId,
-                                  status: false,
-                                }),
+                              selectedWallet.balance.map(
+                                (balance: ObservedBalanceDetails) =>
+                                  isTokenSelected.selection.push({
+                                    balanceId: balance.balanceId,
+                                    status: false,
+                                  }),
                               );
                             }
                           } else {
@@ -841,5 +844,3 @@ function parseWalletsToOptions(
   availableBalances.value = totalBalances;
   return options;
 }
-
-
