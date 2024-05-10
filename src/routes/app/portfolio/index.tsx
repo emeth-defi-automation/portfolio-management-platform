@@ -12,6 +12,7 @@ import {
   useStore,
   useTask$,
   useContext,
+  useVisibleTask$,
 } from "@builder.io/qwik";
 import { messagesContext } from "../layout";
 import { Form } from "@builder.io/qwik-city";
@@ -22,6 +23,7 @@ import {
   simulateContract,
   writeContract,
   waitForTransactionReceipt,
+  getAccount,
 } from "@wagmi/core";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import { getCookie } from "~/utils/refresh";
@@ -43,7 +45,11 @@ export {
   useObservedWalletBalances,
   useAvailableStructures,
 } from "./server";
-import { fetchTokens, queryTokens } from "~/database/tokens";
+import {
+  fetchTokens,
+  getTokenSymbolByAddress,
+  queryTokens,
+} from "~/database/tokens";
 import { convertToFraction } from "~/utils/fractions";
 import {
   type WalletWithBalance,
@@ -88,9 +94,16 @@ export default component$(() => {
   const accountToAddress = useSignal("");
   const walletAddressOfTokenToSwap = useSignal("");
   const allTokensFromDb = useSignal([]);
+  const tokensToSwapListVisible = useSignal(false);
   useTask$(async () => {
     const tokens: any = await fetchTokens();
     allTokensFromDb.value = tokens;
+  });
+  // TODO: after configs merged shall be fine
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(() => {
+    const account = wagmiConfig.config ? getAccount(wagmiConfig.config) : null;
+    accountToAddress.value = account ? (account.address as `0x${string}`) : "";
   });
   useTask$(async ({ track }) => {
     track(() => {
@@ -790,7 +803,11 @@ export default component$(() => {
           {tokenFromAddress.value ? (
             <div class="flex-column">
               <div>
-                <label for="amount">You pay</label>
+                <div class="mb-1 flex items-center justify-between">
+                  <p class="custom-text-50 text-light text-xs uppercase">
+                    You pay
+                  </p>
+                </div>
                 <input
                   class="bg-black"
                   type="number"
@@ -805,30 +822,50 @@ export default component$(() => {
                   <p class="custom-text-50 text-light text-xs uppercase">
                     You get
                   </p>
+                  <div>
+                    {tokenToAddress.value ? (
+                      <span class="text-sm">
+                        {getTokenSymbolByAddress(
+                          tokenToAddress.value as `0x${string}`,
+                        )}
+                      </span>
+                    ) : (
+                      <span>Select token</span>
+                    )}
+                    <button
+                      onClick$={() => {
+                        tokensToSwapListVisible.value =
+                          !tokensToSwapListVisible.value;
+                      }}
+                    >
+                      <IconArrowDown />
+                    </button>
+                  </div>
                 </div>
-                {allTokensFromDb.value.map((token: any) => (
-                  <FormBadge
-                    key={`formBadge_${token.id}`}
-                    class="mb-2"
-                    image={token.imagePath}
-                    description={token.symbol}
-                    for={token.symbol}
-                    input={
-                      <input
-                        id={`input_${token.id}`}
-                        type="checkbox"
-                        name={token.symbol}
-                        value={token.address}
-                        class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                        checked={tokenToAddress.value === token.address}
-                        onClick$={() => {
-                          tokenToAddress.value = token.address;
-                        }}
-                      />
-                    }
-                    customClass="border-gradient"
-                  />
-                ))}
+                {tokensToSwapListVisible.value &&
+                  allTokensFromDb.value.map((token: any) => (
+                    <FormBadge
+                      key={`formBadge_${token.id}`}
+                      class="mb-2"
+                      image={token.imagePath}
+                      description={token.symbol}
+                      for={token.symbol}
+                      input={
+                        <input
+                          id={`input_${token.id}`}
+                          type="checkbox"
+                          name={token.symbol}
+                          value={token.address}
+                          class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                          checked={tokenToAddress.value === token.address}
+                          onClick$={() => {
+                            tokenToAddress.value = token.address;
+                          }}
+                        />
+                      }
+                      customClass="border-gradient"
+                    />
+                  ))}
               </div>
               <div>
                 <label for="accountToAddress">Account To Address</label>
