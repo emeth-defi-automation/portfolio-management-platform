@@ -41,7 +41,7 @@
   "devDependencies": {
     "@builder.io/qwik": "1.5.2",
     "@builder.io/qwik-city": "1.5.2",
-    "@playwright/test": "1.41.1",
+    "@playwright/test": "1.41.2",
     "@storybook/addon-essentials": "8.0.8",
     "@storybook/addon-links": "8.0.8",
     "@storybook/blocks": "8.0.8",

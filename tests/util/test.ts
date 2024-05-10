@@ -1,3 +1,4 @@
+import type { BrowserContext, Page } from "@playwright/test";
 import {
   MetaMask,
   testWithSynpress,
@@ -11,8 +12,8 @@ export const test = testWithSynpress(basicSetup, unlockForFixture).extend<{
 }>({
   metamask: async ({ context, metamaskPage, extensionId }, use) => {
     const metamask = new MetaMask(
-      context,
-      metamaskPage,
+      context as BrowserContext,
+      metamaskPage as Page,
       basicSetup.walletPassword,
       extensionId,
     );
