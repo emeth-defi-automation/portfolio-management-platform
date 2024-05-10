@@ -1,10 +1,10 @@
 import Button, { type ButtonProps } from "./Button";
-import IconAdd from '@material-design-icons/svg/outlined/add.svg?jsx';
+import IconAdd from "@material-design-icons/svg/outlined/add.svg?jsx";
 import IconWalletConnect from "/public/assets/icons/login/walletconnect.svg?jsx";
-import IconTrashRed from '@material-design-icons/svg/outlined/delete.svg?jsx';
-import IconMaximize from '@material-design-icons/svg/outlined/open_in_full.svg?jsx';
-import IconInfo from '@material-design-icons/svg/outlined/info.svg?jsx';
-import IconArrowForward from '@material-design-icons/svg/outlined/arrow_forward.svg?jsx';
+import IconTrashRed from "@material-design-icons/svg/outlined/delete.svg?jsx";
+import IconMaximize from "@material-design-icons/svg/outlined/open_in_full.svg?jsx";
+import IconInfo from "@material-design-icons/svg/outlined/info.svg?jsx";
+import IconArrowForward from "@material-design-icons/svg/outlined/arrow_forward.svg?jsx";
 
 export default {
   title: "atoms/Button",
@@ -47,10 +47,6 @@ export function OnlyIcon(args: ButtonProps) {
   return <Button {...args} />;
 }
 
-export function Disabled(args: ButtonProps) {
-  return <Button {...args} />;
-}
-
 ConnectButton.args = {
   disabled: false,
   text: "Use Wallet Connect",
@@ -64,7 +60,7 @@ ConnectButton.args = {
 InfoButton.args = {
   disabled: false,
   text: "How to use Wallet?",
-  leftIcon:  <IconInfo class="h-6 w-6 " />,
+  leftIcon: <IconInfo class="h-6 w-6 " />,
   rightIcon: <IconArrowForward class="h-4 w-4" />,
   variant: "blue",
   class: "font-normal h-10",
@@ -121,13 +117,4 @@ OnlyIcon.args = {
   disabled: false,
   leftIcon: <IconAdd class="h-4 w-4" />,
   variant: "onlyIcon",
-};
-
-Disabled.args = {
-  disabled: true,
-  text: "How to use Wallet?",
-  leftIcon:  <IconInfo class="h-6 w-6" />,
-  rightIcon: <IconArrowForward class="h-4 w-4" />,
-  class: "font-normal h-10",
-  size: "small",
 };
