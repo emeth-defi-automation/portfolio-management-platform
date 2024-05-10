@@ -1,10 +1,10 @@
 import Button, { type ButtonProps } from "./Button";
-import IconAdd from "/public/assets/icons/portfolio/add.svg?jsx";
-import IconArrowForward from "/public/assets/icons/arrow-forward.svg?jsx";
+import IconAdd from '@material-design-icons/svg/outlined/add.svg?jsx';
 import IconWalletConnect from "/public/assets/icons/login/walletconnect.svg?jsx";
-import IconInfoWhite from "/public/assets/icons/info-white.svg?jsx";
-import IconTrashRed from "/public/assets/icons/wallets/delete-red.svg?jsx";
-import IconMaximize from "/public/assets/icons/dashboard/maximize.svg?jsx";
+import IconTrashRed from '@material-design-icons/svg/outlined/delete.svg?jsx';
+import IconMaximize from '@material-design-icons/svg/outlined/open_in_full.svg?jsx';
+import IconInfo from '@material-design-icons/svg/outlined/info.svg?jsx';
+import IconArrowForward from '@material-design-icons/svg/outlined/arrow_forward.svg?jsx';
 
 export default {
   title: "atoms/Button",
@@ -52,6 +52,7 @@ export function Disabled(args: ButtonProps) {
 }
 
 ConnectButton.args = {
+  disabled: false,
   text: "Use Wallet Connect",
   variant: "transparent",
   leftIcon: <IconWalletConnect class="h-6 w-6" />,
@@ -61,8 +62,9 @@ ConnectButton.args = {
 };
 
 InfoButton.args = {
+  disabled: false,
   text: "How to use Wallet?",
-  leftIcon: <IconInfoWhite class="h-6 w-6" />,
+  leftIcon:  <IconInfo class="h-6 w-6 " />,
   rightIcon: <IconArrowForward class="h-4 w-4" />,
   variant: "blue",
   class: "font-normal h-10",
@@ -70,18 +72,21 @@ InfoButton.args = {
 };
 
 Gradient.args = {
+  disabled: false,
   text: "Accept and Sign",
   variant: "gradient",
   class: "",
 };
 
 Transparent.args = {
+  disabled: false,
   text: "Cancel",
   variant: "transparent",
   class: "",
 };
 
 BlueIcon.args = {
+  disabled: false,
   text: "Add Sub Portfolio",
   leftIcon: <IconAdd class="h-4 w-4" />,
   variant: "blue",
@@ -90,12 +95,14 @@ BlueIcon.args = {
 };
 
 Red.args = {
+  disabled: false,
   text: "Yes, Let's Do It!",
   variant: "red",
   class: "px-20",
 };
 
 Danger.args = {
+  disabled: false,
   text: "Delete Wallet",
   leftIcon: <IconTrashRed class="h-4 w-4" />,
   variant: "danger",
@@ -104,21 +111,23 @@ Danger.args = {
 };
 
 IconBox.args = {
+  disabled: false,
   leftIcon: <IconMaximize class="h-4 w-4" />,
   variant: "iconBox",
   size: "small",
 };
 
 OnlyIcon.args = {
+  disabled: false,
   leftIcon: <IconAdd class="h-4 w-4" />,
   variant: "onlyIcon",
 };
 
 Disabled.args = {
+  disabled: true,
   text: "How to use Wallet?",
-  leftIcon: <IconInfoWhite class="h-6 w-6" />,
+  leftIcon:  <IconInfo class="h-6 w-6" />,
   rightIcon: <IconArrowForward class="h-4 w-4" />,
-  variant: "disabled",
   class: "font-normal h-10",
   size: "small",
 };
