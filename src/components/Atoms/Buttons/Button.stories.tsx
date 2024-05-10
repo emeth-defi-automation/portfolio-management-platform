@@ -106,7 +106,7 @@ Danger.args = {
 IconBox.args = {
   leftIcon: <IconMaximize class="h-4 w-4" />,
   variant: "iconBox",
-  size: "small"
+  size: "small",
 };
 
 OnlyIcon.args = {
