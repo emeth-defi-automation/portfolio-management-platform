@@ -24,7 +24,7 @@ export const swapTokensForTokens = async (
       parseFloat(amountIn) * 10 ** parseInt(tokenDecimals[0]),
     );
 
-    // TODO: POSSIBLY LOWER IT BY 0.5% ON MAINNET - SLEEPAGE -- move to tokendelegator
+    // TODO: POSSIBLY LOWER IT BY 0.5% ON MAINNET - SLIPPAGE -- move to tokendelegator
     const amountOutMin = await readContract(wagmiConfig.config, {
       abi: uniswapRouterAbi,
       address: routerContractAddress,

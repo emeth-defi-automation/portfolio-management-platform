@@ -45,3 +45,18 @@ export const getTokenDecimalsServer = server$(async function (
     throw e;
   }
 });
+
+export const GetTokenSymbolResult = z.string();
+export type GetTokenSymbolResult = z.infer<typeof GetTokenSymbolResult>;
+
+export const getTokenSymbolByAddress = server$(async function (tokenAddress: `0x${string}`) {
+  const db = await connectToDB(this.env);
+  const tokenSymbol = (await db.query(
+    `SELECT VALUE symbol FROM token where address = '${tokenAddress}';`,
+  )).at(0);
+  const parsingResult = GetTokenSymbolResult.array().parse(tokenSymbol).at(0);
+  if (!parsingResult) {
+    throw new Error("Token symbol not found");
+  }
+  return parsingResult;
+});

@@ -17,6 +17,7 @@ export interface GroupProps {
   isSwapModalOpen: Signal<boolean>;
   walletAddressOfTokenToSwap: Signal<string>;
   tokenFromAddress: Signal<string>;
+  tokenFromSymbol: Signal<string>;
 }
 
 function extractData(
@@ -25,6 +26,7 @@ function extractData(
   isSwapModalOpen: Signal<boolean>,
   walletAddressOfTokenToSwap: Signal<string>,
   tokenFromAddress: Signal<string>,
+  tokenFromSymbol: Signal<string>,
 ): JSXOutput[] {
   const extractedArray: {
     walletId: string;
@@ -37,8 +39,6 @@ function extractData(
     balanceId: string;
     structureId: string;
   }[] = [];
-  console.log("createdStructure", createdStructure);
-  console.log(createdStructure.structureBalance[0].wallet);
   createdStructure.structureBalance.forEach(
     (balanceEntry: StructureBalance) => {
       extractedArray.push({
@@ -77,6 +77,7 @@ function extractData(
       walletId={entry.walletId}
       walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
       tokenFromAddress={tokenFromAddress}
+      tokenFromSymbol={tokenFromSymbol}
     />
   ));
 }
@@ -104,6 +105,7 @@ export const Group = component$<GroupProps>((props) => {
             props.isSwapModalOpen,
             props.walletAddressOfTokenToSwap,
             props.tokenFromAddress,
+            props.tokenFromSymbol,
           )}
         </div>
       </div>

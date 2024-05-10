@@ -5,6 +5,7 @@ import IconGraph from "/public/assets/icons/graph.svg?jsx";
 import { ButtonWithIcon } from "../Buttons/Buttons";
 import { server$ } from "@builder.io/qwik-city";
 import { connectToDB } from "~/database/db";
+import { getTokenSymbolByAddress } from "~/database/tokens";
 
 const getWalletAddressById = server$(async function (walletId: string) {
   const db = await connectToDB(this.env);
@@ -37,6 +38,7 @@ export interface TokenRowProps {
   walletId: string;
   walletAddressOfTokenToSwap: Signal<string>;
   tokenFromAddress: Signal<string>;
+  tokenFromSymbol: Signal<string>;
 }
 export const TokenRow = component$<TokenRowProps>((props) => {
   return (
@@ -75,6 +77,10 @@ export const TokenRow = component$<TokenRowProps>((props) => {
             );
             props.tokenFromAddress.value = await getTokenAddressByTokenSymbol(
               props.symbol,
+            );
+
+            props.tokenFromSymbol.value = await getTokenSymbolByAddress(
+              props.tokenFromAddress.value as `0x${string}`,
             );
           }}
         >
