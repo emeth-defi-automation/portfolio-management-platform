@@ -230,7 +230,7 @@ export default component$(() => {
       });
     }
   });
-
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => wagmiConfig.config);
     watchAccount(wagmiConfig.config!, {

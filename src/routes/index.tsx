@@ -10,16 +10,16 @@ import {
 } from "~/components/WalletConnect/context";
 import { useNavigate } from "@builder.io/qwik-city";
 import { disconnectWallets } from "~/utils/walletConnections";
-import { Config } from "@wagmi/core";
 
 export default component$(() => {
   const login = useContext(LoginContext);
   const nav = useNavigate();
   const wagmiConfig = useContext(WagmiConfigContext);
-
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     await disconnectWallets(wagmiConfig.config);
   });
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => login.address.value);
 
