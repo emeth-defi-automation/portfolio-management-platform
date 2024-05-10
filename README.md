@@ -32,7 +32,7 @@ Now start `ngrok` and get https webhook url from there for `NGROK_WEBHOOK_URL` (
 npm run ngrok
 ```
 
-Create `.env` (public values, used by client) and `.env.local` (secret values, used by API) files in root directory with templates below:
+Create `.env` (public values, used by client) and `.env.local` (secret values, used by API) files in root directory with templates below and fill all missing values (ask core team for values):
 
 ```
 # .env file
