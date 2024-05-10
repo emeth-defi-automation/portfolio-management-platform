@@ -6,7 +6,7 @@ export interface ParagraphProps {
   text?: string;
 }
 
-const ParagraphStyles = cva(["font-['Sora']"], {
+const ParagraphStyles = cva(["font-['Sora'] !leading-none"], {
   variants: {
     variant: {
       primaryText: ["color-white"],
