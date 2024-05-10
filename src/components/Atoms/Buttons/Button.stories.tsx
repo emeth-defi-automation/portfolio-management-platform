@@ -39,11 +39,15 @@ export function Red(args: ButtonProps) {
   return <Button {...args} />;
 }
 
-export function iconBox(args: ButtonProps) {
+export function IconBox(args: ButtonProps) {
   return <Button {...args} />;
 }
 
-export function onlyIcon(args: ButtonProps) {
+export function OnlyIcon(args: ButtonProps) {
+  return <Button {...args} />;
+}
+
+export function Disabled(args: ButtonProps) {
   return <Button {...args} />;
 }
 
@@ -52,7 +56,7 @@ ConnectButton.args = {
   variant: "transparent",
   leftIcon: <IconWalletConnect class="h-6 w-6" />,
   rightIcon: <IconArrowForward class="h-4 w-4" />,
-  class: "w-72 py-3",
+  class: "px-4 w-72",
   size: "large",
 };
 
@@ -61,27 +65,27 @@ InfoButton.args = {
   leftIcon: <IconInfoWhite class="h-6 w-6" />,
   rightIcon: <IconArrowForward class="h-4 w-4" />,
   variant: "blue",
-  class: "py-[10px] px-2 w-48 font-normal",
+  class: "font-normal h-10",
   size: "small",
 };
 
 Gradient.args = {
   text: "Accept and Sign",
   variant: "gradient",
-  class: "px-10",
+  class: "",
 };
 
 Transparent.args = {
   text: "Cancel",
   variant: "transparent",
-  class: "px-20 py-4",
+  class: "",
 };
 
 BlueIcon.args = {
   text: "Add Sub Portfolio",
   leftIcon: <IconAdd class="h-4 w-4" />,
   variant: "blue",
-  class: "py-3",
+  class: "",
   size: "small",
 };
 
@@ -95,16 +99,26 @@ Danger.args = {
   text: "Delete Wallet",
   leftIcon: <IconTrashRed class="h-4 w-4" />,
   variant: "danger",
-  class: "py-2",
+  class: "",
   size: "small",
 };
 
-iconBox.args = {
+IconBox.args = {
   leftIcon: <IconMaximize class="h-4 w-4" />,
   variant: "iconBox",
+  size: "small"
 };
 
-onlyIcon.args = {
+OnlyIcon.args = {
   leftIcon: <IconAdd class="h-4 w-4" />,
   variant: "onlyIcon",
+};
+
+Disabled.args = {
+  text: "How to use Wallet?",
+  leftIcon: <IconInfoWhite class="h-6 w-6" />,
+  rightIcon: <IconArrowForward class="h-4 w-4" />,
+  variant: "disabled",
+  class: "font-normal h-10",
+  size: "small",
 };
