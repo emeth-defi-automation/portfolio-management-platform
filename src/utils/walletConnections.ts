@@ -19,7 +19,6 @@ export const openWeb3Modal = async (config: NoSerialize<Config>) => {
     projectId,
   });
 
-
   await modal.open({ view: "Connect" });
 
   return modal;
@@ -40,20 +39,15 @@ export const disconnectWallets = async (
       }
     }
   } else {
-
     const connections = await getConnections(config as Config);
 
-
-
-    console.log('outside: ', connections)
+    console.log("outside: ", connections);
     if (connections.length > 0) {
-
-      console.log('inside')
+      console.log("inside");
       for (const connection of connections) {
-        console.log(connection)
+        console.log(connection);
         const connector = connection.connector;
         await disconnect(config as Config, { connector });
-
       }
     }
 

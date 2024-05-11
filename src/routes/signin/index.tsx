@@ -59,7 +59,6 @@ export default component$(() => {
     login.address.value = undefined;
     login.chainId.value = undefined;
     await nav("/");
-    
   });
 
   return (

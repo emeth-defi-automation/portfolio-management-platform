@@ -1,10 +1,5 @@
 import { HeroText } from "~/components/HeroText/HeroText";
-import {
-  component$,
-  noSerialize,
-  useContext,
-  useVisibleTask$,
-} from "@builder.io/qwik";
+import { component$, useContext, useVisibleTask$ } from "@builder.io/qwik";
 import { ConnectButton } from "~/components/Buttons/Buttons";
 import WalletConnect from "~/components/WalletConnect";
 import { Copyright } from "~/components/Paragraph/Paragraph";
@@ -15,7 +10,6 @@ import {
 } from "~/components/WalletConnect/context";
 import { useNavigate } from "@builder.io/qwik-city";
 import { disconnectWallets } from "~/utils/walletConnections";
-import { Config, getConnections, reconnect, watchAccount } from "@wagmi/core";
 
 export default component$(() => {
   const login = useContext(LoginContext);
@@ -23,16 +17,13 @@ export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
-
-    if(localStorage.getItem('emmethUserWalletAddress')){
-      localStorage.removeItem('emmethUserWalletAddress')
+    if (localStorage.getItem("emmethUserWalletAddress")) {
+      localStorage.removeItem("emmethUserWalletAddress");
     }
-    
+
     if (wagmiConfig.config) {
       await disconnectWallets(wagmiConfig.config);
     }
-
-   
   });
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
@@ -41,7 +32,6 @@ export default component$(() => {
     if (login.address.value) {
       await nav("/signin");
     }
-  
   });
   return (
     <>

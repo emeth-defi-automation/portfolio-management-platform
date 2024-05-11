@@ -77,8 +77,11 @@ export default component$(() => {
     wagmiConfig.config = noSerialize(wconfig);
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {
-        onChange(account, prevAccount) {
-          if (window.location.pathname === "/signin" || window.location.pathname === "/") {
+        onChange(account) {
+          if (
+            window.location.pathname === "/signin" ||
+            window.location.pathname === "/"
+          ) {
             localStorage.setItem(
               "emmethUserWalletAddress",
               `${account.address}`,
