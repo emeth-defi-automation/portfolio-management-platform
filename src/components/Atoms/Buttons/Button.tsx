@@ -12,8 +12,8 @@ export interface ButtonProps {
 
 const buttonStyles = cva(
   [
-    "font-['Sora'] pointer flex items-center gap-2 text-nowrap rounded-full",
-    "hover:brightness-75 disabled:bg-transparent disabled:cursor-not-allowed  disabled:hover:brightness-100  disabled:border-2 disabled:border-customGrey disabled:border-opacity-15 disabled:text-white disabled:text-opacity-25",
+    "font-['Sora'] pointer flex items-center gap-2 text-nowrap rounded-full border-2 border-transparent",
+    "hover:brightness-75 disabled:bg-transparent disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:border-2 disabled:border-customGrey/15 disabled:text-customGrey",
   ],
   {
     variants: {
@@ -53,7 +53,7 @@ const Button = ({ variant, size, ...props }: buttonType) => {
       >
         {props.leftIcon ? (
           <span
-            class={`${props.disabled ? "first:fill-customGrey" : "first:fill-white"} grow-0`}
+            class={`${props.disabled ? "first:fill-customGrey" : variant == "danger" ? "fill-customRed" : "first:fill-white"} grow-0`}
           >
             {props.leftIcon}
           </span>

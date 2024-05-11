@@ -100,21 +100,19 @@ Red.args = {
 Danger.args = {
   disabled: false,
   text: "Delete Wallet",
-  leftIcon: <IconTrashRed class="h-4 w-4" />,
+  leftIcon: <IconTrashRed class="h-4 w-4"/>,
   variant: "danger",
   class: "",
   size: "small",
 };
 
 IconBox.args = {
-  disabled: false,
   leftIcon: <IconMaximize class="h-4 w-4" />,
   variant: "iconBox",
   size: "small",
 };
 
 OnlyIcon.args = {
-  disabled: false,
   leftIcon: <IconAdd class="h-4 w-4" />,
   variant: "onlyIcon",
 };
