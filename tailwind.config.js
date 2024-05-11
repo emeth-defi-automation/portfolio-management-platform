@@ -12,7 +12,8 @@ export default {
         customWarning: "#ffc107",
         customGreen: "#4CAF50",
         customRed: "#DA1E28",
-        customGrey: "#9E9E9E"
+        customGrey: "#9E9E9E",
+        customGradient: 'linear-gradient(241deg, #309A6D 22.4%, #7DC767 69.51%, #F9F952 95.88%)'
       },
       borderRadius: {
         10: "40px",
