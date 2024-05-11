@@ -23,28 +23,25 @@ export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
+
+    if(localStorage.getItem('emmethUserWalletAddress')){
+      localStorage.removeItem('emmethUserWalletAddress')
+    }
+    
     if (wagmiConfig.config) {
       await disconnectWallets(wagmiConfig.config);
     }
 
-    console.log("[LOGIN ADDRESS INDEX] ", login.address.value);
+   
   });
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => login.address.value);
 
-    // if (localStorage.getItem("emmethUserWalletAddress")) {
-    //   await nav("/signin");
-    // }
     if (login.address.value) {
       await nav("/signin");
     }
-    // const connections = await getConnections(wagmiConfig.config as Config)
-    // console.log('connections: ',connections)
-    // if (connections.length > 0) {
-    //   console.log('[[puk]]')
-    //   await nav("/signin");
-    // }
+  
   });
   return (
     <>

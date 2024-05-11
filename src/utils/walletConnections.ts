@@ -18,12 +18,8 @@ export const openWeb3Modal = async (config: NoSerialize<Config>) => {
     wagmiConfig: config!,
     projectId,
   });
-  // console.log('state modal ', modal.getState());
-  // console.log('getEvent ', modal.getEvent())
-  // modal.subscribeEvents(event => {
-  //   // if(event.data.event === 'CONNECT_SUCCESS')
-  //   console.log('event: ', event)
-  // })
+
+
   await modal.open({ view: "Connect" });
 
   return modal;
@@ -44,27 +40,26 @@ export const disconnectWallets = async (
       }
     }
   } else {
-    // const connectors = await getConnectors(config as Config);
+
     const connections = await getConnections(config as Config);
 
-    // for (const connector of connectors) {
-    //   // console.log(connector);
-    //   await disconnect(config as Config, { connector });
-    //   // console.log('disconnected ')
-    // }
-    for (const connection of connections) {
-      // console.log(connector);
-      const connector = connection.connector;
-      await disconnect(config as Config, { connector });
-      // console.log('disconnected ')
+
+
+    console.log('outside: ', connections)
+    if (connections.length > 0) {
+
+      console.log('inside')
+      for (const connection of connections) {
+        console.log(connection)
+        const connector = connection.connector;
+        await disconnect(config as Config, { connector });
+
+      }
     }
 
     if (localStorage.getItem("emmethUserWalletAddress")) {
       localStorage.removeItem("emmethUserWalletAddress");
     }
-    // if (localStorage.getItem("refreshToken")) {
-    //   localStorage.removeItem("refreshToken");
-    // }
 
     await disconnect(config as Config);
   }

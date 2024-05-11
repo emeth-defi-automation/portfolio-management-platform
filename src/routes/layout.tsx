@@ -75,32 +75,20 @@ export default component$(() => {
     });
 
     wagmiConfig.config = noSerialize(wconfig);
-    console.log("[LOGIN ADDRESS LAYOUT] ", login.address.value);
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {
         onChange(account, prevAccount) {
-          // console.log('[PrevAcc]: ', prevAccount)
-          // console.log('[Acc]: ', account)
-          // console.log('[Config]: ', wagmiConfig.config!.state)
-          if (window.location.pathname === "/") {
+          if (window.location.pathname === "/signin" || window.location.pathname === "/") {
             localStorage.setItem(
               "emmethUserWalletAddress",
               `${account.address}`,
             );
-            // login.account = noSerialize(account);
-            // login.address.value = account.address;
-            // login.chainId.value = account.chainId;
-            // console.log('[INSIDE PATH /]')
           } else {
             reconnect(wagmiConfig.config as Config);
           }
           login.account = noSerialize(account);
           login.address.value = account.address;
           login.chainId.value = account.chainId;
-          console.log(
-            "[LOGIN ADDRESS LAYOUT Watch Account] ",
-            login.address.value,
-          );
         },
       });
       console.log(
