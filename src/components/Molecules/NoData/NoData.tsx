@@ -27,12 +27,12 @@ const NoData = ({ ...props }) => {
           ) : props.variant == "warning" ? (
             <IconError class="h-16 w-16 fill-customRed" />
           ) : props.variant == "success" ? (
-            <IconCelebration class="fill-white h-14 w-14" />
+            <IconCelebration class="h-14 w-14 fill-white" />
           ) : null}
         </span>
         {props.size == "small" ? (
           <>
-            <Header variant="h5" text={props.title} class="font-medium"/>
+            <Header variant="h5" text={props.title} class="font-medium" />
             <Paragraph
               variant="secondaryText"
               size="xs"
@@ -42,7 +42,7 @@ const NoData = ({ ...props }) => {
           </>
         ) : (
           <>
-          <Header variant="h3" text={props.title}  class="font-medium"/>
+            <Header variant="h3" text={props.title} class="font-medium" />
             <Paragraph
               variant="secondaryText"
               size="sm"
@@ -54,7 +54,11 @@ const NoData = ({ ...props }) => {
       </div>
 
       <div class="flex items-center justify-center gap-2">
-        <Button variant="transparent" text="Deposit Funds" class="py-2.5 text-xs" />
+        <Button
+          variant="transparent"
+          text="Deposit Funds"
+          class="py-2.5 text-xs"
+        />
         <Button text="Setup Wallet" class="py-2.5 text-xs" />
         {/* <Slot/> */}
       </div>

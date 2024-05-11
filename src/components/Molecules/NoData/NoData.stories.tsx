@@ -13,5 +13,5 @@ NoDataBlock.args = {
   title: "No data available yet",
   description: "To view the chart, set up your wallets and deposit funds.",
   variant: "success",
-  size: "small"
+  size: "small",
 };
