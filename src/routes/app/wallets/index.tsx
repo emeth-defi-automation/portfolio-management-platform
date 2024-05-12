@@ -42,6 +42,11 @@ import {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
+export {
+  getObservedWallets,
+  ObservedWalletsList,
+} from "~/components/ObservedWalletsList/ObservedWalletsList";
+
 import {
   checkPattern,
   convertToFraction,
@@ -67,7 +72,6 @@ export default component$(() => {
   const walletTokenBalances = useSignal<any>([]);
   const addWalletAction = useAddWallet();
   const removeWalletAction = useRemoveWallet();
-  const observedWallets = useSignal<WalletTokensBalances[]>([]);
   const isAddWalletModalOpen = useSignal(false);
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
@@ -87,6 +91,7 @@ export default component$(() => {
     coinsToApprove: [],
   });
   const getWalletBalanceHistory = useGetBalanceHistory();
+  const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
   const msg = useSignal("1");
 
@@ -97,7 +102,20 @@ export default component$(() => {
       msg.value = value;
     }
   });
-
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async ({ track }) => {
+    track(() => wagmiConfig.config);
+    watchAccount(wagmiConfig.config!, {
+      onChange() {
+        const connections = getConnections(wagmiConfig.config as Config);
+        if (connections.length > 1) {
+          isSecondWalletConnected.value = true;
+        } else {
+          isSecondWalletConnected.value = false;
+        }
+      },
+    });
+  });
   const handleAddWallet = $(async () => {
     isAddWalletModalOpen.value = false;
 

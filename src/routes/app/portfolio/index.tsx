@@ -12,10 +12,10 @@ import {
   useStore,
   useTask$,
   useContext,
+  useVisibleTask$,
 } from "@builder.io/qwik";
 import { messagesContext } from "../layout";
 import { Form } from "@builder.io/qwik-city";
-
 import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
 
@@ -23,6 +23,7 @@ import {
   simulateContract,
   writeContract,
   waitForTransactionReceipt,
+  getAccount,
 } from "@wagmi/core";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import { getCookie } from "~/utils/refresh";
@@ -34,23 +35,32 @@ import {
   useDeleteStructure,
   useDeleteToken,
   useCreateStructure,
-  useObservedWalletBalances,
-  useAvailableStructures,
+  getObservedWalletBalances,
+  getAvailableStructures,
 } from "./server";
 export {
   useDeleteStructure,
   useDeleteToken,
   useCreateStructure,
-  useObservedWalletBalances,
-  useAvailableStructures,
+  getObservedWalletBalances,
+  getAvailableStructures,
 } from "./server";
-import { queryTokens } from "~/database/tokens";
+import {
+  fetchTokens,
+  getTokenSymbolByAddress,
+  queryTokens,
+} from "~/database/tokens";
 import { convertToFraction } from "~/utils/fractions";
 import {
   type WalletWithBalance,
   type BatchTransferFormStore,
 } from "./interface";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import { swapTokensForTokens } from "~/utils/tokens/swap";
+import { FormBadge } from "~/components/FormBadge/FormBadge";
+import { Spinner } from "~/components/Spinner/Spinner";
+
+import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -59,12 +69,11 @@ export default component$(() => {
   const selectedWallets = useStore({ wallets: [] as any[] });
   const isCreateNewStructureModalOpen = useSignal(false);
   const isTransferModalOpen = useSignal(false);
+  const isSwapModalOpen = useSignal<boolean>(false);
   const deleteToken = useDeleteToken();
   const formMessageProvider = useContext(messagesContext);
-  const availableStructures = useAvailableStructures();
   const createStructureAction = useCreateStructure();
   const deleteStructureAction = useDeleteStructure();
-  const observedWalletsWithBalance = useObservedWalletBalances();
   const isWalletSelected = useStore({
     selection: [] as { walletId: string; status: boolean }[],
   });
@@ -79,6 +88,30 @@ export default component$(() => {
     receiverAddress: "",
     coinsToTransfer: [],
   });
+  const tokenFromAddress = useSignal("");
+  const tokenFromSymbol = useSignal("");
+  const tokenFromAmount = useSignal("");
+  const tokenToAddress = useSignal("");
+  const accountToAddress = useSignal("");
+  const walletAddressOfTokenToSwap = useSignal("");
+  const allTokensFromDb = useSignal([]);
+  const tokensToSwapListVisible = useSignal(false);
+  useTask$(async () => {
+    const tokens: any = await fetchTokens();
+    allTokensFromDb.value = tokens;
+  });
+  // TODO: after configs merged shall be fine
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(() => {
+    const account = wagmiConfig.config ? getAccount(wagmiConfig.config) : null;
+    accountToAddress.value = account ? (account.address as `0x${string}`) : "";
+  });
+  const observedWalletsWithBalance = useSignal<any>([]);
+  const availableStructures = useSignal<any>({
+    structures: [],
+    isLoading: true,
+  });
+
   useTask$(async ({ track }) => {
     track(() => {
       clickedToken.structureId;
@@ -109,6 +142,21 @@ export default component$(() => {
         isTokenSelected.selection.map((balance) => (balance.status = false));
       }
     });
+  });
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async () => {
+    availableStructures.value = await getAvailableStructures();
+    observedWalletsWithBalance.value = await getObservedWalletBalances();
+  });
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async ({ track }) => {
+    track(() => {
+      createStructureAction.value;
+      deleteToken.value;
+      deleteStructureAction.value;
+    });
+
+    availableStructures.value = await getAvailableStructures();
   });
 
   const handleCheckboxChange = $(
@@ -203,7 +251,9 @@ export default component$(() => {
   });
   return (
     <>
-      {availableStructures.value.length === 0 ? (
+      {availableStructures.value.isLoading ? (
+        <Spinner />
+      ) : !availableStructures.value.structures.length ? (
         <NoDataAdded
           title="You didn't add any Sub Portfolio yet"
           description="Please add your first Sub Portfolio"
@@ -223,10 +273,11 @@ export default component$(() => {
                 text="Transfer"
                 class="custom-border-2"
                 onClick$={async () => {
-                  for (const structure of availableStructures.value) {
+                  for (const structure of availableStructures.value
+                    .structures) {
                     const coins = [];
                     for (const wallet of structure.structureBalance) {
-                      const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
+                      const walletAddress = `${observedWalletsWithBalance.value.find((item: WalletWithBalance) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
                       coins.push({
                         wallet: wallet.wallet.name,
                         isExecutable: wallet.wallet.isExecutable,
@@ -296,18 +347,24 @@ export default component$(() => {
                   <div class="">NETWORK</div>
                   <div class=""></div>
                 </div>
-                {availableStructures.value.map((createdStructures) => (
-                  <Group
-                    key={createdStructures.structure.name}
-                    createdStructure={createdStructures}
-                    tokenStore={clickedToken}
-                    onClick$={async () => {
-                      await deleteStructureAction.submit({
-                        id: createdStructures.structure.id,
-                      });
-                    }}
-                  />
-                ))}
+                {availableStructures.value.structures.map(
+                  (createdStructures: any) => (
+                    <Group
+                      key={createdStructures.structure.name}
+                      createdStructure={createdStructures}
+                      tokenStore={clickedToken}
+                      onClick$={async () => {
+                        await deleteStructureAction.submit({
+                          id: createdStructures.structure.id,
+                        });
+                      }}
+                      isSwapModalOpen={isSwapModalOpen}
+                      walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
+                      tokenFromAddress={tokenFromAddress}
+                      tokenFromSymbol={tokenFromSymbol}
+                    />
+                  ),
+                )}
               </div>
             </div>
           </div>
@@ -331,16 +388,10 @@ export default component$(() => {
               />
             ) : null}
             {stepsCounter.value === 2 ? (
-              <CoinsAmounts
-                availableStructures={availableStructures}
-                batchTransferFormStore={batchTransferFormStore}
-              />
+              <CoinsAmounts batchTransferFormStore={batchTransferFormStore} />
             ) : null}
             {stepsCounter.value === 3 ? (
-              <Destination
-                availableStructures={availableStructures}
-                batchTransferFormStore={batchTransferFormStore}
-              />
+              <Destination batchTransferFormStore={batchTransferFormStore} />
             ) : null}
           </div>
           <div class="flex gap-4">
@@ -349,10 +400,11 @@ export default component$(() => {
               onClick$={async () => {
                 if (stepsCounter.value === 2) {
                   batchTransferFormStore.coinsToTransfer = [];
-                  for (const structure of availableStructures.value) {
+                  for (const structure of availableStructures.value
+                    .structures) {
                     const coins = [];
                     for (const wallet of structure.structureBalance) {
-                      const walletAddress = `${observedWalletsWithBalance.value.find((item) => item.walletName === wallet.wallet.name)?.wallet.address}`;
+                      const walletAddress = `${observedWalletsWithBalance.value.find((item: WalletWithBalance) => item.walletName === wallet.wallet.name)?.wallet.address}`;
                       coins.push({
                         wallet: wallet.wallet.name,
                         isExecutable: wallet.wallet.isExecutable,
@@ -503,37 +555,41 @@ export default component$(() => {
                           isSelectAllChecked.wallets = true;
                           const { checked } = e.target as HTMLInputElement;
                           if (checked) {
-                            observedWalletsWithBalance.value.map((wallet) => {
-                              if (
-                                !selectedWallets.wallets.find(
-                                  (item) => item.wallet.id === wallet.wallet.id,
-                                )
-                              ) {
-                                selectedWallets.wallets.push(wallet);
-                                wallet.balance.map((balance) =>
-                                  isTokenSelected.selection.push({
-                                    balanceId: balance.balanceId,
-                                    status: false,
-                                  }),
-                                );
-                              }
+                            observedWalletsWithBalance.value.map(
+                              (wallet: WalletWithBalance) => {
+                                if (
+                                  !selectedWallets.wallets.find(
+                                    (item) =>
+                                      item.wallet.id === wallet.wallet.id,
+                                  )
+                                ) {
+                                  selectedWallets.wallets.push(wallet);
+                                  wallet.balance.map((balance) =>
+                                    isTokenSelected.selection.push({
+                                      balanceId: balance.balanceId,
+                                      status: false,
+                                    }),
+                                  );
+                                }
 
-                              const selectedIndex =
-                                isWalletSelected.selection.findIndex(
-                                  (item) => item.walletId === wallet.wallet.id,
-                                );
+                                const selectedIndex =
+                                  isWalletSelected.selection.findIndex(
+                                    (item) =>
+                                      item.walletId === wallet.wallet.id,
+                                  );
 
-                              if (selectedIndex === -1) {
-                                isWalletSelected.selection.push({
-                                  walletId: wallet.wallet.id,
-                                  status: true,
-                                });
-                              } else {
-                                isWalletSelected.selection[
-                                  selectedIndex
-                                ].status = true;
-                              }
-                            });
+                                if (selectedIndex === -1) {
+                                  isWalletSelected.selection.push({
+                                    walletId: wallet.wallet.id,
+                                    status: true,
+                                  });
+                                } else {
+                                  isWalletSelected.selection[
+                                    selectedIndex
+                                  ].status = true;
+                                }
+                              },
+                            );
                           } else {
                             isSelectAllChecked.wallets = false;
                             isSelectAllChecked.tokens = false;
@@ -554,7 +610,7 @@ export default component$(() => {
                 </div>
                 {/* div strikte z opcjami */}
                 <div class="scrollbar m-1 flex max-h-[80px] flex-col gap-2 overflow-auto">
-                  {observedWalletsWithBalance.value.map((option) => (
+                  {observedWalletsWithBalance.value.map((option: any) => (
                     <div class="relative mr-2 min-h-9" key={option.wallet.id}>
                       <input
                         type="checkbox"
@@ -578,17 +634,18 @@ export default component$(() => {
 
                           const selectedWallet =
                             observedWalletsWithBalance.value.find(
-                              (selectedWallet) =>
+                              (selectedWallet: any) =>
                                 selectedWallet.wallet.id === defaultValue,
                             );
                           if (checked) {
                             if (selectedWallet) {
                               selectedWallets.wallets.push(selectedWallet);
-                              selectedWallet.balance.map((balance) =>
-                                isTokenSelected.selection.push({
-                                  balanceId: balance.balanceId,
-                                  status: false,
-                                }),
+                              selectedWallet.balance.map(
+                                (balance: ObservedBalanceDetails) =>
+                                  isTokenSelected.selection.push({
+                                    balanceId: balance.balanceId,
+                                    status: false,
+                                  }),
                               );
                             }
                           } else {
@@ -759,6 +816,135 @@ export default component$(() => {
           </Form>
         </Modal>
       )}
+      {isSwapModalOpen.value ? (
+        <Modal
+          isOpen={isSwapModalOpen}
+          title="Swap"
+          onClose={$(() => {
+            tokenFromAddress.value = "";
+            tokenFromAmount.value = "";
+            tokenToAddress.value = "";
+            accountToAddress.value = "";
+          })}
+        >
+          {tokenFromAddress.value ? (
+            <div class="flex-column">
+              <div>
+                <div class="mb-1 flex items-center justify-between">
+                  <p class="custom-text-50 text-light text-xs uppercase">
+                    You pay
+                  </p>
+                </div>
+                <input
+                  class="bg-black"
+                  type="number"
+                  name="amount"
+                  placeholder={`0`}
+                  bind:value={tokenFromAmount}
+                />
+                <label for="amount">{tokenFromSymbol.value}</label>
+              </div>
+              <div class="flex max-h-[450px] flex-col overflow-auto pb-4">
+                <div class="mb-3 flex items-center justify-between">
+                  <p class="custom-text-50 text-light text-xs uppercase">
+                    You get
+                  </p>
+                  <div>
+                    {tokenToAddress.value ? (
+                      <span class="text-sm">
+                        {getTokenSymbolByAddress(
+                          tokenToAddress.value as `0x${string}`,
+                        )}
+                      </span>
+                    ) : (
+                      <span>Select token</span>
+                    )}
+                    <button
+                      onClick$={() => {
+                        tokensToSwapListVisible.value =
+                          !tokensToSwapListVisible.value;
+                      }}
+                    >
+                      <IconArrowDown />
+                    </button>
+                  </div>
+                </div>
+                {tokensToSwapListVisible.value &&
+                  allTokensFromDb.value.map((token: any) => (
+                    <FormBadge
+                      key={`formBadge_${token.id}`}
+                      class="mb-2"
+                      image={token.imagePath}
+                      description={token.symbol}
+                      for={token.symbol}
+                      input={
+                        <input
+                          id={`input_${token.id}`}
+                          type="checkbox"
+                          name={token.symbol}
+                          value={token.address}
+                          class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                          checked={tokenToAddress.value === token.address}
+                          onClick$={() => {
+                            tokenToAddress.value = token.address;
+                          }}
+                        />
+                      }
+                      customClass="border-gradient"
+                    />
+                  ))}
+              </div>
+              <div>
+                <label for="accountToAddress">Account To Address</label>
+                <input
+                  class="bg-black"
+                  type="text"
+                  name="accountToAddress"
+                  placeholder="Provide account to address"
+                  bind:value={accountToAddress}
+                />
+              </div>
+              <div class="mt-6 flex gap-4">
+                <button
+                  type="button"
+                  class="custom-border-1 h-12 w-1/2 rounded-10 duration-300 ease-in-out hover:scale-105 "
+                  onClick$={() => {
+                    isSwapModalOpen.value = false;
+                    tokenFromAddress.value = "";
+                    tokenFromAmount.value = "";
+                    tokenToAddress.value = "";
+                    accountToAddress.value = "";
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  class="h-12 w-1/2 rounded-10 rounded-lg bg-blue-500 p-2 text-white duration-300 ease-in-out hover:scale-105"
+                  onClick$={async () => {
+                    isSwapModalOpen.value = false;
+                    await swapTokensForTokens(
+                      tokenFromAddress.value as `0x${string}`,
+                      tokenToAddress.value as `0x${string}`,
+                      tokenFromAmount.value,
+                      walletAddressOfTokenToSwap.value as `0x${string}`,
+                      accountToAddress.value as `0x${string}`,
+                      wagmiConfig,
+                    );
+                  }}
+                >
+                  Swap tokens
+                </button>
+              </div>
+            </div>
+          ) : (
+            <h1>Can't swap selected token</h1>
+          )}
+        </Modal>
+      ) : null}
+      <h1>
+        {tokenFromAddress.value} -- {tokenFromAmount.value} --{" "}
+        {tokenToAddress.value}
+      </h1>
     </>
   );
 });

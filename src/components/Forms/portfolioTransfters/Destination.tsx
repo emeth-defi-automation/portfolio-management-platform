@@ -4,7 +4,6 @@ import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 
 export interface DestinationProps {
   batchTransferFormStore: BatchTransferFormStore;
-  availableStructures: any;
 }
 
 export default component$<DestinationProps>(({ batchTransferFormStore }) => {

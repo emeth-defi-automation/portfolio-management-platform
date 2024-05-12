@@ -6,7 +6,6 @@ import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 
 export interface CoinsAmountsProps {
   batchTransferFormStore: BatchTransferFormStore;
-  availableStructures: any;
 }
 
 export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
