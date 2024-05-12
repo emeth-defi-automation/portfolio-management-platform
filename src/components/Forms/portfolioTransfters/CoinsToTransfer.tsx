@@ -11,9 +11,9 @@ export interface CoinsToTransferProps {
 
 export default component$<CoinsToTransferProps>(
   ({ batchTransferFormStore, availableStructures }) => {
-    return (
+    return ( 
       <>
-        {availableStructures.value.map((structure: any, index: number) => {
+        {availableStructures.value.structures.map((structure: any, index: number) => {
           return (
             <>
               <div

@@ -24,6 +24,7 @@ import {
   writeContract,
   waitForTransactionReceipt,
   getAccount,
+  readContract,
 } from "@wagmi/core";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import { getCookie } from "~/utils/refresh";
@@ -47,6 +48,7 @@ export {
 } from "./server";
 import {
   fetchTokens,
+  getTokenDecimalsServer,
   getTokenSymbolByAddress,
   queryTokens,
 } from "~/database/tokens";
@@ -61,6 +63,8 @@ import { FormBadge } from "~/components/FormBadge/FormBadge";
 import { Spinner } from "~/components/Spinner/Spinner";
 
 import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
+import { useDebouncer } from "~/utils/debouncer";
+import { uniswapRouterAbi } from "~/abi/UniswapRouterAbi";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -96,16 +100,69 @@ export default component$(() => {
   const walletAddressOfTokenToSwap = useSignal("");
   const allTokensFromDb = useSignal([]);
   const tokensToSwapListVisible = useSignal(false);
+  const tokenToEstimatedAmount = useSignal("");
+  const tokenFromAmountDebounce = useDebouncer(
+    $(
+      async ({
+        amountIn,
+        tokenInAddress,
+        tokenOutAddress,
+      }: {
+        amountIn: bigint;
+        tokenInAddress: `0x${string}`;
+        tokenOutAddress: `0x${string}`;
+      }) => {
+        // console.log("amountInWEI", amountIn); 
+        // console.log("tokenInAddress", tokenInAddress);
+        // console.log("tokenOutAddress", tokenOutAddress);
+        const tokenDecimals = await getTokenDecimalsServer(tokenInAddress);
+
+        const amountInWEI = BigInt(
+          parseFloat(amountIn.toString()) * 10 ** parseInt(tokenDecimals[0]),
+        );
+
+        const routerContractAddress = import.meta.env
+          .PUBLIC_ROUTER_CONTRACT_ADDRESS;
+
+        if (!wagmiConfig.config) {
+          return;
+        }
+
+        const estimatedValue = await readContract(wagmiConfig.config, {
+          abi: uniswapRouterAbi,
+          address: routerContractAddress,
+          functionName: "getAmountsOut",
+          args: [amountInWEI, [tokenInAddress, tokenOutAddress]],
+        });
+
+        console.log("[[estimatedValue]]", estimatedValue);
+        
+        tokenToEstimatedAmount.value = estimatedValue[1].toString();
+      },
+    ),
+    500,
+  );
+
   useTask$(async () => {
     const tokens: any = await fetchTokens();
     allTokensFromDb.value = tokens;
   });
-  // TODO: after configs merged shall be fine
+
   // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(() => {
-    const account = wagmiConfig.config ? getAccount(wagmiConfig.config) : null;
-    accountToAddress.value = account ? (account.address as `0x${string}`) : "";
+  useVisibleTask$(({track}) => {
+    track(() => isSwapModalOpen.value)
+    const cookieWallet = localStorage.getItem('emmethUserWalletAddress');
+    if(cookieWallet){
+      accountToAddress.value = cookieWallet; 
+    }
+
   });
+  useVisibleTask$(({track}) => {
+    track(() => tokenToEstimatedAmount.value)
+    console.log('[NO ZMIENILO SIE]: ', tokenToEstimatedAmount.value)
+
+  });
+
   const observedWalletsWithBalance = useSignal<any>([]);
   const availableStructures = useSignal<any>({
     structures: [],
@@ -400,7 +457,7 @@ export default component$(() => {
               onClick$={async () => {
                 if (stepsCounter.value === 2) {
                   batchTransferFormStore.coinsToTransfer = [];
-                  for (const structure of availableStructures.value
+                  for (const structure of availableStructures.value 
                     .structures) {
                     const coins = [];
                     for (const wallet of structure.structureBalance) {
@@ -829,10 +886,11 @@ export default component$(() => {
         >
           {tokenFromAddress.value ? (
             <div class="flex-column">
+              {/* amount */}
               <div>
                 <div class="mb-1 flex items-center justify-between">
                   <p class="custom-text-50 text-light text-xs uppercase">
-                    You pay
+                    You pay 
                   </p>
                 </div>
                 <input
@@ -840,10 +898,32 @@ export default component$(() => {
                   type="number"
                   name="amount"
                   placeholder={`0`}
-                  bind:value={tokenFromAmount}
+                  bind:value={tokenFromAmount} 
+                  onInput$={async (e) => {
+                    const target = e.target as HTMLInputElement;
+                    tokenFromAmount.value = target.value;
+                    // console.log("[wallet to send from]", tokenFromAddress.value);
+                    if (
+                      tokenFromAddress.value &&
+                      tokenToAddress.value &&
+                      tokenFromAmount.value
+                    ) {
+                      // console.log("[wallet to send from]", tokenFromAddress.value);
+                      // console.log("[wallet to send to]", tokenToAddress.value);
+                      // console.log("[how many]", tokenFromAmount.value);
+                      const amountIn = BigInt(parseInt(target.value));
+                      await tokenFromAmountDebounce({ 
+                        amountIn: amountIn,
+                        tokenInAddress: tokenFromAddress.value as `0x${string}`,
+                        tokenOutAddress: tokenToAddress.value as `0x${string}`,
+                      });
+                      console.log("[estimatedAmount]", tokenToEstimatedAmount.value);
+                    }
+                  }}
                 />
                 <label for="amount">{tokenFromSymbol.value}</label>
               </div>
+               {/* select token */}
               <div class="flex max-h-[450px] flex-col overflow-auto pb-4">
                 <div class="mb-3 flex items-center justify-between">
                   <p class="custom-text-50 text-light text-xs uppercase">
@@ -869,31 +949,45 @@ export default component$(() => {
                     </button>
                   </div>
                 </div>
-                {tokensToSwapListVisible.value &&
-                  allTokensFromDb.value.map((token: any) => (
-                    <FormBadge
-                      key={`formBadge_${token.id}`}
-                      class="mb-2"
-                      image={token.imagePath}
-                      description={token.symbol}
-                      for={token.symbol}
-                      input={
-                        <input
-                          id={`input_${token.id}`}
-                          type="checkbox"
-                          name={token.symbol}
-                          value={token.address}
-                          class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                          checked={tokenToAddress.value === token.address}
-                          onClick$={() => {
-                            tokenToAddress.value = token.address;
-                          }}
+                <p class="custom-text-50 text-light text-xs uppercase mb-2">
+                  {tokenToEstimatedAmount.value} 
+                </p>
+                {tokensToSwapListVisible.value && 
+                  allTokensFromDb.value.map(async (token: any) => {
+                    const tokenSymbol = await getTokenSymbolByAddress(
+                      tokenFromAddress.value as `0x${string}`,
+                    ) 
+                    console.log('1', token.symbol)
+                    console.log('2', tokenSymbol, 'a to: ',tokenFromAddress.value )
+                    if(token.symbol !== tokenSymbol){   
+                      return(
+                        <FormBadge
+                          key={`formBadge_${token.id}`}
+                          class="mb-2"
+                          image={token.imagePath}
+                          description={token.symbol}
+                          for={token.symbol}
+                          input={
+                            <input 
+                              id={`input_${token.id}`}
+                              type="checkbox"
+                              name={token.symbol}
+                              value={token.address}
+                              class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                              checked={tokenToAddress.value === token.address}
+                              onClick$={() => {
+                                tokenToAddress.value = token.address;
+                              }}
+                            />
+                          }
+                          customClass="border-gradient"
                         />
-                      }
-                      customClass="border-gradient"
-                    />
-                  ))}
+                      )
+                    }
+                    }
+                    )}
               </div>
+              {/* where to send */}
               <div>
                 <label for="accountToAddress">Account To Address</label>
                 <input
@@ -904,6 +998,7 @@ export default component$(() => {
                   bind:value={accountToAddress}
                 />
               </div>
+              {/* buttons */}
               <div class="mt-6 flex gap-4">
                 <button
                   type="button"
