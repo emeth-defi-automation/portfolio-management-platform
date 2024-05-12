@@ -15,16 +15,16 @@ const CheckboxStyles = cva(["cursor-pointer"], {
   variants: {
     variant: {
       checkTick: [
-        "border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg relative z-10 appearance-none rounded checked:after:absolute checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]",
+        "appearance-none custom-border-1 rounded custom-bg-white checkbox-gradient-border relative before:absolute before:rounded before:p-px after:absolute  border-grd after:rotate-45",
       ],
       toggleTick: ["opacity-0 w-8 h-5 absolute"],
     },
     size: {
       small: [
-        "h-5 w-5 checked:after:ms-[0.35rem] checked:after:mt-0.5 checked:after:h-2.5 checked:after:w-1.5",
+        "h-5 w-5 before:w-5 before:h-5 after:w-1.5 after:h-2.5 after:left-1/2 after:-translate-x-1/2 after:top-1/2 after:-translate-y-2/3",
       ],
       large: [
-        "h-6 w-6 checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2",
+        "h-6 w-6 before:w-6 before:h-6 after:w-1.5 after:h-2.5 after:left-1/2 after:-translate-x-1/2 after:top-1/2 after:-translate-y-2/3",
       ],
     },
     defaultVariant: {
