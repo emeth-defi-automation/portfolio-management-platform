@@ -30,7 +30,7 @@ Portfolio.args = {
   ],
   size: "large",
   variant: "largeArrow",
-  onValueChange: $((target:any) => console.log(target))
+  onValueChange: $((target: any) => console.log(target)),
 };
 
 Modal.args = {
@@ -46,5 +46,5 @@ Dashboard.args = {
   options: [{ value: "", text: "All" }],
   size: "small",
   variant: "smallArrow",
-  onValueChange: $((target:any) => console.log(target))
+  onValueChange: $((target: any) => console.log(target)),
 };

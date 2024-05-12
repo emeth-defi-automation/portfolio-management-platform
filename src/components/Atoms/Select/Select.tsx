@@ -7,7 +7,6 @@ export type Option = {
   text: string;
 };
 
-
 const SelectStyles = cva(
   [
     "custom-border-1 min-w-max w-full cursor-pointer rounded-lg bg-transparent px-4 text-white  text-xs font-['Sora'] appearance-none bg-[url('/assets/icons/arrow-down.svg')] bg-no-repeat bg-auto",
@@ -42,30 +41,32 @@ export interface SelectProps extends VariantProps<typeof SelectStyles> {
   name: string;
 }
 
-const Select = component$(({ onValueChange, variant, size, ...props }: SelectProps) => {
-  return (
-    <select
-      name={props.name}
-      id={props.name}
-      class={twMerge(SelectStyles({ variant, size }), props.class)}
-      onInput$={(e: any) => {
+const Select = component$(
+  ({ onValueChange, variant, size, ...props }: SelectProps) => {
+    return (
+      <select
+        name={props.name}
+        id={props.name}
+        class={twMerge(SelectStyles({ variant, size }), props.class)}
+        onInput$={(e: any) => {
           const target = e.target as any;
-          if(onValueChange){
-            onValueChange(target.value); 
+          if (onValueChange) {
+            onValueChange(target.value);
           }
-      }}
-    >
-      {props.options?.map((option, index) => (
-        <option
-          class="text-black"
-          key={`${option.text}${index}`}
-          value={option.value}
-        >
-          {option.text}
-        </option>
-      ))}
-    </select>
-  );
-});
+        }}
+      >
+        {props.options?.map((option, index) => (
+          <option
+            class="text-black"
+            key={`${option.text}${index}`}
+            value={option.value}
+          >
+            {option.text}
+          </option>
+        ))}
+      </select>
+    );
+  },
+);
 
 export default Select;
