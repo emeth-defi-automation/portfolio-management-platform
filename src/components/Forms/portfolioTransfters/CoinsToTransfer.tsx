@@ -13,7 +13,7 @@ export default component$<CoinsToTransferProps>(
   ({ batchTransferFormStore, availableStructures }) => {
     return (
       <>
-        {availableStructures.value.map((structure: any, index: number) => {
+        {availableStructures.value.structures.map((structure: any, index: number) => {
           return (
             <>
               <div
