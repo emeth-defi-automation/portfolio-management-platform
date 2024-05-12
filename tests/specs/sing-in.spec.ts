@@ -5,7 +5,7 @@ import LoginPage from '../pages/login.page';
 import SignInPage from '../pages/signin.page';
 import { test } from '../util/test';
 
-test.describe('sign in', () => {
+test.describe("sign in", () => {
   test.beforeEach(async ({ page }) => {
     const loginPage = new LoginPage(page);
 
@@ -22,13 +22,12 @@ test.describe('sign in', () => {
     await loginPage.verifyTitle();
     await loginPage.useMetamask();
 
-    // TODO: Temporary for debugging GitHub Actions run
     await signInPage.useMetamaskWithConnectWalletModal();
-    // await metamask.connectToDapp();
-    // await signInPage.acceptAndSign();
+    await metamask.connectToDapp();
+    await signInPage.acceptAndSign();
 
-    // await metamask.confirmSignature();
+    await metamask.confirmSignature();
 
-    // await dashboardPage.verifyPortfolioValue("0.00");
+    await dashboardPage.verifyPortfolioValue("0.00");
   });
 });
