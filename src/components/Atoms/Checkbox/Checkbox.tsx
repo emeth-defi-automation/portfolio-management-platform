@@ -36,34 +36,35 @@ const CheckboxStyles = cva(["cursor-pointer"], {
 
 export type CheckboxType = VariantProps<typeof CheckboxStyles> & CheckboxProps;
 
-const Checkbox = component$<CheckboxType>(({ isChecked, variant, size, ...props }) => {
-  const isInputChecked = useSignal<boolean>(isChecked);
-  return (
-    <div>
-      <input
-        id={props.name}
-        name={props.name}
-        type="checkbox"
-        class={twMerge(CheckboxStyles({ variant, size }), props.class)}
-        value={props.value}
-        onClick$={props.onClick}
-        checked={isChecked}
-      />
-      {variant === "toggleTick" ? (
-        <span
-        onClick$={(e) => {
-          const target = e.target;
-          const input = target!.parentNode!.childNodes[0];
-          isInputChecked.value = !isInputChecked.value;
-          input.checked = isInputChecked.value; 
-          console.log(input.checked)
-
-        }}
-          class={`absolute h-5 w-8 cursor-pointer rounded-full before:absolute before:left-1 before:top-1/2 before:h-3 before:w-3 before:-translate-y-1/2 before:rounded-full before:bg-white after:absolute after:left-2 after:top-1/2 after:h-1.5 after:w-1 after:-translate-y-1/2 after:rotate-45 after:border-2 after:border-l-0 after:border-t-0 after:border-solid ${isInputChecked.value ? "bg-customGreen before:translate-x-3 after:translate-x-3 after:border-customGreen" : "bg-gray-400 after:border-gray-400"}`}
+const Checkbox = component$<CheckboxType>(
+  ({ isChecked, variant, size, ...props }) => {
+    const isInputChecked = useSignal<boolean>(isChecked);
+    return (
+      <div>
+        <input
+          id={props.name}
+          name={props.name}
+          type="checkbox"
+          class={twMerge(CheckboxStyles({ variant, size }), props.class)}
+          value={props.value}
+          onClick$={props.onClick}
+          checked={isChecked}
         />
-      ) : null}
-    </div>
-  );
-});
+        {variant === "toggleTick" ? (
+          <span
+            onClick$={(e) => {
+              const target = e.target;
+              const input = target!.parentNode!.childNodes[0];
+              isInputChecked.value = !isInputChecked.value;
+              input.checked = isInputChecked.value;
+              console.log(input.checked);
+            }}
+            class={`absolute h-5 w-8 cursor-pointer rounded-full before:absolute before:left-1 before:top-1/2 before:h-3 before:w-3 before:-translate-y-1/2 before:rounded-full before:bg-white after:absolute after:left-2 after:top-1/2 after:h-1.5 after:w-1 after:-translate-y-1/2 after:rotate-45 after:border-2 after:border-l-0 after:border-t-0 after:border-solid ${isInputChecked.value ? "bg-customGreen before:translate-x-3 after:translate-x-3 after:border-customGreen" : "bg-gray-400 after:border-gray-400"}`}
+          />
+        ) : null}
+      </div>
+    );
+  },
+);
 
 export default Checkbox;
