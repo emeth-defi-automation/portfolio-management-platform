@@ -9,12 +9,7 @@ import {
   useSignal,
 } from "@builder.io/qwik";
 import { type RequestHandler } from "@builder.io/qwik-city";
-import {
-  type Config,
-  reconnect,
-  watchAccount,
-  getConnections,
-} from "@wagmi/core";
+import { type Config, reconnect, watchAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, sepolia } from "viem/chains";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";

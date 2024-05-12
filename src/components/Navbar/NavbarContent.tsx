@@ -16,7 +16,7 @@ export const NavbarContent = component$(() => {
   const login = useContext(LoginContext);
   const wagmiConfig = useContext(WagmiConfigContext);
   const address = useSignal("");
-// eslint-disable-next-line qwik/no-use-visible-task
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ track }) => {
     track(() => login.address.value);
     wagmiConfig.config &&

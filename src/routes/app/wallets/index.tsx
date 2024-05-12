@@ -19,10 +19,7 @@ import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import {
-  LoginContext,
-  WagmiConfigContext,
-} from "~/components/WalletConnect/context";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
 
 import {
@@ -70,7 +67,6 @@ import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
-  const login = useContext(LoginContext);
   const formMessageProvider = useContext(messagesContext);
   const { streamId } = useContext(StreamStoreContext);
   const walletTokenBalances = useSignal<any>([]);

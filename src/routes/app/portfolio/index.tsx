@@ -118,7 +118,7 @@ export default component$(() => {
       }
     });
   });
-// eslint-disable-next-line qwik/no-use-visible-task
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     availableStructures.value = await getAvailableStructures();
     observedWalletsWithBalance.value = await getObservedWalletBalances();
