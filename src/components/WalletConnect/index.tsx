@@ -8,10 +8,10 @@ export interface WalletConnectProps {
 }
 
 export default component$<ButtonProps>((props) => {
-  const modalConfig = useContext(WagmiConfigContext);
+  const wagmiConfig = useContext(WagmiConfigContext);
 
   const openModal = $(async () => {
-    await openWeb3Modal(modalConfig!.config);
+    await openWeb3Modal(wagmiConfig!.config);
   });
 
   return (

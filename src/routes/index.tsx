@@ -17,13 +17,19 @@ export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
-    await disconnectWallets(wagmiConfig.config);
+    if (localStorage.getItem("emmethUserWalletAddress")) {
+      localStorage.removeItem("emmethUserWalletAddress");
+    }
+
+    if (wagmiConfig.config) {
+      await disconnectWallets(wagmiConfig.config);
+    }
   });
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => login.address.value);
 
-    if (localStorage.getItem("emmethUserWalletAddress")) {
+    if (login.address.value) {
       await nav("/signin");
     }
   });
