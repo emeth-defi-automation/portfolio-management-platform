@@ -1,5 +1,11 @@
 import { type NoSerialize } from "@builder.io/qwik";
-import { type Config, disconnect, getConnectors, reconnect } from "@wagmi/core";
+import {
+  type Config,
+  disconnect,
+  getConnectors,
+  reconnect,
+  getConnections,
+} from "@wagmi/core";
 import { createWeb3Modal } from "@web3modal/wagmi";
 
 export const openWeb3Modal = async (config: NoSerialize<Config>) => {
@@ -12,7 +18,10 @@ export const openWeb3Modal = async (config: NoSerialize<Config>) => {
     wagmiConfig: config!,
     projectId,
   });
+
   await modal.open({ view: "Connect" });
+
+  return modal;
 };
 
 export const disconnectWallets = async (
@@ -30,10 +39,12 @@ export const disconnectWallets = async (
       }
     }
   } else {
-    const connectors = await getConnectors(config as Config);
-
-    for (const connector of connectors) {
-      await disconnect(config as Config, { connector });
+    const connections = await getConnections(config as Config);
+    if (connections.length > 0) {
+      for (const connection of connections) {
+        const connector = connection.connector;
+        await disconnect(config as Config, { connector });
+      }
     }
 
     if (localStorage.getItem("emmethUserWalletAddress")) {
