@@ -1,5 +1,5 @@
 import { Slot, component$ } from "@builder.io/qwik";
-import { useLocation } from "@builder.io/qwik-city";
+import { Link, useLocation } from "@builder.io/qwik-city";
 
 export interface NavLinkProps {
   href: string;
@@ -11,11 +11,12 @@ export const NavLink = component$<NavLinkProps>(({ href }) => {
 
   const isActive = locationPathname.startsWith(toPathname);
   return (
-    <a
+    <Link
       href={href}
       class={`text-white no-underline${isActive ? "" : " opacity-50"}`}
+      prefetch={false}
     >
       <Slot />
-    </a>
+    </Link>
   );
 });

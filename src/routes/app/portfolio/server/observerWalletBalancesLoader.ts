@@ -1,12 +1,12 @@
-import { routeLoader$ } from "@builder.io/qwik-city";
+import { server$ } from "@builder.io/qwik-city";
 import { connectToDB } from "~/database/db";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { getResultAddresses, getWalletDetails } from "~/interface/wallets/observedWallets";
 
-export const useObservedWalletBalances = routeLoader$(async (requestEvent) => {
-    const db = await connectToDB(requestEvent.env);
+export const getObservedWalletBalances = server$(async function () {
+    const db = await connectToDB(this.env);
 
-    const cookie = requestEvent.cookie.get("accessToken");
+    const cookie = this.cookie.get("accessToken");
     if (!cookie) {
         throw new Error("No cookie found");
     }

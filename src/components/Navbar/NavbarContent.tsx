@@ -1,8 +1,12 @@
-import { component$, useContext } from "@builder.io/qwik";
+import {
+  component$,
+  useContext,
+  useSignal,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import ImgAvatar from "/public/assets/images/avatar.png?jsx";
 import IconLogout from "/public/assets/icons/logout.svg?jsx";
 import { LoginContext, WagmiConfigContext } from "../WalletConnect/context";
-import { getAccount } from "@wagmi/core";
 import { NavLink } from "./NavLink";
 import { useNavigate } from "@builder.io/qwik-city";
 import { disconnectWallets } from "~/utils/walletConnections";
@@ -11,10 +15,19 @@ export const NavbarContent = component$(() => {
   const nav = useNavigate();
   const login = useContext(LoginContext);
   const wagmiConfig = useContext(WagmiConfigContext);
-  let address;
-  wagmiConfig.config &&
-    (({ address } = getAccount(wagmiConfig.config)),
-    address && (address = address.slice(0, 4) + "..." + address.slice(-4)));
+  const address = useSignal("");
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(({ track }) => {
+    track(() => login.address.value);
+    wagmiConfig.config &&
+      (login.address.value,
+      login.address.value &&
+        (address.value =
+          login.address.value.slice(0, 4) +
+          "..." +
+          login.address.value.slice(-4)));
+  });
+
   return (
     <>
       <div class="flex items-center gap-10 ">

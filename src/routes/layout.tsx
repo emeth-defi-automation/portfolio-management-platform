@@ -70,21 +70,23 @@ export default component$(() => {
     });
 
     wagmiConfig.config = noSerialize(wconfig);
-
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {
         onChange(account) {
-          if (window.location.pathname === "/") {
+          if (
+            window.location.pathname === "/signin" ||
+            window.location.pathname === "/"
+          ) {
             localStorage.setItem(
               "emmethUserWalletAddress",
               `${account.address}`,
             );
-            login.account = noSerialize(account);
-            login.address.value = account.address;
-            login.chainId.value = account.chainId;
           } else {
             reconnect(wagmiConfig.config as Config);
           }
+          login.account = noSerialize(account);
+          login.address.value = account.address;
+          login.chainId.value = account.chainId;
         },
       });
     }
