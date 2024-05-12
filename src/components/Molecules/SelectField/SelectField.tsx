@@ -7,9 +7,7 @@ export interface SelectFieldProps {
   class?: string;
   name: string;
   options?: Option[];
-  // value: number | string;
   onValueChange?: any;
-  placeholder?: string;
   variant: "smallArrow" | "largeArrow" | null;
   size: "small" | "large" | null;
 }

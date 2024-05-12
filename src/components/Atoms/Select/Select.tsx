@@ -36,8 +36,6 @@ export interface SelectProps extends VariantProps<typeof SelectStyles> {
   class?: string;
   options?: Option[];
   onValueChange?: QRL<(target: any) => void>;
-  placeholder?: string;
-  id: string | number;
   name: string;
 }
 
