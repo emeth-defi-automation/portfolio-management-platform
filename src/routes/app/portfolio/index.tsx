@@ -16,7 +16,6 @@ import {
 } from "@builder.io/qwik";
 import { messagesContext } from "../layout";
 import { Form } from "@builder.io/qwik-city";
-
 import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
 
@@ -24,6 +23,7 @@ import {
   simulateContract,
   writeContract,
   waitForTransactionReceipt,
+  getAccount,
 } from "@wagmi/core";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import { getCookie } from "~/utils/refresh";
@@ -45,13 +45,19 @@ export {
   getObservedWalletBalances,
   getAvailableStructures,
 } from "./server";
-import { queryTokens } from "~/database/tokens";
+import {
+  fetchTokens,
+  getTokenSymbolByAddress,
+  queryTokens,
+} from "~/database/tokens";
 import { convertToFraction } from "~/utils/fractions";
 import {
   type WalletWithBalance,
   type BatchTransferFormStore,
 } from "./interface";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import { swapTokensForTokens } from "~/utils/tokens/swap";
+import { FormBadge } from "~/components/FormBadge/FormBadge";
 import { Spinner } from "~/components/Spinner/Spinner";
 
 import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
@@ -63,6 +69,7 @@ export default component$(() => {
   const selectedWallets = useStore({ wallets: [] as any[] });
   const isCreateNewStructureModalOpen = useSignal(false);
   const isTransferModalOpen = useSignal(false);
+  const isSwapModalOpen = useSignal<boolean>(false);
   const deleteToken = useDeleteToken();
   const formMessageProvider = useContext(messagesContext);
   const createStructureAction = useCreateStructure();
@@ -80,6 +87,24 @@ export default component$(() => {
   const batchTransferFormStore = useStore<BatchTransferFormStore>({
     receiverAddress: "",
     coinsToTransfer: [],
+  });
+  const tokenFromAddress = useSignal("");
+  const tokenFromSymbol = useSignal("");
+  const tokenFromAmount = useSignal("");
+  const tokenToAddress = useSignal("");
+  const accountToAddress = useSignal("");
+  const walletAddressOfTokenToSwap = useSignal("");
+  const allTokensFromDb = useSignal([]);
+  const tokensToSwapListVisible = useSignal(false);
+  useTask$(async () => {
+    const tokens: any = await fetchTokens();
+    allTokensFromDb.value = tokens;
+  });
+  // TODO: after configs merged shall be fine
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(() => {
+    const account = wagmiConfig.config ? getAccount(wagmiConfig.config) : null;
+    accountToAddress.value = account ? (account.address as `0x${string}`) : "";
   });
   const observedWalletsWithBalance = useSignal<any>([]);
   const availableStructures = useSignal<any>({
@@ -333,6 +358,10 @@ export default component$(() => {
                           id: createdStructures.structure.id,
                         });
                       }}
+                      isSwapModalOpen={isSwapModalOpen}
+                      walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
+                      tokenFromAddress={tokenFromAddress}
+                      tokenFromSymbol={tokenFromSymbol}
                     />
                   ),
                 )}
@@ -787,6 +816,135 @@ export default component$(() => {
           </Form>
         </Modal>
       )}
+      {isSwapModalOpen.value ? (
+        <Modal
+          isOpen={isSwapModalOpen}
+          title="Swap"
+          onClose={$(() => {
+            tokenFromAddress.value = "";
+            tokenFromAmount.value = "";
+            tokenToAddress.value = "";
+            accountToAddress.value = "";
+          })}
+        >
+          {tokenFromAddress.value ? (
+            <div class="flex-column">
+              <div>
+                <div class="mb-1 flex items-center justify-between">
+                  <p class="custom-text-50 text-light text-xs uppercase">
+                    You pay
+                  </p>
+                </div>
+                <input
+                  class="bg-black"
+                  type="number"
+                  name="amount"
+                  placeholder={`0`}
+                  bind:value={tokenFromAmount}
+                />
+                <label for="amount">{tokenFromSymbol.value}</label>
+              </div>
+              <div class="flex max-h-[450px] flex-col overflow-auto pb-4">
+                <div class="mb-3 flex items-center justify-between">
+                  <p class="custom-text-50 text-light text-xs uppercase">
+                    You get
+                  </p>
+                  <div>
+                    {tokenToAddress.value ? (
+                      <span class="text-sm">
+                        {getTokenSymbolByAddress(
+                          tokenToAddress.value as `0x${string}`,
+                        )}
+                      </span>
+                    ) : (
+                      <span>Select token</span>
+                    )}
+                    <button
+                      onClick$={() => {
+                        tokensToSwapListVisible.value =
+                          !tokensToSwapListVisible.value;
+                      }}
+                    >
+                      <IconArrowDown />
+                    </button>
+                  </div>
+                </div>
+                {tokensToSwapListVisible.value &&
+                  allTokensFromDb.value.map((token: any) => (
+                    <FormBadge
+                      key={`formBadge_${token.id}`}
+                      class="mb-2"
+                      image={token.imagePath}
+                      description={token.symbol}
+                      for={token.symbol}
+                      input={
+                        <input
+                          id={`input_${token.id}`}
+                          type="checkbox"
+                          name={token.symbol}
+                          value={token.address}
+                          class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                          checked={tokenToAddress.value === token.address}
+                          onClick$={() => {
+                            tokenToAddress.value = token.address;
+                          }}
+                        />
+                      }
+                      customClass="border-gradient"
+                    />
+                  ))}
+              </div>
+              <div>
+                <label for="accountToAddress">Account To Address</label>
+                <input
+                  class="bg-black"
+                  type="text"
+                  name="accountToAddress"
+                  placeholder="Provide account to address"
+                  bind:value={accountToAddress}
+                />
+              </div>
+              <div class="mt-6 flex gap-4">
+                <button
+                  type="button"
+                  class="custom-border-1 h-12 w-1/2 rounded-10 duration-300 ease-in-out hover:scale-105 "
+                  onClick$={() => {
+                    isSwapModalOpen.value = false;
+                    tokenFromAddress.value = "";
+                    tokenFromAmount.value = "";
+                    tokenToAddress.value = "";
+                    accountToAddress.value = "";
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  class="h-12 w-1/2 rounded-10 rounded-lg bg-blue-500 p-2 text-white duration-300 ease-in-out hover:scale-105"
+                  onClick$={async () => {
+                    isSwapModalOpen.value = false;
+                    await swapTokensForTokens(
+                      tokenFromAddress.value as `0x${string}`,
+                      tokenToAddress.value as `0x${string}`,
+                      tokenFromAmount.value,
+                      walletAddressOfTokenToSwap.value as `0x${string}`,
+                      accountToAddress.value as `0x${string}`,
+                      wagmiConfig,
+                    );
+                  }}
+                >
+                  Swap tokens
+                </button>
+              </div>
+            </div>
+          ) : (
+            <h1>Can't swap selected token</h1>
+          )}
+        </Modal>
+      ) : null}
+      <h1>
+        {tokenFromAddress.value} -- {tokenFromAmount.value} --{" "}
+        {tokenToAddress.value}
+      </h1>
     </>
   );
 });

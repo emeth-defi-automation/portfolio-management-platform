@@ -1,5 +1,5 @@
 import { component$, type JSXOutput } from "@builder.io/qwik";
-import type { QRL } from "@builder.io/qwik";
+import type { QRL, Signal } from "@builder.io/qwik";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import {
   type Structure,
@@ -14,13 +14,22 @@ export interface GroupProps {
   createdStructure: Structure;
   onClick$?: QRL<() => void>;
   tokenStore: { balanceId: string; structureId: string };
+  isSwapModalOpen: Signal<boolean>;
+  walletAddressOfTokenToSwap: Signal<string>;
+  tokenFromAddress: Signal<string>;
+  tokenFromSymbol: Signal<string>;
 }
 
 function extractData(
   createdStructure: Structure,
   tokenStore: { balanceId: string; structureId: string },
+  isSwapModalOpen: Signal<boolean>,
+  walletAddressOfTokenToSwap: Signal<string>,
+  tokenFromAddress: Signal<string>,
+  tokenFromSymbol: Signal<string>,
 ): JSXOutput[] {
   const extractedArray: {
+    walletId: string;
     walletName: string;
     symbol: string;
     tokenName: string;
@@ -30,10 +39,10 @@ function extractData(
     balanceId: string;
     structureId: string;
   }[] = [];
-
   createdStructure.structureBalance.forEach(
     (balanceEntry: StructureBalance) => {
       extractedArray.push({
+        walletId: balanceEntry.wallet.id,
         walletName: balanceEntry.wallet.name,
         networkName:
           chainIdToNetworkName[balanceEntry.wallet.chainId.toString()],
@@ -64,6 +73,11 @@ function extractData(
         tokenStore.balanceId = entry.balanceId;
         tokenStore.structureId = entry.structureId;
       }}
+      isSwapModalOpen={isSwapModalOpen}
+      walletId={entry.walletId}
+      walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
+      tokenFromAddress={tokenFromAddress}
+      tokenFromSymbol={tokenFromSymbol}
     />
   ));
 }
@@ -84,7 +98,16 @@ export const Group = component$<GroupProps>((props) => {
             See Performance
           </button>
         </div>
-        <div>{extractData(props.createdStructure, props.tokenStore)}</div>
+        <div>
+          {extractData(
+            props.createdStructure,
+            props.tokenStore,
+            props.isSwapModalOpen,
+            props.walletAddressOfTokenToSwap,
+            props.tokenFromAddress,
+            props.tokenFromSymbol,
+          )}
+        </div>
       </div>
     </>
   );
