@@ -40,12 +40,8 @@ export const disconnectWallets = async (
     }
   } else {
     const connections = await getConnections(config as Config);
-
-    console.log("outside: ", connections);
     if (connections.length > 0) {
-      console.log("inside");
       for (const connection of connections) {
-        console.log(connection);
         const connector = connection.connector;
         await disconnect(config as Config, { connector });
       }

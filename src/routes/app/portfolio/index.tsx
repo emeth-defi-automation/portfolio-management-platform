@@ -118,11 +118,12 @@ export default component$(() => {
       }
     });
   });
-
+// eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     availableStructures.value = await getAvailableStructures();
     observedWalletsWithBalance.value = await getObservedWalletBalances();
   });
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => {
       createStructureAction.value;
@@ -226,9 +227,8 @@ export default component$(() => {
   return (
     <>
       {availableStructures.value.isLoading ? (
-        //  <div class="w-full h-full flex flex-col items-center justify-center"> <Spinner /></div>
         <Spinner />
-      ) : availableStructures.value.structures.length === 0 ? (
+      ) : !availableStructures.value.structures.length ? (
         <NoDataAdded
           title="You didn't add any Sub Portfolio yet"
           description="Please add your first Sub Portfolio"

@@ -11,12 +11,6 @@ export const NavLink = component$<NavLinkProps>(({ href }) => {
 
   const isActive = locationPathname.startsWith(toPathname);
   return (
-    // <a
-    //   href={href}
-    //   class={`text-white no-underline${isActive ? "" : " opacity-50"}`}
-    // >
-    //   <Slot />
-    // </a>
     <Link
       href={href}
       class={`text-white no-underline${isActive ? "" : " opacity-50"}`}

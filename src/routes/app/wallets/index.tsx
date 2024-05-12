@@ -49,10 +49,7 @@ export {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
-// import {
-//   getObservedWallets,
-//   ObservedWalletsList,
-// } from "~/components/ObservedWalletsList/ObservedWalletsList";
+
 import {
   checkPattern,
   convertToFraction,
@@ -108,8 +105,8 @@ export default component$(() => {
     for await (const value of data) {
       msg.value = value;
     }
-    console.log("[Wallet login address] ", login.address.value);
   });
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => wagmiConfig.config);
     watchAccount(wagmiConfig.config!, {
@@ -189,9 +186,7 @@ export default component$(() => {
           }
         }
         // approving logged in user by observed wallet by emeth contract
-        console.log("jebac qwika");
         const cookie = getCookie("accessToken");
-        console.log("ciastko:", cookie);
         if (!cookie) throw new Error("No accessToken cookie found");
 
         const { address } = jwtDecode.jwtDecode(cookie) as JwtPayload;

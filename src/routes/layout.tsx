@@ -67,7 +67,7 @@ export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
   const login = useContext(LoginContext);
   // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async () => {
+  useVisibleTask$(() => {
     const wconfig = defaultWagmiConfig({
       chains: [mainnet, sepolia],
       projectId: import.meta.env.PUBLIC_PROJECT_ID,
@@ -94,10 +94,6 @@ export default component$(() => {
           login.chainId.value = account.chainId;
         },
       });
-      console.log(
-        "[connections]: ",
-        await getConnections(wagmiConfig.config as Config),
-      );
     }
   });
 
