@@ -1,4 +1,3 @@
-import type { BrowserContext, Page } from "@playwright/test";
 import {
   MetaMask,
   defineWalletSetup,
@@ -9,14 +8,11 @@ import { SEED_PHRASE, WALLET_PASSWORD } from "../../data/wallet";
 export default defineWalletSetup(
   WALLET_PASSWORD,
   async (context, walletPage) => {
-    const extensionId = await getExtensionId(
-      context as BrowserContext,
-      "MetaMask",
-    );
+    const extensionId = await getExtensionId(context, "MetaMask");
 
     const metamask = new MetaMask(
-      context as BrowserContext,
-      walletPage as Page,
+      context,
+      walletPage,
       WALLET_PASSWORD,
       extensionId,
     );
