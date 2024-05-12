@@ -54,7 +54,8 @@ const Checkbox = component$<CheckboxType>(
           <span
             onClick$={(e) => {
               const target = e.target;
-              const input = target!.parentNode!.childNodes[0];
+              const input = (target as HTMLElement)!.parentNode!
+                .childNodes[0] as HTMLInputElement;
               isInputChecked.value = !isInputChecked.value;
               input.checked = isInputChecked.value;
               console.log(input.checked);
