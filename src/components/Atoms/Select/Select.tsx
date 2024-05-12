@@ -1,3 +1,4 @@
+import { QRL } from "@builder.io/qwik";
 import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
@@ -7,12 +8,12 @@ export type Option = {
 };
 
 export interface SelectProps {
-  text?: string;
   class?: string;
   options?: Option[];
-  // value: number | string;
-  onValueChange: any;
+  onValueChange: QRL<(targeT: any) => void> | ((target: any) => void);
   placeholder?: string;
+  id: string | number;
+  name: string;
 }
 
 const SelectStyles = cva(
@@ -43,11 +44,10 @@ const Select = ({ variant, size, ...props }: SelectType) => {
   return (
     <select
       class={twMerge(SelectStyles({ variant, size }), props.class)}
-      // onInput$={(e: any) => {
-      //     const target = e.target as any;
-      //     $(props.onValueChange(target.value)); // Użyj funkcji przekazanej przez propsy do aktualizacji wartości
-      // }}
-      // value={props.value}
+      onInput$={(e: any) => {
+          const target = e.target as any;
+          props.onValueChange(target.value); 
+      }}
     >
       {props.options?.map((option, index) => (
         <option
