@@ -12,8 +12,6 @@ export default component$<CoinsToApproveProps>(
     const coins = walletTokenBalances.value.filter(
       (tokenBalance: any) => tokenBalance.balance != 0,
     );
-    console.log("COINS,", coins);
-
     return (
       <>
         <div class="flex max-h-[450px] flex-col overflow-auto pb-4">
