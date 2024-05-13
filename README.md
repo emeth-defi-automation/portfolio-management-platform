@@ -32,7 +32,7 @@ Now start `ngrok` and get https webhook url from there for `NGROK_WEBHOOK_URL` (
 npm run ngrok
 ```
 
-Create `.env` (public values, used by client) and `.env.local` (secret values, used by API) files in root directory with templates below:
+Create `.env` (public values, used by client) and `.env.local` (secret values, used by API) files in root directory with templates below and fill all missing values (ask core team for values):
 
 ```
 # .env file
@@ -43,7 +43,7 @@ PUBLIC_METADATA_DESCRIPTION=emeth
 PUBLIC_EMETH_CONTRACT_ADDRESS=0x075FbeB3802AfdCDe6DDEB1d807E4805ed719eca
 PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA=0xfC11321e66Cb526c4a9c14295Fff03FC3FC637F2
 
-PW_BASE_URL=
+PW_BASE_URL=http://localhost:5173
 ```
 
 ```
@@ -153,6 +153,8 @@ npm run test.e2e.setup
 ```
 
 #### Run
+
+Verify e2e environment variables (starting with `PW_` prefix) in `.env` and `.env.local` files. Check on what destination tests will be run against (`PW_BASE_URL`). In case of running against local environment, you need to run the whole local setup before (as above).
 
 Run e2e scenarios:
 
