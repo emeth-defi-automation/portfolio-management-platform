@@ -72,6 +72,7 @@
     "vite-tsconfig-paths": "4.3.2"
   },
   "dependencies": {
+    "@material-design-icons/svg": "^0.14.13",
     "@moralisweb3/common-evm-utils": "2.25.4",
     "@wagmi/connectors": "4.1.26",
     "@wagmi/core": "2.6.17",
