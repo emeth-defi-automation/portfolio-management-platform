@@ -33,6 +33,13 @@ if [ "${CI:-false}" = "false" ]; then
   done < "${ENV_LOCAL_FILE_PATH}"
 fi
 
+# Find, pause and remove running old surrealdb container
+if podman ps --format "{{.Names}}" | grep "surrealdb" &> /dev/null; then
+  echo "Stopping old surrealdb container..."
+  podman stop surrealdb &> /dev/null
+  echo "Old surrealdb container stopped."
+fi
+
 podman run --rm --pull always \
   --name surrealdb \
   -p 8000:8000 \

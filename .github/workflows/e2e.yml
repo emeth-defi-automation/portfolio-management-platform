@@ -59,7 +59,7 @@ jobs:
       - name: Get Playwright version
         id: playwright-version
         run: |
-          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright/test | sed 's/.*@//')
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright/test | sed 's/.*@//;s/ deduped//' | sort | uniq)
           echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
 
       - name: Cache Playwright dependencies
@@ -97,6 +97,17 @@ jobs:
       - name: Provision app database data
         run: ./scripts/database-provision.sh
 
+      - name: Cache synpress wallets
+        uses: actions/cache@v4
+        id: synpress-wallets-cache
+        with:
+          path: ./.cache-synpress
+          key: ${{ runner.os }}-synpress-wallets-${{ hashFiles('**/.cache-synpress/**') }}
+
+      - name: Run synpress build
+        if: steps.synpress-wallets-cache.outputs.cache-hit != 'true'
+        run: npm run test.e2e.build.ci
+
       - name: Cache app build
         uses: actions/cache@v4
         id: app-build-cache
@@ -116,8 +127,22 @@ jobs:
           run: npm run serve
           wait-on: http-get://localhost:${{ env.APP_PORT }}
 
+      - name: Install extra dependencies
+        run: |
+          sudo apt-get install --no-install-recommends -y \
+          fluxbox \
+          xvfb
+
       - name: Run tests
-        run: npm run test.e2e
+        run: |
+          xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
+          fluxbox &
+          npm run test.e2e
+        env:
+          DISPLAY: :0.0
+
+      # - name: Run tests
+      #   run: npm run test.e2e.ci
 
       - name: Save results artifact
         if: ${{ !cancelled() }}
