@@ -1,10 +1,10 @@
 import Button, { type ButtonProps } from "./Button";
-import IconAdd from "/public/assets/icons/portfolio/add.svg?jsx";
-import IconArrowForward from "/public/assets/icons/arrow-forward.svg?jsx";
+import IconAdd from "@material-design-icons/svg/outlined/add.svg?jsx";
 import IconWalletConnect from "/public/assets/icons/login/walletconnect.svg?jsx";
-import IconInfoWhite from "/public/assets/icons/info-white.svg?jsx";
-import IconTrashRed from "/public/assets/icons/wallets/delete-red.svg?jsx";
-import IconMaximize from "/public/assets/icons/dashboard/maximize.svg?jsx";
+import IconTrashRed from "@material-design-icons/svg/outlined/delete.svg?jsx";
+import IconMaximize from "@material-design-icons/svg/outlined/open_in_full.svg?jsx";
+import IconInfo from "@material-design-icons/svg/outlined/info.svg?jsx";
+import IconArrowForward from "@material-design-icons/svg/outlined/arrow_forward.svg?jsx";
 
 export default {
   title: "atoms/Button",
@@ -39,72 +39,80 @@ export function Red(args: ButtonProps) {
   return <Button {...args} />;
 }
 
-export function iconBox(args: ButtonProps) {
+export function IconBox(args: ButtonProps) {
   return <Button {...args} />;
 }
 
-export function onlyIcon(args: ButtonProps) {
+export function OnlyIcon(args: ButtonProps) {
   return <Button {...args} />;
 }
 
 ConnectButton.args = {
+  disabled: false,
   text: "Use Wallet Connect",
   variant: "transparent",
   leftIcon: <IconWalletConnect class="h-6 w-6" />,
   rightIcon: <IconArrowForward class="h-4 w-4" />,
-  class: "w-72 py-3",
+  class: "px-4 w-72",
   size: "large",
 };
 
 InfoButton.args = {
+  disabled: false,
   text: "How to use Wallet?",
-  leftIcon: <IconInfoWhite class="h-6 w-6" />,
+  leftIcon: <IconInfo class="h-6 w-6 " />,
   rightIcon: <IconArrowForward class="h-4 w-4" />,
   variant: "blue",
-  class: "py-[10px] px-2 w-48 font-normal",
+  class: "font-normal h-10",
   size: "small",
 };
 
 Gradient.args = {
+  disabled: false,
   text: "Accept and Sign",
   variant: "gradient",
-  class: "px-10",
+  class: "",
 };
 
 Transparent.args = {
+  disabled: false,
   text: "Cancel",
   variant: "transparent",
-  class: "px-20 py-4",
+  class: "",
 };
 
 BlueIcon.args = {
+  disabled: false,
   text: "Add Sub Portfolio",
   leftIcon: <IconAdd class="h-4 w-4" />,
   variant: "blue",
-  class: "py-3",
+  class: "",
   size: "small",
 };
 
 Red.args = {
+  disabled: false,
   text: "Yes, Let's Do It!",
   variant: "red",
   class: "px-20",
 };
 
 Danger.args = {
+  disabled: false,
   text: "Delete Wallet",
   leftIcon: <IconTrashRed class="h-4 w-4" />,
   variant: "danger",
-  class: "py-2",
+  class: "",
   size: "small",
 };
 
-iconBox.args = {
+IconBox.args = {
   leftIcon: <IconMaximize class="h-4 w-4" />,
   variant: "iconBox",
+  size: "small",
 };
 
-onlyIcon.args = {
+OnlyIcon.args = {
   leftIcon: <IconAdd class="h-4 w-4" />,
   variant: "onlyIcon",
 };
