@@ -1,4 +1,4 @@
-import { type JSXOutput } from "@builder.io/qwik";
+import { component$, type JSXOutput } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -40,7 +40,7 @@ const buttonStyles = cva(
 
 export type buttonType = VariantProps<typeof buttonStyles> & ButtonProps;
 
-const Button = ({ variant, size, ...props }: buttonType) => {
+const Button = component$(({ variant, size, ...props }: buttonType) => {
   return (
     <>
       <link
@@ -73,6 +73,6 @@ const Button = ({ variant, size, ...props }: buttonType) => {
       </button>
     </>
   );
-};
+});
 
 export default Button;
