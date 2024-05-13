@@ -134,7 +134,7 @@ jobs:
 
       - name: Run tests
         run: |
-          xvfb-run playwright test
+          xvfb-run npm run test.e2e
 
       # - name: Run tests
       #   run: npm run test.e2e.ci
