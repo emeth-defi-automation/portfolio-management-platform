@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge";
 import { cva, type VariantProps } from "class-variance-authority";
 
 export interface HeaderProps {
-  text?: string;
+  title?: string;
   class?: string;
 }
 
@@ -29,31 +29,31 @@ const Header = ({ variant, ...props }: HeaderType) => {
     case "h1":
       return (
         <h1 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
-          {props.text}
+          {props.title}
         </h1>
       );
     case "h2":
       return (
         <h2 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
-          {props.text}
+          {props.title}
         </h2>
       );
     case "h3":
       return (
         <h3 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
-          {props.text}
+          {props.title}
         </h3>
       );
     case "h4":
       return (
         <h4 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
-          {props.text}
+          {props.title}
         </h4>
       );
     case "h5":
       return (
         <h5 {...props} class={twMerge(HeaderStyles({ variant }), props.class)}>
-          {props.text}
+          {props.title}
         </h5>
       );
   }
