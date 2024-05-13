@@ -101,6 +101,7 @@ export default component$(() => {
   const allTokensFromDb = useSignal([]);
   const tokensToSwapListVisible = useSignal(false);
   const tokenToEstimatedAmount = useSignal("");
+  const estimatedAfterSwapTokenValue = useSignal('0');
   const tokenFromAmountDebounce = useDebouncer(
     $(
       async ({
@@ -157,10 +158,28 @@ export default component$(() => {
     }
 
   });
-  useVisibleTask$(({track}) => {
+  const calculate = $(async () => {
+    if(tokenFromAddress.value){
+
+      const decimals = await getTokenDecimalsServer(tokenFromAddress.value);
+      const numerator = BigInt(tokenToEstimatedAmount.value) / BigInt(BigInt(10)**BigInt(decimals[0]));
+      const denominator = tokenToEstimatedAmount.value.toString()
+      .substring(
+        numerator.toString().length,
+        tokenToEstimatedAmount.value.toString().length - 1,
+      );
+
+      console.log(`${numerator}.${denominator}` )
+      
+      return `${numerator}.${denominator}`;
+    }
+  }) 
+  useVisibleTask$(async ({track}) => {
     track(() => tokenToEstimatedAmount.value)
     console.log('[NO ZMIENILO SIE]: ', tokenToEstimatedAmount.value)
-
+    const calculation = await calculate()
+      estimatedAfterSwapTokenValue.value = `${calculation}`;
+   
   });
 
   const observedWalletsWithBalance = useSignal<any>([]);
@@ -199,7 +218,8 @@ export default component$(() => {
         isTokenSelected.selection.map((balance) => (balance.status = false));
       }
     });
-  });
+  }); 
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     availableStructures.value = await getAvailableStructures();
@@ -306,6 +326,7 @@ export default component$(() => {
       });
     }
   });
+ 
   return (
     <>
       {availableStructures.value.isLoading ? (
@@ -902,22 +923,17 @@ export default component$(() => {
                   onInput$={async (e) => {
                     const target = e.target as HTMLInputElement;
                     tokenFromAmount.value = target.value;
-                    // console.log("[wallet to send from]", tokenFromAddress.value);
                     if (
                       tokenFromAddress.value &&
                       tokenToAddress.value &&
                       tokenFromAmount.value
                     ) {
-                      // console.log("[wallet to send from]", tokenFromAddress.value);
-                      // console.log("[wallet to send to]", tokenToAddress.value);
-                      // console.log("[how many]", tokenFromAmount.value);
                       const amountIn = BigInt(parseInt(target.value));
                       await tokenFromAmountDebounce({ 
                         amountIn: amountIn,
                         tokenInAddress: tokenFromAddress.value as `0x${string}`,
                         tokenOutAddress: tokenToAddress.value as `0x${string}`,
-                      });
-                      console.log("[estimatedAmount]", tokenToEstimatedAmount.value);
+                      }); 
                     }
                   }}
                 />
@@ -935,7 +951,7 @@ export default component$(() => {
                         {getTokenSymbolByAddress(
                           tokenToAddress.value as `0x${string}`,
                         )}
-                      </span>
+                       </span>
                     ) : (
                       <span>Select token</span>
                     )}
@@ -950,15 +966,13 @@ export default component$(() => {
                   </div>
                 </div>
                 <p class="custom-text-50 text-light text-xs uppercase mb-2">
-                  {tokenToEstimatedAmount.value} 
+                  {estimatedAfterSwapTokenValue.value}    
                 </p>
                 {tokensToSwapListVisible.value && 
                   allTokensFromDb.value.map(async (token: any) => {
                     const tokenSymbol = await getTokenSymbolByAddress(
                       tokenFromAddress.value as `0x${string}`,
                     ) 
-                    console.log('1', token.symbol)
-                    console.log('2', tokenSymbol, 'a to: ',tokenFromAddress.value )
                     if(token.symbol !== tokenSymbol){   
                       return(
                         <FormBadge
@@ -966,7 +980,7 @@ export default component$(() => {
                           class="mb-2"
                           image={token.imagePath}
                           description={token.symbol}
-                          for={token.symbol}
+                          for={`input_${token.id}`}
                           input={
                             <input 
                               id={`input_${token.id}`}
