@@ -20,7 +20,8 @@ test.describe("sign in", () => {
     const dashboardPage = new DashboardPage(page);
 
     await loginPage.verifyTitle();
-    await loginPage.useMetamask();
+    // await loginPage.useMetamask();
+    await loginPage.useWalletConnect();
 
     await signInPage.useMetamaskWithConnectWalletModal();
     await metamask.connectToDapp();
