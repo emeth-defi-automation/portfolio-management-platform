@@ -22,28 +22,28 @@ export function Header5Medium(args: HeaderProps) {
 }
 
 Header1Medium.args = {
-  text: "Login to Emeth",
+  title: "Login to Emeth",
   variant: "h1",
   class: "font-medium",
 };
 
 Header2SemiBold.args = {
-  text: "Portfolio Name",
+  title: "Portfolio Name",
   variant: "h2",
 };
 
 Header3SemiBold.args = {
-  text: "Portfolio Value",
+  title: "Portfolio Value",
   variant: "h3",
 };
 
 Header4SemiBold.args = {
-  text: "Subportfolios",
+  title: "Subportfolios",
   variant: "h4",
 };
 
 Header5Medium.args = {
-  text: "Bitcoin share exceeded 20%",
+  title: "Bitcoin share exceeded 20%",
   variant: "h5",
   class: "font-medium",
 };

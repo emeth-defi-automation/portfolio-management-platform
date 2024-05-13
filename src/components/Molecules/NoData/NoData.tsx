@@ -1,9 +1,9 @@
 import { twMerge } from "tailwind-merge";
 import Header from "~/components/Atoms/Headers/Header";
 import Paragraph from "~/components/Atoms/Paragraphs/Paragraphs";
-// import IconInfo from "@material-design-icons/svg/outlined/info.svg?jsx";
-// import IconError from "@material-design-icons/svg/outlined/error_outline.svg?jsx";
-// import IconCelebration from "@material-design-icons/svg/outlined/celebration.svg?jsx";
+import IconInfo from "@material-design-icons/svg/outlined/info.svg?jsx";
+import IconError from "@material-design-icons/svg/outlined/error_outline.svg?jsx";
+import IconCelebration from "@material-design-icons/svg/outlined/celebration.svg?jsx";
 import { component$ } from "@builder.io/qwik";
 import { Slot } from "@builder.io/qwik";
 
@@ -26,7 +26,7 @@ const NoData = component$<NoDataType>(
         )}
       >
         <div class="flex flex-col items-center justify-center gap-4 ">
-          {/* <span>
+          <span>
             {variant == "info" ? (
               <IconInfo class="h-10 w-10 fill-white" />
             ) : variant == "warning" ? (
@@ -34,10 +34,10 @@ const NoData = component$<NoDataType>(
             ) : variant == "success" ? (
               <IconCelebration class="h-14 w-14  fill-pink-600" />
             ) : null}
-          </span> */}
+          </span>
           {variant == "info" ? (
             <>
-              <Header variant="h5" text={title} class="font-medium" />
+              <Header variant="h5" title={title} class="font-medium" />
               <Paragraph
                 variant="secondaryText"
                 size="xs"
@@ -48,7 +48,7 @@ const NoData = component$<NoDataType>(
             </>
           ) : (
             <>
-              <Header variant="h3" text={title} class="font-medium" />
+              <Header variant="h3" title={title} class="font-medium" />
               <Paragraph
                 variant="secondaryText"
                 size="sm"

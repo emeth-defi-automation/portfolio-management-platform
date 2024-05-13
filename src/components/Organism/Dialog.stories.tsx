@@ -6,13 +6,10 @@ export default {
 };
 
 export function Default(args: DialogProps) {
-  return (
-    <Dialog {...args}>
-      <p>hello</p>
-    </Dialog>
-  );
+  return <Dialog {...args} />;
 }
 
 Default.args = {
   hasButton: true,
+  title: "Add wallet",
 };
