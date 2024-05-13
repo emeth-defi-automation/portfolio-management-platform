@@ -12,9 +12,9 @@ export function NoDataInfo(args: NoDataProps) {
       <Button
         variant="transparent"
         text="Deposit Funds"
-        class="py-2.5 text-xs"
+        size="small"
       />
-      <Button text="Setup Wallet" class="py-2.5 text-xs" />
+      <Button text="Setup Wallet" size="small" />
     </NoData>
   );
 }
@@ -22,7 +22,7 @@ export function NoDataInfo(args: NoDataProps) {
 export function NoDataWarning(args: NoDataProps) {
   return (
     <NoData {...args}>
-      <Button text="Setup Wallet" class="py-2.5 w-full" />
+      <Button text="Setup Wallet" class="w-full" />
     </NoData>
   );
 }
@@ -32,9 +32,8 @@ export function NoDataSuccess(args: NoDataProps) {
       <Button
         variant="transparent"
         text="Authorize another wallet"
-        class="py-2.5"
       />
-      <Button text="Back To Wallet" class="py-2.5" />
+      <Button text="Back To Wallet" />
     </NoData>
   );
 }
@@ -47,7 +46,8 @@ NoDataInfo.args = {
 
 NoDataWarning.args = {
   title: "Error Connecting",
-  description: "The connection attempt failed. Please click try again and follow the steps to connect in your wallet.",
+  description:
+    "The connection attempt failed. Please click try again and follow the steps to connect in your wallet.",
   variant: "warning",
 };
 
