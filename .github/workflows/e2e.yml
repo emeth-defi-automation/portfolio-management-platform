@@ -128,14 +128,16 @@ jobs:
 
       - name: Install extra dependencies
         run: |
+          sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
           fluxbox \
           xvfb
 
       - name: Run tests
         run: |
-          xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
+          Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
           fluxbox &
+          sleep 3
           npm run test.e2e.ci
         env:
           DISPLAY: :0.0
