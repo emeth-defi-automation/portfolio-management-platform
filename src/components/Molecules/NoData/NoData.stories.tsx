@@ -9,11 +9,7 @@ export default {
 export function NoDataInfo(args: NoDataProps) {
   return (
     <NoData {...args}>
-      <Button
-        variant="transparent"
-        text="Deposit Funds"
-        size="small"
-      />
+      <Button variant="transparent" text="Deposit Funds" size="small" />
       <Button text="Setup Wallet" size="small" />
     </NoData>
   );
@@ -29,10 +25,7 @@ export function NoDataWarning(args: NoDataProps) {
 export function NoDataSuccess(args: NoDataProps) {
   return (
     <NoData {...args}>
-      <Button
-        variant="transparent"
-        text="Authorize another wallet"
-      />
+      <Button variant="transparent" text="Authorize another wallet" />
       <Button text="Back To Wallet" />
     </NoData>
   );
