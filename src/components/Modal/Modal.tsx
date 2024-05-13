@@ -24,11 +24,11 @@ export const Modal = component$<ModalProps>(
         }}
         class="fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-60"
       >
-        <Box
+        <div
           onClick$={(event) => {
             event.stopPropagation();
           }}
-          customClass="w-1/3 min-w-[455px] overflow-auto backdrop-blur-2xl"
+          class="custom-bg-opacity-5 relative h-fit w-1/3 min-w-[455px] overflow-auto p-6 backdrop-blur-2xl"
         >
           {hasButton ? (
             <div class="mb-8 flex items-center justify-between">
@@ -46,7 +46,7 @@ export const Modal = component$<ModalProps>(
             </div>
           ) : null}
           <Slot />
-        </Box>
+        </div>
       </div>
     );
   },
