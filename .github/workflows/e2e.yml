@@ -126,22 +126,22 @@ jobs:
           run: npm run serve
           wait-on: http-get://localhost:${{ env.APP_PORT }}
 
-      - name: Install extra dependencies
-        run: |
-          sudo apt-get install --no-install-recommends -y \
-          fluxbox \
-          xvfb
-
-      - name: Run tests
-        run: |
-          xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
-          fluxbox &
-          npm run test.e2e.ci
-        env:
-          DISPLAY: :0.0
+      # - name: Install extra dependencies
+      #   run: |
+      #     sudo apt-get install --no-install-recommends -y \
+      #     fluxbox \
+      #     xvfb
 
       # - name: Run tests
-      #   run: npm run test.e2e.ci
+      #   run: |
+      #     xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
+      #     fluxbox &
+      #     npm run test.e2e.ci
+      #   env:
+      #     DISPLAY: :0.0
+
+      - name: Run tests
+        run: npm run test.e2e.ci
 
       - name: Save results artifact
         if: ${{ !cancelled() }}
