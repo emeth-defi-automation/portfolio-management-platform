@@ -1,13 +1,19 @@
-import { component$, type JSXOutput } from "@builder.io/qwik";
+import { component$, type JSXOutput, type QRL } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 import { cva, type VariantProps } from "class-variance-authority";
 
 export interface ButtonProps {
   text?: string;
-  class?: string;
+  customClass?: string;
   leftIcon?: JSXOutput | null;
   rightIcon?: JSXOutput | null;
   disabled?: boolean;
+  onClick$?:
+    | QRL<() => void>
+    | (() => void)
+    | QRL<() => Promise<void>>
+    | (() => Promise<void>);
+  dataTestId?: string;
 }
 
 const buttonStyles = cva(
@@ -43,13 +49,10 @@ export type buttonType = VariantProps<typeof buttonStyles> & ButtonProps;
 const Button = component$(({ variant, size, ...props }: buttonType) => {
   return (
     <>
-      <link
-        href="/path/to/@material-design-icons/font/index.css"
-        rel="stylesheet"
-      ></link>
       <button
         {...props}
-        class={twMerge(buttonStyles({ variant, size }), props.class)}
+        class={twMerge(buttonStyles({ variant, size }), props.customClass)}
+        data-testid={props.dataTestId}
       >
         {props.leftIcon ? (
           <span

@@ -25,6 +25,7 @@ import {
   toggleChart,
 } from "./server";
 import { type PeriodState } from "~/interface/balance/Balance";
+import Button from "~/components/Atoms/Buttons/Button";
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -139,9 +140,7 @@ export default component$(() => {
         <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Alerts</h1>
-            <button class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110">
-              See All
-            </button>
+            <Button text="See All" variant="transparent" size="small" />
           </div>
           <div class="">
             <ActionAlertMessage
@@ -170,9 +169,7 @@ export default component$(() => {
         <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Actions</h1>
-            <button class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110">
-              See All
-            </button>
+            <Button text="See All" variant="transparent" size="small" />
           </div>
           <div>
             <ActionAlertMessage
@@ -209,14 +206,14 @@ export default component$(() => {
       <div class="custom-border-1 custom-shadow custom-bg-opacity-5 grid grid-rows-[32px_1fr] gap-6 rounded-2xl p-6">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold">Favourite Tokens</h1>
-          <button
-            class="custom-border-opacity-30 h-8 rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110"
+          <Button
             onClick$={() => {
               nav("/app/portfolio");
             }}
-          >
-            Go To Portfolio
-          </button>
+            text="Go To Portfolio"
+            variant="transparent"
+            size="small"
+          />
         </div>
 
         {favoriteTokenLoading.value ? (

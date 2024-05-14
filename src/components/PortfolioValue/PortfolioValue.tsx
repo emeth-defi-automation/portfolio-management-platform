@@ -14,9 +14,10 @@ import {
 } from "~/utils/portfolio/axisFormatter";
 import { Spinner } from "../Spinner/Spinner";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
-import IconMaximize from "/public/assets/icons/dashboard/maximize.svg?jsx";
-import ImgMinimalize from "/public/assets/icons/minimalize.svg?jsx";
+import IconMaximize from "@material-design-icons/svg/filled/open_in_full.svg?jsx";
+import IconMinimalize from "@material-design-icons/svg/filled/close_fullscreen.svg?jsx";
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
+import Button from "../Atoms/Buttons/Button";
 
 export interface PortfolioValueProps {
   hideChartWhileLoading: Signal<boolean>;
@@ -278,18 +279,20 @@ export const PortfolioValue = component$<PortfolioValueProps>(
                 <p>All</p>
                 <IconArrowDown />
               </button>
-              <button
-                class="custom-border-1 custom-bg-opacity-5 h-8 items-center rounded-lg px-2 duration-300 ease-in-out hover:scale-110"
+              <Button
                 onClick$={() => {
                   isPortfolioFullScreen.value = !isPortfolioFullScreen.value;
                 }}
-              >
-                {!isPortfolioFullScreen.value ? (
-                  <IconMaximize />
-                ) : (
-                  <ImgMinimalize />
-                )}
-              </button>
+                variant="iconBox"
+                leftIcon={
+                  !isPortfolioFullScreen.value ? (
+                    <IconMaximize class="h-4 w-4" />
+                  ) : (
+                    <IconMinimalize class="h-4 w-4" />
+                  )
+                }
+                size="small"
+              />
             </div>
           </div>
         )}
@@ -304,12 +307,18 @@ export const PortfolioValue = component$<PortfolioValueProps>(
             <div class="ml-7">
               <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
                 <div class="pr-timeline row-start-2"></div>
-                <button class="custom-border-1 absolute left-3/4 top-1/3 rounded-lg bg-white bg-opacity-10 px-1 py-1.5">
-                  <ImgPfButton />
-                </button>
-                <button class="custom-border-1 absolute left-2/4 top-1/3 rounded-lg bg-white bg-opacity-10 px-1 py-1.5">
-                  <ImgPfButton />
-                </button>
+                <Button
+                  variant="iconBox"
+                  leftIcon={<ImgPfButton />}
+                  size="small"
+                  customClass="absolute left-3/4 top-1/3 !bg-white/10 !px-1"
+                />
+                <Button
+                  variant="iconBox"
+                  leftIcon={<ImgPfButton />}
+                  size="small"
+                  customClass="absolute absolute left-2/4 top-1/3 !bg-white/10 !px-1"
+                />
                 {/* <div class="absolute custom-bg-button opacity-20 h-full left-2/4 right-1/4 "></div> */}
               </div>
               <div class="custom-text-50 mt-3 flex justify-between text-xs">
