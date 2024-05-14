@@ -28,7 +28,7 @@
     "start": "vite --open --mode ssr",
     "storybook": "storybook dev -p 6006",
     "test.e2e": "playwright test",
-    "test.e2e.ci": "xvfb-run playwright test",
+    "test.e2e.ci": "xvfb-run --auto-servernum --server-num=1 playwright test",
     "test.e2e.report": "playwright show-report",
     "test.e2e.setup": "playwright install --with-deps",
     "test.e2e.build": "synpress tests/config/wallet",
