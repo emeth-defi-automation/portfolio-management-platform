@@ -58,7 +58,7 @@ export const isNameUnique = server$(async function (name: string) {
   return true;
 });
 
-export const UniqueAddressResult= z.array(z.array(z.string()));
+export const UniqueAddressResult = z.array(z.array(z.string()));
 export const isAddressUnique = server$(async function (address: string) {
   const db = await connectToDB(this.env);
   const cookie = this.cookie.get("accessToken");

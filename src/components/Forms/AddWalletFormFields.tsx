@@ -32,7 +32,7 @@ export default component$<AddWalletFormFieldsProps>(
     );
     const walletAddressDebounce = useDebouncer(
       $(async (value: string) => {
-        addWalletFormStore.isAddressUnique = await isAddressUnique(value)
+        addWalletFormStore.isAddressUnique = await isAddressUnique(value);
       }),
       300,
     );
@@ -123,7 +123,7 @@ export default component$<AddWalletFormFieldsProps>(
                 onInput={$((e) => {
                   const target = e.target as HTMLInputElement;
                   addWalletFormStore.address = target.value;
-                  walletAddressDebounce(target.value)
+                  walletAddressDebounce(target.value);
                 })}
               />
 
