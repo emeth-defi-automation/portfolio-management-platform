@@ -9,6 +9,10 @@
  * const fractionObject = convertToFraction(numericString);
  * console.log(fractionObject); // Output: { numerator: 314159, denominator: 100000 }
  */
+export type FractionObject = {
+  numerator: string;
+  denominator: string;
+}
 
 export const convertToFraction = (numericString: string) => {
   let fractionObject;

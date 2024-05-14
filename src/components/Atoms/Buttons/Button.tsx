@@ -1,4 +1,4 @@
-import { component$, type JSXOutput } from "@builder.io/qwik";
+import { QRL, component$, type JSXOutput } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -8,6 +8,7 @@ export interface ButtonProps {
   leftIcon?: JSXOutput | null;
   rightIcon?: JSXOutput | null;
   disabled?: boolean;
+  onClick$?: QRL<() => void> | (() => void) | QRL<() => Promise<void>> | (() => Promise<void>);
 }
 
 const buttonStyles = cva(

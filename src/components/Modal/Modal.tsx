@@ -27,8 +27,8 @@ export const Modal = component$<ModalProps>(
             event.stopPropagation();
           }}
           class={twMerge(
-            "custom-border-1 bg-modal-glass relative h-fit w-1/3 min-w-[455px] overflow-auto rounded-xl p-6",
             customClass,
+            "custom-border-1 bg-modal-glass relative h-fit  min-w-[455px] overflow-auto rounded-xl p-6",
           )}
         >
           {hasButton ? (
