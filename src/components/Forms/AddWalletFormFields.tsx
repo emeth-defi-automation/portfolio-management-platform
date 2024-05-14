@@ -4,6 +4,7 @@ import { Input } from "~/components/Input/Input";
 
 import { useDebouncer } from "~/utils/debouncer";
 import {
+  isAddressUnique,
   isCheckSum,
   isNameUnique,
   isValidAddress,
@@ -26,6 +27,12 @@ export default component$<AddWalletFormFieldsProps>(
         addWalletFormStore.isNameUniqueLoading = true;
         addWalletFormStore.isNameUnique = await isNameUnique(value);
         addWalletFormStore.isNameUniqueLoading = false;
+      }),
+      300,
+    );
+    const walletAddressDebounce = useDebouncer(
+      $(async (value: string) => {
+        addWalletFormStore.isAddressUnique = await isAddressUnique(value)
       }),
       300,
     );
@@ -60,7 +67,7 @@ export default component$<AddWalletFormFieldsProps>(
             text="Wallet Name"
             type="text"
             name="name"
-            customClass={` 
+            customClass={`
               ${!isValidName(addWalletFormStore.name) ? "border-red-700" : ""}`}
             value={addWalletFormStore.name}
             placeholder="Enter wallet name..."
@@ -73,6 +80,11 @@ export default component$<AddWalletFormFieldsProps>(
         </div>
         {/* Address */}
         <div>
+          {!addWalletFormStore.isAddressUnique && (
+            <span class="absolute end-6 pt-[1px] text-xs text-red-500">
+              Wallet already exists
+            </span>
+          )}
           <label
             for="address"
             class="custom-text-50 flex items-center justify-between gap-2 text-xs"
@@ -111,6 +123,7 @@ export default component$<AddWalletFormFieldsProps>(
                 onInput={$((e) => {
                   const target = e.target as HTMLInputElement;
                   addWalletFormStore.address = target.value;
+                  walletAddressDebounce(target.value)
                 })}
               />
 
