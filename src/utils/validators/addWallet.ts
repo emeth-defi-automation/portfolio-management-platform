@@ -58,7 +58,7 @@ export const isNameUnique = server$(async function (name: string) {
   return true;
 });
 
-export const UniqueAddressResult = z.array(z.array(z.string()));
+export const UniqueAddressResult = z.array(z.number());
 export const isAddressUnique = server$(async function (address: string) {
   const db = await connectToDB(this.env);
   const cookie = this.cookie.get("accessToken");
@@ -68,20 +68,17 @@ export const isAddressUnique = server$(async function (address: string) {
   const { userId } = jwt.decode(cookie.value) as JwtPayload;
   const result = (
     await db.query(`
-      LET $walletId = SELECT VALUE ->observes_wallet.out FROM ${userId};
-      SELECT VALUE address FROM $walletId;
+     LET $walletId = SELECT VALUE ->observes_wallet.out FROM ${userId};
+     LET $wallets = SELECT address FROM wallet WHERE $walletId;
+     SELECT VALUE count() FROM $wallets WHERE address = type::string('${address}');
     `)
-  ).at(1);
+  ).at(2);
+
   if (!result) {
     return true;
   }
   const [usersObservedWallets] = UniqueAddressResult.parse(result);
-  for (const observedWalletAddress of usersObservedWallets) {
-    if (observedWalletAddress === address) {
-      return false;
-    }
-  }
-  return true;
+  return !usersObservedWallets;
 });
 
 /**

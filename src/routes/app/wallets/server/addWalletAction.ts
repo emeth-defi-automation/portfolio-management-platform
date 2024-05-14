@@ -8,7 +8,6 @@ import { getExistingWallet, getExistingRelation } from "~/interface/wallets/addW
 import { connectToDB } from "~/database/db";
 import { testPublicClient } from "../testconfig";
 import { Token } from "~/interface/token/Token";
-import {isAddressUnique} from "~/utils/validators/addWallet";
 
 /**
  * This function is used to add a wallet, create balances for tokens, and create a relations.
