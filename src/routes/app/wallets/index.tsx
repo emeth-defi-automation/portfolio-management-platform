@@ -87,6 +87,7 @@ export default component$(() => {
     isExecutable: 0,
     isNameUnique: true,
     isNameUniqueLoading: false,
+    isAddressUnique: true,
     coinsToCount: [],
     coinsToApprove: [],
   });

@@ -4,6 +4,7 @@ export interface AddWalletFormStore {
   isExecutable: number;
   isNameUnique: boolean;
   isNameUniqueLoading: boolean;
+  isAddressUnique: boolean;
   coinsToCount: string[];
   coinsToApprove: {
     symbol: string;

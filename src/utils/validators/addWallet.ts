@@ -58,6 +58,29 @@ export const isNameUnique = server$(async function (name: string) {
   return true;
 });
 
+export const UniqueAddressResult = z.array(z.number());
+export const isAddressUnique = server$(async function (address: string) {
+  const db = await connectToDB(this.env);
+  const cookie = this.cookie.get("accessToken");
+  if (!cookie) {
+    throw new Error("No cookie found");
+  }
+  const { userId } = jwt.decode(cookie.value) as JwtPayload;
+  const result = (
+    await db.query(`
+     LET $walletId = SELECT VALUE ->observes_wallet.out FROM ${userId};
+     LET $wallets = SELECT address FROM wallet WHERE $walletId;
+     SELECT VALUE count() FROM $wallets WHERE address = type::string('${address}');
+    `)
+  ).at(2);
+
+  if (!result) {
+    return true;
+  }
+  const [usersObservedWallets] = UniqueAddressResult.parse(result);
+  return !usersObservedWallets;
+});
+
 /**
  * Checks if the proceed action should be disabled based on the state of the add wallet form and temporary modal.
  *
@@ -87,7 +110,8 @@ export const isExecutableDisabled = (addWalletFormStore: AddWalletFormStore) =>
   addWalletFormStore.name === "" ||
   !isValidName(addWalletFormStore.name) ||
   !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
+  addWalletFormStore.isNameUniqueLoading ||
+  !addWalletFormStore.isAddressUnique;
 
 /**
  * Checks if the action should be disabled based on the state of the add wallet form for a non-executable action.
@@ -104,4 +128,5 @@ export const isNotExecutableDisabled = (
   !isValidName(addWalletFormStore.name) ||
   !isValidAddress(addWalletFormStore.address) ||
   !addWalletFormStore.isNameUnique ||
-  addWalletFormStore.isNameUniqueLoading;
+  addWalletFormStore.isNameUniqueLoading ||
+  !addWalletFormStore.isAddressUnique;
