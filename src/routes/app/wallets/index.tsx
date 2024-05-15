@@ -458,7 +458,7 @@ export default component$(() => {
                   class="w-full border-0 bg-customBlue text-white duration-300 ease-in-out hover:scale-105 disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
                   onClick$={handleAddWallet}
                   type="button"
-                  disabled={isExecutableDisabled(addWalletFormStore)}
+                  disabled={isNotExecutableDisabled(addWalletFormStore)}
                   text="Add Wallet"
                 />
               ) : stepsCounter.value === 3 ? (

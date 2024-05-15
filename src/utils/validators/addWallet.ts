@@ -129,4 +129,5 @@ export const isNotExecutableDisabled = (
   !isValidAddress(addWalletFormStore.address) ||
   !addWalletFormStore.isNameUnique ||
   addWalletFormStore.isNameUniqueLoading ||
-  !addWalletFormStore.isAddressUnique;
+  !addWalletFormStore.isAddressUnique ||
+  !isCheckSum(addWalletFormStore.address);
