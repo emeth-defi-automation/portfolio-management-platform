@@ -1,6 +1,6 @@
 name: E2E
 
-# Temporarly only run on test branches
+# TODO: Temporarly only run on test branches
 # until we have a stable test suite
 on:
   push:
