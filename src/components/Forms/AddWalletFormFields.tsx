@@ -12,7 +12,7 @@ import {
 } from "~/utils/validators/addWallet";
 import IconSuccess from "/public/assets/icons/dashboard/success.svg?jsx";
 import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
-import { Button } from "../Buttons/Buttons";
+import Button from "../Atoms/Buttons/Button";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 export interface AddWalletFormFieldsProps {
   addWalletFormStore: AddWalletFormStore;
@@ -87,9 +87,9 @@ export default component$<AddWalletFormFieldsProps>(
           )}
           <label
             for="address"
-            class="custom-text-50 flex items-center justify-between gap-2 text-xs"
+            class="flex items-center justify-between gap-2 text-xs"
           >
-            Wallet Address
+            <span class="custom-text-50">Wallet Address</span>
             {!addWalletFormStore.isExecutable ? (
               <div>
                 {!isValidAddress(addWalletFormStore.address) ? (
@@ -102,18 +102,18 @@ export default component$<AddWalletFormFieldsProps>(
               </div>
             ) : (
               <div>
-                <button
+                <Button
+                  variant="blue"
                   onClick$={onConnectWalletClick}
-                  class={`h-8 rounded-3xl border-none ${isWalletConnected ? "custom-border-1" : "bg-customBlue"} px-4 text-xs font-semibold text-white duration-300 ease-in-out hover:scale-105`}
-                >
-                  {isWalletConnected ? "Disconnect " : "Connect Wallet"}
-                </button>
+                  text={isWalletConnected ? "Disconnect " : "Connect Wallet"}
+                  size="small"
+                />
               </div>
             )}
           </label>
 
           {!addWalletFormStore.isExecutable ? (
-            <div class="mb-5 grid grid-cols-[75%_25%] items-center justify-between">
+            <div class="mb-5 grid grid-cols-[75%_25%] items-center justify-between gap-2">
               <Input
                 type="text"
                 name="address"
@@ -126,11 +126,10 @@ export default component$<AddWalletFormFieldsProps>(
                   walletAddressDebounce(target.value);
                 })}
               />
-
               <Button
-                class="ml-2 h-8 rounded-3xl border-0 bg-customBlue px-2 text-xs font-normal text-white duration-300 ease-in-out hover:scale-105 disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
-                type="button"
+                variant="blue"
                 text="Convert"
+                size="small"
                 onClick$={async () => {
                   addWalletFormStore.address = getAddress(
                     addWalletFormStore.address,

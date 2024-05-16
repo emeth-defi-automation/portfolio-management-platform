@@ -1,8 +1,8 @@
 import { type Signal, component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
-import { Button } from "../Buttons/Buttons";
 import { checkPattern, replaceNonMatching } from "~/utils/fractions";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
+import Button from "../Atoms/Buttons/Button";
 
 export interface AmountOfCoinsProps {
   addWalletFormStore: AddWalletFormStore;
@@ -19,7 +19,7 @@ export default component$<AmountOfCoinsProps>(
           </p>
           {addWalletFormStore.coinsToCount.map((symbol) => (
             <div class="flex max-h-[500px] flex-col overflow-auto" key={symbol}>
-              <div class="flex items-center justify-between ">
+              <div class="flex items-center justify-between gap-2">
                 <FormBadge
                   key={symbol}
                   image={`/assets/icons/tokens/${symbol.toLowerCase()}.svg`}
@@ -54,7 +54,7 @@ export default component$<AmountOfCoinsProps>(
                 />
                 <Button
                   text="max"
-                  class="custom-border-1 absolute end-10 h-9 !rounded-lg p-2 text-xs duration-300 ease-in-out hover:scale-105"
+                  variant="transparent"
                   onClick$={async () => {
                     const inputTokenValue =
                       addWalletFormStore.coinsToApprove.find(

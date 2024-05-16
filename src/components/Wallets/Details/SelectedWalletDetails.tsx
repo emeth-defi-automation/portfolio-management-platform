@@ -1,11 +1,12 @@
 import { type Signal, component$ } from "@builder.io/qwik";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import IconDelete from "/public/assets/icons/wallets/delete-red.svg?jsx";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconWallet from "/public/assets/icons/wallets/wallet.svg?jsx";
 // import IconLoading from "/public/assets/icons/wallets/loading.svg?jsx";
 import { TokenRowWallets } from "~/components/Tokens/TokenRowWallets";
 import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
+import Button from "~/components/Atoms/Buttons/Button";
+import IconTrashRed from "@material-design-icons/svg/outlined/delete.svg?jsx";
 
 interface SelectedWalletProps {
   selectedWallet: Signal<WalletTokensBalances | null>;
@@ -59,21 +60,28 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             </div>
           </div>
           <div class="flex gap-2">
-            <button class="custom-border-2 h-8 cursor-pointer rounded-10 px-4 text-xs duration-300 ease-in-out hover:scale-105">
-              Edit
-            </button>
-            <button class="custom-border-2 h-8 cursor-pointer rounded-10 px-4 text-xs duration-300 ease-in-out hover:scale-105">
-              Deactivate
-            </button>
-            <button
-              class="flex h-8 cursor-pointer items-center gap-2 rounded-10 bg-red-500 bg-opacity-20 px-4 text-xs text-red-500 duration-300 ease-in-out hover:scale-105"
+            <Button
+              variant="transparent"
+              text="Edit"
+              size="small"
+              customClass="font-normal"
+            />
+            <Button
+              variant="transparent"
+              text="Deactivate"
+              size="small"
+              customClass="font-normal"
+            />
+            <Button
+              variant="danger"
+              text="Delete Wallet"
+              size="small"
+              leftIcon={<IconTrashRed class="h-4 w-4" />}
+              customClass="font-medium"
               onClick$={() => {
                 isDeleteModalopen.value = !isDeleteModalopen.value;
               }}
-            >
-              <IconDelete />
-              <p class="lg:hidden">Delete Wallet</p>
-            </button>
+            />
           </div>
         </div>
         <div class="grid gap-4">
