@@ -23,11 +23,15 @@ const config: PlaywrightTestConfig = {
     trace: "on-first-retry",
   },
   projects: [
+    // {
+    //   name: "chromium",
+    //   use: {
+    //     ...devices["Desktop Chrome"],
+    //   },
+    // },
     {
-      name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-      },
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
     },
   ],
 };
