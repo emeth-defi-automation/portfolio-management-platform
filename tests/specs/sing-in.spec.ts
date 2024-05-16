@@ -20,15 +20,8 @@ test.describe("sign in", () => {
     const dashboardPage = new DashboardPage(page);
 
     await loginPage.verifyTitle();
+    await loginPage.useMetamask();
 
-    console.log('>>>>> clicking on "Use Metamask" button')
-    try {
-      await loginPage.useMetamask();
-    } catch (error) {
-      console.log('>>>>> error:', error)
-    }
-
-    console.log('>>>>> clicking on "Connect Wallet" button inside modal')
     await signInPage.useMetamaskWithConnectWalletModal();
     await metamask.connectToDapp();
     await signInPage.acceptAndSign();

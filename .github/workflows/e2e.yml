@@ -1,5 +1,7 @@
 name: E2E
 
+# Temporarly only run on test branches
+# until we have a stable test suite
 on:
   push:
     # branches: ["master", "dev"]
@@ -127,31 +129,7 @@ jobs:
           wait-on: http-get://localhost:${{ env.APP_PORT }}
 
       - name: Run tests
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run test.e2e.ci
-
-      # - name: Install extra dependencies
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install --no-install-recommends -y \
-      #     fluxbox \
-      #     x11-xserver-utils \
-      #     x11-utils \
-      #     xvfb
-
-      # - name: Run tests
-      #   run: |
-      #     Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
-      #     sleep 3
-      #     fluxbox &
-      #     sleep 3
-      #     npm run test.e2e.ci
-      #   env:
-      #     DISPLAY: :0.0
-
-      # - name: Run tests
-      #   run: npm run test.e2e.ci
+        run: npm run test.e2e.ci
 
       - name: Save results artifact
         if: ${{ !cancelled() }}
