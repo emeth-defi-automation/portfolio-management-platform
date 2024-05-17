@@ -5,6 +5,8 @@ import LoginPage from '../pages/login.page';
 import SignInPage from '../pages/signin.page';
 import { test } from '../util/test';
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 test.describe("sign in", () => {
   test.beforeEach(async ({ page }) => {
     const loginPage = new LoginPage(page);
@@ -20,6 +22,7 @@ test.describe("sign in", () => {
     const dashboardPage = new DashboardPage(page);
 
     await loginPage.verifyTitle();
+    await sleep(5000);
     await loginPage.useMetamask();
 
     await signInPage.useMetamaskWithConnectWalletModal();
