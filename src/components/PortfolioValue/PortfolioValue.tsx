@@ -317,9 +317,8 @@ export const PortfolioValue = component$<PortfolioValueProps>(
                   variant="iconBox"
                   leftIcon={<ImgPfButton />}
                   size="small"
-                  customClass="absolute absolute left-2/4 top-1/3 !bg-white/10 !px-1"
+                  customClass="absolute left-2/4 top-1/3 !bg-white/10 !px-1"
                 />
-                {/* <div class="absolute custom-bg-button opacity-20 h-full left-2/4 right-1/4 "></div> */}
               </div>
               <div class="custom-text-50 mt-3 flex justify-between text-xs">
                 <span>2011</span>
