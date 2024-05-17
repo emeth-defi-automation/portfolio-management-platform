@@ -22,6 +22,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
             >
               <div class="flex gap-2">
                 <IconArrowDown />
+
                 <p class="text-sm">{structure.name}</p>
               </div>
               <div class="mr-2 flex flex-col py-2">
