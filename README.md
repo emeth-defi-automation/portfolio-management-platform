@@ -66,6 +66,9 @@ MORALIS_API_KEY=
 # Every time you run `npm run ngrok`, it will generated new one url,
 # so you need to update it here accordingly.
 NGROK_WEBHOOK_URL=https://1111-11-111-11-111.ngrok-free.app/webhook/
+# Get static domain from ngrok website and paste it here - should look alike `weak-horse-badly.ngrok-free.app`
+NGROK_STATIC_DOMAIN=
+
 
 PUBLIC_EMETH_CONTRACT_ADDRESS=
 PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA=
