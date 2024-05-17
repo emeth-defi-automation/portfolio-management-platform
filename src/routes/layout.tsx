@@ -99,6 +99,7 @@ export default component$(() => {
     await initializeStreamIfNeeded(setupStream);
     const stream = await getStream();
     streamStore.streamId = stream["jsonResponse"]["id"];
+    console.log(streamStore.streamId);
   });
 
   return (

@@ -50,10 +50,6 @@ export const useAddWallet = routeAction$(
             });
             walletId = createWalletQueryResult.id;
 
-            await db.query(
-                `UPDATE ${walletId} SET nativeBalance = '${nativeBalance}';`,
-            );
-
             // create balances for tokens
             const tokens = await db.select<Token>("token");
             for (const token of tokens) {

@@ -85,7 +85,6 @@ export default component$(() => {
     coinsToCount: [],
     coinsToApprove: [],
   });
-  const getWalletBalanceHistory = useGetBalanceHistory();
   const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
   const msg = useSignal("1");
@@ -209,9 +208,6 @@ export default component$(() => {
 
       if (success) {
         observedWallets.value = await getObservedWallets();
-        await getWalletBalanceHistory.submit({
-          address: addWalletFormStore.address,
-        });
       }
 
       formMessageProvider.messages.push({
@@ -220,11 +216,6 @@ export default component$(() => {
         message: "Wallet successfully added.",
         isVisible: true,
       });
-
-      await addAddressToStreamConfig(
-        streamId,
-        addWalletFormStore.address as `0x${string}`,
-      );
 
       addWalletFormStore.address = "";
       addWalletFormStore.name = "";
