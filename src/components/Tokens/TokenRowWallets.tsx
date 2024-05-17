@@ -1,5 +1,6 @@
 import { $, type Signal, component$ } from "@builder.io/qwik";
-// import IconMenuDots from "/public/assets/icons/menu-dots.svg?jsx";
+// import Button from "../Atoms/Buttons/Button";
+// import IconMenuDots from "@material-design-icons/svg/outlined/more_vert.svg?jsx";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
 import {
   Image,
@@ -58,11 +59,12 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             <span class="text-customGreen">3,6%</span>
             <IconGraph />
           </div>
-          {/* <div class="text-right">
-            <button class="">
-              <IconMenuDots />
-            </button>
-          </div> */}
+          <div class="text-right">
+            {/* <Button
+              variant="onlyIcon"
+              leftIcon={<IconMenuDots class="w-4 h-4 fill-white/>}
+            /> */}
+          </div>
         </div>
       </>
     );

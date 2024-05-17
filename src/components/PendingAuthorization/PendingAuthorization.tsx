@@ -1,5 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import IconInfo from "/public/assets/icons/info-blue.svg?jsx";
+import Button from "../Atoms/Buttons/Button";
 
 export const PendingAuthorization = component$(() => {
   return (
@@ -15,12 +16,8 @@ export const PendingAuthorization = component$(() => {
           </p>
         </div>
         <div class="lg:flex lg:gap-2">
-          <button class="custom-border-2 mr-3 h-8 cursor-pointer rounded-3xl px-4 text-xs font-semibold text-white duration-300 ease-in-out hover:scale-110">
-            Dismiss
-          </button>
-          <button class="h-8 rounded-3xl border-none bg-blue-500 px-4 text-xs font-semibold text-white duration-300 ease-in-out hover:scale-110">
-            Authorize
-          </button>
+          <Button variant="transparent" text="Dismiss" size="small" />
+          <Button variant="blue" text="Authorize" size="small" />
         </div>
       </div>
     </>
