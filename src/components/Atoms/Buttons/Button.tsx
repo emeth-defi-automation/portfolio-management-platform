@@ -14,6 +14,7 @@ export interface ButtonProps {
     | QRL<() => Promise<void>>
     | (() => Promise<void>);
   dataTestId?: string;
+  type?: "submit" | "button";
 }
 
 const buttonStyles = cva(
@@ -53,6 +54,7 @@ const Button = component$(({ variant, size, ...props }: buttonType) => {
         {...props}
         class={twMerge(buttonStyles({ variant, size }), props.customClass)}
         data-testid={props.dataTestId}
+        type={props.type}
       >
         {props.leftIcon ? (
           <span

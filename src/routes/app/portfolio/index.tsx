@@ -803,18 +803,12 @@ export default component$(() => {
                 }}
                 customClass="w-full"
               />
-              {/* PYTANIE NR1: Submit */}
-              <button
-                type="submit"
-                class="h-12 w-full rounded-10 bg-blue-500 duration-300 ease-in-out hover:scale-105"
-                disabled={!isValidName(structureStore.name)}
-              >
-                Add token
-              </button>
-              {/* <Button
+              <Button
                 variant="blue"
+                text="Add token"
                 disabled={!isValidName(structureStore.name)}
-              /> */}
+                type="submit"
+              />
             </div>
           </Form>
         </Modal>
