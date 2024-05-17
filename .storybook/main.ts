@@ -10,8 +10,8 @@ const config: StorybookConfig = {
   },
   stories: [
     // ...rootMain.stories,
-    "../src/components/**/*.stories.mdx",
-    "../src/components/**/*.stories.@(js|jsx|ts|tsx)",
+    "../src/**/**/*.stories.mdx",
+    "../src/**/**/*.stories.@(js|jsx|ts|tsx)",
   ],
 
   viteFinal: async (config: any) => {
