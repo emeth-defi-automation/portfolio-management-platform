@@ -12,7 +12,7 @@ export interface ButtonProps {
 
 const buttonStyles = cva(
   [
-    "font-['Sora'] pointer flex items-center gap-2 text-nowrap rounded-full border-2 border-transparent",
+    "font-['Sora'] pointer flex items-center gap-2 text-nowrap justify-center rounded-full border-2 border-transparent",
     "hover:brightness-75 disabled:bg-transparent disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:border-2 disabled:border-customGrey/15 disabled:text-customGrey",
   ],
   {

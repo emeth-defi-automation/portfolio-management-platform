@@ -41,14 +41,14 @@
   "devDependencies": {
     "@builder.io/qwik": "1.5.2",
     "@builder.io/qwik-city": "1.5.2",
-    "@playwright/test": "1.41.2",
+    "@playwright/test": "1.44.0",
     "@storybook/addon-essentials": "8.0.8",
     "@storybook/addon-links": "8.0.8",
     "@storybook/blocks": "8.0.8",
     "@storybook/builder-vite": "8.0.8",
     "@storybook/html": "8.0.8",
     "@storybook/html-vite": "8.0.8",
-    "@synthetixio/synpress": "4.0.0-alpha.3",
+    "@synthetixio/synpress": "4.0.0-alpha.7",
     "@types/d3": "7.4.3",
     "@types/eslint": "8.56.9",
     "@types/express": "4.17.21",
@@ -72,7 +72,6 @@
     "vite-tsconfig-paths": "4.3.2"
   },
   "dependencies": {
-    "@material-design-icons/font": "^0.14.13",
     "@material-design-icons/svg": "^0.14.13",
     "@moralisweb3/common-evm-utils": "2.25.4",
     "@wagmi/connectors": "4.1.26",

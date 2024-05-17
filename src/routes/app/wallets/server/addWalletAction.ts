@@ -11,7 +11,7 @@ import { Token } from "~/interface/token/Token";
 
 /**
  * This function is used to add a wallet, create balances for tokens, and create a relations.
- * 
+ *
  * @param {Object} data - The data of wallet that shall be added.
  * @param {string} data.address - The address of the wallet.
  * @param {string} data.name - The name of the wallet.

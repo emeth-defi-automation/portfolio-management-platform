@@ -6,7 +6,7 @@ export interface HeaderProps {
   class?: string;
 }
 
-const HeaderStyles = cva(["font-['Sora'] font-semibold"], {
+const HeaderStyles = cva(["font-['Sora'] font-semibold !leading-none"], {
   variants: {
     variant: {
       h1: ["text-4xl"],
