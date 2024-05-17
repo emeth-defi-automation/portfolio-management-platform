@@ -58,7 +58,7 @@ export default component$(() => {
               customClass="px-4 w-72"
             />
             <WalletConnect
-              text="Use Metamask"
+              text="Use Wallet Connect"
               variant="transparent"
               dataTestId="use-walletconnect-button"
               leftIcon={<IconWalletConnect class="h-6 w-6" />}

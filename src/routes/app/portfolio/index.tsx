@@ -805,9 +805,10 @@ export default component$(() => {
               />
               <Button
                 variant="blue"
-                text="Add token"
+                text="Add Token"
                 disabled={!isValidName(structureStore.name)}
                 type="submit"
+                customClass="w-full"
               />
             </div>
           </Form>
