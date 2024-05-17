@@ -1,6 +1,9 @@
-import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
+import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
-import IconClose from "/public/assets/icons/close.svg?jsx";
+import IconClose from "@material-design-icons/svg/round/close.svg?jsx";
+import Button from "~/components/Atoms/Buttons/Button";
+import IconTransfer from "@material-design-icons/svg/round/arrow_circle_up.svg?jsx";
+import IconAdd from "@material-design-icons/svg/outlined/add.svg?jsx";
 import { Group } from "~/components/Groups/Group";
 import {
   $,
@@ -263,10 +266,10 @@ export default component$(() => {
           <div class="flex items-center justify-between">
             <h2 class="text-2xl font-semibold">Portfolio Name</h2>
             <div class="flex items-center gap-2">
-              <ButtonWithIcon
-                image="/assets/icons/portfolio/transfer.svg"
+              <Button
+                variant="transparent"
                 text="Transfer"
-                class="custom-border-2"
+                size="small"
                 onClick$={async () => {
                   for (const structure of availableStructures.value
                     .structures) {
@@ -289,15 +292,19 @@ export default component$(() => {
                   }
                   isTransferModalOpen.value = true;
                 }}
+                customClass="font-normal"
+                leftIcon={<IconTransfer class="h-4 w-4 fill-white" />}
               />
-              <ButtonWithIcon
-                image="/assets/icons/portfolio/add.svg"
+              <Button
                 text="Add Sub Portfolio"
-                class="bg-customBlue"
+                variant="blue"
+                size="small"
                 onClick$={async () => {
                   isCreateNewStructureModalOpen.value =
                     !isCreateNewStructureModalOpen.value;
                 }}
+                customClass="font-normal"
+                leftIcon={<IconAdd class="h-4 w-4 fill-white" />}
               />
             </div>
           </div>
@@ -391,7 +398,8 @@ export default component$(() => {
           </div>
           <div class="flex gap-4">
             <Button
-              class="custom-border-1 w-full bg-transparent  disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
+              variant="transparent"
+              text={stepsCounter.value === 1 ? "Cancel" : "Back"}
               onClick$={async () => {
                 if (stepsCounter.value === 2) {
                   batchTransferFormStore.coinsToTransfer = [];
@@ -424,11 +432,11 @@ export default component$(() => {
                   isTransferModalOpen.value = false;
                 }
               }}
-              type="button"
-              text={stepsCounter.value === 1 ? "Cancel" : "Back"}
+              customClass="w-full"
             />
             <Button
-              class="w-full border-0 bg-customBlue disabled:scale-100 disabled:bg-[#e6e6e6] disabled:text-gray-500"
+              variant="blue"
+              text={stepsCounter.value === 3 ? "Send" : "Next"}
               onClick$={async () => {
                 if (stepsCounter.value === 3) {
                   isTransferModalOpen.value = false;
@@ -439,7 +447,7 @@ export default component$(() => {
                   stepsCounter.value = stepsCounter.value + 1;
                 }
               }}
-              text={stepsCounter.value === 3 ? "Send" : "Next"}
+              customClass="w-full"
             />
           </div>
         </Modal>
@@ -510,20 +518,18 @@ export default component$(() => {
                 class="walletLabel custom-border-1 relative block h-12 w-full cursor-pointer rounded-lg bg-transparent outline-none"
               >
                 {selectedWallets.wallets.length > 0 && (
-                  <div class="custom-bg-button absolute start-2 top-[0.45rem] flex h-8 w-fit gap-2 rounded-md px-3 py-1.5">
+                  <div class="custom-bg-button absolute start-2 top-[0.45rem] flex h-8 w-fit items-center gap-2 rounded-md px-3 py-1.5">
                     <p>{selectedWallets.wallets.length} selections</p>
-                    <button
-                      class="cursor-pointer"
-                      type="button"
+                    <Button
+                      variant="onlyIcon"
+                      leftIcon={<IconClose class="h-4 w-4 fill-white" />}
                       onClick$={() => {
                         isSelectAllChecked.wallets = false;
                         isSelectAllChecked.tokens = false;
                         isWalletSelected.selection = [];
                         selectedWallets.wallets = [];
                       }}
-                    >
-                      <IconClose />
-                    </button>
+                    />
                   </div>
                 )}
                 <span class="absolute end-4 top-4 cursor-pointer">
@@ -686,9 +692,9 @@ export default component$(() => {
                 {selectedTokens.balances.length > 0 && (
                   <div class="custom-bg-button absolute start-2 top-[0.45rem] flex h-8 w-fit gap-2 rounded-md px-3 py-1.5">
                     <p>{selectedTokens.balances.length} selections</p>
-                    <button
-                      class="cursor-pointer"
-                      type="button"
+                    <Button
+                      variant="onlyIcon"
+                      leftIcon={<IconClose class="h-4 w-4 fill-white" />}
                       onClick$={() => {
                         isSelectAllChecked.tokens = false;
                         selectedTokens.balances = [];
@@ -696,9 +702,7 @@ export default component$(() => {
                           (balance) => (balance.status = false),
                         );
                       }}
-                    >
-                      <IconClose />
-                    </button>
+                    />
                   </div>
                 )}
                 <span class="absolute end-4 top-4 cursor-pointer">
@@ -786,9 +790,9 @@ export default component$(() => {
               </div>
             </div>
             <div class="flex gap-4">
-              <button
-                type="button"
-                class="custom-border-1 h-12 w-1/2 rounded-10 duration-300 ease-in-out hover:scale-105 "
+              <Button
+                variant="transparent"
+                text="Cancel"
                 onClick$={() => {
                   isCreateNewStructureModalOpen.value = false;
                   isWalletSelected.selection = [];
@@ -797,16 +801,15 @@ export default component$(() => {
                   selectedTokens.balances = [];
                   structureStore.name = "";
                 }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                class=" h-12 w-1/2 rounded-10 bg-blue-500 duration-300 ease-in-out hover:scale-105"
+                customClass="w-full"
+              />
+              <Button
+                variant="blue"
+                text="Add Token"
                 disabled={!isValidName(structureStore.name)}
-              >
-                Add token
-              </button>
+                type="submit"
+                customClass="w-full"
+              />
             </div>
           </Form>
         </Modal>
@@ -860,7 +863,7 @@ export default component$(() => {
                           !tokensToSwapListVisible.value;
                       }}
                     >
-                      <IconArrowDown />
+                      <IconArrowDown class="h-4 w-4 fill-white" />
                     </button>
                   </div>
                 </div>
@@ -914,7 +917,7 @@ export default component$(() => {
                   Cancel
                 </button>
                 <button
-                  class="h-12 w-1/2 rounded-10 rounded-lg bg-blue-500 p-2 text-white duration-300 ease-in-out hover:scale-105"
+                  class="h-12 w-1/2 rounded-10 bg-blue-500 p-2 text-white duration-300 ease-in-out hover:scale-105"
                   onClick$={async () => {
                     isSwapModalOpen.value = false;
                     await swapTokensForTokens(

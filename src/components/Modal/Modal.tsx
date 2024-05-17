@@ -1,6 +1,7 @@
 import { type QRL, type Signal, Slot, component$ } from "@builder.io/qwik";
-import IconClose from "/public/assets/icons/close.svg?jsx";
+import IconClose from "@material-design-icons/svg/round/close.svg?jsx";
 import { twMerge } from "tailwind-merge";
+import Button from "../Atoms/Buttons/Button";
 
 export interface ModalProps {
   title: string;
@@ -34,17 +35,16 @@ export const Modal = component$<ModalProps>(
           {hasButton ? (
             <div class="mb-8 flex items-center justify-between">
               <div class="text-xl font-semibold text-white">{title}</div>
-              <button
-                class="cursor-pointer"
+              <Button
+                variant="onlyIcon"
                 onClick$={() => {
                   isOpen.value = !isOpen.value;
                   if (onClose) {
                     onClose();
                   }
                 }}
-              >
-                <IconClose />
-              </button>
+                leftIcon={<IconClose class="h-6 w-6 fill-white" />}
+              />
             </div>
           ) : null}
           <Slot />

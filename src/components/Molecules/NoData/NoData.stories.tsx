@@ -18,7 +18,7 @@ export function NoDataInfo(args: NoDataProps) {
 export function NoDataWarning(args: NoDataProps) {
   return (
     <NoData {...args}>
-      <Button text="Setup Wallet" class="w-full" />
+      <Button text="Setup Wallet" customClass="w-full" />
     </NoData>
   );
 }

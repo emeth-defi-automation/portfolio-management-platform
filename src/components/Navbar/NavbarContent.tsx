@@ -5,11 +5,12 @@ import {
   useVisibleTask$,
 } from "@builder.io/qwik";
 import ImgAvatar from "/public/assets/images/avatar.png?jsx";
-import IconLogout from "/public/assets/icons/logout.svg?jsx";
+import IconLogout from "@material-design-icons/svg/outlined/logout.svg?jsx";
 import { LoginContext, WagmiConfigContext } from "../WalletConnect/context";
 import { NavLink } from "./NavLink";
 import { useNavigate } from "@builder.io/qwik-city";
 import { disconnectWallets } from "~/utils/walletConnections";
+import Button from "~/components/Atoms/Buttons/Button";
 
 export const NavbarContent = component$(() => {
   const nav = useNavigate();
@@ -46,9 +47,9 @@ export const NavbarContent = component$(() => {
 
           <p class="text-[10px] text-customGreen">Account verified</p>
         </div>
-        <button
-          class="ml-1"
-          type="button"
+        <Button
+          variant="onlyIcon"
+          leftIcon={<IconLogout class="h-6 w-6 fill-white" />}
           onClick$={async () => {
             localStorage.removeItem("refreshToken");
             document.cookie =
@@ -60,9 +61,7 @@ export const NavbarContent = component$(() => {
             await disconnectWallets(wagmiConfig.config, true);
             await nav("/");
           }}
-        >
-          <IconLogout />
-        </button>
+        />
       </div>
     </>
   );

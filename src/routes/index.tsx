@@ -1,7 +1,5 @@
 import { HeroText } from "~/components/HeroText/HeroText";
 import { component$, useContext, useVisibleTask$ } from "@builder.io/qwik";
-import { ConnectButton } from "~/components/Buttons/Buttons";
-import WalletConnect from "~/components/WalletConnect";
 import { Copyright } from "~/components/Paragraph/Paragraph";
 import IconLogo from "/public/assets/icons/logo.svg?jsx";
 import {
@@ -10,6 +8,12 @@ import {
 } from "~/components/WalletConnect/context";
 import { useNavigate } from "@builder.io/qwik-city";
 import { disconnectWallets } from "~/utils/walletConnections";
+import IconArrowForward from "@material-design-icons/svg/outlined/arrow_forward.svg?jsx";
+import IconInfo from "@material-design-icons/svg/outlined/info.svg?jsx";
+import IconWalletConnect from "/public/assets/icons/login/walletconnect.svg?jsx";
+import IconMetaMask from "/public/assets/icons/login/metamask.svg?jsx";
+import WalletConnect from "~/components/WalletConnect";
+import Button from "~/components/Atoms/Buttons/Button";
 
 export default component$(() => {
   const login = useContext(LoginContext);
@@ -46,22 +50,31 @@ export default component$(() => {
           </HeroText>
           <div class="grid justify-items-center gap-3">
             <WalletConnect
-              image="/assets/icons/login/metamask.svg"
               text="Use Metamask"
+              variant="transparent"
               dataTestId="use-metamask-button"
+              leftIcon={<IconMetaMask class="h-6 w-6" />}
+              rightIcon={<IconArrowForward class="h-4 w-4" />}
+              customClass="px-4 w-72"
             />
             <WalletConnect
-              image="/assets/icons/login/walletconnect.svg"
-              text="Use WalletConnect"
+              text="Use Wallet Connect"
+              variant="transparent"
               dataTestId="use-walletconnect-button"
+              leftIcon={<IconWalletConnect class="h-6 w-6" />}
+              rightIcon={<IconArrowForward class="h-4 w-4" />}
+              customClass="px-4 w-72"
             />
           </div>
         </div>
         <div class="grid h-full items-end justify-items-center gap-6 pb-10">
-          <ConnectButton
-            image="/assets/icons/info-white.svg"
+          <Button
             text="How to use Wallet?"
-            class="w-52 !border-0 bg-customBlue py-2 pl-2 pr-3 text-xs"
+            variant="blue"
+            leftIcon={<IconInfo class="h-6 w-6 " />}
+            rightIcon={<IconArrowForward class="h-4 w-4" />}
+            customClass="font-normal h-10 w-52 px-3"
+            size="small"
             dataTestId="how-to-use-wallet-button"
           />
           <Copyright />
