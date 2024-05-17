@@ -16,7 +16,6 @@ import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/wal
 import { checksumAddress } from "viem";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
-import { getCookie } from "~/utils/refresh";
 import * as jwtDecode from "jwt-decode";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
@@ -64,6 +63,7 @@ import { fetchTokens } from "~/database/tokens";
 import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import { balancesLiveStream } from "./server/balancesLiveStream";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
+import { getAccessToken } from "~/utils/refresh";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -87,6 +87,7 @@ export default component$(() => {
     isExecutable: 0,
     isNameUnique: true,
     isNameUniqueLoading: false,
+    isAddressUnique: true,
     coinsToCount: [],
     coinsToApprove: [],
   });
@@ -182,7 +183,7 @@ export default component$(() => {
           }
         }
         // approving logged in user by observed wallet by emeth contract
-        const cookie = getCookie("accessToken");
+        const cookie = await getAccessToken();
         if (!cookie) throw new Error("No accessToken cookie found");
 
         const { address } = jwtDecode.jwtDecode(cookie) as JwtPayload;
@@ -199,6 +200,9 @@ export default component$(() => {
         );
 
         await writeContract(wagmiConfig.config as Config, request);
+      }
+      if (wagmiConfig.config) {
+        await disconnectWallets(wagmiConfig.config);
       }
 
       const {
@@ -234,10 +238,6 @@ export default component$(() => {
       addWalletFormStore.coinsToCount = [];
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
-
-      if (wagmiConfig.config) {
-        await disconnectWallets(wagmiConfig.config);
-      }
     } catch (err) {
       console.error("error: ", err);
       formMessageProvider.messages.push({
@@ -295,8 +295,6 @@ export default component$(() => {
       };
     } else {
       isTransferModalOpen.value = false;
-      const cookie = getCookie("accessToken");
-      if (!cookie) throw new Error("No accessToken cookie found");
       const emethContractAddress = import.meta.env
         .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
       try {
@@ -457,7 +455,7 @@ export default component$(() => {
                   class="w-full border-0 bg-customBlue text-white duration-300 ease-in-out hover:scale-105 disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
                   onClick$={handleAddWallet}
                   type="button"
-                  disabled={isExecutableDisabled(addWalletFormStore)}
+                  disabled={isNotExecutableDisabled(addWalletFormStore)}
                   text="Add Wallet"
                 />
               ) : stepsCounter.value === 3 ? (

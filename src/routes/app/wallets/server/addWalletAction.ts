@@ -11,7 +11,7 @@ import { Token } from "~/interface/token/Token";
 
 /**
  * This function is used to add a wallet, create balances for tokens, and create a relations.
- * 
+ *
  * @param {Object} data - The data of wallet that shall be added.
  * @param {string} data.address - The address of the wallet.
  * @param {string} data.name - The name of the wallet.
@@ -39,15 +39,17 @@ export const useAddWallet = routeAction$(
         if (existingWallet.at(0)) {
             walletId = existingWallet[0].id;
         } else {
+            const nativeBalance = await testPublicClient.getBalance({
+                address: data.address as `0x${string}`,
+            });
             const [createWalletQueryResult] = await db.create<Wallet>("wallet", {
                 chainId: 1,
                 address: data.address.toString(),
                 isExecutable: data.isExecutable === "1" ? true : false,
+                nativeBalance: nativeBalance.toString(),
             });
             walletId = createWalletQueryResult.id;
-            const nativeBalance = await testPublicClient.getBalance({
-                address: createWalletQueryResult.address as `0x${string}`,
-            });
+
             await db.query(
                 `UPDATE ${walletId} SET nativeBalance = '${nativeBalance}';`,
             );
