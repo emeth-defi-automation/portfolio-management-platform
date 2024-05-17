@@ -101,14 +101,6 @@ export default component$(() => {
     streamStore.streamId = stream["jsonResponse"]["id"];
   });
 
-  // eslint-disable-next-line qwik/no-use-visible-task
-
-  useTask$(async function () {
-    await initializeStreamIfNeeded(setupStream);
-    const stream = await getStream();
-    streamStore.streamId = stream["jsonResponse"]["id"];
-  });
-
   return (
     <>
       <main class="h-screen overflow-auto bg-black font-['Sora'] text-white">

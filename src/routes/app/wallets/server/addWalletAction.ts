@@ -39,15 +39,17 @@ export const useAddWallet = routeAction$(
         if (existingWallet.at(0)) {
             walletId = existingWallet[0].id;
         } else {
+            const nativeBalance = await testPublicClient.getBalance({
+                address: data.address as `0x${string}`,
+            });
             const [createWalletQueryResult] = await db.create<Wallet>("wallet", {
                 chainId: 1,
                 address: data.address.toString(),
                 isExecutable: data.isExecutable === "1" ? true : false,
+                nativeBalance: nativeBalance.toString(),
             });
             walletId = createWalletQueryResult.id;
-            const nativeBalance = await testPublicClient.getBalance({
-                address: createWalletQueryResult.address as `0x${string}`,
-            });
+
             await db.query(
                 `UPDATE ${walletId} SET nativeBalance = '${nativeBalance}';`,
             );
