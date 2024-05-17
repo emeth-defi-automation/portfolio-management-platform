@@ -26,7 +26,6 @@ import {
   getAccount,
 } from "@wagmi/core";
 import { emethContractAbi } from "~/abi/emethContractAbi";
-import { getCookie } from "~/utils/refresh";
 import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
 import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
 import Destination from "~/components/Forms/portfolioTransfters/Destination";
@@ -100,7 +99,7 @@ export default component$(() => {
     const tokens: any = await fetchTokens();
     allTokensFromDb.value = tokens;
   });
-  // TODO: after configs merged shall be fine
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
     const account = wagmiConfig.config ? getAccount(wagmiConfig.config) : null;
@@ -177,10 +176,6 @@ export default component$(() => {
   );
 
   const handleBatchTransfer = $(async () => {
-    const cookie = getCookie("accessToken");
-
-    if (!cookie) throw new Error("No accessToken cookie found");
-
     const emethContractAddress = import.meta.env
       .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
 

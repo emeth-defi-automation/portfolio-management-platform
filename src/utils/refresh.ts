@@ -1,3 +1,5 @@
+import { server$ } from "@builder.io/qwik-city";
+
 export const isTokenExpired = (token: string) => {
   try {
     const { exp } = JSON.parse(atob(token.split(".")[1]));
@@ -17,3 +19,7 @@ export const getCookie = (name: string) => {
     }
   }
 };
+
+export const getAccessToken = server$(function () {
+  return this.cookie.get("accessToken")?.value;
+});

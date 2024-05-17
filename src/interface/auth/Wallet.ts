@@ -3,4 +3,5 @@ export type Wallet = {
   chainId: number;
   address: string;
   isExecutable: boolean;
+  nativeBalance?: string;
 };
