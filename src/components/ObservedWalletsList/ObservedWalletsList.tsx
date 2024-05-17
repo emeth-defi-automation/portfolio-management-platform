@@ -84,7 +84,7 @@ export const getObservedWallets = server$(async function () {
         name: observedWallet.name,
         chainId: wallet.chainId,
         address: wallet.address,
-        nativeBalance: nativeBalance,
+        nativeBalance: nativeBalance.toString(),
         isExecutable: wallet.isExecutable,
       },
       tokens: [],

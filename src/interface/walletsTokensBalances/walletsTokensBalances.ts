@@ -2,7 +2,7 @@ import { type Wallet } from "../auth/Wallet";
 
 import { type Token } from "../token/Token";
 
-type WalletWithNativeBalance = Wallet & { nativeBalance: bigint; name: string };
+type WalletWithName = Wallet & { name: string };
 export type TokenWithBalance = Token & {
   balance: string;
   balanceValueUSD: string;
@@ -13,7 +13,7 @@ export type TokenWithBalance = Token & {
 };
 
 export type WalletTokensBalances = {
-  wallet: WalletWithNativeBalance;
+  wallet: WalletWithName;
   tokens: TokenWithBalance[];
 };
 
