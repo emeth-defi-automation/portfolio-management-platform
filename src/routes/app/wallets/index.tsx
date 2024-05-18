@@ -206,6 +206,7 @@ export default component$(() => {
         isExecutable: addWalletFormStore.isExecutable.toString(),
       });
 
+      // could be removed
       if (success) {
         observedWallets.value = await getObservedWallets();
       }
