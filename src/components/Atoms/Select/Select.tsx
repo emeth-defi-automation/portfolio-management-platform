@@ -1,5 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
+import IconArrowDown from '/public/assets/icons/arrow-down.svg?jsx';
 
 export type Option = {
   value: string;
@@ -8,14 +9,10 @@ export type Option = {
 
 const SelectStyles = cva(
   [
-    "custom-border-1 min-w-max w-full cursor-pointer rounded-lg bg-transparent px-4 text-white  text-xs font-['Sora'] appearance-none bg-[url('/assets/icons/arrow-down.svg')] bg-no-repeat bg-auto",
+    "custom-border-1 min-w-max w-full cursor-pointer rounded-lg bg-transparent px-4 text-white  text-xs font-['Sora'] appearance-none",
   ],
   {
     variants: {
-      variant: {
-        smallArrow: ["bg-[position:right_6px_center] bg-white bg-opacity-5"],
-        largeArrow: ["bg-[position:right_16px_center]"],
-      },
       size: {
         small: ["w-14 px-1.5 h-8"],
         medium: ["w-full h-10 pr-10"],
@@ -23,34 +20,26 @@ const SelectStyles = cva(
       },
     },
     defaultVariants: {
-      variant: "largeArrow",
       size: "large",
     },
   },
 );
 
-// export type SelectType = VariantProps<typeof SelectStyles>;
-
 export interface SelectProps extends VariantProps<typeof SelectStyles> {
   name: string;
   class?: string;
   options?: Option[];
-  // value: number | string;
   onValueChange?: any;
   placeholder?: string;
 }
 
-const Select = ({ variant, size, ...props }: SelectProps) => {
+const Select = ({ size, ...props }: SelectProps) => {
   return (
+    <div class={`relative ${size == "small" ? "w-fit" : null}`}>
     <select
       name={props.name}
       id={props.name}
-      class={twMerge(SelectStyles({ variant, size }), props.class)}
-      // onInput$={(e: any) => {
-      //     const target = e.target as any;
-      //     $(props.onValueChange(target.value)); // Użyj funkcji przekazanej przez propsy do aktualizacji wartości
-      // }}
-      // value={props.value}
+      class={twMerge(SelectStyles({ size }), props.class)}
     >
       {props.options?.map((option, index) => (
         <option
@@ -62,6 +51,8 @@ const Select = ({ variant, size, ...props }: SelectProps) => {
         </option>
       ))}
     </select>
+    <span class={`absolute top-1/2 -translate-y-1/2 ${size == "small" ? "right-1.5" : "right-4"}`}><IconArrowDown/></span>
+    </div>
   );
 };
 

@@ -25,7 +25,6 @@ Portfolio.args = {
     { value: "Ethereum", text: "Ethereum" },
   ],
   size: "large",
-  variant: "largeArrow",
 };
 
 Modal.args = {
@@ -34,11 +33,9 @@ Modal.args = {
     { value: "Ethereum", text: "Ethereum" },
   ],
   size: "medium",
-  variant: "largeArrow",
 };
 
 Dashboard.args = {
   options: [{ value: "", text: "All" }],
   size: "small",
-  variant: "smallArrow",
 };

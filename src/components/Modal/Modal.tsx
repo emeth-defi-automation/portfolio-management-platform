@@ -28,8 +28,8 @@ export const Modal = component$<ModalProps>(
           onClick$={(event) => {
             event.stopPropagation();
           }}
-          class="custom-bg-opacity-5 relative h-fit w-1/3 min-w-[455px] overflow-auto p-6 backdrop-blur-2xl"
-        >
+          class="custom-bg-opacity-5 relative h-fit w-1/3 min-w-[455px] overflow-auto p-6 backdrop-blur-2xl rounded-2xl custom-border-1"
+        >       
           {hasButton ? (
             <div class="mb-8 flex items-center justify-between">
               <div class="text-xl font-semibold text-white">{title}</div>
