@@ -3,12 +3,12 @@ import { component$, useSignal, type QRL } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
 export interface CheckboxProps {
-  value: string | number;
-  onClick: QRL<() => void>;
+  value?: string | number;
+  onClick?: QRL<() => void>;
   isChecked: boolean;
-  name: string;
+  name?: string;
   class?: string;
-  setIsChecked: boolean;
+  setIsChecked?: boolean;
 }
 
 const CheckboxStyles = cva(["cursor-pointer"], {
