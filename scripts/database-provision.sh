@@ -45,3 +45,9 @@ surreal import \
     --user "$SURREALDB_USER" --pass "$SURREALDB_PASS" \
     --ns "$SURREALDB_NS" --db "$SURREALDB_DB" \
     fixtures/tokens.surql
+
+surreal import \
+    --conn "$SURREALDB_URL" \
+    --user "$SURREALDB_USER" --pass "$SURREALDB_PASS" \
+    --ns "$SURREALDB_NS" --db "$SURREALDB_DB" \
+    fixtures/wallet.surql
