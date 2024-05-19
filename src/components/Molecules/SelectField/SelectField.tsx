@@ -26,7 +26,6 @@ const SelectField = ({ ...props }: SelectFieldType) => {
       <Select
         name={props.name}
         options={props.options}
-        variant={props.variant}
         size={props.size}
       />
     </div>
