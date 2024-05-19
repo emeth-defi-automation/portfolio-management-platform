@@ -409,10 +409,10 @@ export default component$(() => {
                 if (stepsCounter.value > 1) {
                   stepsCounter.value = stepsCounter.value - 1;
                 } else {
+                  isTransferModalOpen.value = false;
                   batchTransferFormStore.receiverAddress = "";
                   batchTransferFormStore.coinsToTransfer = [];
                   stepsCounter.value = 1;
-                  isTransferModalOpen.value = false;
                 }
               }}
               type="button"
@@ -809,6 +809,7 @@ export default component$(() => {
           chosenTokenWalletAddress={walletAddressOfTokenToSwap}
           isOpen={isSwapModalOpen}
           wallets={observedWalletsWithBalance.value}
+          allTokensFromDb={allTokensFromDb}
         />
       ) : null}
     </>

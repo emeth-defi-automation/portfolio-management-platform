@@ -56,6 +56,7 @@ interface SwapModalProps {
   chosenTokenSymbol: Signal<string>;
   isOpen: Signal<boolean>;
   wallets: WalletWithBalance[];
+  allTokensFromDb: any;
 }
 
 export const SwapModal = component$<SwapModalProps>(
@@ -65,6 +66,7 @@ export const SwapModal = component$<SwapModalProps>(
     chosenTokenSymbol,
     isOpen,
     wallets,
+    allTokensFromDb,
   }) => {
     const formMessageProvider = useContext(messagesContext);
     const wagmiConfig = useContext(WagmiConfigContext);
@@ -137,7 +139,7 @@ export const SwapModal = component$<SwapModalProps>(
     const isManualAddress = useSignal<boolean>(false);
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(() => {
-      console.log(chosenTokenWalletAddress.value);
+      console.log(allTokensFromDb.value);
       swapValues.accountToSendTokens = chosenTokenWalletAddress.value;
     });
     // eslint-disable-next-line qwik/no-use-visible-task
@@ -261,7 +263,6 @@ export const SwapModal = component$<SwapModalProps>(
                     ${swapValues.chosenToken.dolarValue}
                   </span>
                 </div>
-                {/* TODO parsin options */}
                 <Select
                   name=""
                   options={[
@@ -291,20 +292,22 @@ export const SwapModal = component$<SwapModalProps>(
                     ${swapValues.tokenToSwapOn.value}
                   </span>
                 </div>
-                {/* parsing options */}
+
                 <Select
                   name=""
                   options={[
                     { value: "", text: "Pick a coin" },
-                    {
-                      value: "0xD418937d10c9CeC9d20736b2701E506867fFD85f",
-                      text: "USDC",
-                    },
-                    {
-                      value: "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
-                      text: "USDT",
-                    },
-                  ]}
+                    ...allTokensFromDb.value.map((token: any) => {
+                      if (
+                        !(token.symbol === swapValues.chosenToken.symbol.value)
+                      ) {
+                        return {
+                          value: token.address,
+                          text: token.symbol,
+                        };
+                      } else return null;
+                    }),
+                  ].filter((item) => item != null)}
                   onValueChange={$(async (value) => {
                     swapValues.tokenToSwapOn.address = value;
                     swapValues.tokenToSwapOn.symbol =
@@ -315,9 +318,6 @@ export const SwapModal = component$<SwapModalProps>(
                 />
               </Box>
             </div>
-
-            {/* pick addres section
-            TODO switch and select handler */}
             <WalletAddressValueSwitch isManualAddress={isManualAddress} />
             <div class="flex flex-col gap-2">
               <label for="swapValues.accountToSendTokens">
