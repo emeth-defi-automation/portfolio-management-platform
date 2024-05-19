@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 export type Option = {
   value: string;
   text: string;
+  selected?: boolean;
 };
 
 const SelectStyles = cva(
@@ -34,7 +35,7 @@ const SelectStyles = cva(
 
 export interface SelectProps extends VariantProps<typeof SelectStyles> {
   class?: string;
-  options?: Option[];
+  options?: Option[] | void[];
   onValueChange?: QRL<(target: any) => void> | ((target: any) => void);
   name: string;
 }
@@ -48,7 +49,7 @@ const Select = component$(
         class={twMerge(SelectStyles({ variant, size }), props.class)}
         onInput$={(e: any) => {
           const target = e.target as any;
-         
+
           if (onValueChange) {
             onValueChange(target.value);
           }
@@ -56,11 +57,12 @@ const Select = component$(
       >
         {props.options?.map((option, index) => (
           <option
+            selected={option?.selected}
             class="text-black"
-            key={`${option.text}${index}`}
-            value={option.value}
+            key={`${option?.text}${index}`}
+            value={option?.value}
           >
-            {option.text}
+            {option?.text}
           </option>
         ))}
       </select>

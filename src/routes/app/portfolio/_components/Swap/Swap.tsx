@@ -5,6 +5,7 @@ import {
   $,
   useContext,
   useVisibleTask$,
+  useSignal,
 } from "@builder.io/qwik";
 import Box from "../../../../../components/Atoms/Box/Box";
 import Button from "../../../../../components/Atoms/Buttons/Button";
@@ -26,6 +27,7 @@ import { messagesContext } from "~/routes/app/layout";
 import { swapTokensForTokens } from "~/utils/tokens/swap";
 import { WalletWithBalance } from "../../interface";
 import { convertToFraction, replaceNonMatching } from "~/utils/fractions";
+import WalletAddressValueSwitch from "./WalletAddressValueSwitch";
 
 const askMoralisForPrices = server$(async () => {
   const response = await Moralis.EvmApi.token.getMultipleTokenPrices(
@@ -132,18 +134,13 @@ export const SwapModal = component$<SwapModalProps>(
       ),
       500,
     );
-
+    const isManualAddress = useSignal<boolean>(false);
+    // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(() => {
-      console.log("wallets: ", wallets);
+      console.log(chosenTokenWalletAddress.value);
+      swapValues.accountToSendTokens = chosenTokenWalletAddress.value;
     });
     // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(({ track }) => {
-      track(() => isOpen);
-      const cookieWallet = localStorage.getItem("emmethUserWalletAddress");
-      if (cookieWallet) {
-        swapValues.accountToSendTokens = cookieWallet;
-      }
-    });
     useVisibleTask$(async ({ track }) => {
       track(() => {
         swapValues.tokenToSwapOn.value;
@@ -321,15 +318,39 @@ export const SwapModal = component$<SwapModalProps>(
 
             {/* pick addres section
             TODO switch and select handler */}
+            <WalletAddressValueSwitch isManualAddress={isManualAddress} />
             <div class="flex flex-col gap-2">
               <label for="swapValues.accountToSendTokens">
                 Address to send coins to:
               </label>
-              <Input
-                type="text"
-                name="swapValues.accountToSendTokens"
-                value={swapValues.accountToSendTokens}
-              />
+              {isManualAddress.value ? (
+                <Input
+                  type="text"
+                  name="swapValues.accountToSendTokens"
+                  value={swapValues.accountToSendTokens}
+                  onInput={$((e) => {
+                    const target = e.target;
+                    swapValues.accountToSendTokens = target.value;
+                  })}
+                />
+              ) : (
+                <Select
+                  name=""
+                  options={[
+                    { value: "", text: "Select wallet" },
+                    ...wallets.map((option) => {
+                      return {
+                        value: option.wallet.address,
+                        text: option.walletName,
+                        selected: undefined,
+                      };
+                    }),
+                  ]}
+                  onValueChange={$((value) => {
+                    swapValues.accountToSendTokens = value;
+                  })}
+                />
+              )}
             </div>
             {/* BUTTONS */}
             <div class="flex items-center gap-4">
