@@ -19,13 +19,13 @@ export const convertToFraction = (numericString: string) => {
   if (!numericString.includes(".")) {
     fractionObject = {
       numerator: BigInt(numericString),
-      denominator: BigInt(1),
+      denominator:BigInt(1),
     };
   } else {
     const fractionArray = numericString.split(".");
     fractionObject = {
       numerator: BigInt(`${fractionArray[0]}${fractionArray[1]}`),
-      denominator: BigInt(Math.pow(10, fractionArray[1].length)),
+      denominator: BigInt(10**fractionArray[1].length),
     };
   }
   return fractionObject;

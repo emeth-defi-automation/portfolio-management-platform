@@ -25,6 +25,7 @@ import { uniswapRouterAbi } from "~/abi/UniswapRouterAbi";
 import { messagesContext } from "~/routes/app/layout";
 import { swapTokensForTokens } from "~/utils/tokens/swap";
 import { WalletWithBalance } from "../../interface";
+import { convertToFraction, replaceNonMatching } from "~/utils/fractions";
 
 const askMoralisForPrices = server$(async () => {
   const response = await Moralis.EvmApi.token.getMultipleTokenPrices(
@@ -81,6 +82,7 @@ export const SwapModal = component$<SwapModalProps>(
       accountToSendTokens: "",
       chosenTokenWalletAddress: chosenTokenWalletAddress,
     });
+
     const tokenFromAmountDebounce = useDebouncer(
       $(
         async ({
@@ -88,18 +90,19 @@ export const SwapModal = component$<SwapModalProps>(
           tokenInAddress,
           tokenOutAddress,
         }: {
-          amountIn: bigint;
+          amountIn: string;
           tokenInAddress: `0x${string}`;
           tokenOutAddress: `0x${string}`;
         }) => {
-          console.log("amountInWEI", amountIn);
-          console.log("tokenInAddress", tokenInAddress);
-          console.log("tokenOutAddress", tokenOutAddress);
           const tokenDecimals = await getTokenDecimalsServer(tokenInAddress);
 
-          const amountInWEI = BigInt(
-            parseFloat(amountIn.toString()) * 10 ** parseInt(tokenDecimals[0]),
-          );
+          const amountInFraction = convertToFraction(amountIn);
+
+          const amountInWEI =
+            (BigInt(amountInFraction.numerator) *
+              BigInt(10) ** BigInt(tokenDecimals[0])) /
+            BigInt(amountInFraction.denominator);
+
           const routerContractAddress = import.meta.env
             .PUBLIC_ROUTER_CONTRACT_ADDRESS;
 
@@ -114,33 +117,22 @@ export const SwapModal = component$<SwapModalProps>(
             args: [amountInWEI, [tokenInAddress, tokenOutAddress]],
           });
 
-          console.log("[[estimatedValue]]", estimatedValue);
+          const nominator =
+            estimatedValue[1] / BigInt(10) ** BigInt(tokenDecimals[0]);
+          console.log("nominator: ", nominator);
+          const denominator = estimatedValue[1]
+            .toString()
+            .substring(
+              nominator.toString().length,
+              estimatedValue[1].toString().length - 1,
+            );
 
-          swapValues.tokenToSwapOn.value = estimatedValue[1].toString();
+          swapValues.tokenToSwapOn.value = `${nominator}.${denominator}`;
         },
       ),
       500,
     );
-    const calculate = $(async () => {
-      if (swapValues.tokenToSwapOn.address) {
-        const decimals = await getTokenDecimalsServer(
-          swapValues.tokenToSwapOn.address,
-        );
-        const numerator =
-          BigInt(swapValues.tokenToSwapOn.value) /
-          BigInt(BigInt(10) ** BigInt(decimals[0]));
-        const denominator = swapValues.tokenToSwapOn.value
-          .toString()
-          .substring(
-            numerator.toString().length,
-            swapValues.tokenToSwapOn.value.toString().length - 1,
-          );
 
-        console.log(`${numerator}.${denominator}`);
-
-        return `${numerator}.${denominator}`;
-      }
-    });
     useVisibleTask$(() => {
       console.log("wallets: ", wallets);
     });
@@ -158,14 +150,9 @@ export const SwapModal = component$<SwapModalProps>(
         swapValues.accountToSendTokens;
       });
 
-      const calculation = await calculate();
-      if (calculation != undefined) {
-        swapValues.tokenToSwapOn.value = `${calculation}`;
-      }
-
       const { response } = await askMoralisForPrices();
       const findFromToken = response.find(
-        (token) => token.tokenSymbol === swapValues.chosenToken.symbol,
+        (token) => token.tokenSymbol === swapValues.chosenToken.symbol.value,
       );
       const findToToken = response.find(
         (token) => token.tokenSymbol === swapValues.tokenToSwapOn.symbol,
@@ -178,7 +165,7 @@ export const SwapModal = component$<SwapModalProps>(
             5,
           );
 
-        swapValues.tokenToSwapOn.value =
+        swapValues.tokenToSwapOn.dolarValue =
           `${Number(swapValues.tokenToSwapOn.value) * Number(findToToken!.usdPrice)}`.substring(
             0,
             5,
@@ -195,7 +182,7 @@ export const SwapModal = component$<SwapModalProps>(
       try {
         await swapTokensForTokens(
           swapValues.chosenToken.address.value as `0x${string}`,
-          swapValues.tokenToSwapOn.address.value as `0x${string}`,
+          swapValues.tokenToSwapOn.address as `0x${string}`,
           swapValues.chosenToken.value,
           swapValues.chosenTokenWalletAddress.value as `0x${string}`,
           swapValues.accountToSendTokens as `0x${string}`,
@@ -243,17 +230,25 @@ export const SwapModal = component$<SwapModalProps>(
                       placeholder="00.00"
                       customClass="!border-0 p-0 text-[28px] h-fit"
                       value={swapValues.chosenToken.value}
-                      type="number"
+                      type="text"
                       name="amount"
                       onInput={$(async (e) => {
                         const target = e.target as HTMLInputElement;
+
+                        const regex = /^\d*\.?\d*$/;
+                        target.value = replaceNonMatching(
+                          target.value,
+                          regex,
+                          "",
+                        );
+
                         swapValues.chosenToken.value = target.value;
                         if (
                           swapValues.chosenToken.address &&
                           swapValues.tokenToSwapOn.address &&
                           swapValues.chosenToken.value
                         ) {
-                          const amountIn = BigInt(parseInt(target.value));
+                          const amountIn = target.value;
                           await tokenFromAmountDebounce({
                             amountIn: amountIn,
                             tokenInAddress: swapValues.chosenToken.address
@@ -323,6 +318,9 @@ export const SwapModal = component$<SwapModalProps>(
                 />
               </Box>
             </div>
+
+            {/* pick addres section
+            TODO switch and select handler */}
             <div class="flex flex-col gap-2">
               <label for="swapValues.accountToSendTokens">
                 Address to send coins to:

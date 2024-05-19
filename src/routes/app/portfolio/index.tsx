@@ -23,8 +23,6 @@ import {
   simulateContract,
   writeContract,
   waitForTransactionReceipt,
-  getAccount,
-  readContract,
 } from "@wagmi/core";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
@@ -45,53 +43,20 @@ export {
   getObservedWalletBalances,
   getAvailableStructures,
 } from "./server";
-import {
-  fetchTokens,
-  getTokenDecimalsServer,
-  getTokenSymbolByAddress,
-  queryTokens,
-} from "~/database/tokens";
+import { fetchTokens, queryTokens } from "~/database/tokens";
 import { convertToFraction } from "~/utils/fractions";
 import {
   type WalletWithBalance,
   type BatchTransferFormStore,
 } from "./interface";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
-import { swapTokensForTokens } from "~/utils/tokens/swap";
-import { FormBadge } from "~/components/FormBadge/FormBadge";
+
 import { Spinner } from "~/components/Spinner/Spinner";
 
 import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { useDebouncer } from "~/utils/debouncer";
-import { uniswapRouterAbi } from "~/abi/UniswapRouterAbi";
+
 import { SwapModal } from "./_components/Swap/Swap";
-import Box from "~/components/Atoms/Box/Box";
 
-import Input from "~/components/Atoms/Input/Input";
-import Select from "~/components/Atoms/Select/Select";
-import Moralis from "moralis";
-import { EvmChain } from "@moralisweb3/common-evm-utils";
-
-// const askMoralisForPrices = server$(async () => {
-//   const response = await Moralis.EvmApi.token.getMultipleTokenPrices(
-//     {
-//       chain: EvmChain.ETHEREUM.hex,
-//       include: "percent_change",
-//     },
-//     {
-//       tokens: [
-//         {
-//           tokenAddress: "0xdac17f958d2ee523a2206206994597c13d831ec7",
-//         },
-//         {
-//           tokenAddress: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-//         },
-//       ],
-//     },
-//   );
-
-//   return { response: response.raw };
-// });
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
   const clickedToken = useStore({ balanceId: "", structureId: "" });
