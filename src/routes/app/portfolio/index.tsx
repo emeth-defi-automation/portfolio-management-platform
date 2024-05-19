@@ -65,6 +65,8 @@ import { Spinner } from "~/components/Spinner/Spinner";
 import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { hasExecutableWallet } from "~/utils/validators/availableStructure";
 import Box from "~/components/Atoms/Box/Box";
+import Header from "~/components/Atoms/Headers/Header";
+import Annotation from "~/components/Atoms/Annotation/Annotation";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -266,7 +268,7 @@ export default component$(() => {
       ) : (
         <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
           <div class="flex items-center justify-between">
-            <h2 class="text-2xl font-semibold">Portfolio Name</h2>
+            <Header text="Portfolio Name" variant="h2" />
             <div class="flex items-center gap-2">
               <Button
                 variant="transparent"
@@ -314,7 +316,7 @@ export default component$(() => {
             </div>
           </div>
           <Box customClass="grid min-h-[260px] grid-rows-[20px_32px_auto] gap-6 h-full">
-            <p class="text-xl font-semibold">Token list</p>
+            <Header variant="h3" text="Token list" />
             <div class="grid grid-cols-4 gap-2">
               <ButtonWithIcon
                 image="/assets/icons/search.svg"
@@ -339,19 +341,19 @@ export default component$(() => {
             </div>
             <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
               <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
-                <div class="">TOKEN NAME</div>
-                <div class="">QUANTITY</div>
-                <div class="">VALUE</div>
+                <Annotation text="Token name" transform="upper" />
+                <Annotation text="Quantity" transform="upper" />
+                <Annotation text="Value" transform="upper" />
                 <div class="custom-bg-white custom-border-1 flex h-8 w-fit gap-2 rounded-lg p-[2px] text-center text-white">
                   <button class="custom-bg-button rounded-lg px-2">24h</button>
                   <button class="rounded-lg px-2">3d</button>
                   <button class="rounded-lg px-2">30d</button>
                 </div>
-                <div class="">WALLET</div>
-                <div class="">NETWORK</div>
-                <div class=""></div>
+                <Annotation text="Wallet" transform="upper" />
+                <Annotation text="Network" transform="upper" />
+                <Annotation text="" transform="upper" />
               </div>
-              {availableStructures.value.map((createdStructures) => (
+              {availableStructures.value.map((createdStructures: any) => (
                 <Group
                   key={createdStructures.structure.name}
                   createdStructure={createdStructures}
@@ -501,6 +503,8 @@ export default component$(() => {
             >
               Select Wallets
             </label>
+
+            {/* <Label name="Select Wallets" class="mb-2"/> */}
 
             <div class="mb-3 w-full text-sm">
               {/* input Select wallet */}

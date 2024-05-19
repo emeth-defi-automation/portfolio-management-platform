@@ -2,7 +2,6 @@ import { type QRL, type Signal, Slot, component$ } from "@builder.io/qwik";
 import IconClose from "@material-design-icons/svg/round/close.svg?jsx";
 // import { twMerge } from "tailwind-merge";
 import Button from "../Atoms/Buttons/Button";
-import Box from "../Atoms/Box/Box";
 
 export interface ModalProps {
   title: string;
@@ -28,8 +27,8 @@ export const Modal = component$<ModalProps>(
           onClick$={(event) => {
             event.stopPropagation();
           }}
-          class="custom-bg-opacity-5 relative h-fit w-1/3 min-w-[455px] overflow-auto p-6 backdrop-blur-2xl rounded-2xl custom-border-1"
-        >       
+          class="custom-bg-opacity-5 custom-border-1 relative h-fit w-1/3 min-w-[455px] overflow-auto rounded-2xl p-6 backdrop-blur-2xl"
+        >
           {hasButton ? (
             <div class="mb-8 flex items-center justify-between">
               <div class="text-xl font-semibold text-white">{title}</div>

@@ -33,14 +33,14 @@ PortfolioSearch.args = {
   placeholder: "Search for name",
   variant: "search",
   size: "small",
-  iconLeft: <IconSearch/>
+  iconLeft: <IconSearch />,
 };
 
 TransferChecked.args = {
   placeholder: "Approval limit...",
   variant: "checked",
   size: "medium",
-  iconRight: <IconChecked class="h-4 w-4"/>
+  iconRight: <IconChecked class="h-4 w-4" />,
 };
 
 TransferCoin.args = {

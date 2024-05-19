@@ -12,7 +12,7 @@ export const ActionAlertMessage = component$<ActionAlertMessageProps>(
     return (
       <>
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between gap-2 py-5 last:border-b-0 last:pb-0">
-          <div class="flex flex-col gap-2">   
+          <div class="flex flex-col gap-2">
             <Header variant={"h5"} text={props.title} class="font-normal" />
             <Paragraphs
               text={props.description}

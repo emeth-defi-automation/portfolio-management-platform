@@ -11,8 +11,8 @@ export interface InputProps {
   customClass?: string;
   disabled?: boolean;
   subValue?: string;
-  iconLeft?:  JSXOutput | null;
-  iconRight?:  JSXOutput | null;
+  iconLeft?: JSXOutput | null;
+  iconRight?: JSXOutput | null;
   type?: string;
 }
 
@@ -23,9 +23,7 @@ const InputStyles = cva(
   {
     variants: {
       variant: {
-        search: [
-          "pl-10",
-        ],  
+        search: ["pl-10"],
         checked: [
           "text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
         ],
@@ -47,12 +45,12 @@ export type InputType = VariantProps<typeof InputStyles> & InputProps;
 
 const Input = component$(({ variant, size, ...props }: InputType) => {
   return (
-    <div class='relative'>
+    <div class="relative">
       {props.iconLeft ? (
         <span class="absolute left-3 top-1/2 -translate-y-1/2 fill-white">
           {props.iconLeft}
         </span>
-      ): null}
+      ) : null}
       <input
         {...props}
         class={twMerge(
@@ -61,7 +59,7 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
           props.customClass,
         )}
         placeholder={props.placeholder}
-        type={props.type ? props.type : "text"} 
+        type={props.type ? props.type : "text"}
         name={props.name}
         value={props.value}
         onInput$={props.onInput}
@@ -71,7 +69,7 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
         <span class="absolute right-3 top-1/2 -translate-y-1/2  fill-customGreen">
           {props.iconRight}
         </span>
-      ): null}
+      ) : null}
       {props.subValue ? (
         <span class="custom-text-50 absolute right-3 top-1/2 -translate-y-1/2 text-xs">
           ({props.subValue})

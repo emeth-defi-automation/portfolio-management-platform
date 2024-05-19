@@ -61,6 +61,7 @@ import { balancesLiveStream } from "./server/balancesLiveStream";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 import { getAccessToken } from "~/utils/refresh";
 import Box from "~/components/Atoms/Box/Box";
+import Header from "~/components/Atoms/Headers/Header";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -272,7 +273,7 @@ export default component$(() => {
       <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
         <Box customClass="grid grid-rows-[32px_88px_1fr] gap-6 h-full">
           <div class="flex items-center justify-between gap-2">
-            <h1 class="text-xl font-semibold">Wallets</h1>
+            <Header text="Wallets" variant="h3" />
             <Button
               onClick$={() => {
                 isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
@@ -436,9 +437,10 @@ export default component$(() => {
         >
           <div class="flex flex-col items-center gap-4">
             <ImgWarningRed />
-            <h1 class="text-center text-xl">
-              You are going to permanently delete your wallet!
-            </h1>
+            <Header
+              variant="h3"
+              text="You are going to permantly delete your wallet!"
+            />
           </div>
           <div class="my-8 flex justify-center">
             <ul class="custom-text-50 text-sm">

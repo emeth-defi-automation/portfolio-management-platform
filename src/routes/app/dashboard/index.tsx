@@ -27,6 +27,8 @@ import {
 import { type PeriodState } from "~/interface/balance/Balance";
 import Button from "~/components/Atoms/Buttons/Button";
 import Box from "~/components/Atoms/Box/Box";
+import Header from "~/components/Atoms/Headers/Header";
+import Annotation from "../../../components/Atoms/Annotation/Annotation";
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -138,12 +140,12 @@ export default component$(() => {
           }}
         />
 
-        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4">
+        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4 h-full">
           <div class="flex items-center justify-between gap-2">
-            <h1 class="text-xl font-semibold">Alerts</h1>
+            <Header variant={"h3"} text={"Alerts"} />
             <Button text="See All" variant="transparent" size="small" />
           </div>
-          <div class="">
+          <div>
             <ActionAlertMessage
               title="Bitcoin share exceeded 20%"
               description="6 hours ago"
@@ -167,9 +169,9 @@ export default component$(() => {
           </div>
         </Box>
 
-        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4">
+        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4 h-full">
           <div class="flex items-center justify-between gap-2">
-            <h1 class="text-xl font-semibold">Actions</h1>
+            <Header variant={"h3"} text={"Actions"} />
             <Button text="See All" variant="transparent" size="small" />
           </div>
           <div>
@@ -206,7 +208,7 @@ export default component$(() => {
 
       <Box customClass="grid grid-row-[32px_1fr] gap-6">
         <div class="flex items-center justify-between">
-          <h1 class="text-xl font-semibold">Favourite Tokens</h1>
+          <Header variant={"h3"} text={"Favourite tokens"} />
           <Button
             onClick$={() => {
               nav("/app/portfolio");
@@ -229,19 +231,19 @@ export default component$(() => {
           />
         ) : (
           <div class="grid grid-rows-[32px_auto] gap-4">
-            <div class="custom-text-50 grid grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2 text-xs font-normal uppercase">
-              <div class="">Token name</div>
-              <div class="">Quantity</div>
-              <div class="">Value</div>
+            <div class="custom-text-50 grid grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2">
+              <Annotation text="Token name" transform="upper" />
+              <Annotation text="Quantity" transform="upper" />
+              <Annotation text="Value" transform="upper" />
               <div class="custom-border-1 flex h-8 w-fit gap-2 rounded-lg bg-white bg-opacity-5 p-1 text-white">
                 <button class="custom-bg-button rounded-lg px-2">24h</button>
                 <button class="rounded-lg px-2">3d</button>
                 <button class="rounded-lg px-2">30d</button>
               </div>
-              <div class="">Wallet</div>
-              <div class="">Network</div>
-              <div class="">Subportfolio</div>
-              <div class=""></div>
+              <Annotation text="Wallet" transform="upper" />
+              <Annotation text="Network" transform="upper" />
+              <Annotation text="Subportfolio" transform="upper" />
+              <Annotation text="" transform="upper" />
             </div>
             <div>
               {favoriteTokens.value[0] &&
