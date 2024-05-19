@@ -439,7 +439,7 @@ export default component$(() => {
             <ImgWarningRed />
             <Header
               variant="h3"
-              text="You are going to permantly delete your wallet!"
+              text="You are going to permanently delete your wallet!"
             />
           </div>
           <div class="my-8 flex justify-center">
