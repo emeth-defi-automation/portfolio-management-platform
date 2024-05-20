@@ -28,6 +28,7 @@ import { swapTokensForTokens } from "~/utils/tokens/swap";
 import { WalletWithBalance } from "../../interface";
 import { convertToFraction, replaceNonMatching } from "~/utils/fractions";
 import WalletAddressValueSwitch from "./WalletAddressValueSwitch";
+import { isAddress } from "viem";
 
 const askMoralisForPrices = server$(async () => {
   const response = await Moralis.EvmApi.token.getMultipleTokenPrices(
@@ -179,7 +180,7 @@ export const SwapModal = component$<SwapModalProps>(
         isVisible: true,
       });
       try {
-        await swapTokensForTokens(
+        const swap = await swapTokensForTokens(
           swapValues.chosenToken.address.value as `0x${string}`,
           swapValues.tokenToSwapOn.address as `0x${string}`,
           swapValues.chosenToken.value,
@@ -187,6 +188,7 @@ export const SwapModal = component$<SwapModalProps>(
           swapValues.accountToSendTokens as `0x${string}`,
           wagmiConfig,
         );
+        console.log(swap);
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "success",
@@ -375,6 +377,12 @@ export const SwapModal = component$<SwapModalProps>(
                   isOpen.value = false;
                   await handleSwap();
                 }}
+                disabled={
+                  !swapValues.chosenToken.address.value ||
+                  !swapValues.tokenToSwapOn.address ||
+                  swapValues.chosenToken.value == "0" ||
+                  !isAddress(swapValues.accountToSendTokens as `0x${string}`)
+                }
               />
             </div>
           </div>
