@@ -63,6 +63,7 @@ import { FormBadge } from "~/components/FormBadge/FormBadge";
 import { Spinner } from "~/components/Spinner/Spinner";
 
 import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
+import { hasExecutableWallet } from "~/utils/validators/availableStructure";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -270,6 +271,9 @@ export default component$(() => {
                 variant="transparent"
                 text="Transfer"
                 size="small"
+                disabled={
+                  !hasExecutableWallet(availableStructures.value.structures)
+                }
                 onClick$={async () => {
                   for (const structure of availableStructures.value
                     .structures) {
@@ -385,6 +389,7 @@ export default component$(() => {
           <div class="mb-4 flex flex-col overflow-y-scroll">
             {stepsCounter.value === 1 ? (
               <CoinsToTransfer
+                // add filter to exclude structures with no exe wallet
                 availableStructures={availableStructures}
                 batchTransferFormStore={batchTransferFormStore}
               />
