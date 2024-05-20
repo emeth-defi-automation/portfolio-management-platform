@@ -20,13 +20,13 @@ import * as jwtDecode from "jwt-decode";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
+import Button from "~/components/Atoms/Buttons/Button";
 
 import {
   type Config,
   getAccount,
   readContract,
   simulateContract,
-  waitForTransactionReceipt,
   writeContract,
   getConnections,
   watchAccount,
@@ -35,7 +35,7 @@ import {
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
 import CoinsToApprove from "~/components/Forms/CoinsToApprove";
 import AmountOfCoins from "~/components/Forms/AmountOfCoins";
-import { Button, ButtonWithIcon } from "~/components/Buttons/Buttons";
+import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
 import {
   getObservedWallets,
@@ -46,11 +46,7 @@ export {
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 
-import {
-  checkPattern,
-  convertToFraction,
-  replaceNonMatching,
-} from "~/utils/fractions";
+import { convertToFraction } from "~/utils/fractions";
 import {
   isExecutableDisabled,
   isNotExecutableDisabled,
@@ -77,8 +73,6 @@ export default component$(() => {
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
   const selectedWallet = useSignal<WalletTokensBalances | null>(null);
-  const receivingWalletAddress = useSignal("");
-  const transferredTokenAmount = useSignal("");
   const isSecondWalletConnected = useSignal(false);
   const stepsCounter = useSignal(1);
   const addWalletFormStore = useStore<AddWalletFormStore>({
@@ -268,82 +262,6 @@ export default component$(() => {
     walletTokenBalances.value = tokenBalances.tokens;
   });
 
-  const handleTransfer = $(async () => {
-    if (!selectedWallet.value || !wagmiConfig.config) {
-      return { error: "no chosen wallet" };
-    }
-
-    const from = selectedWallet.value.wallet.address;
-    const to = receivingWalletAddress.value;
-    const token = transferredCoin.address;
-    const decimals = selectedWallet.value.tokens.filter(
-      (token) => token.symbol === transferredCoin.symbol,
-    )[0].decimals;
-    const amount = transferredTokenAmount.value;
-    const { numerator, denominator } = convertToFraction(amount);
-    const calculation =
-      BigInt(numerator * BigInt(Math.pow(10, decimals))) / BigInt(denominator);
-    if (
-      from === "" ||
-      to === "" ||
-      token === "" ||
-      amount === "" ||
-      !checkPattern(transferredTokenAmount.value, /^\d*\.?\d*$/)
-    ) {
-      return {
-        error: "Values cant be empty",
-      };
-    } else {
-      isTransferModalOpen.value = false;
-      const emethContractAddress = import.meta.env
-        .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
-      try {
-        const { request } = await simulateContract(wagmiConfig.config, {
-          abi: emethContractAbi,
-          address: emethContractAddress,
-          functionName: "transferToken",
-          args: [
-            token as `0x${string}`,
-            from as `0x${string}`,
-            to as `0x${string}`,
-            BigInt(calculation),
-          ],
-        });
-
-        formMessageProvider.messages.push({
-          id: formMessageProvider.messages.length,
-          variant: "info",
-          message: "Transferring tokens...",
-          isVisible: true,
-        });
-
-        const transactionHash = await writeContract(
-          wagmiConfig.config,
-          request,
-        );
-
-        await waitForTransactionReceipt(wagmiConfig.config, {
-          hash: transactionHash,
-        });
-
-        formMessageProvider.messages.push({
-          id: formMessageProvider.messages.length,
-          variant: "success",
-          message: "Success!",
-          isVisible: true,
-        });
-      } catch (err) {
-        console.error("error", err);
-        formMessageProvider.messages.push({
-          id: formMessageProvider.messages.length,
-          variant: "error",
-          message: "Something went wrong.",
-          isVisible: true,
-        });
-      }
-    }
-  });
-
   const connectWallet = $(async () => {
     await openWeb3Modal(wagmiConfig!.config);
   });
@@ -354,14 +272,14 @@ export default component$(() => {
         <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Wallets</h1>
-            <button
-              class="custom-border-opacity-30 h-8 cursor-pointer text-nowrap rounded-10 px-4 text-xs font-medium duration-300 ease-in-out hover:scale-110"
+            <Button
               onClick$={() => {
                 isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
               }}
-            >
-              Add New Wallet
-            </button>
+              text="Add New Wallet"
+              variant="transparent"
+              size="small"
+            />
           </div>
 
           <div class="grid w-full gap-2">
@@ -442,37 +360,38 @@ export default component$(() => {
             <div class="flex w-full items-center justify-between gap-2">
               {stepsCounter.value > 1 && addWalletFormStore.isExecutable ? (
                 <Button
-                  class="custom-border-1 w-full bg-transparent text-white duration-300 ease-in-out hover:scale-105 disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
+                  variant="transparent"
                   onClick$={async () => {
                     stepsCounter.value = stepsCounter.value - 1;
                   }}
-                  type="button"
                   text="Back"
+                  customClass="w-full"
                 />
               ) : null}
               {addWalletFormStore.isExecutable === 0 ? (
                 <Button
-                  class="w-full border-0 bg-customBlue text-white duration-300 ease-in-out hover:scale-105 disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
+                  variant="blue"
                   onClick$={handleAddWallet}
-                  type="button"
-                  disabled={isNotExecutableDisabled(addWalletFormStore)}
                   text="Add Wallet"
+                  customClass="w-full"
+                  disabled={isNotExecutableDisabled(addWalletFormStore)}
                 />
               ) : stepsCounter.value === 3 ? (
                 <Button
-                  class="w-full border-0 bg-customBlue text-white duration-300 ease-in-out hover:scale-105 disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
+                  variant="blue"
                   onClick$={handleAddWallet}
-                  type="button"
+                  text="Add Wallet"
+                  customClass="w-full"
                   disabled={
                     addWalletFormStore.isExecutable
                       ? isExecutableDisabled(addWalletFormStore)
                       : isNotExecutableDisabled(addWalletFormStore)
                   }
-                  text="Add wallet"
                 />
               ) : (
                 <Button
-                  class="w-full border-0 bg-customBlue text-white duration-300 ease-in-out hover:scale-105 disabled:scale-100 disabled:cursor-default disabled:border disabled:border-white disabled:border-opacity-10 disabled:bg-white disabled:bg-opacity-10 disabled:text-opacity-20"
+                  variant="blue"
+                  text="Proceed"
                   onClick$={async () => {
                     if (stepsCounter.value === 1) {
                       const { address } = getAccount(
@@ -499,7 +418,7 @@ export default component$(() => {
                     addWalletFormStore,
                     isSecondWalletConnected,
                   )}
-                  text="Proceed"
+                  customClass="w-full"
                 />
               )}
             </div>
@@ -537,13 +456,16 @@ export default component$(() => {
             </ul>
           </div>
           <div class="grid grid-cols-[49%_49%] gap-2">
-            <button
-              class="custom-border-1 flex h-12 items-center justify-center rounded-3xl px-2 text-center text-xs text-white duration-300 ease-in-out hover:scale-105"
+            <Button
+              variant="transparent"
+              text="Cancel"
               onClick$={() => (isDeleteModalOpen.value = false)}
-            >
-              Cancel
-            </button>
-            <button
+              customClass="w-full"
+            />
+            <Button
+              variant="red"
+              text="Yes, Let’s Do It!"
+              customClass="w-full"
               onClick$={async () => {
                 if (selectedWallet.value && selectedWallet.value.wallet.id) {
                   const {
@@ -558,75 +480,10 @@ export default component$(() => {
                   }
                 }
               }}
-              class="h-12 rounded-3xl bg-red-500 px-2 text-center text-sm text-white duration-300 ease-in-out hover:scale-105"
-            >
-              Yes, let’s do it!
-            </button>
+            />
           </div>
         </Modal>
       )}
-
-      {isTransferModalOpen.value ? (
-        <Modal isOpen={isTransferModalOpen} title="Transfer">
-          <Form>
-            <div class="p-4">
-              <p class="mb-4 mt-4 flex items-center gap-2 text-sm">
-                {transferredCoin.symbol ? transferredCoin.symbol : null}
-              </p>
-
-              <label
-                for="receivingWallet"
-                class="block pb-1 text-xs text-white"
-              >
-                Receiving Wallet Address
-              </label>
-              <input
-                type="text"
-                name="receivingWallet"
-                class={`border-white-opacity-20 mb-5 block w-full rounded bg-transparent p-3 text-sm placeholder-white placeholder-opacity-50`}
-                placeholder="Place wallet address"
-                value={receivingWalletAddress.value}
-                onInput$={(e) => {
-                  const target = e.target as HTMLInputElement;
-                  receivingWalletAddress.value = target.value;
-                }}
-              />
-              <label
-                for="receivingWallet"
-                class="block pb-1 text-xs text-white"
-              >
-                Amount
-              </label>
-              <input
-                type="text"
-                name="transferredTokenAmount"
-                class={`border-white-opacity-20 mb-5 block w-full rounded bg-transparent p-3 text-sm placeholder-white placeholder-opacity-50`}
-                placeholder="Please enter digits and at most one dot"
-                value={transferredTokenAmount.value}
-                onInput$={(e) => {
-                  const target = e.target as HTMLInputElement;
-                  const regex = /^\d*\.?\d*$/;
-                  target.value = replaceNonMatching(target.value, regex, "");
-                  transferredTokenAmount.value = target.value;
-                }}
-              />
-              <span class="block pb-1 text-xs text-white">
-                {!checkPattern(transferredTokenAmount.value, /^\d*\.?\d*$/) ? (
-                  <span class="text-xs text-red-500">
-                    Invalid amount. There should be only one dot.
-                  </span>
-                ) : null}
-              </span>
-              <button
-                class="custom-border-1 custom-bg-white row-span-1 row-start-3 mb-6 flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-xs text-white"
-                onClick$={() => handleTransfer()}
-              >
-                transfer
-              </button>
-            </div>
-          </Form>
-        </Modal>
-      ) : null}
     </>
   );
 });

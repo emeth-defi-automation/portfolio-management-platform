@@ -2,7 +2,7 @@ import { $, component$, useContext } from "@builder.io/qwik";
 import { useLocation, useNavigate } from "@builder.io/qwik-city";
 import { signMessage } from "@wagmi/core";
 import { SiweMessage } from "siwe";
-import { Button } from "~/components/Buttons/Buttons";
+import Button from "~/components/Atoms/Buttons/Button";
 import { HeroText } from "~/components/HeroText/HeroText";
 import { Copyright } from "~/components/Paragraph/Paragraph";
 import {
@@ -75,15 +75,14 @@ export default component$(() => {
           <div class="grid w-full grid-cols-2 gap-4">
             <Button
               onClick$={cancelHandler}
+              variant="transparent"
               text="Cancel"
-              class="custom-border-2 w-full"
               dataTestId="cancel-button"
             />
             <Button
               onClick$={signInHandler}
+              variant="gradient"
               text="Accept and Sign"
-              class="custom-btn-gradient w-full border-none p-[2px]"
-              divClass="rounded-10 bg-black py-[14px]"
               dataTestId="accept-and-sign-button"
             />
           </div>

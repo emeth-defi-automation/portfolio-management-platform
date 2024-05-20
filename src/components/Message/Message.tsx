@@ -1,6 +1,7 @@
 import { component$, useTask$, useContext, useSignal } from "@builder.io/qwik";
 
 import { messagesContext } from "~/routes/app/layout";
+import Button from "../Atoms/Buttons/Button";
 
 export interface MessageProps {
   variant?: "success" | "error" | "info";
@@ -44,14 +45,13 @@ export const Message = component$(
             i
           </div>
           <div class="ml-2">{message}</div>
-          <button
-            class="flex h-8 w-8 items-center justify-center"
+          <Button
+            variant="onlyIcon"
             onClick$={() => {
               shouldBeVisible.value = false;
             }}
-          >
-            x
-          </button>
+            text="X"
+          />
         </div>
       </>
     );

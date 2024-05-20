@@ -8,7 +8,8 @@ import {
 import { TokenRow } from "~/components/Groups/TokenRow";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import { chainIdToNetworkName } from "~/utils/chains";
-import IconDelete from "/public/assets/icons/delete-white.svg?jsx";
+import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
+import Button from "../Atoms/Buttons/Button";
 
 export interface GroupProps {
   createdStructure: Structure;
@@ -86,17 +87,17 @@ export const Group = component$<GroupProps>((props) => {
   return (
     <>
       <div class="">
-        <div class="flex gap-6 text-sm">
+        <div class="item-center flex gap-6 text-sm">
           <div class="flex items-center gap-2">
             <IconArrowDown />
             <h3>{props.createdStructure.structure.name}</h3>
-            <button class="cursor-pointer" onClick$={props.onClick$}>
-              <IconDelete />
-            </button>
+            <Button
+              variant="onlyIcon"
+              leftIcon={<IconTrash class="h-4 w-4 fill-white" />}
+              onClick$={props.onClick$}
+            />
           </div>
-          <button class="custom-border-2 rounded-3xl px-4 py-2 text-xs">
-            See Performance
-          </button>
+          <Button variant="transparent" text="See Performance" size="small" />
         </div>
         <div>
           {extractData(

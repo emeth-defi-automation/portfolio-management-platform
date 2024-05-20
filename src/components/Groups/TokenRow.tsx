@@ -1,11 +1,12 @@
 import { component$ } from "@builder.io/qwik";
 import type { QRL, Signal } from "@builder.io/qwik";
-import IconDelete from "/public/assets/icons/delete-white.svg?jsx";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
-import { ButtonWithIcon } from "../Buttons/Buttons";
 import { server$ } from "@builder.io/qwik-city";
 import { connectToDB } from "~/database/db";
 import { getTokenSymbolByAddress } from "~/database/tokens";
+import Button from "../Atoms/Buttons/Button";
+import IconSwap from "@material-design-icons/svg/round/swap_vert.svg?jsx";
+import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
 
 const getWalletAddressById = server$(async function (walletId: string) {
   const db = await connectToDB(this.env);
@@ -84,18 +85,19 @@ export const TokenRow = component$<TokenRowProps>((props) => {
             );
           }}
         >
-          <ButtonWithIcon
+          <Button
+            variant="transparent"
             text="Swap Token"
-            image="/assets/icons/portfolio/swap.svg?jsx"
-            class="custom-border-1 py-2 text-sm "
+            leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
+            size="small"
           />
         </div>
-        <button
-          class="flex h-7 w-7 items-center justify-center rounded-lg"
+        <Button
+          variant="onlyIcon"
+          leftIcon={<IconTrash class="h-5 w-5 fill-white" />}
           onClick$={props.onClick$}
-        >
-          <IconDelete />
-        </button>
+          customClass="w-7"
+        />
       </div>
     </>
   );
