@@ -172,6 +172,15 @@ export const SwapModal = component$<SwapModalProps>(
           );
       }
     });
+    // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(async ({ track }) => {
+      track(() => swapValues.tokenToSwapOn.symbol);
+      await tokenFromAmountDebounce({
+        amountIn: swapValues.chosenToken.value,
+        tokenInAddress: swapValues.chosenToken.address.value as `0x${string}`,
+        tokenOutAddress: swapValues.tokenToSwapOn.address as `0x${string}`,
+      });
+    });
     const handleSwap = $(async () => {
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
@@ -359,7 +368,7 @@ export const SwapModal = component$<SwapModalProps>(
               <Button
                 variant="transparent"
                 text="Cancel"
-                class="w-full"
+                customClass="w-full"
                 onClick$={() => {
                   isOpen.value = false;
                   swapValues.chosenToken.address.value = "";
@@ -372,7 +381,7 @@ export const SwapModal = component$<SwapModalProps>(
               <Button
                 variant="blue"
                 text="Swap Tokens"
-                class="w-full"
+                customClass="w-full"
                 onClick$={async () => {
                   isOpen.value = false;
                   await handleSwap();
