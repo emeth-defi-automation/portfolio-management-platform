@@ -275,7 +275,7 @@ export const SwapModal = component$<SwapModalProps>(
                   </span>
                 </div>
                 <Select
-                  name=""
+                  name="chosenToken"
                   options={[
                     {
                       value: swapValues.chosenToken.address.value,
@@ -305,7 +305,7 @@ export const SwapModal = component$<SwapModalProps>(
                 </div>
 
                 <Select
-                  name=""
+                  name="selectedToken"
                   options={[
                     { value: "", text: "Pick a coin" },
                     ...allTokensFromDb.value.map((token: any) => {
@@ -346,7 +346,7 @@ export const SwapModal = component$<SwapModalProps>(
                 />
               ) : (
                 <Select
-                  name=""
+                  name="Wallet"
                   options={[
                     { value: "", text: "Select wallet" },
                     ...wallets.map((option) => {
