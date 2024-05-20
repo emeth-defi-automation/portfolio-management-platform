@@ -25,7 +25,7 @@ import { readContract } from "@wagmi/core";
 import { uniswapRouterAbi } from "~/abi/UniswapRouterAbi";
 import { messagesContext } from "~/routes/app/layout";
 import { swapTokensForTokens } from "~/utils/tokens/swap";
-import { WalletWithBalance } from "../../interface";
+import { type WalletWithBalance } from "../../interface";
 import { convertToFraction, replaceNonMatching } from "~/utils/fractions";
 import WalletAddressValueSwitch from "./WalletAddressValueSwitch";
 import { isAddress } from "viem";
@@ -227,177 +227,171 @@ export const SwapModal = component$<SwapModalProps>(
           swapValues.accountToSendTokens = "";
         })}
       >
-        {swapValues.chosenToken.address ? (
-          <div class="flex min-w-[500px] max-w-[500px] flex-col gap-6 font-['Sora']">
-            <div class="flex flex-col gap-2">
-              <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
-                <div class="flex flex-col gap-6">
-                  <div class="flex flex-col gap-2">
-                    <span class="text-xs font-normal text-white/60">
-                      You Pay
-                    </span>
-                    <Input
-                      placeholder="00.00"
-                      customClass="!border-0 p-0 text-[28px] h-fit"
-                      value={swapValues.chosenToken.value}
-                      type="text"
-                      name="amount"
-                      onInput={$(async (e) => {
-                        const target = e.target as HTMLInputElement;
+        <div class="flex min-w-[500px] max-w-[500px] flex-col gap-6 font-['Sora']">
+          <div class="flex flex-col gap-2">
+            <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
+              <div class="flex flex-col gap-6">
+                <div class="flex flex-col gap-2">
+                  <span class="text-xs font-normal text-white/60">You Pay</span>
+                  <Input
+                    placeholder="00.00"
+                    customClass="!border-0 p-0 text-[28px] h-fit"
+                    value={swapValues.chosenToken.value}
+                    type="text"
+                    name="amount"
+                    onInput={$(async (e) => {
+                      const target = e.target as HTMLInputElement;
 
-                        const regex = /^\d*\.?\d*$/;
-                        target.value = replaceNonMatching(
-                          target.value,
-                          regex,
-                          "",
-                        );
+                      const regex = /^\d*\.?\d*$/;
+                      target.value = replaceNonMatching(
+                        target.value,
+                        regex,
+                        "",
+                      );
 
-                        swapValues.chosenToken.value = target.value;
-                        if (
-                          swapValues.chosenToken.address &&
-                          swapValues.tokenToSwapOn.address &&
-                          swapValues.chosenToken.value
-                        ) {
-                          const amountIn = target.value;
-                          await tokenFromAmountDebounce({
-                            amountIn: amountIn,
-                            tokenInAddress: swapValues.chosenToken.address
-                              .value as `0x${string}`,
-                            tokenOutAddress: swapValues.tokenToSwapOn
-                              .address as `0x${string}`,
-                          });
-                        }
-                      })}
-                    />
-                  </div>
-                  <span class="text-xs font-normal text-white/60">
-                    ${swapValues.chosenToken.dolarValue}
-                  </span>
-                </div>
-                <Select
-                  name="chosenToken"
-                  options={[
-                    {
-                      value: swapValues.chosenToken.address.value,
-                      text: swapValues.chosenToken.symbol.value,
-                    },
-                  ]}
-                  size="medium"
-                  class="h-8 pr-0"
-                />
-              </Box>
-              <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
-                <div class="flex flex-col gap-6">
-                  <div class="flex flex-col gap-2">
-                    <span class="text-xs font-normal text-white/60">
-                      You receive
-                    </span>
-                    <Input
-                      type="text"
-                      placeholder="00.00"
-                      customClass="!border-0 p-0 text-[28px] h-fit"
-                      value={swapValues.tokenToSwapOn.value}
-                    />
-                  </div>
-                  <span class="text-xs font-normal text-white/60">
-                    ${swapValues.tokenToSwapOn.value}
-                  </span>
-                </div>
-
-                <Select
-                  name="selectedToken"
-                  options={[
-                    { value: "", text: "Pick a coin" },
-                    ...allTokensFromDb.value.map((token: any) => {
+                      swapValues.chosenToken.value = target.value;
                       if (
-                        !(token.symbol === swapValues.chosenToken.symbol.value)
+                        swapValues.chosenToken.address.value != "" &&
+                        swapValues.tokenToSwapOn.address != "" &&
+                        swapValues.chosenToken.value != 0
                       ) {
-                        return {
-                          value: token.address,
-                          text: token.symbol,
-                        };
-                      } else return null;
-                    }),
-                  ].filter((item) => item != null)}
-                  onValueChange={$(async (value) => {
-                    swapValues.tokenToSwapOn.address = value;
-                    swapValues.tokenToSwapOn.symbol =
-                      await getTokenSymbolByAddress(value);
-                  })}
-                  size="medium"
-                  class="h-8 pr-0"
-                />
-              </Box>
-            </div>
-            <WalletAddressValueSwitch isManualAddress={isManualAddress} />
-            <div class="flex flex-col gap-2">
-              <label for="swapValues.accountToSendTokens">
-                Address to send coins to:
-              </label>
-              {isManualAddress.value ? (
-                <Input
-                  type="text"
-                  name="swapValues.accountToSendTokens"
-                  value={swapValues.accountToSendTokens}
-                  onInput={$((e) => {
-                    const target = e.target;
-                    swapValues.accountToSendTokens = target.value;
-                  })}
-                />
-              ) : (
-                <Select
-                  name="Wallet"
-                  options={[
-                    { value: "", text: "Select wallet" },
-                    ...wallets.map((option) => {
+                        const amountIn = target.value;
+                        await tokenFromAmountDebounce({
+                          amountIn: amountIn,
+                          tokenInAddress: swapValues.chosenToken.address
+                            .value as `0x${string}`,
+                          tokenOutAddress: swapValues.tokenToSwapOn
+                            .address as `0x${string}`,
+                        });
+                      }
+                    })}
+                  />
+                </div>
+                <span class="text-xs font-normal text-white/60">
+                  ${swapValues.chosenToken.dolarValue}
+                </span>
+              </div>
+              <Select
+                name="chosenToken"
+                options={[
+                  {
+                    value: swapValues.chosenToken.address.value,
+                    text: swapValues.chosenToken.symbol.value,
+                  },
+                ]}
+                size="medium"
+                class="h-8 pr-0"
+              />
+            </Box>
+            <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
+              <div class="flex flex-col gap-6">
+                <div class="flex flex-col gap-2">
+                  <span class="text-xs font-normal text-white/60">
+                    You receive
+                  </span>
+                  <Input
+                    type="text"
+                    placeholder="00.00"
+                    customClass="!border-0 p-0 text-[28px] h-fit"
+                    value={swapValues.tokenToSwapOn.value}
+                  />
+                </div>
+                <span class="text-xs font-normal text-white/60">
+                  ${swapValues.tokenToSwapOn.value}
+                </span>
+              </div>
+
+              <Select
+                name="selectedToken"
+                options={[
+                  { value: "", text: "Pick a coin" },
+                  ...allTokensFromDb.value.map((token: any) => {
+                    if (
+                      !(token.symbol === swapValues.chosenToken.symbol.value)
+                    ) {
                       return {
-                        value: option.wallet.address,
-                        text: option.walletName,
-                        selected: undefined,
+                        value: token.address,
+                        text: token.symbol,
                       };
-                    }),
-                  ]}
-                  onValueChange={$((value) => {
-                    swapValues.accountToSendTokens = value;
-                  })}
-                />
-              )}
-            </div>
-            {/* BUTTONS */}
-            <div class="flex items-center gap-4">
-              <Button
-                variant="transparent"
-                text="Cancel"
-                customClass="w-full"
-                onClick$={() => {
-                  isOpen.value = false;
-                  swapValues.chosenToken.address.value = "";
-                  swapValues.chosenToken.value = "";
-                  swapValues.tokenToSwapOn.address = "";
-                  swapValues.accountToSendTokens = "";
-                  swapValues.tokenToSwapOn.value = "";
-                }}
+                    } else return null;
+                  }),
+                ].filter((item) => item != null)}
+                onValueChange={$(async (value) => {
+                  swapValues.tokenToSwapOn.address = value;
+                  swapValues.tokenToSwapOn.symbol =
+                    await getTokenSymbolByAddress(value);
+                })}
+                size="medium"
+                class="h-8 pr-0"
               />
-              <Button
-                variant="blue"
-                text="Swap Tokens"
-                customClass="w-full"
-                onClick$={async () => {
-                  isOpen.value = false;
-                  await handleSwap();
-                }}
-                disabled={
-                  !swapValues.chosenToken.address.value ||
-                  !swapValues.tokenToSwapOn.address ||
-                  swapValues.chosenToken.value == "0" ||
-                  !isAddress(swapValues.accountToSendTokens as `0x${string}`)
-                }
-              />
-            </div>
+            </Box>
           </div>
-        ) : (
-          <h1>Can't swap selected token</h1>
-        )}
+          <WalletAddressValueSwitch isManualAddress={isManualAddress} />
+          <div class="flex flex-col gap-2">
+            <label for="swapValues.accountToSendTokens">
+              Address to send coins to:
+            </label>
+            {isManualAddress.value ? (
+              <Input
+                type="text"
+                name="swapValues.accountToSendTokens"
+                value={swapValues.accountToSendTokens}
+                onInput={$((e) => {
+                  const target = e.target;
+                  swapValues.accountToSendTokens = target.value;
+                })}
+              />
+            ) : (
+              <Select
+                name="Wallet"
+                options={[
+                  { value: "", text: "Select wallet" },
+                  ...wallets.map((option) => {
+                    return {
+                      value: option.wallet.address,
+                      text: option.walletName,
+                      selected: undefined,
+                    };
+                  }),
+                ]}
+                onValueChange={$((value) => {
+                  swapValues.accountToSendTokens = value;
+                })}
+              />
+            )}
+          </div>
+          {/* BUTTONS */}
+          <div class="flex items-center gap-4">
+            <Button
+              variant="transparent"
+              text="Cancel"
+              customClass="w-full"
+              onClick$={() => {
+                isOpen.value = false;
+                swapValues.chosenToken.address.value = "";
+                swapValues.chosenToken.value = "";
+                swapValues.tokenToSwapOn.address = "";
+                swapValues.accountToSendTokens = "";
+                swapValues.tokenToSwapOn.value = "";
+              }}
+            />
+            <Button
+              variant="blue"
+              text="Swap Tokens"
+              customClass="w-full"
+              onClick$={async () => {
+                isOpen.value = false;
+                await handleSwap();
+              }}
+              disabled={
+                !swapValues.chosenToken.address.value ||
+                !swapValues.tokenToSwapOn.address ||
+                swapValues.chosenToken.value == "0" ||
+                !isAddress(swapValues.accountToSendTokens as `0x${string}`)
+              }
+            />
+          </div>
+        </div>
       </Modal>
     );
   },

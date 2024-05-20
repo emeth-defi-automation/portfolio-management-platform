@@ -18,7 +18,7 @@ import {
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { messagesContext } from "../layout";
-import { Form, server$ } from "@builder.io/qwik-city";
+import { Form } from "@builder.io/qwik-city";
 import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
 

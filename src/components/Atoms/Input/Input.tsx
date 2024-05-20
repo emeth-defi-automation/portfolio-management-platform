@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { type Signal, type QRL } from "@builder.io/qwik";
+import { type QRL } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
 export interface InputProps {

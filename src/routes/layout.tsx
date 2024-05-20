@@ -70,17 +70,6 @@ export default component$(() => {
     });
 
     wagmiConfig.config = noSerialize(wconfig);
-    console.log("configerinio: ", wagmiConfig.config);
-    console.log(
-      "configerinio2: ",
-      noSerialize(
-        defaultWagmiConfig({
-          chains: [mainnet, sepolia],
-          projectId: import.meta.env.PUBLIC_PROJECT_ID,
-          metadata,
-        }),
-      ),
-    );
 
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {
