@@ -28,7 +28,7 @@ export function Modal(args: BoxHeaderProps) {
     <BoxHeader {...args}>
       <Button
         variant="onlyIcon"
-        leftIcon={<IconClose customClass="h-5 w-5 fill-white" />}
+        leftIcon={<IconClose class="h-5 w-5 fill-white" />}
       />
     </BoxHeader>
   );
