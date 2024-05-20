@@ -253,7 +253,7 @@ export const SwapModal = component$<SwapModalProps>(
                       if (
                         swapValues.chosenToken.address.value != "" &&
                         swapValues.tokenToSwapOn.address != "" &&
-                        swapValues.chosenToken.value != 0
+                        swapValues.chosenToken.value != "0"
                       ) {
                         const amountIn = target.value;
                         await tokenFromAmountDebounce({
