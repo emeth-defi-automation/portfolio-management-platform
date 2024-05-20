@@ -31,7 +31,6 @@ import { emethContractAbi } from "~/abi/emethContractAbi";
 import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
 import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
 import Destination from "~/components/Forms/portfolioTransfters/Destination";
-import { NoDataAdded } from "~/components/NoDataAdded/NoDataAdded";
 import {
   useDeleteStructure,
   useDeleteToken,
@@ -60,6 +59,7 @@ import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/w
 import { hasExecutableWallet } from "~/utils/validators/availableStructure";
 
 import { SwapModal } from "./_components/Swap/Swap";
+import NoData from "~/components/Molecules/NoData/NoData";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -243,15 +243,20 @@ export default component$(() => {
       {availableStructures.value.isLoading ? (
         <Spinner />
       ) : !availableStructures.value.structures.length ? (
-        <NoDataAdded
+        <NoData
+          variant="info"
           title="You didn't add any Sub Portfolio yet"
           description="Please add your first Sub Portfolio"
-          buttonText="Add Sub Portfolio"
-          buttonOnClick$={async () => {
-            isCreateNewStructureModalOpen.value =
-              !isCreateNewStructureModalOpen.value;
-          }}
-        />
+        >
+          <Button
+            text="Add Sub Portfolio"
+            onClick$={async () => {
+              isCreateNewStructureModalOpen.value =
+                !isCreateNewStructureModalOpen.value;
+            }}
+            size="small"
+          />
+        </NoData>
       ) : (
         <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
           <div class="flex items-center justify-between">
