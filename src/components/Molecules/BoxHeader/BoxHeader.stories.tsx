@@ -13,7 +13,12 @@ export default {
 export function Alert(args: BoxHeaderProps) {
   return (
     <BoxHeader {...args}>
-      <Button variant="transparent" text="See all" size="small" class="h-8" />
+      <Button
+        variant="transparent"
+        text="See all"
+        size="small"
+        customClass="h-8"
+      />
     </BoxHeader>
   );
 }
@@ -23,7 +28,7 @@ export function Modal(args: BoxHeaderProps) {
     <BoxHeader {...args}>
       <Button
         variant="onlyIcon"
-        leftIcon={<IconClose class="h-5 w-5 fill-white" />}
+        leftIcon={<IconClose customClass="h-5 w-5 fill-white" />}
       />
     </BoxHeader>
   );
@@ -33,18 +38,23 @@ export function Wallet(args: BoxHeaderProps) {
   return (
     <BoxHeader {...args}>
       <div class="flex gap-2">
-        <Button variant="transparent" text="Edit" size="small" class="h-8" />
+        <Button
+          variant="transparent"
+          text="Edit"
+          size="small"
+          customClass="h-8"
+        />
         <Button
           variant="transparent"
           text="Deactivate"
           size="small"
-          class="h-8"
+          customClass="h-8"
         />
         <Button
           variant="danger"
           text="Delete wallet"
           size="small"
-          class="h-8"
+          customClass="h-8"
           leftIcon={<IconTrashRed class="h-4 w-4 fill-customRed" />}
         />
       </div>
