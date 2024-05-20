@@ -6,7 +6,11 @@ export interface InputProps {
   placeholder?: string;
   name?: string;
   value?: any;
-  onInput?: QRL<(value:any) => void> | ((value:any) => void) | QRL<(value:any) => Promise<void>> | ((value:any) => Promise<void>);
+  onInput?:
+    | QRL<(value: any) => void>
+    | ((value: any) => void)
+    | QRL<(value: any) => Promise<void>>
+    | ((value: any) => Promise<void>);
   customClass?: string;
   disabled?: boolean;
   subValue?: string;
@@ -31,7 +35,7 @@ const InputStyles = cva(
         xs: ["h-8 text-xs"],
         small: ["h-10 text-xs placeholder:text-opacity-50"],
         medium: ["h-11"],
-        large: ["h-12"],  
+        large: ["h-12"],
       },
     },
     defaultVariants: {
@@ -47,7 +51,6 @@ const Input = ({ variant, size, ...props }: InputType) => {
     <>
       <input
         {...props}
-
         class={twMerge(
           InputStyles({ variant, size }),
           props.subValue ? "pr-[80px]" : null,
