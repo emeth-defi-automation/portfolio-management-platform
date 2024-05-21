@@ -90,7 +90,6 @@ export default component$(() => {
   const tokenFromAddress = useSignal("");
   const allTokensFromDb = useSignal([]);
   const walletAddressOfTokenToSwap = useSignal("");
-  // remove
   const tokenFromSymbol = useSignal("");
 
   useTask$(async () => {
