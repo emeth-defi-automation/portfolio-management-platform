@@ -36,7 +36,7 @@ const tagStyles = cva(
         greyText: ["border-customGrey"],
       },
       size: {
-        small: ["text-xs font-medium w-fit"],
+        small: ["text-xs font-medium w-fit h-7"],
         large: ["text-sm text-center py-3.5"],
       },
     },
