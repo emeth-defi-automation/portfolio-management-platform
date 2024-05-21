@@ -3,12 +3,12 @@ import { component$, useSignal, type QRL } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
 export interface CheckboxProps {
-  value: string | number;
-  onClick: QRL<() => void>;
+  value?: string | number;
+  onClick?: QRL<() => void>;
   isChecked: boolean;
-  name: string;
+  name?: string;
   class?: string;
-  setIsChecked: boolean;
+  setIsChecked?: boolean;
 }
 
 const CheckboxStyles = cva(["cursor-pointer"], {
@@ -27,10 +27,10 @@ const CheckboxStyles = cva(["cursor-pointer"], {
         "h-6 w-6 before:w-6 before:h-6 after:w-1.5 after:h-2.5 after:left-1/2 after:-translate-x-1/2 after:top-1/2 after:-translate-y-2/3",
       ],
     },
-    defaultVariant: {
-      variant: "checkTick",
-      size: "large",
-    },
+  },
+  defaultVariants: {
+    variant: "checkTick",
+    size: "large",
   },
 });
 
@@ -40,7 +40,7 @@ const Checkbox = component$<CheckboxType>(
   ({ isChecked, variant, size, ...props }) => {
     const isInputChecked = useSignal<boolean>(isChecked);
     return (
-      <div>
+      <div class={`${variant === "toggleTick" ? "relative h-5 w-8" : ""}`}>
         <input
           id={props.name}
           name={props.name}
