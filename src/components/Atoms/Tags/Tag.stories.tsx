@@ -2,7 +2,7 @@ import Tag, { type TagProps } from "./Tag";
 import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
 import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 import IconError from "@material-design-icons/svg/filled/error_outline.svg?jsx";
-import IconPending from "@material-design-icons/svg/outlined/toll.svg?jsx";
+import IconPending from "@material-design-icons/svg/outlined/pending.svg?jsx";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconLoading from "@material-design-icons/svg/round/sync.svg?jsx";
 
@@ -69,7 +69,7 @@ Grey.args = {
   text: "Pending",
   variant: "greyText",
   class: "",
-  icon: <IconPending class="h-5 w-5 fill-customGrey" />,
+  icon: <IconPending class="h-4 w-4 fill-customGrey" />,
   size: "small",
 };
 
