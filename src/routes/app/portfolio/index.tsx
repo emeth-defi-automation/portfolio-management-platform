@@ -65,6 +65,9 @@ import { SwapModal } from "./_components/Swap/Swap";
 import NoData from "~/components/Molecules/NoData/NoData";
 import { Input } from "~/components/Input/Input";
 import { useDebouncer } from "~/utils/debouncer";
+import Box from "~/components/Atoms/Box/Box";
+import Header from "~/components/Atoms/Headers/Header";
+import Annotation from "~/components/Atoms/Annotation/Annotation";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -280,7 +283,7 @@ export default component$(() => {
       ) : (
         <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
           <div class="flex items-center justify-between">
-            <h2 class="text-2xl font-semibold">Portfolio Name</h2>
+            <Header text="Portfolio Name" variant="h2" />
             <div class="flex items-center gap-2">
               <Button
                 variant="transparent"
@@ -327,68 +330,64 @@ export default component$(() => {
               />
             </div>
           </div>
-          <div class="grid">
-            <div class="custom-border-1 custom-bg-opacity-5 grid min-h-[260px] grid-rows-[20px_32px_auto] gap-6 rounded-2xl p-6">
-              <p class="text-xl font-semibold">Token list</p>
-              <div class="grid grid-cols-4 gap-2">
-                <ButtonWithIcon
-                  image="/assets/icons/search.svg"
-                  text="Search for name"
-                  class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
-                />
-                <ButtonWithIcon
-                  image="/assets/icons/arrow-down.svg"
-                  text="Choose Subportfolio"
-                  class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
-                />
-                <ButtonWithIcon
-                  image="/assets/icons/arrow-down.svg"
-                  text="Choose Wallet"
-                  class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
-                />
-                <ButtonWithIcon
-                  image="/assets/icons/arrow-down.svg"
-                  text="Choose Network"
-                  class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
-                />
-              </div>
-              <div class="grid h-fit items-start gap-4 text-left text-sm">
-                <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
-                  <div class="">TOKEN NAME</div>
-                  <div class="">QUANTITY</div>
-                  <div class="">VALUE</div>
-                  <div class="custom-bg-white custom-border-1 flex h-8 w-fit gap-2 rounded-lg p-[2px] text-center text-white">
-                    <button class="custom-bg-button rounded-lg px-2">
-                      24h
-                    </button>
-                    <button class="rounded-lg px-2">3d</button>
-                    <button class="rounded-lg px-2">30d</button>
-                  </div>
-                  <div class="">WALLET</div>
-                  <div class="">NETWORK</div>
-                  <div class=""></div>
-                </div>
-                {availableStructures.value.structures.map(
-                  (createdStructures: any) => (
-                    <Group
-                      key={createdStructures.structure.name}
-                      createdStructure={createdStructures}
-                      tokenStore={clickedToken}
-                      onClick$={async () => {
-                        await deleteStructureAction.submit({
-                          id: createdStructures.structure.id,
-                        });
-                      }}
-                      isSwapModalOpen={isSwapModalOpen}
-                      walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
-                      tokenFromAddress={tokenFromAddress}
-                      tokenFromSymbol={tokenFromSymbol}
-                    />
-                  ),
-                )}
-              </div>
+          <Box customClass="grid min-h-[260px] grid-rows-[20px_32px_auto] gap-6 h-full">
+            <Header variant="h3" text="Token list" />
+            <div class="grid grid-cols-4 gap-2">
+              <ButtonWithIcon
+                image="/assets/icons/search.svg"
+                text="Search for name"
+                class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
+              />
+              <ButtonWithIcon
+                image="/assets/icons/arrow-down.svg"
+                text="Choose Subportfolio"
+                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+              />
+              <ButtonWithIcon
+                image="/assets/icons/arrow-down.svg"
+                text="Choose Wallet"
+                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+              />
+              <ButtonWithIcon
+                image="/assets/icons/arrow-down.svg"
+                text="Choose Network"
+                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+              />
             </div>
-          </div>
+            <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
+              <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
+                <Annotation text="Token name" transform="upper" />
+                <Annotation text="Quantity" transform="upper" />
+                <Annotation text="Value" transform="upper" />
+                <div class="custom-bg-white custom-border-1 flex h-8 w-fit gap-2 rounded-lg p-[2px] text-center text-white">
+                  <button class="custom-bg-button rounded-lg px-2">24h</button>
+                  <button class="rounded-lg px-2">3d</button>
+                  <button class="rounded-lg px-2">30d</button>
+                </div>
+                <Annotation text="Wallet" transform="upper" />
+                <Annotation text="Network" transform="upper" />
+                <Annotation text="" transform="upper" />
+              </div>
+              {availableStructures.value.structures.map(
+                (createdStructures: any) => (
+                  <Group
+                    key={createdStructures.structure.name}
+                    createdStructure={createdStructures}
+                    tokenStore={clickedToken}
+                    onClick$={async () => {
+                      await deleteStructureAction.submit({
+                        id: createdStructures.structure.id,
+                      });
+                    }}
+                    isSwapModalOpen={isSwapModalOpen}
+                    walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
+                    tokenFromAddress={tokenFromAddress}
+                    tokenFromSymbol={tokenFromSymbol}
+                  />
+                ),
+              )}
+            </div>
+          </Box>
         </div>
       )}
       {isTransferModalOpen.value ? (

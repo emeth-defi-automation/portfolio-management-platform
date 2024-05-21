@@ -8,6 +8,17 @@ import Button from "~/components/Atoms/Buttons/Button";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { chainIdToNetworkName } from "~/utils/chains";
+// import { checksumAddress } from "viem";
+// import { emethContractAbi } from "~/abi/emethContractAbi";
+// import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
+// import * as jwtDecode from "jwt-decode";
+// import { StreamStoreContext } from "~/interface/streamStore/streamStore";
+// import { WagmiConfigContext } from "~/components/WalletConnect/context";
+// import { messagesContext } from "../layout";
+import Box from "~/components/Atoms/Box/Box";
+// import Header from "~/components/Atoms/Headers/Header";
+
+// import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
   getObservedWallets,
@@ -44,7 +55,7 @@ export default component$(() => {
   return (
     <>
       <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
-        <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
+        <Box customClass="grid grid-rows-[32px_88px_1fr] gap-6 h-full">
           <BoxHeader title="Wallets" variantHeader="h3">
             <Button
               onClick$={() => {
@@ -62,6 +73,7 @@ export default component$(() => {
               customClass="text-xs custom-text-50"
             />
             <Select
+              name="network"
               size="medium"
               options={[
                 {
@@ -76,11 +88,11 @@ export default component$(() => {
             observedWallets={observedWallets}
             selectedWallet={selectedWallet}
           />
-        </div>
+        </Box>
 
         <div class="grid gap-6">
           {/* <PendingAuthorization/> */}
-          <div class="custom-border-1 custom-bg-opacity-5 flex min-w-fit flex-col gap-4 rounded-2xl p-6">
+          <Box customClass="grid grid-rows-[64px_24px_1fr] gap-4 h-full">
             {selectedWallet.value && (
               <SelectedWalletDetails
                 key={selectedWallet.value.wallet.address}
@@ -91,7 +103,7 @@ export default component$(() => {
                 transferredCoin={transferredCoin}
               />
             )}
-          </div>
+          </Box>
         </div>
       </div>
 

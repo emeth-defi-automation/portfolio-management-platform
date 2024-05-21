@@ -22,6 +22,9 @@ import {
   PeriodValues,
 } from "~/routes/app/dashboard/server/getPortfolio24hChange";
 import { routeLoader$ } from "@builder.io/qwik-city";
+import Box from "../Atoms/Box/Box";
+import Header from "../Atoms/Headers/Header";
+import Annotation from "../Atoms/Annotation/Annotation";
 
 export interface PortfolioValueProps {
   isPortfolioFullScreen: Signal<boolean>;
@@ -168,11 +171,11 @@ export const PortfolioValue = component$<PortfolioValueProps>(
     });
 
     return (
-      <div
-        class={`custom-border-1 custom-bg-opacity-5 ${isDataForChartLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
+      <Box
+        customClass={`${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"} h-full ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
       >
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
-          <h1 class="text-xl font-semibold">Portfolio Value</h1>
+          <Header variant="h3" text="Portfolio Value" />
           <div class="text-right">
             <h1
               class="custom-text-gradient text-xl font-semibold text-transparent"
@@ -201,7 +204,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         ) : (
           <div class="flex items-center justify-between text-xs">
             <div class="flex items-center gap-2">
-              <h3 class="custom-text-50 uppercase">Value over time</h3>
+              <Annotation transform="upper" text="Value over time" />
               <div class="custom-bg-opacity-5 custom-border-1 flex h-8 rounded-lg p-1">
                 <button
                   name="24h"
@@ -259,12 +262,17 @@ export const PortfolioValue = component$<PortfolioValueProps>(
             </div>
 
             <div class="flex items-center gap-2">
-              <h2 class="custom-text-50 uppercase lg:hidden">Portfolio</h2>
+              <Annotation
+                transform="upper"
+                text="Portfolio"
+                class="lg:hidden"
+              />
               <button class="custom-border-1 custom-bg-opacity-5 flex h-8 items-center gap-2 rounded-lg px-2">
                 <p>All</p>
                 <IconArrowDown class="h-4 w-4 fill-white" />
               </button>
               <Button
+                customClass="custom-border-1 custom-bg-opacity-5 h-8 items-center rounded-lg px-2 duration-300 ease-in-out hover:scale-110"
                 onClick$={() => {
                   isPortfolioFullScreen.value = !isPortfolioFullScreen.value;
                 }}
@@ -285,42 +293,27 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         {isDataForChartLoading.value ? null : (
           <div id="container" ref={outputRef}></div>
         )}
-        {isPortfolioFullScreen.value && !isDataForChartLoading.value && (
-          <div class="ml-7">
-            <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
-              <div class="pr-timeline row-start-2"></div>
-              <Button
-                variant="iconBox"
-                leftIcon={<ImgPfButton />}
-                size="small"
-                customClass="absolute left-3/4 top-1/3 !bg-white/10 !px-1"
-              />
-              <Button
-                variant="iconBox"
-                leftIcon={<ImgPfButton />}
-                size="small"
-                customClass="absolute left-2/4 top-1/3 !bg-white/10 !px-1"
-              />
+        {isPortfolioFullScreen.value &&
+          !isDataForChartLoading.value && (
+            <div class="ml-7">
+              <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
+                <div class="pr-timeline row-start-2"></div>
+                <Button
+                  variant="iconBox"
+                  leftIcon={<ImgPfButton />}
+                  size="small"
+                  customClass="absolute left-3/4 top-1/3 !bg-white/10 !px-1"
+                />
+                <Button
+                  variant="iconBox"
+                  leftIcon={<ImgPfButton />}
+                  size="small"
+                  customClass="absolute left-2/4 top-1/3 !bg-white/10 !px-1"
+                />
+              </div>
             </div>
-            <div class="custom-text-50 mt-3 flex justify-between text-xs">
-              <span>2011</span>
-              <span>2012</span>
-              <span>2013</span>
-              <span>2014</span>
-              <span>2015</span>
-              <span>2016</span>
-              <span>2017</span>
-              <span>2018</span>
-              <span>2019</span>
-              <span>2020</span>
-              <span>2021</span>
-              <span>2022</span>
-              <span>2023</span>
-              <span>2024</span>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+      </Box>
     );
   },
 );

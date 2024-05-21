@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { component$, type JSXOutput } from "@builder.io/qwik";
 import { type QRL } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
@@ -15,20 +16,20 @@ export interface InputProps {
   disabled?: boolean;
   subValue?: string;
   type?: string;
+  iconLeft?: JSXOutput | null;
+  iconRight?: JSXOutput | null;
 }
 
 const InputStyles = cva(
   [
-    "custom-border-1 min-w-[20rem] w-full rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm",
+    "custom-border-1 min-w-[11rem] w-full cursor-pointer rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm relative",
   ],
   {
     variants: {
       variant: {
-        search: [
-          "bg-[url('/assets/icons/search.svg')] bg-no-repeat bg-[position:12px_50%] pl-10",
-        ],
+        search: ["pl-10"],
         checked: [
-          "bg-[url('/assets/icons/dashboard/success.svg')] bg-[size:16px_16px] bg-no-repeat bg-[position:right_12px_top_50%] text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
+          "text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
         ],
       },
       size: {
@@ -46,9 +47,14 @@ const InputStyles = cva(
 
 export type InputType = VariantProps<typeof InputStyles> & InputProps;
 
-const Input = ({ variant, size, ...props }: InputType) => {
+const Input = component$(({ variant, size, ...props }: InputType) => {
   return (
-    <>
+    <div class="relative min-w-max">
+      {props.iconLeft ? (
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 fill-white">
+          {props.iconLeft}
+        </span>
+      ) : null}
       <input
         class={twMerge(
           InputStyles({ variant, size }),
@@ -63,13 +69,18 @@ const Input = ({ variant, size, ...props }: InputType) => {
         disabled={props.disabled}
         {...props}
       />
+      {props.iconRight ? (
+        <span class="absolute right-3 top-1/2 -translate-y-1/2  fill-customGreen">
+          {props.iconRight}
+        </span>
+      ) : null}
       {props.subValue ? (
-        <span class="custom-text-50 absolute right-8 top-8 -translate-y-1/2 text-xs">
+        <span class="custom-text-50 absolute right-3 top-1/2 -translate-y-1/2 text-xs">
           ({props.subValue})
         </span>
       ) : null}
-    </>
+    </div>
   );
-};
+});
 
 export default Input;
