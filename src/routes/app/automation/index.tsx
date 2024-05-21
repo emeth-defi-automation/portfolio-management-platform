@@ -37,7 +37,7 @@ export default component$(() => {
                   text="At a scheduled time with a defined alert"
                 />
               </div>
-              <Checkbox variant="toggleTick" checked={true} class="" />
+              <Checkbox variant="toggleTick" isChecked={true} class="" />
             </div>
             <div class="flex items-center justify-between p-4">
               <div class="flex flex-col gap-3">
@@ -48,7 +48,7 @@ export default component$(() => {
                   text="At a scheduled time with a defined alert"
                 />
               </div>
-              <Checkbox variant="toggleTick" checked={true} />
+              <Checkbox variant="toggleTick" isChecked={true} />
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@ export default component$(() => {
             </div>
             <div class="flex items-center gap-2">
               <Paragraph size="xs" class="text-customGreen" text="Active" />
-              <Checkbox variant="toggleTick" checked={true} class="" />
+              <Checkbox variant="toggleTick" isChecked={true} class="" />
             </div>
           </div>
         </div>
