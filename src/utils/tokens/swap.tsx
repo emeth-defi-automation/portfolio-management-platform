@@ -47,6 +47,6 @@ export const swapTokensForTokens = async (
       ],
     });
   } catch (e) {
-    console.error("Error in swapTokensForTokens: ", e);
+    throw new Error(`Error in swapTokensForTokens: ${e}`);
   }
 };

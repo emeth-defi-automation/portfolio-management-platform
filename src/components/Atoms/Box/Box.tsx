@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-// import { Slot } from "@builder.io/qwik";
+import { Slot, component$ } from "@builder.io/qwik";
 import { cva, type VariantProps } from "class-variance-authority";
 
 export interface BoxProps {
@@ -23,12 +23,12 @@ const BoxStyles = cva(
 
 export type BoxType = VariantProps<typeof BoxStyles> & BoxProps;
 
-const Box = ({ variant, ...props }: BoxType) => {
+const Box = component$(({ variant, ...props }: BoxType) => {
   return (
     <div {...props} class={twMerge(BoxStyles({ variant }), props.customClass)}>
-      {/* <Slot /> */}
+      <Slot />
     </div>
   );
-};
+});
 
 export default Box;
