@@ -8,10 +8,6 @@ import {
 } from "@builder.io/qwik";
 import { PortfolioValue } from "~/components/PortfolioValue/PortfolioValue";
 import { ActionAlertMessage } from "~/components/ActionAlertsMessage/ActionAlertsMessage";
-import {
-  SuccessStatus,
-  WarningStatus,
-} from "~/components/ActionAlertsMessage/ActionStatus";
 import { TokenRow } from "~/components/Tokens/TokenRow";
 import { useNavigate } from "@builder.io/qwik-city";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
@@ -26,6 +22,9 @@ import {
 import { type PeriodState } from "~/interface/balance/Balance";
 import Button from "~/components/Atoms/Buttons/Button";
 import NoData from "~/components/Molecules/NoData/NoData";
+import Tag from "~/components/Atoms/Tags/Tag";
+import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
+import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -137,7 +136,7 @@ export default component$(() => {
           }}
         />
 
-        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
+        <div class="custom-border-1 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl bg-white/[0.03] p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Alerts</h1>
             <Button text="See All" variant="transparent" size="small" />
@@ -166,7 +165,7 @@ export default component$(() => {
           </div>
         </div>
 
-        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
+        <div class="custom-border-1 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl bg-white/[0.03] p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Actions</h1>
             <Button text="See All" variant="transparent" size="small" />
@@ -176,34 +175,59 @@ export default component$(() => {
               title="Automation name #1"
               description="6 hours ago"
             >
-              <SuccessStatus />
+              <Tag
+                variant="success"
+                text="Success"
+                icon={<IconSuccess class="h-3 w-3 fill-customGreen" />}
+                isBorder={true}
+              />
             </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #2"
               description="6 hours ago"
             >
-              <SuccessStatus />
+              <Tag
+                variant="success"
+                text="Success"
+                icon={<IconSuccess class="h-3 w-3 fill-customGreen" />}
+                isBorder={true}
+              />
             </ActionAlertMessage>
             <ActionAlertMessage title="DCA" description="1 day ago">
-              <WarningStatus />
+              <Tag
+                variant="warning"
+                text="Warning"
+                icon={<IconWarning class="h-3 w-3 fill-customWarning" />}
+                isBorder={true}
+              />
             </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #3"
               description="6 hours ago"
             >
-              <SuccessStatus />
+              <Tag
+                variant="success"
+                text="Success"
+                icon={<IconSuccess class="h-3 w-3 fill-customGreen" />}
+                isBorder={true}
+              />
             </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #4"
               description="6 hours ago"
             >
-              <SuccessStatus />
+              <Tag
+                variant="success"
+                text="Success"
+                icon={<IconSuccess class="h-3 w-3 fill-customGreen" />}
+                isBorder={true}
+              />
             </ActionAlertMessage>
           </div>
         </div>
       </div>
 
-      <div class="custom-border-1 custom-shadow custom-bg-opacity-5 grid grid-rows-[32px_1fr] gap-6 rounded-2xl p-6">
+      <div class="custom-border-1 custom-shadow grid grid-rows-[32px_1fr] gap-6 rounded-2xl bg-white/[0.03] p-6">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold">Favourite Tokens</h1>
           <Button

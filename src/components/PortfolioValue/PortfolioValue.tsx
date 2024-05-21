@@ -187,7 +187,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
     });
     return (
       <div
-        class={`custom-border-1 custom-bg-opacity-5 ${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
+        class={`custom-border-1 bg-white/[0.03] ${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
       >
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
           <h1 class="text-xl font-semibold">Portfolio Value</h1>

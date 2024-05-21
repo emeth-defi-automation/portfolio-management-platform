@@ -123,6 +123,6 @@ WalletNotConnected.args = {
   text: "Wallet Not Connected",
   variant: "warning",
   class: "",
-  icon: <IconWarning class="h-5 w-4.5 fill-customWarning" />,
+  icon: <IconWarning class="w-4.5 h-5 fill-customWarning" />,
   size: "large",
 };
