@@ -25,7 +25,7 @@ export const convertToFraction = (numericString: string) => {
     const fractionArray = numericString.split(".");
     fractionObject = {
       numerator: BigInt(`${fractionArray[0]}${fractionArray[1]}`),
-      denominator: BigInt(10) ** BigInt(fractionArray[1].length),
+      denominator: 10n ** BigInt(fractionArray[1].length),
     };
   }
   return fractionObject;
