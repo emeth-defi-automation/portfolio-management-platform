@@ -1,4 +1,3 @@
-import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 import Header from "~/components/Atoms/Headers/Header";
 import { component$, Slot } from "@builder.io/qwik";
@@ -12,7 +11,10 @@ export interface BoxHeaderProps {
 
 const BoxHeader = component$(({ ...props }: BoxHeaderProps) => {
   return (
-    <div {...props} class={twMerge("flex items-center justify-between gap-6", props.class)}>
+    <div
+      {...props}
+      class={twMerge("flex items-center justify-between gap-6", props.class)}
+    >
       <Header
         variant={props.variantHeader}
         text={props.title}
