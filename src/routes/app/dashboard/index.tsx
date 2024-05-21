@@ -17,7 +17,6 @@ import { useNavigate } from "@builder.io/qwik-city";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Spinner } from "~/components/Spinner/Spinner";
-import { NoDataAdded } from "~/components/NoDataAdded/NoDataAdded";
 import {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -26,6 +25,7 @@ import {
 } from "./server";
 import { type PeriodState } from "~/interface/balance/Balance";
 import Button from "~/components/Atoms/Buttons/Button";
+import NoData from "~/components/Molecules/NoData/NoData";
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -221,11 +221,13 @@ export default component$(() => {
             <Spinner />
           </div>
         ) : favoriteTokens.value.length === 0 ? (
-          <NoDataAdded
+          <NoData
+            variant="info"
             title="You didn’t choose your favourite tokens"
             description="To display tokens, choose your favorite tokens from the list."
-            buttonText="Add Favourite Tokens"
-          />
+          >
+            <Button text="Add Favourite Tokens" size="small" />
+          </NoData>
         ) : (
           <div class="grid grid-rows-[32px_auto] gap-4">
             <div class="custom-text-50 grid grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2 text-xs font-normal uppercase">
