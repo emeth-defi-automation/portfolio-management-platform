@@ -419,6 +419,7 @@ export default component$(() => {
           <div class="flex gap-4">
             <Button
               variant="transparent"
+              type="button"
               text={stepsCounter.value === 1 ? "Cancel" : "Back"}
               onClick$={async () => {
                 if (stepsCounter.value === 2) {
@@ -822,6 +823,7 @@ export default component$(() => {
             <div class="flex gap-4">
               <Button
                 variant="transparent"
+                type="button"
                 text="Cancel"
                 onClick$={() => {
                   isCreateNewStructureModalOpen.value = false;
