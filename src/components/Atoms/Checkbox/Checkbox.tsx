@@ -40,7 +40,7 @@ const Checkbox = component$<CheckboxType>(
   ({ isChecked, variant, size, ...props }) => {
     const isInputChecked = useSignal<boolean>(isChecked);
     return (
-      <div class={`${variant === "toggleTick" ? "relative h-5 w-8" : ""}`}>
+      <div class={`${variant === "toggleTick" ? "h-5 w-8" : null} relative`}>
         <input
           id={props.name}
           name={props.name}
