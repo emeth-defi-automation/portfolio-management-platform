@@ -67,7 +67,7 @@ export function Transfer(args: BoxHeaderProps) {
     <BoxHeader {...args}>
       <div class="relative flex items-center gap-2 ">
         <Annotation text="All" />
-        <Checkbox variant="toggleTick" checked={true} />
+        <Checkbox variant="toggleTick" isChecked={true} />
       </div>
     </BoxHeader>
   );
