@@ -8,7 +8,6 @@ export interface SelectFieldProps {
   name: string;
   options?: Option[];
   onValueChange?: any;
-  variant: "smallArrow" | "largeArrow" | null;
   size: "small" | "large" | null;
 }
 
@@ -21,12 +20,7 @@ const SelectField = ({ ...props }: SelectFieldType) => {
   return (
     <div {...props} class={twMerge(SelectFieldStyles(), props.class)}>
       <Label name={props.name} />
-      <Select
-        name={props.name}
-        options={props.options}
-        variant={props.variant}
-        size={props.size}
-      />
+      <Select name={props.name} options={props.options} size={props.size} />
     </div>
   );
 };

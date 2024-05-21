@@ -11,7 +11,7 @@ const Label = ({ ...props }: LabelProps) => {
       {...props}
       for={props.name}
       class={twMerge(
-        "custom-text-50 text-nowrap font-['Sora'] text-xs uppercase",
+        "custom-text-50 block text-nowrap font-['Sora'] text-xs uppercase",
         props.class,
       )}
     >

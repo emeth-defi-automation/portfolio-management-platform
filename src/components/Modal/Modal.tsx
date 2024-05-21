@@ -29,7 +29,7 @@ export const Modal = component$<ModalProps>(
           }}
           class={twMerge(
             customClass,
-            "custom-border-1 bg-modal-glass relative h-fit  min-w-[455px] overflow-auto rounded-xl p-6",
+            "custom-bg-opacity-5 custom-border-1 relative h-fit w-1/3 min-w-[455px] overflow-auto rounded-2xl p-6 backdrop-blur-2xl",
           )}
         >
           {hasButton ? (

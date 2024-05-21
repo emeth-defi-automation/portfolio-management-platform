@@ -21,6 +21,8 @@ import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
 import Button from "~/components/Atoms/Buttons/Button";
+import Box from "~/components/Atoms/Box/Box";
+import Header from "~/components/Atoms/Headers/Header";
 
 import {
   type Config,
@@ -269,9 +271,9 @@ export default component$(() => {
   return (
     <>
       <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
-        <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
+        <Box customClass="grid grid-rows-[32px_88px_1fr] gap-6 h-full">
           <div class="flex items-center justify-between gap-2">
-            <h1 class="text-xl font-semibold">Wallets</h1>
+            <Header text="Wallets" variant="h3" />
             <Button
               onClick$={() => {
                 isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
@@ -298,11 +300,11 @@ export default component$(() => {
             observedWallets={observedWallets}
             selectedWallet={selectedWallet}
           />
-        </div>
+        </Box>
 
         <div class="grid gap-6">
           {/* <PendingAuthorization/> */}
-          <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
+          <Box customClass="grid grid-rows-[64px_24px_1fr] gap-4 h-full">
             {selectedWallet.value && (
               <SelectedWalletDetails
                 key={selectedWallet.value.wallet.address}
@@ -313,7 +315,7 @@ export default component$(() => {
                 transferredCoin={transferredCoin}
               />
             )}
-          </div>
+          </Box>
         </div>
       </div>
 
@@ -435,9 +437,10 @@ export default component$(() => {
         >
           <div class="flex flex-col items-center gap-4">
             <ImgWarningRed />
-            <h1 class="text-center text-xl">
-              You are going to permanently delete your wallet!
-            </h1>
+            <Header
+              variant="h3"
+              text="You are going to permanently delete your wallet!"
+            />
           </div>
           <div class="my-8 flex justify-center">
             <ul class="custom-text-50 text-sm">

@@ -7,11 +7,11 @@ export interface BoxProps {
 }
 
 const BoxStyles = cva(
-  [" p-6  h-fit w-full relative overflow-auto custom-bg-opacity-5"],
+  ["p-6 h-fit relative custom-bg-opacity-5 overflow-auto"],
   {
     variants: {
       variant: {
-        box: ["custom-border-1 rounded-3xl custom-shadow-2"],
+        box: ["custom-border-1 rounded-2xl custom-shadow-2"],
         navbar: ["custom-shadow rounded-none custom-border-b-1"],
       },
     },
