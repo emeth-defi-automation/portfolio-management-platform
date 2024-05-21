@@ -37,7 +37,7 @@ const tagStyles = cva(
       },
       size: {
         small: ["text-xs font-medium w-fit"],
-        large: ["text-sm flex-row-reverse text-center py-3.5"],
+        large: ["text-sm text-center py-3.5"],
       },
     },
     defaultVariants: {
