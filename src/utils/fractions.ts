@@ -19,7 +19,7 @@ export const convertToFraction = (numericString: string) => {
   if (!numericString.includes(".")) {
     fractionObject = {
       numerator: BigInt(numericString),
-      denominator: BigInt(1),
+      denominator: 1n,
     };
   } else {
     const fractionArray = numericString.split(".");
