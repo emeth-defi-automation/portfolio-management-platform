@@ -10,14 +10,9 @@ export interface BoxHeaderProps {
   headerClass?: string;
 }
 
-const BoxHeaderStyles = cva(["flex items-center justify-between gap-6"]);
-
-export type BoxHeaderType = VariantProps<typeof BoxHeaderStyles> &
-  BoxHeaderProps;
-
-const BoxHeader = component$(({ ...props }: BoxHeaderType) => {
+const BoxHeader = component$(({ ...props }: BoxHeaderProps) => {
   return (
-    <div {...props} class={twMerge(BoxHeaderStyles(), props.class)}>
+    <div {...props} class={twMerge("flex items-center justify-between gap-6", props.class)}>
       <Header
         variant={props.variantHeader}
         text={props.title}
