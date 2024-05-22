@@ -32,6 +32,7 @@ import { balancesLiveStream } from "./server/balancesLiveStream";
 import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
 import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
+import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx"
 
 export default component$(() => {
   const isAddWalletModalOpen = useSignal(false);
@@ -69,18 +70,14 @@ export default component$(() => {
           <div class="grid w-full gap-2">
             <Input
               variant="search"
-              placeholder="Search for Wallet"
-              customClass="text-xs custom-text-50"
+              iconLeft={<IconSearch class="h-4 w-4" />}
+              placeholder="Search for wallet"
+              size="small"
             />
             <Select
               name="network"
+              options={[{ value: "", text: "Choose Network" }]}
               size="medium"
-              options={[
-                {
-                  text: "Choose network",
-                  value: "",
-                },
-              ]}
             />
           </div>
 

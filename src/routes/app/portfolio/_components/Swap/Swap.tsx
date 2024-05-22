@@ -29,6 +29,7 @@ import { type WalletWithBalance } from "../../interface";
 import { convertToFraction, replaceNonMatching } from "~/utils/fractions";
 import WalletAddressValueSwitch from "./WalletAddressValueSwitch";
 import { isAddress } from "viem";
+import { type Token } from "~/interface/token/Token";
 
 const askMoralisForPrices = server$(async () => {
   const response = await Moralis.EvmApi.token.getMultipleTokenPrices(
@@ -306,7 +307,7 @@ export const SwapModal = component$<SwapModalProps>(
                 name="selectedToken"
                 options={[
                   { value: "", text: "Pick a coin" },
-                  ...allTokensFromDb.value.map((token: any) => {
+                  ...allTokensFromDb.value.map((token: Token) => {
                     if (
                       !(token.symbol === swapValues.chosenToken.symbol.value)
                     ) {
@@ -317,10 +318,10 @@ export const SwapModal = component$<SwapModalProps>(
                     } else return null;
                   }),
                 ].filter((item) => item != null)}
-                onValueChange={$(async (value) => {
+                onValueChange={$(async (value: string) => {
                   swapValues.tokenToSwapOn.address = value;
                   swapValues.tokenToSwapOn.symbol =
-                    await getTokenSymbolByAddress(value);
+                    await getTokenSymbolByAddress(value as `0x${string}`);
                 })}
                 size="medium"
                 class="h-8"
@@ -356,7 +357,7 @@ export const SwapModal = component$<SwapModalProps>(
                     };
                   }),
                 ]}
-                onValueChange={$((value) => {
+                onValueChange={$((value: string) => {
                   swapValues.accountToSendTokens = value;
                 })}
               />

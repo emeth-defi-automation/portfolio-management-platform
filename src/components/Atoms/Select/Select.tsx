@@ -33,6 +33,7 @@ export interface SelectProps extends VariantProps<typeof SelectStyles> {
   onValueChange?: any;
   placeholder?: string;
   selectClass?: string;
+  disabled?: boolean;
 }
 
 const Select = component$(({ size, ...props }: SelectProps) => {
@@ -47,6 +48,7 @@ const Select = component$(({ size, ...props }: SelectProps) => {
         name={props.name}
         id={props.name}
         class={twMerge(SelectStyles({ size }), props.selectClass)}
+        disabled={props.disabled ? props.disabled : false}
       >
         {props.options?.map((option, index) => (
           <option
