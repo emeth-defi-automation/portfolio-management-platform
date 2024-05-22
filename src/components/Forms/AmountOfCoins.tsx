@@ -23,12 +23,34 @@ export default component$<AmountOfCoinsProps>(
                   key={symbol}
                   image={`/assets/icons/tokens/${symbol.toLowerCase()}.svg`}
                   description={symbol}
-                  class="w-[98%]"
+                  class="w-[98%] flex-row-reverse"
                   input={
+                    // <Input
+                    // name={`${symbol}Amount`}
+                    // disabled={false}
+                    // variant="checked" size="xs" placeholder={`${symbol} approval limit`} InputClass="right-2 z-10"
+                    //    value={
+                    //      addWalletFormStore.coinsToApprove.find(
+                    //        (item) => item.symbol === symbol,
+                    //      )!.amount
+                    //    }
+                    //    onInput={(e) => {
+                    //         const target = e.target as HTMLInputElement;
+                    //         const regex = /^\d*\.?\d*$/;
+                    //         target.value = replaceNonMatching(
+                    //           target.value,
+                    //           regex,
+                    //           "",
+                    //         );
+                    //         addWalletFormStore.coinsToApprove.find(
+                    //           (item) => item.symbol === symbol,
+                    //         )!.amount = target.value;
+                    //       }}
+                    // />
                     <input
                       type="text"
                       name={`${symbol}Amount`}
-                      class={` absolute end-[56px] block h-9 w-1/2 rounded border border-[#24a148] bg-transparent p-3 text-sm text-[#24a148] placeholder-white placeholder-opacity-50`}
+                      class={` absolute end-2 z-10 block h-8 w-1/2 rounded border border-[#24a148] bg-transparent p-3 pr-6 text-sm text-[#24a148] placeholder-white placeholder-opacity-50`}
                       placeholder={`${symbol} approval limit`}
                       value={
                         addWalletFormStore.coinsToApprove.find(

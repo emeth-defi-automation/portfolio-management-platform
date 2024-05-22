@@ -25,14 +25,14 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
 
                 <p class="text-sm">{structure.name}</p>
               </div>
-              <div class="mr-2 flex flex-col py-2">
+              <div class="mr-2 flex flex-col gap-2 py-2">
                 {structure.coins.map((coin: any, index: number) => {
                   if (coin.isChecked === false) return null;
                   return (
                     <>
                       <FormBadge
                         key={`${coin}${index}`}
-                        class="mb-2"
+                        class=""
                         customClass="h-[56px]"
                         labelClass="start-4"
                         imgClass="end-5"
@@ -49,6 +49,31 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                             : undefined
                         }
                         input={
+                          // <Input
+                          //   name={`${coin.symbol}${coin.wallet}Amount`}
+                          //   // id={`${coin.symbol}${coin.wallet}Amount`}
+                          //   value={coin.amount}
+                          //   onInput={(e) => {
+                          //     const target = e.target as HTMLInputElement;
+                          //     const regex = /^\d*\.?\d*$/;
+                          //     target.value = replaceNonMatching(
+                          //       target.value,
+                          //       regex,
+                          //       "",
+                          //     );
+                          //     const currentStructure =
+                          //       batchTransferFormStore.coinsToTransfer.find(
+                          //         (item) => item.name === structure.name,
+                          //       );
+                          //     const currentCoin = currentStructure!.coins.find(
+                          //       (item) =>
+                          //         item.wallet === coin.wallet &&
+                          //         item.symbol === coin.symbol,
+                          //     );
+
+                          //     currentCoin!.amount = target.value;
+                          //   }}
+                          // />
                           <input
                             type="text"
                             name={`${coin.symbol}${coin.wallet}Amount`}

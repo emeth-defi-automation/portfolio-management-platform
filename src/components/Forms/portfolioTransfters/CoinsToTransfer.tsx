@@ -27,7 +27,7 @@ export default component$<CoinsToTransferProps>(
                       <IconArrowDown />
                       <p class="text-sm">{structure.structure.name}</p>
                     </div>
-                    <div class="mr-2 flex flex-col py-2">
+                    <div class="mr-2 flex flex-col gap-2 py-2">
                       {structure.structureBalance.map(
                         (balance: any, index: number) => {
                           const currentStructure =
@@ -46,7 +46,7 @@ export default component$<CoinsToTransferProps>(
                             <FormBadge
                               key={index}
                               text={balance.balance.symbol}
-                              class="mb-2"
+                              class="!mb-3"
                               customClass="h-[56px]"
                               labelClass="start-4"
                               description={balance.wallet.name}

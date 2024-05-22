@@ -37,7 +37,6 @@ import {
 import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
 import CoinsToApprove from "~/components/Forms/CoinsToApprove";
 import AmountOfCoins from "~/components/Forms/AmountOfCoins";
-import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import IconWarningRed from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 import {
   getObservedWallets,

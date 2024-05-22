@@ -1,5 +1,5 @@
 import { $, component$ } from "@builder.io/qwik";
-import { Input } from "~/components/Input/Input";
+import InputField from "~/components/Molecules/InputField/InputField";
 import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 
 export interface DestinationProps {
@@ -9,7 +9,19 @@ export interface DestinationProps {
 export default component$<DestinationProps>(({ batchTransferFormStore }) => {
   return (
     <>
-      <Input
+      <InputField
+        class="ml-0.5 w-[98%]"
+        variant={null}
+        size="medium"
+        name="delivery address"
+        placeholder="Type or paste deposit address here"
+        value={batchTransferFormStore.receiverAddress}
+        onInput={$((e) => {
+          const target = e.target;
+          batchTransferFormStore.receiverAddress = target.value;
+        })}
+      />
+      {/* <Input
         text="DELIVERY ADDRESS"
         name="receiverAddress"
         type="text"
@@ -20,7 +32,7 @@ export default component$<DestinationProps>(({ batchTransferFormStore }) => {
           const target = e.target;
           batchTransferFormStore.receiverAddress = target.value;
         })}
-      />
+      />*/}
     </>
   );
 });
