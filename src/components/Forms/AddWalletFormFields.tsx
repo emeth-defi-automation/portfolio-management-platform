@@ -186,9 +186,11 @@ export default component$<AddWalletFormFieldsProps>(
             <div>
               {connectedAddress.value ? (
                 <Tag
-                  text={connectedAddress.value.slice(0, 4) +
+                  text={
+                    connectedAddress.value.slice(0, 4) +
                     "..." +
-                    connectedAddress.value.slice(-4)}
+                    connectedAddress.value.slice(-4)
+                  }
                   isBorder={true}
                   variant="success"
                   icon={<IconSuccess class="h-4 w-4 fill-customGreen" />}
