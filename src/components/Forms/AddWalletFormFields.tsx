@@ -191,7 +191,7 @@ export default component$<AddWalletFormFieldsProps>(
                     connectedAddress.value.slice(-4)}
                   isBorder={true}
                   variant="success"
-                  icon={<IconSuccess class="h-4 w-4 fill-customGreen"/>}
+                  icon={<IconSuccess class="h-4 w-4 fill-customGreen" />}
                   size="large"
                   class="mb-8 mt-4"
                 />
