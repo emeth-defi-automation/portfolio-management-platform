@@ -1,4 +1,11 @@
-import { type QRL, component$, $ } from "@builder.io/qwik";
+import {
+  type QRL,
+  component$,
+  $,
+  useContext,
+  useVisibleTask$,
+  useSignal,
+} from "@builder.io/qwik";
 import { getAddress } from "viem";
 import { Input } from "~/components/Input/Input";
 
@@ -14,14 +21,15 @@ import IconSuccess from "/public/assets/icons/dashboard/success.svg?jsx";
 import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
+import { WagmiConfigContext } from "../WalletConnect/context";
+import { type Config, watchAccount } from "@wagmi/core";
 export interface AddWalletFormFieldsProps {
   addWalletFormStore: AddWalletFormStore;
   onConnectWalletClick: QRL<() => void>;
-  isWalletConnected: boolean | undefined;
 }
 
 export default component$<AddWalletFormFieldsProps>(
-  ({ addWalletFormStore, onConnectWalletClick, isWalletConnected }) => {
+  ({ addWalletFormStore, onConnectWalletClick }) => {
     const nameInputDebounce = useDebouncer(
       $(async (value: string) => {
         addWalletFormStore.isNameUniqueLoading = true;
@@ -36,6 +44,22 @@ export default component$<AddWalletFormFieldsProps>(
       }),
       300,
     );
+
+    const wagmiConfig = useContext(WagmiConfigContext);
+    const connectedAddress = useSignal<any>(
+      localStorage.getItem("emmethUserWalletAddress"),
+    );
+    // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(({ track }) => {
+      track(() => connectedAddress.value);
+      watchAccount(wagmiConfig.config as Config, {
+        onChange: (account) => {
+          if (account.address != connectedAddress.value) {
+            connectedAddress.value = account.address;
+          }
+        },
+      });
+    });
 
     return (
       <>
@@ -105,7 +129,12 @@ export default component$<AddWalletFormFieldsProps>(
                 <Button
                   variant="blue"
                   onClick$={onConnectWalletClick}
-                  text={isWalletConnected ? "Disconnect " : "Connect Wallet"}
+                  text={
+                    connectedAddress.value !==
+                    localStorage.getItem("emmethUserWalletAddress")
+                      ? "Second Wallet connected."
+                      : "Connect another wallet"
+                  }
                   size="small"
                 />
               </div>
@@ -144,16 +173,14 @@ export default component$<AddWalletFormFieldsProps>(
             </div>
           ) : (
             <div>
-              {isWalletConnected ? (
+              {connectedAddress.value ? (
                 <div
                   class={`mb-8 mt-4 flex h-12 w-full items-center justify-between rounded-lg border border-customGreen bg-customGreen bg-opacity-10 p-3 text-customGreen`}
                 >
                   <div></div>
-                  {/* don't delete this div it's for correct flex */}
-                  {/*addWalletFormStore.address
-                    ? `${addWalletFormStore.address.slice(0, 4) + "..." + addWalletFormStore.address.slice(-4)}`
-                    : "wallet address"} */}
-                  Wallet address
+                  {connectedAddress.value.slice(0, 4) +
+                    "..." +
+                    connectedAddress.value.slice(-4)}
                   <IconSuccess class="h-4 w-4" />
                 </div>
               ) : (
