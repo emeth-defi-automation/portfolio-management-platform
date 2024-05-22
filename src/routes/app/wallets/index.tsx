@@ -1,7 +1,10 @@
 import {
   $,
   component$,
+  createContextId,
+  type Signal,
   useContext,
+  useContextProvider,
   useSignal,
   useStore,
   useVisibleTask$,
@@ -17,7 +20,6 @@ import { checksumAddress } from "viem";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import * as jwtDecode from "jwt-decode";
-import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
 import Button from "~/components/Atoms/Buttons/Button";
@@ -52,19 +54,32 @@ import {
   isNotExecutableDisabled,
   isProceedDisabled,
 } from "~/utils/validators/addWallet";
-import { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
+import { useAddWallet, useRemoveWallet } from "./server";
 export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
 import { type AddWalletFormStore } from "./interface";
 import { fetchTokens } from "~/database/tokens";
-import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
-import { balancesLiveStream } from "./server/balancesLiveStream";
+import { getMoralisBalance } from "~/server/moralis";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 import { getAccessToken } from "~/utils/refresh";
+import { type Wallet } from "~/interface/auth/Wallet";
+
+export const SelectedWalletDetailsContext = createContextId<Signal<Wallet>>(
+  "selected-wallet-details-context",
+);
+export const SelectedWalletNameContext = createContextId<Signal<string>>(
+  "selected-wallet-name-context",
+);
 
 export default component$(() => {
+  // context start
+  const selectedWalletDetails = useSignal<Wallet | undefined>(undefined);
+  useContextProvider(SelectedWalletDetailsContext, selectedWalletDetails);
+
+  const selectedWalletName = useSignal<string>("");
+  useContextProvider(SelectedWalletNameContext, selectedWalletName);
+  // context end
   const wagmiConfig = useContext(WagmiConfigContext);
   const formMessageProvider = useContext(messagesContext);
-  const { streamId } = useContext(StreamStoreContext);
   const walletTokenBalances = useSignal<any>([]);
   const addWalletAction = useAddWallet();
   const removeWalletAction = useRemoveWallet();
@@ -73,6 +88,7 @@ export default component$(() => {
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
   const selectedWallet = useSignal<WalletTokensBalances | null>(null);
+  const selWallet = useSignal<Wallet | null>(null);
   const isSecondWalletConnected = useSignal(false);
   const stepsCounter = useSignal(1);
   const addWalletFormStore = useStore<AddWalletFormStore>({
@@ -85,17 +101,8 @@ export default component$(() => {
     coinsToCount: [],
     coinsToApprove: [],
   });
-  const observedWallets = useSignal<WalletTokensBalances[]>([]);
+  // const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
-  const msg = useSignal("1");
-
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async () => {
-    const data = await balancesLiveStream();
-    for await (const value of data) {
-      msg.value = value;
-    }
-  });
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => wagmiConfig.config);
@@ -207,9 +214,9 @@ export default component$(() => {
       });
 
       // could be removed
-      if (success) {
-        observedWallets.value = await getObservedWallets();
-      }
+      // if (success) {
+      //   observedWallets.value = await getObservedWallets();
+      // }
 
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
@@ -234,20 +241,7 @@ export default component$(() => {
       });
     }
   });
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async ({ track }) => {
-    track(() => wagmiConfig.config);
-    watchAccount(wagmiConfig.config!, {
-      onChange() {
-        const connections = getConnections(wagmiConfig.config as Config);
-        if (connections.length > 1) {
-          isSecondWalletConnected.value = true;
-        } else {
-          isSecondWalletConnected.value = false;
-        }
-      },
-    });
-  });
+
   const handleReadBalances = $(async (wallet: string) => {
     const tokenBalances = await getMoralisBalance({ wallet });
 
@@ -287,7 +281,7 @@ export default component$(() => {
             />
           </div>
           <ObservedWalletsList
-            observedWallets={observedWallets}
+            // observedWallets={observedWallets}
             selectedWallet={selectedWallet}
           />
         </div>
@@ -295,9 +289,10 @@ export default component$(() => {
         <div class="grid gap-6">
           {/* <PendingAuthorization/> */}
           <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
-            {selectedWallet.value && (
+            {selectedWalletDetails.value && (
               <SelectedWalletDetails
-                key={selectedWallet.value.wallet.address}
+                selWallet={selWallet}
+                key={selectedWalletDetails.value.address}
                 selectedWallet={selectedWallet}
                 chainIdToNetworkName={chainIdToNetworkName}
                 isDeleteModalopen={isDeleteModalOpen}
@@ -467,9 +462,9 @@ export default component$(() => {
                   });
                   selectedWallet.value = null;
                   isDeleteModalOpen.value = false;
-                  if (success) {
-                    observedWallets.value = await getObservedWallets();
-                  }
+                  // if (success) {
+                  //   observedWallets.value = await getObservedWallets();
+                  // }
                 }
               }}
             />

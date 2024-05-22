@@ -8,6 +8,7 @@ import {
   useImageProvider,
 } from "qwik-image";
 import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
+import { server$ } from "@builder.io/qwik-city";
 
 type TokenRowWalletsProps = {
   name: string;
@@ -22,6 +23,10 @@ type TokenRowWalletsProps = {
   isExecutable: boolean | undefined;
 };
 
+export const tokenRowWalletsInfoStream = server$(async function* () {
+  
+})
+
 export const TokenRowWallets = component$<TokenRowWalletsProps>(
   ({ name, symbol, balance, imagePath, balanceValueUSD, allowance }) => {
     const imageTransformer$ = $(
@@ -34,6 +39,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       resolutions: [1920, 1280],
       imageTransformer$,
     });
+
     return (
       <>
         <div class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm">

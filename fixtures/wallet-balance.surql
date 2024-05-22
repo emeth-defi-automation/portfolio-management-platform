@@ -1,6 +1,6 @@
-DEFINE TABLE walletBalance SCHEMAFULL PERMISSIONS NONE;
-DEFINE FIELD timestamp ON walletBalance TYPE datetime;
-DEFINE FIELD blockNumber ON walletBalance TYPE string;
-DEFINE FIELD walletValue ON walletBalance TYPE string;
-DEFINE FIELD walletId ON walletBalance TYPE string;
-DEFINE FIELD tokenSymbol ON walletBalance TYPE string;
+DEFINE TABLE wallet_balance SCHEMAFULL PERMISSIONS NONE;
+DEFINE FIELD timestamp ON wallet_balance TYPE datetime;
+DEFINE FIELD blockNumber ON wallet_balance TYPE string;
+DEFINE FIELD walletValue ON wallet_balance TYPE string;
+DEFINE FIELD walletId ON wallet_balance TYPE any;
+DEFINE FIELD tokenSymbol ON wallet_balance TYPE string;
