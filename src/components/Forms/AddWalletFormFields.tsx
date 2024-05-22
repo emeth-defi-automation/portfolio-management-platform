@@ -1,6 +1,6 @@
 import { type QRL, component$, $ } from "@builder.io/qwik";
 import { getAddress } from "viem";
-import { Input } from "~/components/Input/Input";
+// import { Input } from "~/components/Input/Input";
 
 import { useDebouncer } from "~/utils/debouncer";
 import {
@@ -14,6 +14,11 @@ import IconSuccess from "/public/assets/icons/dashboard/success.svg?jsx";
 import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
+import SelectField from "../Molecules/SelectField/SelectField";
+import Annotation from "../Atoms/Annotation/Annotation";
+import InputField from "../Molecules/InputField/InputField";
+import Input from "../Atoms/Input/Input";
+import Label from "../Atoms/Label/Label";
 export interface AddWalletFormFieldsProps {
   addWalletFormStore: AddWalletFormStore;
   onConnectWalletClick: QRL<() => void>;
@@ -40,7 +45,7 @@ export default component$<AddWalletFormFieldsProps>(
     return (
       <>
         {/* network */}
-        <div class="mb-4">
+        {/* <div class="mb-4">
           <label for="network" class="custom-text-50 pb-2 text-xs uppercase">
             Network
           </label>
@@ -50,25 +55,36 @@ export default component$<AddWalletFormFieldsProps>(
             placeholder="Select network"
             disabled={true}
           />
-        </div>
+        </div> */}
+        <SelectField
+          disabled={true}
+          name="network"
+          size="large"
+          class="mb-4"
+          options={[{ value: "", text: "Select netwrok" }]}
+        />
         {/* Name */}
         <div>
           {!isValidName(addWalletFormStore.name) && (
-            <span class="absolute end-6 pt-[1px] text-xs text-red-500">
-              Name too short
-            </span>
+            <Annotation
+              class="absolute end-6 pt-[1px] !text-red-500"
+              text="Name too short"
+            />
           )}
           {!addWalletFormStore.isNameUnique && (
-            <span class="absolute end-6 pt-[1px] text-xs text-red-500">
-              Name already exists
-            </span>
+            <Annotation
+              class="absolute end-6 pt-[1px] !text-red-500"
+              text="Name already exists"
+            />
           )}
-          <Input
-            text="Wallet Name"
-            type="text"
-            name="name"
-            customClass={`
-              ${!isValidName(addWalletFormStore.name) ? "border-red-700" : ""}`}
+          <InputField
+            size="large"
+            variant={null}
+            name="Wallet name" //might does not work correctly
+            disabled={false}
+            inputClass={`
+                      ${!isValidName(addWalletFormStore.name) ? "!border-red-700 border border-solid" : ""}`}
+            //the border color does not change
             value={addWalletFormStore.name}
             placeholder="Enter wallet name..."
             onInput={$(async (e) => {
@@ -81,23 +97,25 @@ export default component$<AddWalletFormFieldsProps>(
         {/* Address */}
         <div>
           {!addWalletFormStore.isAddressUnique && (
-            <span class="absolute end-6 pt-[1px] text-xs text-red-500">
-              Wallet already exists
-            </span>
+            <Annotation
+              class="absolute end-6 pt-[1px] !text-red-500"
+              text="Wallet already exists"
+            />
           )}
-          <label
-            for="address"
-            class="flex items-center justify-between gap-2 text-xs"
+          <Label
+            name="Wallet address" //might does not work correctly
+            class="mb-2 flex items-center justify-between gap-2"
+            // 0x00000000219ab540356cbb839cbe05303d7705fa
           >
-            <span class="custom-text-50">Wallet Address</span>
             {!addWalletFormStore.isExecutable ? (
               <div>
                 {!isValidAddress(addWalletFormStore.address) ? (
-                  <span class=" text-xs text-red-500">Invalid address</span>
+                  <Annotation class=" !text-red-500" text="Invalid addres" />
                 ) : !isCheckSum(addWalletFormStore.address) ? (
-                  <span class=" text-xs text-red-500">
-                    Convert your address to the check sum before submitting.
-                  </span>
+                  <Annotation
+                    class="text-wrap text-right !text-red-500"
+                    text="Convert your address before submitting"
+                  />
                 ) : null}
               </div>
             ) : (
@@ -110,14 +128,13 @@ export default component$<AddWalletFormFieldsProps>(
                 />
               </div>
             )}
-          </label>
+          </Label>
 
           {!addWalletFormStore.isExecutable ? (
             <div class="mb-5 grid grid-cols-[75%_25%] items-center justify-between gap-2">
               <Input
-                type="text"
                 name="address"
-                customClass={`${!isValidAddress(addWalletFormStore.address) || !isCheckSum(addWalletFormStore.address) ? "border-red-700" : ""} mt-4 w-full`}
+                customClass={`${!isValidAddress(addWalletFormStore.address) || !isCheckSum(addWalletFormStore.address) ? "border-red-700" : ""}`}
                 value={addWalletFormStore.address}
                 placeholder="Enter wallet address..."
                 onInput={$((e) => {

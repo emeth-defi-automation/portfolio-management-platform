@@ -1,3 +1,4 @@
+import { component$, Slot } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
 export interface LabelProps {
@@ -5,7 +6,7 @@ export interface LabelProps {
   name: string;
 }
 
-const Label = ({ ...props }: LabelProps) => {
+const Label = component$(({ ...props }: LabelProps) => {
   return (
     <label
       {...props}
@@ -16,8 +17,9 @@ const Label = ({ ...props }: LabelProps) => {
       )}
     >
       {props.name}
+      <Slot />
     </label>
   );
-};
+});
 
 export default Label;

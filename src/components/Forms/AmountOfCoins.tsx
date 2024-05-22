@@ -3,6 +3,7 @@ import { FormBadge } from "~/components/FormBadge/FormBadge";
 import { checkPattern, replaceNonMatching } from "~/utils/fractions";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 import Button from "../Atoms/Buttons/Button";
+import Label from "../Atoms/Label/Label";
 
 export interface AmountOfCoinsProps {
   addWalletFormStore: AddWalletFormStore;
@@ -14,9 +15,7 @@ export default component$<AmountOfCoinsProps>(
     return (
       <>
         <div class="mb-8">
-          <p class="custom-text-50 text-light mb-3 text-xs uppercase">
-            Selected tokens
-          </p>
+          <Label name="Select tokens" />
           {addWalletFormStore.coinsToCount.map((symbol) => (
             <div class="flex max-h-[500px] flex-col overflow-auto" key={symbol}>
               <div class="flex items-center justify-between gap-2">

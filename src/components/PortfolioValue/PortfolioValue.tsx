@@ -13,7 +13,6 @@ import {
   axisYFormatter,
 } from "~/utils/portfolio/axisFormatter";
 import { Spinner } from "../Spinner/Spinner";
-import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 import IconMaximize from "@material-design-icons/svg/filled/open_in_full.svg?jsx";
 import IconMinimalize from "@material-design-icons/svg/filled/close_fullscreen.svg?jsx";
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
@@ -21,6 +20,7 @@ import Button from "../Atoms/Buttons/Button";
 import Box from "../Atoms/Box/Box";
 import Header from "../Atoms/Headers/Header";
 import Annotation from "../Atoms/Annotation/Annotation";
+import Select from "../Atoms/Select/Select";
 
 export interface PortfolioValueProps {
   hideChartWhileLoading: Signal<boolean>;
@@ -282,10 +282,12 @@ export const PortfolioValue = component$<PortfolioValueProps>(
                 text="Portfolio"
                 class="lg:hidden"
               />
-              <button class="custom-border-1 custom-bg-opacity-5 flex h-8 items-center gap-2 rounded-lg px-2">
-                <p>All</p>
-                <IconArrowDown />
-              </button>
+              <Select
+                name=""
+                size="small"
+                options={[{ value: "", text: "All" }]}
+                selectClass="custom-bg-opacity-5"
+              />
               <Button
                 customClass="custom-border-1 custom-bg-opacity-5 h-8 items-center rounded-lg px-2 duration-300 ease-in-out hover:scale-110"
                 onClick$={() => {

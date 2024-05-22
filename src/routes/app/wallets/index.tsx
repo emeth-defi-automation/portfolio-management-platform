@@ -22,6 +22,7 @@ import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
 import Button from "~/components/Atoms/Buttons/Button";
 import Box from "~/components/Atoms/Box/Box";
+import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
 
 import {
   type Config,
@@ -62,6 +63,8 @@ import { balancesLiveStream } from "./server/balancesLiveStream";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 import { getAccessToken } from "~/utils/refresh";
 import BoxHeader from "../../../components/Molecules/BoxHeader/BoxHeader";
+import Input from "~/components/Atoms/Input/Input";
+import Select from "~/components/Atoms/Select/Select";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -284,15 +287,16 @@ export default component$(() => {
           </BoxHeader>
 
           <div class="grid w-full gap-2">
-            <ButtonWithIcon
-              image="/assets/icons/search.svg"
-              text="Search for wallet"
-              class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
+            <Input
+              variant="search"
+              iconLeft={<IconSearch class="h-4 w-4" />}
+              placeholder="Search for wallet"
+              size="small"
             />
-            <ButtonWithIcon
-              image="/assets/icons/arrow-down.svg"
-              text="Choose Network"
-              class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+            <Select
+              name=""
+              options={[{ value: "", text: "Choose Network" }]}
+              size="medium"
             />
           </div>
           <ObservedWalletsList
