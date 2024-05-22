@@ -1,4 +1,3 @@
-import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import IconClose from "@material-design-icons/svg/round/close.svg?jsx";
 import Button from "~/components/Atoms/Buttons/Button";
@@ -63,12 +62,16 @@ import {
 
 import { SwapModal } from "./_components/Swap/Swap";
 import NoData from "~/components/Molecules/NoData/NoData";
-import { Input } from "~/components/Input/Input";
 import { useDebouncer } from "~/utils/debouncer";
 import Box from "~/components/Atoms/Box/Box";
 import Header from "~/components/Atoms/Headers/Header";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 import BoxHeader from "../../../components/Molecules/BoxHeader/BoxHeader";
+import InputField from "../../../components/Molecules/InputField/InputField";
+import Label from "~/components/Atoms/Label/Label";
+import Input from "~/components/Atoms/Input/Input";
+import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
+import Select from "~/components/Atoms/Select/Select";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -381,25 +384,26 @@ export default component$(() => {
           <Box customClass="grid min-h-[260px] grid-rows-[20px_32px_auto] gap-6 h-full">
             <Header variant="h3" text="Token list" />
             <div class="grid grid-cols-4 gap-2">
-              <ButtonWithIcon
-                image="/assets/icons/search.svg"
-                text="Search for name"
-                class="custom-text-50 custom-border-1 h-10 justify-start gap-2 rounded-lg px-3"
+              <Input
+                variant="search"
+                placeholder="Search for name"
+                size="small"
+                iconLeft={<IconSearch class="h-4 w-4" />}
               />
-              <ButtonWithIcon
-                image="/assets/icons/arrow-down.svg"
-                text="Choose Subportfolio"
-                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+              <Select
+                name=""
+                options={[{ value: "", text: "Choose Subportfolio" }]}
+                size="medium"
               />
-              <ButtonWithIcon
-                image="/assets/icons/arrow-down.svg"
-                text="Choose Wallet"
-                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+              <Select
+                name=""
+                options={[{ value: "", text: "Choose Wallet" }]}
+                size="medium"
               />
-              <ButtonWithIcon
-                image="/assets/icons/arrow-down.svg"
-                text="Choose Network"
-                class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
+              <Select
+                name=""
+                options={[{ value: "", text: "Choose Network" }]}
+                size="medium"
               />
             </div>
             <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
@@ -548,41 +552,22 @@ export default component$(() => {
             })}
             class="mt-8 text-sm"
           >
-            <div>
-              {!isValidName(structureStore.name) && (
-                <span class="absolute end-6 pt-[1px] text-xs text-red-500">
-                  Name too short
-                </span>
-              )}
-              {!isStructureNameUnique.value &&
-                structureStore.name.length > 0 && (
-                  <span class="absolute end-6 pt-[1px] text-xs text-red-500">
-                    Structure Name already exists
-                  </span>
-                )}
-              <Input
-                text="Name"
-                ref={structureNameInputRef}
-                type="text"
-                name="name"
-                placeholder="Structure name..."
-                customClass={`
-              ${!isValidName(structureStore.name) ? "border-red-700" : ""}`}
-                value={structureStore.name}
-                onInput={$((e) => {
-                  const target = e.target as HTMLInputElement;
-                  structureStore.name = target.value;
-                  nameInputDebounce(target.value);
-                })}
-              />
-            </div>
+            <InputField
+              name="name"
+              variant={null}
+              size="large"
+              placeholder="Structure name..."
+              value={structureStore.name}
+              // onInput={(e) => {
+              //   const target = e.target as HTMLInputElement;
+              //   structureStore.name = target.value;
+              // }}
+            />
+            {!isValidName(structureStore.name) && (
+              <Annotation text="Name too short" class="mb-4 text-customRed" />
+            )}
 
-            <label
-              for="walletsId"
-              class="custom-text-50 mb-2 block text-xs uppercase"
-            >
-              Select Wallets
-            </label>
+            <Label name="Select Wallets" class="mb-2" />
 
             <div class="mb-3 w-full text-sm">
               {/* input Select wallet */}
@@ -749,12 +734,7 @@ export default component$(() => {
               </div>
             </div>
 
-            <label
-              for="balance"
-              class="custom-text-50 mb-2 block text-xs uppercase"
-            >
-              Select Tokens
-            </label>
+            <Label name="Select tokens" class="mb-2" />
 
             <div class="mb-3 w-full text-sm">
               {/* input Select token */}

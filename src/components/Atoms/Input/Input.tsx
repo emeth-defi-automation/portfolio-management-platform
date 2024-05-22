@@ -12,12 +12,14 @@ export interface InputProps {
     | ((value: any) => void)
     | QRL<(value: any) => Promise<void>>
     | ((value: any) => Promise<void>);
-  customClass?: string;
+  InputClass?: string;
   disabled?: boolean;
   subValue?: string;
   type?: string;
   iconLeft?: JSXOutput | null;
   iconRight?: JSXOutput | null;
+  customClass?: string;
+  // id?: string;
 }
 
 const InputStyles = cva(
@@ -49,7 +51,7 @@ export type InputType = VariantProps<typeof InputStyles> & InputProps;
 
 const Input = component$(({ variant, size, ...props }: InputType) => {
   return (
-    <div class="relative min-w-max">
+    <div class={twMerge("relative min-w-max", props.customClass)}>
       {props.iconLeft ? (
         <span class="absolute left-3 top-1/2 -translate-y-1/2 fill-white">
           {props.iconLeft}
@@ -59,7 +61,7 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
         class={twMerge(
           InputStyles({ variant, size }),
           props.subValue ? "pr-[80px]" : null,
-          props.customClass,
+          props.InputClass,
         )}
         placeholder={props.placeholder}
         name={props.name}
@@ -67,7 +69,6 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
         value={props.value}
         onInput$={props.onInput}
         disabled={props.disabled}
-        {...props}
       />
       {props.iconRight ? (
         <span class="absolute right-3 top-1/2 -translate-y-1/2  fill-customGreen">

@@ -18,7 +18,6 @@ import { chainIdToNetworkName } from "~/utils/chains";
 import Box from "~/components/Atoms/Box/Box";
 // import Header from "~/components/Atoms/Headers/Header";
 
-// import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
   getObservedWallets,
