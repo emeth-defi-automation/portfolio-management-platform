@@ -22,7 +22,6 @@ import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
 import Button from "~/components/Atoms/Buttons/Button";
 import Box from "~/components/Atoms/Box/Box";
-import Header from "~/components/Atoms/Headers/Header";
 
 import {
   type Config,
@@ -38,7 +37,7 @@ import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
 import CoinsToApprove from "~/components/Forms/CoinsToApprove";
 import AmountOfCoins from "~/components/Forms/AmountOfCoins";
 import { ButtonWithIcon } from "~/components/Buttons/Buttons";
-import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
+import IconWarningRed from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 import {
   getObservedWallets,
   ObservedWalletsList,
@@ -62,6 +61,7 @@ import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import { balancesLiveStream } from "./server/balancesLiveStream";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 import { getAccessToken } from "~/utils/refresh";
+import BoxHeader from "../../../components/Molecules/BoxHeader/BoxHeader";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -272,8 +272,7 @@ export default component$(() => {
     <>
       <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
         <Box customClass="grid grid-rows-[32px_88px_1fr] gap-6 h-full">
-          <div class="flex items-center justify-between gap-2">
-            <Header text="Wallets" variant="h3" />
+          <BoxHeader variantHeader="h3" title="Wallets" class="gap-2">
             <Button
               onClick$={() => {
                 isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
@@ -282,7 +281,7 @@ export default component$(() => {
               variant="transparent"
               size="small"
             />
-          </div>
+          </BoxHeader>
 
           <div class="grid w-full gap-2">
             <ButtonWithIcon
@@ -304,7 +303,7 @@ export default component$(() => {
 
         <div class="grid gap-6">
           {/* <PendingAuthorization/> */}
-          <Box customClass="grid grid-rows-[64px_24px_1fr] gap-4 h-full">
+          <Box customClass="grid grid-rows-[72px_24px_1fr] gap-4 h-full">
             {selectedWallet.value && (
               <SelectedWalletDetails
                 key={selectedWallet.value.wallet.address}
@@ -433,15 +432,15 @@ export default component$(() => {
           isOpen={isDeleteModalOpen}
           title=""
           hasButton={false}
-          customClass="py-8 px-14 w-fit"
+          customClass="!py-8 !px-14 !w-fit"
         >
-          <div class="flex flex-col items-center gap-4">
-            <ImgWarningRed />
-            <Header
-              variant="h3"
-              text="You are going to permanently delete your wallet!"
-            />
-          </div>
+          <BoxHeader
+            variantHeader="h3"
+            title="You are going to permanently delete your wallet!"
+            class="flex-col-reverse gap-4"
+          >
+            <IconWarningRed class="h-16 w-16 fill-customRed" />
+          </BoxHeader>
           <div class="my-8 flex justify-center">
             <ul class="custom-text-50 text-sm">
               <li>

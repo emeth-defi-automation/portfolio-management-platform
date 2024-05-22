@@ -22,7 +22,7 @@
     "fmt": "prettier --write .",
     "fmt.check": "prettier --check .",
     "lint": "eslint .",
-    "ngrok": "ngrok http --domain=humble-goldfish-viable.ngrok-free.app http://localhost:5173",
+    "ngrok": "./scripts/ngrok.sh",
     "preview": "qwik build preview && vite preview --open",
     "serve": "node server/entry.express",
     "start": "vite --open --mode ssr",

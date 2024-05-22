@@ -218,7 +218,7 @@ export const SwapModal = component$<SwapModalProps>(
       <Modal
         isOpen={isOpen}
         title="Swap"
-        customClass="min-w-[500px]! w-[500px]!"
+        customClass="!min-w-[500px] !w-fit"
         onClose={$(() => {
           swapValues.chosenToken.address.value = "";
           swapValues.chosenToken.value = "";
@@ -280,7 +280,8 @@ export const SwapModal = component$<SwapModalProps>(
                   },
                 ]}
                 size="medium"
-                class="h-8 pr-0"
+                class="h-8"
+                selectClass="top-0 right-0 h-8"
               />
             </Box>
             <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
@@ -322,7 +323,8 @@ export const SwapModal = component$<SwapModalProps>(
                     await getTokenSymbolByAddress(value);
                 })}
                 size="medium"
-                class="h-8 pr-0"
+                class="h-8"
+                selectClass="top-0 right-0 h-8"
               />
             </Box>
           </div>

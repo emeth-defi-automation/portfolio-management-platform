@@ -27,8 +27,8 @@ import { type PeriodState } from "~/interface/balance/Balance";
 import Button from "~/components/Atoms/Buttons/Button";
 import NoData from "~/components/Molecules/NoData/NoData";
 import Box from "~/components/Atoms/Box/Box";
-import Header from "~/components/Atoms/Headers/Header";
 import Annotation from "../../../components/Atoms/Annotation/Annotation";
+import BoxHeader from "../../../components/Molecules/BoxHeader/BoxHeader";
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -141,10 +141,9 @@ export default component$(() => {
         />
 
         <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4 h-full">
-          <div class="flex items-center justify-between gap-2">
-            <Header variant={"h3"} text={"Alerts"} />
+          <BoxHeader variantHeader="h3" title="Alerts" class="gap-2">
             <Button text="See All" variant="transparent" size="small" />
-          </div>
+          </BoxHeader>
           <div>
             <ActionAlertMessage
               title="Bitcoin share exceeded 20%"
@@ -170,10 +169,9 @@ export default component$(() => {
         </Box>
 
         <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4 h-full">
-          <div class="flex items-center justify-between gap-2">
-            <Header variant={"h3"} text={"Actions"} />
+          <BoxHeader variantHeader="h3" title="Actions" class="gap-2">
             <Button text="See All" variant="transparent" size="small" />
-          </div>
+          </BoxHeader>
           <div>
             <ActionAlertMessage
               title="Automation name #1"
@@ -207,17 +205,16 @@ export default component$(() => {
       </div>
 
       <Box customClass="grid grid-row-[32px_1fr] gap-6">
-        <div class="flex items-center justify-between">
-          <Header variant={"h3"} text={"Favourite tokens"} />
+        <BoxHeader variantHeader="h3" title="Favourite tokens">
           <Button
+            text="Go to Portfolio"
+            variant="transparent"
+            size="small"
             onClick$={() => {
               nav("/app/portfolio");
             }}
-            text="Go To Portfolio"
-            variant="transparent"
-            size="small"
           />
-        </div>
+        </BoxHeader>
 
         {favoriteTokenLoading.value ? (
           <div class="flex h-full flex-col items-center justify-center">
