@@ -10,7 +10,7 @@ export type Option = {
 
 const SelectStyles = cva(
   [
-    "custom-border-1 min-w-max w-full cursor-pointer rounded-lg bg-transparent px-4 text-white  text-xs font-['Sora'] appearance-none",
+    "custom-border-1 min-w-max w-full cursor-pointer rounded-lg bg-transparent px-4 text-white  text-xs font-['Sora'] appearance-none ",
   ],
   {
     variants: {
@@ -32,15 +32,21 @@ export interface SelectProps extends VariantProps<typeof SelectStyles> {
   options?: Option[];
   onValueChange?: any;
   placeholder?: string;
+  selectClass?: string;
 }
 
 const Select = component$(({ size, ...props }: SelectProps) => {
   return (
-    <div class={`relative min-w-max ${size == "small" ? "w-fit" : null}`}>
+    <div
+      class={twMerge(
+        `relative min-w-max ${size == "small" ? "w-fit" : null}`,
+        props.class,
+      )}
+    >
       <select
         name={props.name}
         id={props.name}
-        class={twMerge(SelectStyles({ size }), props.class)}
+        class={twMerge(SelectStyles({ size }), props.selectClass)}
       >
         {props.options?.map((option, index) => (
           <option
@@ -53,7 +59,7 @@ const Select = component$(({ size, ...props }: SelectProps) => {
         ))}
       </select>
       <span
-        class={`absolute top-1/2 -translate-y-1/2 ${size == "small" ? "right-1.5" : "right-4"}`}
+        class={`absolute top-1/2 -translate-y-1/2 ${size == "small" ? "right-1.5" : size == "medium" ? "right-2" : "right-4"}`}
       >
         <IconArrowDown />
       </span>

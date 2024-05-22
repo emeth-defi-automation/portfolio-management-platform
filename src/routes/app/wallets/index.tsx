@@ -92,7 +92,7 @@ export default component$(() => {
 
         <div class="grid gap-6">
           {/* <PendingAuthorization/> */}
-          <Box customClass="grid grid-rows-[64px_24px_1fr] gap-4 h-full">
+          <Box customClass="grid grid-rows-[72px_24px_1fr] gap-4 h-full">
             {selectedWallet.value && (
               <SelectedWalletDetails
                 key={selectedWallet.value.wallet.address}
