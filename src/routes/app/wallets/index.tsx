@@ -341,7 +341,6 @@ export default component$(() => {
                 <AddWalletFormFields
                   addWalletFormStore={addWalletFormStore}
                   onConnectWalletClick={connectWallet}
-                  isWalletConnected={false}
                 />
               </>
             ) : null}

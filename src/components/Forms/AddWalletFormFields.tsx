@@ -22,15 +22,14 @@ import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 import { WagmiConfigContext } from "../WalletConnect/context";
-import { Config, getAccount, getConnections, watchAccount } from "@wagmi/core";
+import { type Config, watchAccount } from "@wagmi/core";
 export interface AddWalletFormFieldsProps {
   addWalletFormStore: AddWalletFormStore;
   onConnectWalletClick: QRL<() => void>;
-  isWalletConnected: boolean | undefined;
 }
 
 export default component$<AddWalletFormFieldsProps>(
-  ({ addWalletFormStore, onConnectWalletClick, isWalletConnected }) => {
+  ({ addWalletFormStore, onConnectWalletClick }) => {
     const nameInputDebounce = useDebouncer(
       $(async (value: string) => {
         addWalletFormStore.isNameUniqueLoading = true;
@@ -50,7 +49,7 @@ export default component$<AddWalletFormFieldsProps>(
     const connectedAddress = useSignal<any>(
       localStorage.getItem("emmethUserWalletAddress"),
     );
-
+    // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(({ track }) => {
       track(() => connectedAddress.value);
       watchAccount(wagmiConfig.config as Config, {
