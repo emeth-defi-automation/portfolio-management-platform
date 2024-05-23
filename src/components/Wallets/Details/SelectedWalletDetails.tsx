@@ -139,6 +139,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
                   imagePath={token.imagePath}
                   name={token.name}
                   symbol={token.symbol}
+                  decimals={token.decimals}
                   isExecutable={selectedWalletFromContext.value.isExecutable}
                   allowance={token.allowance}
                   balance={token.balance}

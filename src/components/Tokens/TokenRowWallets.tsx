@@ -19,9 +19,11 @@ import { connectToDB } from "~/database/db";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { Readable } from "stream";
 import { killLiveQuery } from "../ObservedWalletsList/ObservedWalletsList";
+import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
 type TokenRowWalletsProps = {
   walletId?: string;
+  decimals: string;
   name: string;
   symbol: string;
   balance: string;
@@ -102,6 +104,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     walletId,
     name,
     symbol,
+    decimals,
     balance,
     imagePath,
     balanceValueUSD,
@@ -121,6 +124,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
 
     const currentBalanceOfToken = useSignal("");
 
+    // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ cleanup }) => {
       if (walletId === undefined) {
         throw new Error("walletId is undefined");
@@ -134,9 +138,10 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
 
       const queryUuid = await data.next();
       console.log("queryUuid", queryUuid);
-      currentBalanceOfToken.value = (await data.next()).value[0][0][
-        "walletValue"
-      ];
+      currentBalanceOfToken.value = convertWeiToQuantity(
+        (await data.next()).value[0][0]["walletValue"],
+        parseInt(decimals),
+      );
 
       console.log("currentBalanceOfToken", currentBalanceOfToken.value);
 
@@ -144,7 +149,11 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         console.log("value", value);
         if (value.action === "CREATE") {
           console.log("CREATE BLLOCK");
-          currentBalanceOfToken.value = value.result.balance;
+
+          currentBalanceOfToken.value = convertWeiToQuantity(
+            value.result.balance,
+            parseInt(decimals),
+          );
         }
       }
     });
