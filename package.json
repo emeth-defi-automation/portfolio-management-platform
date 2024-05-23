@@ -57,8 +57,6 @@
     "@typescript-eslint/eslint-plugin": "7.7.0",
     "@typescript-eslint/parser": "7.7.0",
     "autoprefixer": "10.4.19",
-    "cross-env": "^7.0.3",
-    "dotenv-cli": "^7.4.2",
     "eslint": "8.57.0",
     "eslint-plugin-qwik": "1.5.2",
     "express": "4.19.2",
