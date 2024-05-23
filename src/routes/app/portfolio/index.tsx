@@ -366,23 +366,27 @@ export default component$(() => {
             <Header variant="h3" text="Token list" />
             <div class="grid grid-cols-4 gap-2">
               <Input
+                id="name"
                 variant="search"
                 placeholder="Search for name"
                 size="small"
                 iconLeft={<IconSearch class="h-4 w-4" />}
               />
               <Select
-                name=""
+                id="subportfolio"
+                name="subportfolio"
                 options={[{ value: "", text: "Choose Subportfolio" }]}
                 size="medium"
               />
               <Select
-                name=""
+                id="wallet"
+                name="wallet"
                 options={[{ value: "", text: "Choose Wallet" }]}
                 size="medium"
               />
               <Select
-                name=""
+                id="name"
+                name="network"
                 options={[{ value: "", text: "Choose Network" }]}
                 size="medium"
               />
@@ -531,15 +535,16 @@ export default component$(() => {
             class="mt-8 text-sm"
           >
             <InputField
+              id="name"
               name="name"
               variant={null}
               size="large"
               placeholder="Structure name..."
               value={structureStore.name}
-              // onInput={(e) => {
-              //   const target = e.target as HTMLInputElement;
-              //   structureStore.name = target.value;
-              // }}
+              onInput={$((e) => {
+                const target = e.target as HTMLInputElement;
+                structureStore.name = target.value;
+              })}
             />
             {!isValidName(structureStore.name) && (
               <Annotation text="Name too short" class="mb-4 text-customRed" />

@@ -1,6 +1,5 @@
 import { type QRL, component$, $ } from "@builder.io/qwik";
 import { getAddress } from "viem";
-// import { Input } from "~/components/Input/Input";
 
 import { useDebouncer } from "~/utils/debouncer";
 import {
@@ -45,18 +44,8 @@ export default component$<AddWalletFormFieldsProps>(
     return (
       <>
         {/* network */}
-        {/* <div class="mb-4">
-          <label for="network" class="custom-text-50 pb-2 text-xs uppercase">
-            Network
-          </label>
-          <Input
-            type="text"
-            name="network"
-            placeholder="Select network"
-            disabled={true}
-          />
-        </div> */}
         <SelectField
+          id="network"
           disabled={true}
           name="network"
           size="large"
@@ -78,12 +67,13 @@ export default component$<AddWalletFormFieldsProps>(
             />
           )}
           <InputField
+            id="walletName"
             size="large"
             variant={null}
-            name="Wallet name" //might does not work correctly
+            name="Wallet name"
             disabled={false}
             inputClass={`
-                      ${!isValidName(addWalletFormStore.name) ? "!border-red-700 border border-solid" : ""}`}
+                      ${!isValidName(addWalletFormStore.name) ? "!border-red-700 border border-solid" : null}`}
             //the border color does not change
             value={addWalletFormStore.name}
             placeholder="Enter wallet name..."
@@ -103,7 +93,8 @@ export default component$<AddWalletFormFieldsProps>(
             />
           )}
           <Label
-            name="Wallet address" //might does not work correctly
+            for="address"
+            name="Wallet address"
             class="mb-2 flex items-center justify-between gap-2"
             // 0x00000000219ab540356cbb839cbe05303d7705fa
           >
@@ -133,6 +124,7 @@ export default component$<AddWalletFormFieldsProps>(
           {!addWalletFormStore.isExecutable ? (
             <div class="mb-5 grid grid-cols-[75%_25%] items-center justify-between gap-2">
               <Input
+                id="address"
                 name="address"
                 customClass={`${!isValidAddress(addWalletFormStore.address) || !isCheckSum(addWalletFormStore.address) ? "border-red-700" : ""}`}
                 value={addWalletFormStore.address}

@@ -19,13 +19,15 @@ export interface InputFieldProps {
   iconRight?: JSXOutput | null;
   type?: string;
   inputClass?: string;
+  id: string;
 }
 
 const InputField = ({ ...props }: InputFieldProps) => {
   return (
-    <div {...props} class={twMerge("mb-4 flex flex-col gap-2", props.class)}>
-      <Label name={props.name} />
+    <div class={twMerge("mb-4 flex flex-col gap-2", props.class)}>
+      <Label name={props.name} for={props.id} />
       <Input
+        id={props.id}
         variant={props.variant}
         size={props.size}
         placeholder={props.placeholder}

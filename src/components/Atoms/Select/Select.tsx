@@ -34,6 +34,7 @@ export interface SelectProps extends VariantProps<typeof SelectStyles> {
   placeholder?: string;
   selectClass?: string;
   disabled?: boolean;
+  id: string;
 }
 
 const Select = component$(({ size, ...props }: SelectProps) => {
@@ -46,7 +47,7 @@ const Select = component$(({ size, ...props }: SelectProps) => {
     >
       <select
         name={props.name}
-        id={props.name}
+        id={props.id}
         class={twMerge(SelectStyles({ size }), props.selectClass)}
         disabled={props.disabled ? props.disabled : false}
       >
@@ -61,7 +62,7 @@ const Select = component$(({ size, ...props }: SelectProps) => {
         ))}
       </select>
       <span
-        class={`absolute top-1/2 -translate-y-1/2 ${size == "small" ? "right-1.5" : size == "medium" ? "right-2" : "right-4"}`}
+        class={`absolute top-1/2 -z-10 -translate-y-1/2 ${size == "small" ? "right-1.5" : size == "medium" ? "right-2" : "right-4"}`}
       >
         <IconArrowDown />
       </span>

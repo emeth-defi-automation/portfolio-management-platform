@@ -287,13 +287,15 @@ export default component$(() => {
 
           <div class="grid w-full gap-2">
             <Input
+              id="searchWallet"
               variant="search"
               iconLeft={<IconSearch class="h-4 w-4" />}
               placeholder="Search for wallet"
               size="small"
             />
             <Select
-              name=""
+              id="chooseNetwork"
+              name="chooseNetwork"
               options={[{ value: "", text: "Choose Network" }]}
               size="medium"
             />
