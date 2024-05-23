@@ -84,7 +84,7 @@ export default component$<AddWalletFormFieldsProps>(
           name="network"
           size="large"
           class="mb-4"
-          options={[{ value: "", text: "Select netwrok" }]}
+          options={[{ value: "", text: "Select network" }]}
         />
         {/* Name */}
         <div>
@@ -135,7 +135,7 @@ export default component$<AddWalletFormFieldsProps>(
             {!addWalletFormStore.isExecutable ? (
               <div>
                 {!isValidAddress(addWalletFormStore.address) ? (
-                  <Annotation class=" !text-red-500" text="Invalid addres" />
+                  <Annotation class=" !text-red-500" text="Invalid address" />
                 ) : !isCheckSum(addWalletFormStore.address) ? (
                   <Annotation
                     class="text-wrap text-right !text-red-500"

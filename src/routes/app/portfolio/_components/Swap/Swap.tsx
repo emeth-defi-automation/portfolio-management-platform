@@ -332,7 +332,7 @@ export const SwapModal = component$<SwapModalProps>(
                   inputClass="!border-0 p-0 text-[28px] h-fit"
                 />
                 {/*<div class="flex flex-col gap-2"> 
-                  <Label name="You recieve"/>
+                  <Label name="You receive"/>
                   <Input
                     id="receive"
                     type="text"
