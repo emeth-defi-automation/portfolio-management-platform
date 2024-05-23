@@ -24,7 +24,6 @@ import { connectToDB } from "~/database/db";
 import { Token } from "~/interface/token/Token";
 
 interface SelectedWalletProps {
-  selectedWallet: Signal<WalletTokensBalances | null>;
   chainIdToNetworkName: { [key: string]: string };
   isDeleteModalopen: Signal<boolean>;
   isTransferModalOpen: Signal<boolean>;
@@ -46,12 +45,12 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
     isTransferModalOpen,
     transferredCoin,
   }) => {
-    const selectedWallet = useContext(SelectedWalletDetailsContext);
+    const selectedWalletFromContext = useContext(SelectedWalletDetailsContext);
     const selectedWalletName = useContext(SelectedWalletNameContext);
     const tokens = useSignal<Token[]>([]);
 
-    if (!selectedWallet.value) return <></>;
-    let shortAddress = selectedWallet.value.address;
+    // if (!selectedWalletFromContext.value) return <></>;
+    let shortAddress = selectedWalletFromContext.value.address;
     if (shortAddress) {
       shortAddress = shortAddress.slice(0, 4) + "..." + shortAddress.slice(-4);
     }
@@ -59,6 +58,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
     useTask$(async () => {
       tokens.value = await fetchAllTokens();
       console.log("tokens", tokens.value);
+      console.log("selectedWalletFromContext", selectedWalletFromContext.value);
     });
     return (
       <div class="grid grid-rows-[64px_1fr] gap-6">
@@ -68,19 +68,18 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             <div class="mt-4 flex gap-2">
               <span class="custom-btn-gradient flex h-7 items-center rounded-lg px-[1px] text-xs ">
                 <div class="flex h-[26px] items-center rounded-lg bg-black px-3">
-                  {selectedWallet.value.isExecutable
+                  {selectedWalletFromContext.value.isExecutable
                     ? "Executable"
                     : "Read-only"}
                 </div>
               </span>
               <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">
                 <IconWallet />
-                {/* {selectedWallet.value.wallet.address} */}
                 {shortAddress}
               </span>
               <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">
                 <IconEthereum />
-                {chainIdToNetworkName[selectedWallet.value.chainId]}
+                {chainIdToNetworkName[selectedWalletFromContext.value.chainId]}
               </span>
               {/* <span class="flex items-center gap-2 text-nowrap rounded-lg border border-customBlue px-2 text-xs text-customBlue">
                 <IconLoading />
@@ -124,19 +123,23 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               <button class="rounded-lg px-2">3d</button>
               <button class="rounded-lg px-2">30d</button>
             </div>
-            {selectedWallet.value.isExecutable ? <div class=""></div> : null}
+            {selectedWalletFromContext.value.isExecutable ? (
+              <div class=""></div>
+            ) : null}
             {/* <div class="">Menu</div> */}
           </div>
           <div>
             {tokens.value.map((token: any) => {
+              console.log("token", token);
               return (
                 <TokenRowWallets
+                  walletId={selectedWalletFromContext.value.id}
                   address={token.address}
                   key={token.id}
                   imagePath={token.imagePath}
                   name={token.name}
                   symbol={token.symbol}
-                  isExecutable={selectedWallet.value.isExecutable}
+                  isExecutable={selectedWalletFromContext.value.isExecutable}
                   allowance={token.allowance}
                   balance={token.balance}
                   balanceValueUSD={token.balanceValueUSD}

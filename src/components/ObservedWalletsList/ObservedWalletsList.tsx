@@ -162,10 +162,6 @@ export const getObservedWallets = server$(async function () {
   return observedWallets;
 });
 
-interface ObservedWalletsListProps {
-  selectedWallet: Signal<WalletTokensBalances | null>;
-}
-
 export const FetchObservedWalletsResult = z.array(
   z.object({
     address: z.string(),
@@ -211,9 +207,10 @@ export const observedWalletsLiveStream = server$(async function* () {
     throw new Error("No cookie found");
   }
   const { userId } = jwt.decode(cookie) as JwtPayload;
-  const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet WHERE 
+  console.log("userId", userId);
+  const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet WHERE
   (SELECT VALUE out FROM observes_wallet where in = ${userId});`);
-
+  // const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet`);
   await db.query(
     `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${queryUuid}', ${true});`,
   );
@@ -238,7 +235,7 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   try {
     await db.listenLive(
-      queryUuid,
+      queryUuid[0],
       // The callback function takes an object with the "action" and "result" properties
       ({ action, result }) => {
         if (action === "CLOSE") {
@@ -259,6 +256,7 @@ export const observedWalletsLiveStream = server$(async function* () {
       console.log("result is NULL");
       break;
     }
+    console.log("result", result);
     yield result;
   }
   console.log("exit async for");
@@ -276,7 +274,7 @@ export const killLiveQuery = server$(async function (queryUuid: string) {
   console.log("dataAfterUpdate", dataAfterUpdate);
 });
 
-export const ObservedWalletsList = component$<ObservedWalletsListProps>(() => {
+export const ObservedWalletsList = component$(() => {
   const walletsObservedByLoggedInUser = useSignal<Wallet[]>([]);
   const isLoading = useSignal(true);
   // eslint-disable-next-line qwik/no-use-visible-task
@@ -317,7 +315,7 @@ export const ObservedWalletsList = component$<ObservedWalletsListProps>(() => {
       }
 
       console.log(
-        "walletsObservedByLoggedInUser after adding one",
+        "walletsObservedByLoggedInUser after add/delete",
         walletsObservedByLoggedInUser.value,
       );
     }

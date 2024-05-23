@@ -87,7 +87,6 @@ export default component$(() => {
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
-  const selectedWallet = useSignal<WalletTokensBalances | null>(null);
   const selWallet = useSignal<Wallet | null>(null);
   const isSecondWalletConnected = useSignal(false);
   const stepsCounter = useSignal(1);
@@ -280,10 +279,7 @@ export default component$(() => {
               class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
             />
           </div>
-          <ObservedWalletsList
-            // observedWallets={observedWallets}
-            selectedWallet={selectedWallet}
-          />
+          <ObservedWalletsList />
         </div>
 
         <div class="grid gap-6">
@@ -292,8 +288,7 @@ export default component$(() => {
             {selectedWalletDetails.value && (
               <SelectedWalletDetails
                 selWallet={selWallet}
-                key={selectedWalletDetails.value.address}
-                selectedWallet={selectedWallet}
+                key={selectedWalletDetails.value.id}
                 chainIdToNetworkName={chainIdToNetworkName}
                 isDeleteModalopen={isDeleteModalOpen}
                 isTransferModalOpen={isTransferModalOpen}
@@ -449,7 +444,7 @@ export default component$(() => {
               onClick$={() => (isDeleteModalOpen.value = false)}
               customClass="w-full"
             />
-            <Button
+            {/* <Button
               variant="red"
               text="Yes, Let’s Do It!"
               customClass="w-full"
@@ -467,7 +462,7 @@ export default component$(() => {
                   // }
                 }
               }}
-            />
+            /> */}
           </div>
         </Modal>
       )}

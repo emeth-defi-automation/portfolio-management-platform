@@ -19,8 +19,6 @@ import {
 
 interface ObservedWalletProps {
   observedWallet: Wallet;
-  //   selectedWallet: Signal<WalletTokensBalances | null>;
-
   chainIdToNetworkName: { [key: string]: string };
 }
 
@@ -115,7 +113,7 @@ export const ObsWallet = component$<ObservedWalletProps>(
   ({ observedWallet, chainIdToNetworkName }) => {
     const selectedWalletDetails = useContext(SelectedWalletDetailsContext);
     const observedWalletNameContext = useContext(SelectedWalletNameContext);
-    const observedWalletNameSignal = useSignal("");
+    const observedWalletNameSignal = useSignal("Loading name...");
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ cleanup }) => {
@@ -124,7 +122,7 @@ export const ObsWallet = component$<ObservedWalletProps>(
         await killLiveQuery(queryUuid.value);
       });
       console.log("obsWallet useVisibleTask...");
-      if (!observedWallet.id) return;
+      if (!observedWallet.id) throw new Error("observedWallet.id is undefined");
       const data = await observedWalletNameLiveStream(observedWallet.id);
       const queryUuid = await data.next();
       console.log("queryUuid", queryUuid);
@@ -152,7 +150,6 @@ export const ObsWallet = component$<ObservedWalletProps>(
         class="flex h-14 cursor-pointer items-center justify-between rounded-lg"
         onClick$={() => {
           selectedWalletDetails.value = observedWallet;
-          console.log("selectedWalletDetails", selectedWalletDetails.value);
           observedWalletNameContext.value = observedWalletNameSignal.value;
         }}
       >
