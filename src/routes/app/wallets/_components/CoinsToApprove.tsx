@@ -17,7 +17,6 @@ export default component$<CoinsToApproveProps>(
       <>
         <div class="flex max-h-[450px] flex-col overflow-auto pb-4">
           <div class="mb-3 flex items-center justify-between">
-            {/* might not work correctly */}
             <Label name="Select tokens" />
             {/* <div class="relative">
               <label class="custom-text-50 text-light flex h-6 items-center gap-3 text-xs uppercase">

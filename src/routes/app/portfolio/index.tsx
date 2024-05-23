@@ -286,54 +286,6 @@ export default component$(() => {
         </NoData>
       ) : (
         <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
-          {/* <div class="flex items-center justify-between">
-            <Header text="Portfolio Name" variant="h2" />
-            <div class="flex items-center gap-2">
-              <Button
-                variant="transparent"
-                text="Transfer"
-                size="small"
-                disabled={
-                  !hasExecutableWallet(availableStructures.value.structures)
-                }
-                onClick$={async () => {
-                  for (const structure of availableStructures.value
-                    .structures) {
-                    const coins = [];
-                    for (const wallet of structure.structureBalance) {
-                      const walletAddress = `${observedWalletsWithBalance.value.find((item: WalletWithBalance) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
-                      coins.push({
-                        wallet: wallet.wallet.name,
-                        isExecutable: wallet.wallet.isExecutable,
-                        address: walletAddress,
-                        symbol: wallet.balance.symbol,
-                        amount: "0",
-                        isChecked: false,
-                      });
-                    }
-                    batchTransferFormStore.coinsToTransfer.push({
-                      name: structure.structure.name,
-                      coins: coins,
-                    });
-                  }
-                  isTransferModalOpen.value = true;
-                }}
-                customClass="font-normal"
-                leftIcon={<IconTransfer class="h-4 w-4 fill-white" />}
-              />
-              <Button
-                text="Add Sub Portfolio"
-                variant="blue"
-                size="small"
-                onClick$={async () => {
-                  isCreateNewStructureModalOpen.value =
-                    !isCreateNewStructureModalOpen.value;
-                }}
-                customClass="font-normal"
-                leftIcon={<IconAdd class="h-4 w-4 fill-white" />}
-              />
-            </div>
-          </div> */}
           <BoxHeader variantHeader="h2" title="Portfolio Name">
             <div class="flex items-center gap-2">
               <Button

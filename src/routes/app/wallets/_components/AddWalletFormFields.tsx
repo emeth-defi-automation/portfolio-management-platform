@@ -131,7 +131,6 @@ export default component$<AddWalletFormFieldsProps>(
             for="address"
             name="Wallet address"
             class="mb-2 flex items-center justify-between gap-2"
-            // 0x00000000219ab540356cbb839cbe05303d7705fa
           >
             {!addWalletFormStore.isExecutable ? (
               <div>
