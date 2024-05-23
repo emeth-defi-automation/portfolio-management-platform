@@ -55,8 +55,8 @@ export default component$(() => {
   return (
     <>
       <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
-        <Box customClass="grid grid-rows-[32px_88px_1fr] gap-6 h-full">
-          <BoxHeader title="Wallets" variantHeader="h3">
+        <Box customClass="grid grid-rows-[32px_88px_1fr] gap-6 h-full min-w-max">
+          <BoxHeader variantHeader="h3" title="Wallets" class="gap-2">
             <Button
               onClick$={() => {
                 isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
