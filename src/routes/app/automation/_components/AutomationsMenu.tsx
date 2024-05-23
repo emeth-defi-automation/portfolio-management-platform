@@ -1,4 +1,4 @@
-import { component$, useContext } from "@builder.io/qwik";
+import { $, component$, useContext } from "@builder.io/qwik";
 import { Config, getAccount, simulateContract } from "@wagmi/core";
 import Button from "~/components/Atoms/Buttons/Button";
 import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
@@ -9,8 +9,9 @@ import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { messagesContext } from "../../layout";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 
-interface AutomationMenuProps {}
-export const SwapModal = component$<AutomationMenuProps>(() => {
+interface AutomationsMenuProps {}
+
+export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
   const formMessageProvider = useContext(messagesContext);
 
