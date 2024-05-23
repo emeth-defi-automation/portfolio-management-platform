@@ -136,7 +136,7 @@ export default component$(() => {
           }}
         />
 
-        <div class="custom-border-1 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl bg-white/[0.03] p-6">
+        <div class="custom-border-1 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl bg-white/3 p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Alerts</h1>
             <Button text="See All" variant="transparent" size="small" />
@@ -165,7 +165,7 @@ export default component$(() => {
           </div>
         </div>
 
-        <div class="custom-border-1 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl bg-white/[0.03] p-6">
+        <div class="custom-border-1 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl bg-white/3 p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Actions</h1>
             <Button text="See All" variant="transparent" size="small" />
@@ -227,7 +227,7 @@ export default component$(() => {
         </div>
       </div>
 
-      <div class="custom-border-1 custom-shadow grid grid-rows-[32px_1fr] gap-6 rounded-2xl bg-white/[0.03] p-6">
+      <div class="custom-border-1 custom-shadow grid grid-rows-[32px_1fr] gap-6 rounded-2xl bg-white/3 p-6">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold">Favourite Tokens</h1>
           <Button
