@@ -268,7 +268,8 @@ export const PortfolioValue = component$<PortfolioValueProps>(
                 class="lg:hidden"
               />
               <Select
-                name=""
+                id="portfolioValue"
+                name="portfolioValue"
                 size="small"
                 options={[{ value: "", text: "All" }]}
                 selectClass="custom-bg-opacity-5"

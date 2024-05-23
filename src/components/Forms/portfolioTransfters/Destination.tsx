@@ -10,6 +10,7 @@ export default component$<DestinationProps>(({ batchTransferFormStore }) => {
   return (
     <>
       <InputField
+        id="destination"
         class="ml-0.5 w-[98%]"
         variant={null}
         size="medium"

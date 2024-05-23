@@ -19,7 +19,7 @@ export interface InputProps {
   iconLeft?: JSXOutput | null;
   iconRight?: JSXOutput | null;
   customClass?: string;
-  // id?: string;
+  id: string;
 }
 
 const InputStyles = cva(
@@ -65,7 +65,7 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
         )}
         placeholder={props.placeholder}
         name={props.name}
-        id={props.name}
+        id={props.id}
         value={props.value}
         onInput$={props.onInput}
         disabled={props.disabled}
