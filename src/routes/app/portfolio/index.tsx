@@ -91,6 +91,13 @@ export default component$(() => {
   const allTokensFromDb = useSignal([]);
   const walletAddressOfTokenToSwap = useSignal("");
   const tokenFromSymbol = useSignal("");
+  const structureNameInputRef = useSignal<HTMLInputElement>();
+
+  useTask$(async ({ track }) => {
+    track(() => {
+      structureNameInputRef.value?.focus();
+    });
+  });
 
   useTask$(async () => {
     const tokens: any = await fetchTokens();
@@ -485,6 +492,7 @@ export default component$(() => {
               Name
             </label>
             <input
+              ref={structureNameInputRef}
               type="text"
               name="name"
               placeholder="Structure name..."
