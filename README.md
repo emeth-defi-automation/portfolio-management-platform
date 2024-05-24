@@ -95,6 +95,12 @@ brew install surrealdb/tap/surreal
 curl -sSf https://install.surrealdb.com | sh
 ```
 
+Generate ssl cert and key:
+
+```bash
+openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout ssl/private.key -out ssl/certificate.crt
+```
+
 ## Run
 
 Firstly, you need to run database:
