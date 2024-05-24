@@ -18,7 +18,7 @@ export default {
         10: "40px",
       },
       opacity: {
-        '3': '.03',
+        3: "0.03",
       },
       keyframes: {
         arrival:{
