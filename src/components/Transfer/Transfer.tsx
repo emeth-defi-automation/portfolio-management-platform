@@ -18,7 +18,7 @@ export const Transfer = component$(() => {
       isOpen={isTransferModalOpen}
       customClass="w-full m-10"
     >
-      <div class="grid grid-cols-[1fr_3fr] h-full gap-6">
+      <div class="grid h-full grid-cols-[1fr_3fr] gap-6">
         <Box customClass="grid grid-rows-[32px_40px_1fr] h-full gap-6 p-6">
           <div class="flex items-center justify-between gap-2">
             <Header variant="h4" text="Subportfolios" class="font-normal" />
@@ -91,51 +91,51 @@ export const Transfer = component$(() => {
               <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_24px] text-xs text-customGrey">
                 <span>TOKEN NAME</span>
                 <span class="text-center">CURRENT VALUE</span>
-                <span class="text-center pr-4">WALLET</span>
+                <span class="pr-4 text-center">WALLET</span>
               </div>
               <div class="flex flex-col gap-1">
-                <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_24px] px-4 py-3 rounded-lg bg-white/3">
-                <div class="flex gap-4 items-center">
-                  <div class="bg-white/3 flex items-center justify-center rounded-lg p-2">
-                    <IconBTC class="h-6 w-6" />
+                <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_24px] rounded-lg bg-white/3 px-4 py-3">
+                  <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
+                      <IconBTC class="h-6 w-6" />
+                    </div>
+                    <div class="flex h-full flex-col justify-center gap-1">
+                      <Paragraph text="Bitcoin" />
+                      <span class="text-xs text-customGrey">BTC</span>
+                    </div>
                   </div>
-                  <div class="flex flex-col h-full gap-1 justify-center">
-                    <Paragraph text="Bitcoin" />
-                    <span class="text-customGrey text-xs">BTC</span>
+                  <div class="flex items-center justify-center gap-2">
+                    <span class="text-sm">$67,083.63</span>
+                    <span class="text-xs text-customGrey">(481 BTC)</span>
                   </div>
-                </div>
-                <div class="flex justify-center items-center gap-2">
-                  <span class="text-sm">$67,083.63</span>
-                  <span class="text-xs text-customGrey">(481 BTC)</span>
-                </div>
-                <div class="flex justify-center items-center">
-                  <span class="text-sm">TreasuryWBTC</span>
-                </div> 
-                <div class="flex justify-center items-center">
-                  <Checkbox variant="checkTick" isChecked={true}/>
-                </div>
-              </div>
-              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_24px] px-4 py-3 rounded-lg bg-white/3">
-                <div class="flex gap-4 items-center">
-                  <div class="bg-white/3 flex items-center justify-center rounded-lg p-2">
-                    <IconBTC class="h-6 w-6" />
+                  <div class="flex items-center justify-center">
+                    <span class="text-sm">TreasuryWBTC</span>
                   </div>
-                  <div class="flex flex-col h-full gap-1 justify-center">
-                    <Paragraph text="Bitcoin" />
-                    <span class="text-customGrey text-xs">BTC</span>
+                  <div class="flex items-center justify-center">
+                    <Checkbox variant="checkTick" isChecked={true} />
                   </div>
                 </div>
-                <div class="flex justify-center items-center gap-2">
-                  <span class="text-sm">$67,083.63</span>
-                  <span class="text-xs text-customGrey">(481 BTC)</span>
+                <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_24px] rounded-lg bg-white/3 px-4 py-3">
+                  <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
+                      <IconBTC class="h-6 w-6" />
+                    </div>
+                    <div class="flex h-full flex-col justify-center gap-1">
+                      <Paragraph text="Bitcoin" />
+                      <span class="text-xs text-customGrey">BTC</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-center gap-2">
+                    <span class="text-sm">$67,083.63</span>
+                    <span class="text-xs text-customGrey">(481 BTC)</span>
+                  </div>
+                  <div class="flex items-center justify-center gap-2">
+                    <span class="text-sm">TreasuryWBTC</span>
+                  </div>
+                  <div>
+                    <Checkbox variant="checkTick" isChecked={true} />
+                  </div>
                 </div>
-                <div class="flex justify-center items-center gap-2">
-                  <span class="text-sm">TreasuryWBTC</span>
-                </div> 
-                <div>
-                  <Checkbox variant="checkTick" isChecked={true}/>
-                </div>
-              </div>
               </div>
             </div>
           </div>
