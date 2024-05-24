@@ -95,7 +95,11 @@ brew install surrealdb/tap/surreal
 curl -sSf https://install.surrealdb.com | sh
 ```
 
+Generate ssl cert and key:
 
+```bash
+openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout ssl/private.key -out ssl/certificate.crt
+```
 
 ## Run
 
@@ -117,13 +121,7 @@ Run ngrok tunnel (and copy https url to `.env.local` into `NGROK_WEBHOOK_URL`):
 npm run ngrok
 ```
 
-Generate ssl cert and key:
-```bash
-openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout ssl/private.key -out ssl/certificate.crt
-```
-
 Last step is run the app (in dev mode):
-
 
 ```bash
 npm run dev
