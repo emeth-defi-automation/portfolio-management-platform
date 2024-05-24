@@ -1,9 +1,14 @@
-import { type QRL, type Signal, Slot, component$ } from "@builder.io/qwik";
+import {
+  type QRL,
+  type Signal,
+  Slot,
+  component$,
+  type HTMLAttributes,
+} from "@builder.io/qwik";
 import IconClose from "@material-design-icons/svg/round/close.svg?jsx";
 import { twMerge } from "tailwind-merge";
 import Button from "../Atoms/Buttons/Button";
-
-export interface ModalProps {
+export interface ModalProps extends HTMLAttributes<any> {
   title: string;
   isOpen: Signal<boolean>;
   customClass?: string;

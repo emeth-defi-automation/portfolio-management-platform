@@ -5,6 +5,7 @@ import {
   useContext,
   useVisibleTask$,
   useSignal,
+  useTask$,
 } from "@builder.io/qwik";
 import { getAddress } from "viem";
 import { Input } from "~/components/Input/Input";
@@ -30,6 +31,7 @@ export interface AddWalletFormFieldsProps {
 
 export default component$<AddWalletFormFieldsProps>(
   ({ addWalletFormStore, onConnectWalletClick }) => {
+    const newWalletNameInput = useSignal<HTMLInputElement>();
     const nameInputDebounce = useDebouncer(
       $(async (value: string) => {
         addWalletFormStore.isNameUniqueLoading = true;
@@ -58,6 +60,13 @@ export default component$<AddWalletFormFieldsProps>(
             connectedAddress.value = account.address;
           }
         },
+      });
+    });
+
+    useTask$(async ({ track }) => {
+      track(() => {
+        addWalletFormStore.isExecutable;
+        newWalletNameInput.value?.focus();
       });
     });
 
@@ -90,6 +99,7 @@ export default component$<AddWalletFormFieldsProps>(
           <Input
             text="Wallet Name"
             type="text"
+            ref={newWalletNameInput}
             name="name"
             customClass={`
               ${!isValidName(addWalletFormStore.name) ? "border-red-700" : ""}`}
