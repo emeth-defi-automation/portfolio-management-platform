@@ -105,7 +105,7 @@ openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout ssl/private.
 
 In order to run this app you will need to clone and run [Blockchain-indexer](https://github.com/emeth-defi-automation/blockchain-indexer) repository.
 
-# Portfolio-Management-Platform
+### Portfolio-Management-Platform
 Firstly, you need to run database:
 
 ```bash
@@ -117,14 +117,14 @@ After that, you need to provision db:
 ```bash
 ./scripts/database-provision.sh
 ```
-# Blockchain-indexer
+### Blockchain-indexer
 When database is launched you can run the caching app:
 
 ```
 cargo run
 ```
 
-# Portfolio-Management-Platform
+### Portfolio-Management-Platform
 Before you can run the you must launch ngrok:
 
 ```bash
