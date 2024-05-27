@@ -63,7 +63,7 @@ UNIV3_OPTIMIST_SUBGRAPH_URL=https://api.thegraph.com/subgraphs/name/graph-builde
 
 # Generated from your personal account.
 MORALIS_API_KEY=
-# Every time you run `npm run ngrok`, it will generated new one url,
+# Every time you run `npm run ngrok`, it will generate new url,
 # so you need to update it here accordingly.
 NGROK_WEBHOOK_URL=https://1111-11-111-11-111.ngrok-free.app/webhook/
 # Get static domain from ngrok website and paste it here - should look alike `weak-horse-badly.ngrok-free.app`
@@ -103,6 +103,9 @@ openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout ssl/private.
 
 ## Run
 
+In order to run this app you will need to clone and run [Blockchain-indexer](https://github.com/emeth-defi-automation/blockchain-indexer) repository.
+
+# Portfolio-Management-Platform
 Firstly, you need to run database:
 
 ```bash
@@ -114,8 +117,15 @@ After that, you need to provision db:
 ```bash
 ./scripts/database-provision.sh
 ```
+# Blockchain-indexer
+When database is launched you can run the caching app:
 
-Run ngrok tunnel (and copy https url to `.env.local` into `NGROK_WEBHOOK_URL`):
+```
+cargo run
+```
+
+# Portfolio-Management-Platform
+Before you can run the you must launch ngrok:
 
 ```bash
 npm run ngrok
