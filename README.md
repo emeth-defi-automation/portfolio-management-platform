@@ -125,7 +125,7 @@ cargo run
 ```
 
 ### Portfolio-Management-Platform
-Before you can run the you must launch ngrok:
+Before you can run the app you must launch ngrok:
 
 ```bash
 npm run ngrok
