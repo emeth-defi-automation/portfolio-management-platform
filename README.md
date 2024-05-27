@@ -147,7 +147,7 @@ npm run ngrok
 
 Export all variables from `.env` and `.env.local` files to your shell.
 
-Start database and provision it with data (as above) - `production` build require database up and running.
+Start database and provision it with data (as above) - `production` build require database up and running. After that run caching app as stated before.
 
 Build `production` mode:
 
