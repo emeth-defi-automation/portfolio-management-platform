@@ -47,24 +47,34 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   });
 
   // live query for latest balance of token for wallet
-  const queryUuid: any =
-    await db.query(`LIVE SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
-    AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1`);
+  console.log("walletId", walletId);
+  console.log("tokenSymbol", tokenSymbol);
+  // const queryUuid: any = await db.query(
+  //   `LIVE SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1;`,
+  // );
+  const queryUuid: any = await db.query(
+    `LIVE SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' AND walletId = ${walletId};`,
+  );
   await db.query(
     `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${queryUuid}', ${true});`,
   );
   yield queryUuid;
 
-  // get latest balance of token for wallet
   const latestBalanceOfTokenForWallet =
     await db.query(`SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
       AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1;`);
   console.log("latestBalanceOfTokenForWallet", latestBalanceOfTokenForWallet);
   yield latestBalanceOfTokenForWallet;
 
+  if (tokenSymbol === "USDT") {
+    tokenSymbol = "USDC";
+  }
   const latestTokenPriceQueryUuid: any =
-    await db.query(`LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}'
-  ORDER BY timestamp DESC LIMIT 1;`);
+    //   await db.query(`LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}'
+    // ORDER BY timestamp DESC LIMIT 1;`);
+    await db.query(
+      `LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}';`,
+    );
   await db.query(
     `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${latestTokenPriceQueryUuid}', ${true});`,
   );
