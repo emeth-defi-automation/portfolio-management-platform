@@ -240,8 +240,6 @@ export const observedWalletsLiveStream = server$(async function* () {
       ({ action, result }) => {
         if (action === "CLOSE") {
           resultsStream.push(null);
-          const resultStreamDestroyEvent = resultsStream.destroy();
-          console.log("destroyed stream", resultStreamDestroyEvent);
           return;
         }
         resultsStream.push({ action, result });

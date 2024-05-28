@@ -21,7 +21,7 @@ import {
 } from "~/routes/app/wallets";
 import { server$ } from "@builder.io/qwik-city";
 import { connectToDB } from "~/database/db";
-import { Token } from "~/interface/token/Token";
+import { type Token } from "~/interface/token/Token";
 
 interface SelectedWalletProps {
   chainIdToNetworkName: { [key: string]: string };
@@ -58,7 +58,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
     useTask$(async () => {
       tokens.value = await fetchAllTokens();
       console.log("tokens", tokens.value);
-      console.log("selectedWalletFromContext", selectedWalletFromContext.value);
+      // console.log("selectedWalletFromContext", selectedWalletFromContext.value);
     });
     return (
       <div class="grid grid-rows-[64px_1fr] gap-6">

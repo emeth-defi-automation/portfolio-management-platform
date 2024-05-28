@@ -1,4 +1,4 @@
-DEFINE TABLE wallet_balance SCHEMAFULL PERMISSIONS NONE;
+DEFINE TABLE wallet_balance SCHEMALESS;
 DEFINE FIELD timestamp ON wallet_balance TYPE datetime;
 DEFINE FIELD blockNumber ON wallet_balance TYPE string;
 DEFINE FIELD walletValue ON wallet_balance TYPE string;

@@ -49,23 +49,40 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   // live query for latest balance of token for wallet
   const queryUuid: any =
     await db.query(`LIVE SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
-    AND walletId = ${walletId}`);
+    AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1`);
   await db.query(
     `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${queryUuid}', ${true});`,
   );
   yield queryUuid;
 
   // get latest balance of token for wallet
-  console.log("tokenSymbol", tokenSymbol);
-  console.log("walletId", walletId);
   const latestBalanceOfTokenForWallet =
     await db.query(`SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
       AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1;`);
   console.log("latestBalanceOfTokenForWallet", latestBalanceOfTokenForWallet);
   yield latestBalanceOfTokenForWallet;
 
+  const latestTokenPriceQueryUuid: any =
+    await db.query(`LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}'
+  ORDER BY timestamp DESC LIMIT 1;`);
+  await db.query(
+    `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${latestTokenPriceQueryUuid}', ${true});`,
+  );
+  yield latestTokenPriceQueryUuid;
+
+  const latestTokenPrice = await db.query(
+    `SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}' 
+    ORDER BY timestamp DESC LIMIT 1;`,
+  );
+  console.log("latestTokenPrice", latestTokenPrice);
+  yield latestTokenPrice;
+
   const queryUuidEnabledLive: any = await db.query(
     `LIVE SELECT enabled FROM queryuuids WHERE queryUuid = '${queryUuid[0]}';`,
+  );
+
+  const queryUuidTokenPriceEnabledLive: any = await db.query(
+    `LIVE SELECT enabled FROM queryuuids WHERE queryUuid = '${latestTokenPriceQueryUuid[0]}';`,
   );
 
   await db.listenLive(queryUuidEnabledLive[0], ({ action, result }) => {
@@ -77,10 +94,21 @@ export const tokenRowWalletsInfoStream = server$(async function* (
     }
   });
 
+  await db.listenLive(
+    queryUuidTokenPriceEnabledLive[0],
+    ({ action, result }) => {
+      if (action === "UPDATE") {
+        console.log("result", result);
+        console.log("pushing null to resultStream");
+        resultsStream.push(null);
+        db.kill(queryUuidTokenPriceEnabledLive[0]);
+      }
+    },
+  );
+
   await db.listenLive(queryUuid, ({ action, result }) => {
     if (action === "CLOSE") {
       resultsStream.push(null);
-      resultsStream.destroy();
       return;
     }
 
@@ -96,6 +124,9 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   }
   console.log("exit async for in tokenrowwallets");
   await db.query(`DELETE FROM queryuuids WHERE queryUuid = '${queryUuid[0]}';`);
+  await db.query(
+    `DELETE FROM queryuuids WHERE queryUuid = '${latestTokenPriceQueryUuid[0]}';`,
+  );
   return;
 });
 
@@ -123,6 +154,8 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     });
 
     const currentBalanceOfToken = useSignal("");
+    const latestTokenPrice = useSignal("");
+    const latestBalanceUSD = useSignal("");
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ cleanup }) => {
@@ -134,6 +167,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       cleanup(async () => {
         console.log("clenaup starts TokenRowWallets");
         await killLiveQuery(queryUuid.value);
+        await killLiveQuery(latestTokenPriceQueryUuid.value);
       });
 
       const queryUuid = await data.next();
@@ -142,8 +176,17 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         (await data.next()).value[0][0]["walletValue"],
         parseInt(decimals),
       );
-
       console.log("currentBalanceOfToken", currentBalanceOfToken.value);
+
+      const latestTokenPriceQueryUuid = await data.next();
+      console.log("latestTokenPriceQueryUuid", latestTokenPriceQueryUuid);
+
+      latestTokenPrice.value = (await data.next()).value[0][0]["price"];
+      console.log("latestTokenPrice", latestTokenPrice);
+
+      latestBalanceUSD.value = (
+        Number(currentBalanceOfToken.value) * Number(latestTokenPrice.value)
+      ).toFixed(2);
 
       for await (const value of data) {
         console.log("value", value);
@@ -177,7 +220,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             </p>
           </div>
           <div class="overflow-auto">{currentBalanceOfToken.value}</div>
-          <div class="overflow-auto">${balanceValueUSD}</div>
+          <div class="overflow-auto">${latestBalanceUSD.value}</div>
           <div class="">{allowance}</div>
           <div class="flex h-full items-center gap-4">
             <span class="text-customGreen">3,6%</span>
