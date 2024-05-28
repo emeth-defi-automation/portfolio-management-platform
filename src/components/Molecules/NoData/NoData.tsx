@@ -21,7 +21,7 @@ const NoData = component$<NoDataType>(
     return (
       <div
         class={twMerge(
-          "flex max-w-[400px] flex-col gap-4 text-center",
+          "flex  h-full flex-col items-center justify-center gap-4 text-center",
           customClass,
         )}
       >

@@ -26,13 +26,11 @@ import {
   simulateContract,
   writeContract,
   waitForTransactionReceipt,
-  getAccount,
 } from "@wagmi/core";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
 import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
 import Destination from "~/components/Forms/portfolioTransfters/Destination";
-import { NoDataAdded } from "~/components/NoDataAdded/NoDataAdded";
 import {
   useDeleteStructure,
   useDeleteToken,
@@ -47,22 +45,26 @@ export {
   getObservedWalletBalances,
   getAvailableStructures,
 } from "./server";
-import {
-  fetchTokens,
-  getTokenSymbolByAddress,
-  queryTokens,
-} from "~/database/tokens";
+import { fetchTokens, queryTokens } from "~/database/tokens";
 import { convertToFraction } from "~/utils/fractions";
 import {
   type WalletWithBalance,
   type BatchTransferFormStore,
 } from "./interface";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
-import { swapTokensForTokens } from "~/utils/tokens/swap";
-import { FormBadge } from "~/components/FormBadge/FormBadge";
+
 import { Spinner } from "~/components/Spinner/Spinner";
 
 import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
+import {
+  hasExecutableWallet,
+  isNameUnique,
+} from "~/utils/validators/availableStructure";
+
+import { SwapModal } from "./_components/Swap/Swap";
+import NoData from "~/components/Molecules/NoData/NoData";
+import { Input } from "~/components/Input/Input";
+import { useDebouncer } from "~/utils/debouncer";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -91,23 +93,30 @@ export default component$(() => {
     coinsToTransfer: [],
   });
   const tokenFromAddress = useSignal("");
-  const tokenFromSymbol = useSignal("");
-  const tokenFromAmount = useSignal("");
-  const tokenToAddress = useSignal("");
-  const accountToAddress = useSignal("");
-  const walletAddressOfTokenToSwap = useSignal("");
   const allTokensFromDb = useSignal([]);
-  const tokensToSwapListVisible = useSignal(false);
+  const walletAddressOfTokenToSwap = useSignal("");
+  const tokenFromSymbol = useSignal("");
+  const structureNameInputRef = useSignal<HTMLInputElement>();
+  const isStructureNameUnique = useSignal(true);
+
+  useTask$(async ({ track }) => {
+    track(() => {
+      structureNameInputRef.value?.focus();
+    });
+  });
+
+  const nameInputDebounce = useDebouncer(
+    $(async (value: string) => {
+      isStructureNameUnique.value = await isNameUnique(value);
+    }),
+    300,
+  );
+
   useTask$(async () => {
     const tokens: any = await fetchTokens();
     allTokensFromDb.value = tokens;
   });
 
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(() => {
-    const account = wagmiConfig.config ? getAccount(wagmiConfig.config) : null;
-    accountToAddress.value = account ? (account.address as `0x${string}`) : "";
-  });
   const observedWalletsWithBalance = useSignal<any>([]);
   const availableStructures = useSignal<any>({
     structures: [],
@@ -145,6 +154,7 @@ export default component$(() => {
       }
     });
   });
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     availableStructures.value = await getAvailableStructures();
@@ -247,20 +257,26 @@ export default component$(() => {
       });
     }
   });
+
   return (
     <>
       {availableStructures.value.isLoading ? (
         <Spinner />
       ) : !availableStructures.value.structures.length ? (
-        <NoDataAdded
+        <NoData
+          variant="info"
           title="You didn't add any Sub Portfolio yet"
           description="Please add your first Sub Portfolio"
-          buttonText="Add Sub Portfolio"
-          buttonOnClick$={async () => {
-            isCreateNewStructureModalOpen.value =
-              !isCreateNewStructureModalOpen.value;
-          }}
-        />
+        >
+          <Button
+            text="Add Sub Portfolio"
+            onClick$={async () => {
+              isCreateNewStructureModalOpen.value =
+                !isCreateNewStructureModalOpen.value;
+            }}
+            size="small"
+          />
+        </NoData>
       ) : (
         <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
           <div class="flex items-center justify-between">
@@ -270,6 +286,9 @@ export default component$(() => {
                 variant="transparent"
                 text="Transfer"
                 size="small"
+                disabled={
+                  !hasExecutableWallet(availableStructures.value.structures)
+                }
                 onClick$={async () => {
                   for (const structure of availableStructures.value
                     .structures) {
@@ -385,6 +404,7 @@ export default component$(() => {
           <div class="mb-4 flex flex-col overflow-y-scroll">
             {stepsCounter.value === 1 ? (
               <CoinsToTransfer
+                // add filter to exclude structures with no exe wallet
                 availableStructures={availableStructures}
                 batchTransferFormStore={batchTransferFormStore}
               />
@@ -399,6 +419,7 @@ export default component$(() => {
           <div class="flex gap-4">
             <Button
               variant="transparent"
+              type="button"
               text={stepsCounter.value === 1 ? "Cancel" : "Back"}
               onClick$={async () => {
                 if (stepsCounter.value === 2) {
@@ -426,10 +447,10 @@ export default component$(() => {
                 if (stepsCounter.value > 1) {
                   stepsCounter.value = stepsCounter.value - 1;
                 } else {
+                  isTransferModalOpen.value = false;
                   batchTransferFormStore.receiverAddress = "";
                   batchTransferFormStore.coinsToTransfer = [];
                   stepsCounter.value = 1;
-                  isTransferModalOpen.value = false;
                 }
               }}
               customClass="w-full"
@@ -462,6 +483,7 @@ export default component$(() => {
             selectedWallets.wallets = [];
             selectedTokens.balances = [];
             structureStore.name = "";
+            isStructureNameUnique.value = true;
           })}
         >
           <Form
@@ -474,30 +496,39 @@ export default component$(() => {
                 selectedWallets.wallets = [];
                 selectedTokens.balances = [];
                 structureStore.name = "";
+                isStructureNameUnique.value = true;
               }
             }}
             class="mt-8 text-sm"
           >
-            <label
-              for="name"
-              class="custom-text-50 mb-2 block text-xs uppercase"
-            >
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Structure name..."
-              class={`custom-border-1 mb-4 block h-12 w-full rounded-lg bg-transparent px-3 text-white  placeholder:text-white ${isValidName(structureStore.name) ? "bg-red-300" : ""}`}
-              value={structureStore.name}
-              onInput$={(e) => {
-                const target = e.target as HTMLInputElement;
-                structureStore.name = target.value;
-              }}
-            />
-            {!isValidName(structureStore.name) && (
-              <p class="mb-4 text-red-500">Name too short</p>
-            )}
+            <div>
+              {!isValidName(structureStore.name) && (
+                <span class="absolute end-6 pt-[1px] text-xs text-red-500">
+                  Name too short
+                </span>
+              )}
+              {!isStructureNameUnique.value &&
+                structureStore.name.length > 0 && (
+                  <span class="absolute end-6 pt-[1px] text-xs text-red-500">
+                    Structure Name already exists
+                  </span>
+                )}
+              <Input
+                text="Name"
+                ref={structureNameInputRef}
+                type="text"
+                name="name"
+                placeholder="Structure name..."
+                customClass={`
+              ${!isValidName(structureStore.name) ? "border-red-700" : ""}`}
+                value={structureStore.name}
+                onInput={$((e) => {
+                  const target = e.target as HTMLInputElement;
+                  structureStore.name = target.value;
+                  nameInputDebounce(target.value);
+                })}
+              />
+            </div>
 
             <label
               for="walletsId"
@@ -792,6 +823,7 @@ export default component$(() => {
             <div class="flex gap-4">
               <Button
                 variant="transparent"
+                type="button"
                 text="Cancel"
                 onClick$={() => {
                   isCreateNewStructureModalOpen.value = false;
@@ -800,13 +832,21 @@ export default component$(() => {
                   selectedWallets.wallets = [];
                   selectedTokens.balances = [];
                   structureStore.name = "";
+                  isStructureNameUnique.value = true;
                 }}
                 customClass="w-full"
               />
               <Button
                 variant="blue"
                 text="Add Token"
-                disabled={!isValidName(structureStore.name)}
+                disabled={
+                  !(
+                    isValidName(structureStore.name) &&
+                    isStructureNameUnique.value &&
+                    structureStore.name.length > 0 &&
+                    selectedTokens.balances.length > 0
+                  )
+                }
                 type="submit"
                 customClass="w-full"
               />
@@ -815,134 +855,15 @@ export default component$(() => {
         </Modal>
       )}
       {isSwapModalOpen.value ? (
-        <Modal
+        <SwapModal
+          chosenTokenSymbol={tokenFromSymbol}
+          chosenToken={tokenFromAddress}
+          chosenTokenWalletAddress={walletAddressOfTokenToSwap}
           isOpen={isSwapModalOpen}
-          title="Swap"
-          onClose={$(() => {
-            tokenFromAddress.value = "";
-            tokenFromAmount.value = "";
-            tokenToAddress.value = "";
-            accountToAddress.value = "";
-          })}
-        >
-          {tokenFromAddress.value ? (
-            <div class="flex-column">
-              <div>
-                <div class="mb-1 flex items-center justify-between">
-                  <p class="custom-text-50 text-light text-xs uppercase">
-                    You pay
-                  </p>
-                </div>
-                <input
-                  class="bg-black"
-                  type="number"
-                  name="amount"
-                  placeholder={`0`}
-                  bind:value={tokenFromAmount}
-                />
-                <label for="amount">{tokenFromSymbol.value}</label>
-              </div>
-              <div class="flex max-h-[450px] flex-col overflow-auto pb-4">
-                <div class="mb-3 flex items-center justify-between">
-                  <p class="custom-text-50 text-light text-xs uppercase">
-                    You get
-                  </p>
-                  <div>
-                    {tokenToAddress.value ? (
-                      <span class="text-sm">
-                        {getTokenSymbolByAddress(
-                          tokenToAddress.value as `0x${string}`,
-                        )}
-                      </span>
-                    ) : (
-                      <span>Select token</span>
-                    )}
-                    <button
-                      onClick$={() => {
-                        tokensToSwapListVisible.value =
-                          !tokensToSwapListVisible.value;
-                      }}
-                    >
-                      <IconArrowDown class="h-4 w-4 fill-white" />
-                    </button>
-                  </div>
-                </div>
-                {tokensToSwapListVisible.value &&
-                  allTokensFromDb.value.map((token: any) => (
-                    <FormBadge
-                      key={`formBadge_${token.id}`}
-                      class="mb-2"
-                      image={token.imagePath}
-                      description={token.symbol}
-                      for={token.symbol}
-                      input={
-                        <input
-                          id={`input_${token.id}`}
-                          type="checkbox"
-                          name={token.symbol}
-                          value={token.address}
-                          class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                          checked={tokenToAddress.value === token.address}
-                          onClick$={() => {
-                            tokenToAddress.value = token.address;
-                          }}
-                        />
-                      }
-                      customClass="border-gradient"
-                    />
-                  ))}
-              </div>
-              <div>
-                <label for="accountToAddress">Account To Address</label>
-                <input
-                  class="bg-black"
-                  type="text"
-                  name="accountToAddress"
-                  placeholder="Provide account to address"
-                  bind:value={accountToAddress}
-                />
-              </div>
-              <div class="mt-6 flex gap-4">
-                <button
-                  type="button"
-                  class="custom-border-1 h-12 w-1/2 rounded-10 duration-300 ease-in-out hover:scale-105 "
-                  onClick$={() => {
-                    isSwapModalOpen.value = false;
-                    tokenFromAddress.value = "";
-                    tokenFromAmount.value = "";
-                    tokenToAddress.value = "";
-                    accountToAddress.value = "";
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  class="h-12 w-1/2 rounded-10 bg-blue-500 p-2 text-white duration-300 ease-in-out hover:scale-105"
-                  onClick$={async () => {
-                    isSwapModalOpen.value = false;
-                    await swapTokensForTokens(
-                      tokenFromAddress.value as `0x${string}`,
-                      tokenToAddress.value as `0x${string}`,
-                      tokenFromAmount.value,
-                      walletAddressOfTokenToSwap.value as `0x${string}`,
-                      accountToAddress.value as `0x${string}`,
-                      wagmiConfig,
-                    );
-                  }}
-                >
-                  Swap tokens
-                </button>
-              </div>
-            </div>
-          ) : (
-            <h1>Can't swap selected token</h1>
-          )}
-        </Modal>
+          wallets={observedWalletsWithBalance.value}
+          allTokensFromDb={allTokensFromDb}
+        />
       ) : null}
-      <h1>
-        {tokenFromAddress.value} -- {tokenFromAmount.value} --{" "}
-        {tokenToAddress.value}
-      </h1>
     </>
   );
 });

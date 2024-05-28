@@ -9,19 +9,23 @@
  * const fractionObject = convertToFraction(numericString);
  * console.log(fractionObject); // Output: { numerator: 314159, denominator: 100000 }
  */
+export type FractionObject = {
+  numerator: string;
+  denominator: string;
+};
 
 export const convertToFraction = (numericString: string) => {
   let fractionObject;
   if (!numericString.includes(".")) {
     fractionObject = {
       numerator: BigInt(numericString),
-      denominator: BigInt(1),
+      denominator: 1n,
     };
   } else {
     const fractionArray = numericString.split(".");
     fractionObject = {
       numerator: BigInt(`${fractionArray[0]}${fractionArray[1]}`),
-      denominator: BigInt(Math.pow(10, fractionArray[1].length)),
+      denominator: 10n ** BigInt(fractionArray[1].length),
     };
   }
   return fractionObject;

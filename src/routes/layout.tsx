@@ -50,7 +50,7 @@ export default component$(() => {
   };
 
   useContextProvider(WagmiConfigContext, {
-    config: undefined,
+    config: noSerialize({} as Config),
   });
 
   useContextProvider(LoginContext, {
@@ -70,6 +70,7 @@ export default component$(() => {
     });
 
     wagmiConfig.config = noSerialize(wconfig);
+
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {
         onChange(account) {

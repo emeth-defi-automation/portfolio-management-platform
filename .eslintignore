@@ -40,3 +40,4 @@ storybook-static
 tailwind.config.js
 test-report
 test-results
+src/components/Atoms/Select/Select.tsx

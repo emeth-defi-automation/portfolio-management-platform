@@ -17,14 +17,16 @@ export function ToggleTick(args: CheckboxProps) {
 CheckBoxLarge.args = {
   variant: "checkTick",
   size: "large",
+  isChecked: false,
 };
 
 CheckBoxSmall.args = {
   variant: "checkTick",
   size: "small",
+  isChecked: false,
 };
 
 ToggleTick.args = {
   variant: "toggleTick",
-  checked: true,
+  isChecked: true,
 };

@@ -1,9 +1,14 @@
-import { type QRL, type Signal, Slot, component$ } from "@builder.io/qwik";
+import {
+  type QRL,
+  type Signal,
+  Slot,
+  component$,
+  type HTMLAttributes,
+} from "@builder.io/qwik";
 import IconClose from "@material-design-icons/svg/round/close.svg?jsx";
 import { twMerge } from "tailwind-merge";
 import Button from "../Atoms/Buttons/Button";
-
-export interface ModalProps {
+export interface ModalProps extends HTMLAttributes<any> {
   title: string;
   isOpen: Signal<boolean>;
   customClass?: string;
@@ -28,8 +33,8 @@ export const Modal = component$<ModalProps>(
             event.stopPropagation();
           }}
           class={twMerge(
-            "custom-border-1 bg-modal-glass relative h-fit w-1/3 min-w-[455px] overflow-auto rounded-xl p-6",
             customClass,
+            "custom-border-1 bg-modal-glass relative h-fit  min-w-[455px] overflow-auto rounded-xl p-6",
           )}
         >
           {hasButton ? (

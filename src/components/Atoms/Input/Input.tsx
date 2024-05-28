@@ -5,16 +5,21 @@ import { twMerge } from "tailwind-merge";
 export interface InputProps {
   placeholder?: string;
   name?: string;
-  value?: string;
-  onInput?: QRL<(value: any) => void>;
+  value?: any;
+  onInput?:
+    | QRL<(value: any) => void>
+    | ((value: any) => void)
+    | QRL<(value: any) => Promise<void>>
+    | ((value: any) => Promise<void>);
   customClass?: string;
   disabled?: boolean;
   subValue?: string;
+  type?: string;
 }
 
 const InputStyles = cva(
   [
-    "custom-border-1 min-w-[20rem] w-full cursor-pointer rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm",
+    "custom-border-1 min-w-[20rem] w-full rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm",
   ],
   {
     variants: {
@@ -52,8 +57,8 @@ const Input = ({ variant, size, ...props }: InputType) => {
           props.customClass,
         )}
         placeholder={props.placeholder}
-        type="text"
         name={props.name}
+        id={props.name}
         value={props.value}
         onInput$={props.onInput}
         disabled={props.disabled}
