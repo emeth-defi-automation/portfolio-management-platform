@@ -53,7 +53,6 @@ export const NavbarContent = component$(() => {
           variant="onlyIcon"
           leftIcon={<IconLogout class="h-6 w-6 fill-white" />}
           onClick$={async () => {
-            console.log("logout");
             isLogoutModalOpen.value = true;
           }}
         />
