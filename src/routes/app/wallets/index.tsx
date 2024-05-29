@@ -18,7 +18,10 @@ import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import * as jwtDecode from "jwt-decode";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import {
+  LoginContext,
+  WagmiConfigContext,
+} from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
 import Button from "~/components/Atoms/Buttons/Button";
 
@@ -63,6 +66,7 @@ import { getAccessToken } from "~/utils/refresh";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
+  const login = useContext(LoginContext);
   const formMessageProvider = useContext(messagesContext);
   const { streamId } = useContext(StreamStoreContext);
   const walletTokenBalances = useSignal<any>([]);
@@ -263,7 +267,7 @@ export default component$(() => {
   });
 
   const connectWallet = $(async () => {
-    await openWeb3Modal(wagmiConfig!.config);
+    await openWeb3Modal(wagmiConfig, login);
   });
 
   return (
