@@ -61,8 +61,10 @@ export default component$(() => {
 
   const wagmiConfig = useContext(WagmiConfigContext);
   const login = useContext(LoginContext);
+
   // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(() => {
+  useTask$(() => {
+    console.log("use visible task started");
     const wconfig = defaultWagmiConfig({
       chains: [mainnet, sepolia],
       projectId: import.meta.env.PUBLIC_PROJECT_ID,
@@ -70,6 +72,7 @@ export default component$(() => {
     });
 
     wagmiConfig.config = noSerialize(wconfig);
+    console.log("wagmi config just created", wagmiConfig.config);
 
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {

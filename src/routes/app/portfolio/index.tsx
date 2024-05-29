@@ -22,6 +22,11 @@ import { Form } from "@builder.io/qwik-city";
 import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
 
+// import {
+//   simulateContract,
+//   writeContract,
+//   waitForTransactionReceipt,
+// } from "@wagmi/core";
 import {
   simulateContract,
   writeContract,
@@ -488,7 +493,7 @@ export default component$(() => {
         >
           <Form
             action={createStructureAction}
-            onSubmitCompleted$={() => {
+            onSubmitCompleted$={$(() => {
               if (createStructureAction.value?.success) {
                 isCreateNewStructureModalOpen.value = false;
                 isWalletSelected.selection = [];
@@ -498,7 +503,7 @@ export default component$(() => {
                 structureStore.name = "";
                 isStructureNameUnique.value = true;
               }
-            }}
+            })}
             class="mt-8 text-sm"
           >
             <div>

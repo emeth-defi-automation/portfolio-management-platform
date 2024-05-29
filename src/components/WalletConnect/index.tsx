@@ -1,4 +1,10 @@
-import { component$, $, useContext, type QRL } from "@builder.io/qwik";
+import {
+  component$,
+  $,
+  useContext,
+  type QRL,
+  useTask$,
+} from "@builder.io/qwik";
 // import { ConnectButton, type ButtonProps } from "../Buttons/Buttons";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { openWeb3Modal } from "~/utils/walletConnections";
@@ -11,8 +17,14 @@ export interface WalletConnectProps {
 export default component$<buttonType>((props) => {
   const wagmiConfig = useContext(WagmiConfigContext);
 
+  useTask$(() => {
+    console.log("wagmi config from index ", wagmiConfig.config);
+  });
+
   const openModal = $(async () => {
-    await openWeb3Modal(wagmiConfig!.config);
+    console.log("wagmi config from walletConnect btn", wagmiConfig.config);
+
+    await openWeb3Modal(wagmiConfig.config);
   });
 
   return (
