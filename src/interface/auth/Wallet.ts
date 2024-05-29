@@ -5,3 +5,5 @@ export type Wallet = {
   isExecutable: boolean;
   nativeBalance?: string;
 };
+
+export type WalletWithName = Wallet & { name: string };
