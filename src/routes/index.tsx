@@ -1,5 +1,10 @@
 import { HeroText } from "~/components/HeroText/HeroText";
-import { component$, useContext, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  component$,
+  useContext,
+  useTask$,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { Copyright } from "~/components/Paragraph/Paragraph";
 import IconLogo from "/public/assets/icons/logo.svg?jsx";
 import {
@@ -29,10 +34,12 @@ export default component$(() => {
       await disconnectWallets(wagmiConfig.config);
     }
   });
+
+  // eslint-disable-next-line qwik/no-use-visible-task
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => login.address.value);
-
     if (login.address.value) {
       await nav("/signin");
     }
