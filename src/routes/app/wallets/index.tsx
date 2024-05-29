@@ -20,7 +20,10 @@ import { checksumAddress } from "viem";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
 import * as jwtDecode from "jwt-decode";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import {
+  LoginContext,
+  WagmiConfigContext,
+} from "~/components/WalletConnect/context";
 import { messagesContext } from "../layout";
 import Button from "~/components/Atoms/Buttons/Button";
 
@@ -78,6 +81,7 @@ export default component$(() => {
   const selectedWalletName = useSignal<string>("");
   useContextProvider(SelectedWalletNameContext, selectedWalletName);
   // context end
+  const login = useContext(LoginContext);
   const wagmiConfig = useContext(WagmiConfigContext);
   const formMessageProvider = useContext(messagesContext);
   const walletTokenBalances = useSignal<any>([]);
@@ -248,7 +252,7 @@ export default component$(() => {
   });
 
   const connectWallet = $(async () => {
-    await openWeb3Modal(wagmiConfig!.config);
+    await openWeb3Modal(wagmiConfig, login);
   });
 
   return (

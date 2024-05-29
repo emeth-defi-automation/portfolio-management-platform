@@ -22,16 +22,19 @@ export default component$(() => {
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     if (localStorage.getItem("emmethUserWalletAddress")) {
+      console.log("removing user wallet address from local storage");
       localStorage.removeItem("emmethUserWalletAddress");
     }
 
     if (wagmiConfig.config) {
+      console.log("disconnecting wallets");
       await disconnectWallets(wagmiConfig.config);
     }
   });
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => login.address.value);
+    console.log("login address", login.address.value);
 
     if (login.address.value) {
       await nav("/signin");

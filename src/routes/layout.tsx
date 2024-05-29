@@ -63,20 +63,14 @@ export default component$(() => {
   const login = useContext(LoginContext);
 
   // eslint-disable-next-line qwik/no-use-visible-task
-  useTask$(() => {
-    console.log("use visible task started");
-    const wconfig = defaultWagmiConfig({
-      chains: [mainnet, sepolia],
-      projectId: import.meta.env.PUBLIC_PROJECT_ID,
-      metadata,
-    });
-
-    wagmiConfig.config = noSerialize(wconfig);
-    console.log("wagmi config just created", wagmiConfig.config);
-
+  useVisibleTask$(() => {
+    console.log("use visible task started", wagmiConfig.config);
     if (wagmiConfig.config) {
+      console.log("wagmi config from index ", wagmiConfig.config);
       watchAccount(wagmiConfig.config!, {
         onChange(account) {
+          console.log("watchAccount account:", account);
+
           if (
             window.location.pathname === "/signin" ||
             window.location.pathname === "/"
@@ -94,6 +88,14 @@ export default component$(() => {
         },
       });
     }
+    // const wconfig = defaultWagmiConfig({
+    //   chains: [mainnet, sepolia],
+    //   projectId: import.meta.env.PUBLIC_PROJECT_ID,
+    //   metadata,
+    // });
+
+    // wagmiConfig.config = noSerialize(wconfig);
+    // console.log("wagmi config just created", wagmiConfig.config);
   });
 
   useContextProvider(StreamStoreContext, { streamId: "" });
