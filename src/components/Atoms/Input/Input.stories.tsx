@@ -2,6 +2,7 @@ import type { Meta } from "storybook-framework-qwik";
 import Input, { type InputProps } from "./Input";
 
 const meta: Meta<InputProps> = {
+  title: "atoms/Input",
   component: Input,
 };
 
