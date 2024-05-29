@@ -8,17 +8,16 @@ export interface InputFieldProps {
   name: string;
   onValueChange?: any;
   placeholder?: string;
-  variant: "search" | "checked" | null;
+  variant: "search" | "checked" | "swap" | null;
   size: "xs" | "small" | "medium" | "large" | null;
   disabled?: boolean;
   value?: string;
   onInput?: QRL<(value: any) => void>;
-  customClass?: string;
   subValue?: string;
   iconLeft?: JSXOutput | null;
   iconRight?: JSXOutput | null;
   type?: string;
-  inputClass?: string;
+  isInvalid?: boolean;
   id: string;
 }
 
@@ -36,7 +35,7 @@ const InputField = ({ ...props }: InputFieldProps) => {
         name={props.name}
         value={props.value}
         onInput={props.onInput}
-        customClass={props.inputClass}
+        InputClass={props.isInvalid ? "!border-red-700 border border-solid": ""}
       />
     </div>
   );

@@ -237,10 +237,9 @@ export const SwapModal = component$<SwapModalProps>(
                 <InputField
                   id="amount"
                   name="You pay"
-                  variant={null}
+                  variant="swap"
                   size="large"
                   placeholder="00.00"
-                  customClass="!border-0 p-0 text-[28px] h-fit"
                   value={swapValues.chosenToken.value}
                   onInput={$(async (e) => {
                     const target = e.target as HTMLInputElement;
@@ -315,9 +314,7 @@ export const SwapModal = component$<SwapModalProps>(
                     text: swapValues.chosenToken.symbol.value,
                   },
                 ]}
-                size="medium"
-                class="h-8"
-                selectClass="top-0 right-0 h-8"
+                size="swap"
               />
             </Box>
             <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
@@ -325,11 +322,10 @@ export const SwapModal = component$<SwapModalProps>(
                 <InputField
                   id="receive"
                   name="You receive"
-                  variant={null}
+                  variant="swap"
                   size="large"
                   value={swapValues.tokenToSwapOn.value}
                   placeholder="00.00"
-                  inputClass="!border-0 p-0 text-[28px] h-fit"
                 />
                 {/*<div class="flex flex-col gap-2"> 
                   <Label name="You receive"/>
@@ -367,9 +363,7 @@ export const SwapModal = component$<SwapModalProps>(
                   swapValues.tokenToSwapOn.symbol =
                     await getTokenSymbolByAddress(value as `0x${string}`);
                 })}
-                size="medium"
-                class="h-8"
-                selectClass="top-0 right-0 h-8"
+                size="swap"
               />
             </Box>
           </div>

@@ -107,9 +107,7 @@ export default component$<AddWalletFormFieldsProps>(
             ref={newWalletNameInput}
             name="Wallet name"
             disabled={false}
-            inputClass={`
-                      ${!isValidName(addWalletFormStore.name) ? "!border-red-700 border border-solid" : null}`}
-            //the border color does not change
+            isInvalid = {!isValidName(addWalletFormStore.name) ? true : false}
             value={addWalletFormStore.name}
             placeholder="Enter wallet name..."
             onInput={$(async (e) => {
@@ -165,7 +163,7 @@ export default component$<AddWalletFormFieldsProps>(
               <Input
                 id="address"
                 name="address"
-                customClass={`${!isValidAddress(addWalletFormStore.address) || !isCheckSum(addWalletFormStore.address) ? "border-red-700" : ""}`}
+                InputClass={`${!isValidAddress(addWalletFormStore.address) || !isCheckSum(addWalletFormStore.address) ? "!border-red-700" : ""}`}
                 value={addWalletFormStore.address}
                 placeholder="Enter wallet address..."
                 onInput={$((e) => {

@@ -1,4 +1,4 @@
-import { type QRL, component$ } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
@@ -16,8 +16,9 @@ const SelectStyles = cva(
     variants: {
       size: {
         small: ["w-14 px-1.5 h-8"],
-        medium: ["w-full h-10 pr-10"],
+        medium: ["w-full h-10 pr-8"],
         large: ["w-full h-12 pr-10 text-sm"],
+        swap: ['w-full h-8 pr-10']
       },
     },
     defaultVariants: {
@@ -41,8 +42,7 @@ const Select = component$(({ size, ...props }: SelectProps) => {
   return (
     <div
       class={twMerge(
-        `relative min-w-max ${size == "small" ? "w-fit" : null}`,
-        props.class,
+        `relative min-w-max ${size == "small" ? "w-fit" : size == "swap" ? "h-8" : null}`,
       )}
     >
       <select

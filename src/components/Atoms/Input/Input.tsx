@@ -18,7 +18,6 @@ export interface InputProps {
   type?: string;
   iconLeft?: JSXOutput | null;
   iconRight?: JSXOutput | null;
-  customClass?: string;
   id: string;
 }
 
@@ -32,7 +31,7 @@ const InputStyles = cva(
         search: ["pl-10"],
         checked: [
           "text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
-        ],
+        ],        swap: ['!border-0 p-0 text-[28px] h-fit focus:!border-0']
       },
       size: {
         xs: ["h-8 text-xs"],
@@ -51,7 +50,7 @@ export type InputType = VariantProps<typeof InputStyles> & InputProps;
 
 const Input = component$(({ variant, size, ...props }: InputType) => {
   return (
-    <div class={twMerge("relative min-w-max", props.customClass)}>
+    <div class="relative min-w-max">
       {props.iconLeft ? (
         <span class="absolute left-3 top-1/2 -translate-y-1/2 fill-white">
           {props.iconLeft}
@@ -69,6 +68,7 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
         value={props.value}
         onInput$={props.onInput}
         disabled={props.disabled}
+        type={props.type}
       />
       {props.iconRight ? (
         <span class="absolute right-3 top-1/2 -translate-y-1/2  fill-customGreen">
