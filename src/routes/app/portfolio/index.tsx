@@ -513,6 +513,7 @@ export default component$(() => {
               name="name"
               variant={null}
               size="large"
+              ref={structureNameInputRef}
               placeholder="Structure name..."
               value={structureStore.name}
               onInput={$((e) => {

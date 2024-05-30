@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import Label from "~/components/Atoms/Label/Label";
 import Input from "~/components/Atoms/Input/Input";
-import { type JSXOutput, type QRL } from "@builder.io/qwik";
+import { type JSXOutput, type QRL, type Signal } from "@builder.io/qwik";
 
 export interface InputFieldProps {
   class?: string;
@@ -19,6 +19,7 @@ export interface InputFieldProps {
   type?: string;
   isInvalid?: boolean;
   id: string;
+  ref?: Signal<Element | undefined>;
 }
 
 const InputField = ({ ...props }: InputFieldProps) => {
@@ -26,6 +27,7 @@ const InputField = ({ ...props }: InputFieldProps) => {
     <div class={twMerge("mb-4 flex flex-col gap-2", props.class)}>
       <Label name={props.name} for={props.id} />
       <Input
+        ref={props.ref}
         id={props.id}
         variant={props.variant}
         size={props.size}
@@ -35,7 +37,9 @@ const InputField = ({ ...props }: InputFieldProps) => {
         name={props.name}
         value={props.value}
         onInput={props.onInput}
-        InputClass={props.isInvalid ? "!border-red-700 border border-solid": ""}
+        InputClass={
+          props.isInvalid ? "!border-red-700 border border-solid" : ""
+        }
       />
     </div>
   );

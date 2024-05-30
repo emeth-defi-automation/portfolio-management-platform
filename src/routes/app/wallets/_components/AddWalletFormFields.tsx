@@ -107,7 +107,7 @@ export default component$<AddWalletFormFieldsProps>(
             ref={newWalletNameInput}
             name="Wallet name"
             disabled={false}
-            isInvalid = {!isValidName(addWalletFormStore.name) ? true : false}
+            isInvalid={!isValidName(addWalletFormStore.name) ? true : false}
             value={addWalletFormStore.name}
             placeholder="Enter wallet name..."
             onInput={$(async (e) => {

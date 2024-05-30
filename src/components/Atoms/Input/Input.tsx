@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { component$, type JSXOutput } from "@builder.io/qwik";
+import { component$, type JSXOutput, type Signal } from "@builder.io/qwik";
 import { type QRL } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
@@ -19,6 +19,7 @@ export interface InputProps {
   iconLeft?: JSXOutput | null;
   iconRight?: JSXOutput | null;
   id: string;
+  ref?: Signal<Element | undefined>;
 }
 
 const InputStyles = cva(
@@ -31,7 +32,8 @@ const InputStyles = cva(
         search: ["pl-10"],
         checked: [
           "text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
-        ],        swap: ['!border-0 p-0 text-[28px] h-fit focus:!border-0']
+        ],
+        swap: ["!border-0 p-0 text-[28px] h-fit focus:!border-0"],
       },
       size: {
         xs: ["h-8 text-xs"],
@@ -62,6 +64,7 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
           props.subValue ? "pr-[80px]" : null,
           props.InputClass,
         )}
+        ref={props.ref}
         placeholder={props.placeholder}
         name={props.name}
         id={props.id}

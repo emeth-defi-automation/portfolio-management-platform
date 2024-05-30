@@ -18,7 +18,7 @@ const SelectStyles = cva(
         small: ["w-14 px-1.5 h-8"],
         medium: ["w-full h-10 pr-8"],
         large: ["w-full h-12 pr-10 text-sm"],
-        swap: ['w-full h-8 pr-10']
+        swap: ["w-full h-8 pr-10"],
       },
     },
     defaultVariants: {
