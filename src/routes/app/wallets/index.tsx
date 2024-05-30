@@ -132,11 +132,14 @@ export default component$(() => {
 
     const emethContractAddress = import.meta.env
       .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
-
+    console.log("starting try catch");
     try {
       if (addWalletFormStore.isExecutable) {
         if (wagmiConfig.config) {
+          console.log("config", wagmiConfig.config);
+          console.log("before get account");
           const account = getAccount(wagmiConfig.config);
+          console.log("account", account);
 
           addWalletFormStore.address = account.address as `0x${string}`;
 
@@ -145,6 +148,7 @@ export default component$(() => {
           }
 
           const tokens: any = await fetchTokens();
+          console.log("tokens", tokens);
 
           for (const token of tokens) {
             if (addWalletFormStore.coinsToCount.includes(token.symbol)) {
@@ -155,6 +159,7 @@ export default component$(() => {
                 functionName: "balanceOf",
                 args: [account.address as `0x${string}`],
               });
+              console.log("tokenBalance", tokenBalance);
 
               const amount = addWalletFormStore.coinsToApprove.find(
                 (item) => item.symbol === token.symbol,
@@ -174,6 +179,7 @@ export default component$(() => {
                   functionName: "approve",
                   args: [emethContractAddress, BigInt(calculation)],
                 });
+                console.log("approval", approval);
 
                 // keep receipts for now, to use waitForTransactionReceipt
                 try {
@@ -216,17 +222,14 @@ export default component$(() => {
         isExecutable: addWalletFormStore.isExecutable.toString(),
       });
 
-      // could be removed
-      // if (success) {
-      //   observedWallets.value = await getObservedWallets();
-      // }
-
-      formMessageProvider.messages.push({
-        id: formMessageProvider.messages.length,
-        variant: "success",
-        message: "Wallet successfully added.",
-        isVisible: true,
-      });
+      if (success) {
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "success",
+          message: "Wallet successfully added.",
+          isVisible: true,
+        });
+      }
 
       addWalletFormStore.address = "";
       addWalletFormStore.name = "";

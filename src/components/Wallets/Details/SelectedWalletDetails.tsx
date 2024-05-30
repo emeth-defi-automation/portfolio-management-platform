@@ -45,12 +45,12 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
     isTransferModalOpen,
     transferredCoin,
   }) => {
-    const selectedWalletFromContext = useContext(SelectedWalletDetailsContext);
+    const selectedWalletDetails = useContext(SelectedWalletDetailsContext);
     const selectedWalletName = useContext(SelectedWalletNameContext);
     const tokens = useSignal<Token[]>([]);
 
     // if (!selectedWalletFromContext.value) return <></>;
-    let shortAddress = selectedWalletFromContext.value.address;
+    let shortAddress = selectedWalletDetails.value.address;
     if (shortAddress) {
       shortAddress = shortAddress.slice(0, 4) + "..." + shortAddress.slice(-4);
     }
@@ -68,7 +68,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             <div class="mt-4 flex gap-2">
               <span class="custom-btn-gradient flex h-7 items-center rounded-lg px-[1px] text-xs ">
                 <div class="flex h-[26px] items-center rounded-lg bg-black px-3">
-                  {selectedWalletFromContext.value.isExecutable
+                  {selectedWalletDetails.value.isExecutable
                     ? "Executable"
                     : "Read-only"}
                 </div>
@@ -79,7 +79,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               </span>
               <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">
                 <IconEthereum />
-                {chainIdToNetworkName[selectedWalletFromContext.value.chainId]}
+                {chainIdToNetworkName[selectedWalletDetails.value.chainId]}
               </span>
               {/* <span class="flex items-center gap-2 text-nowrap rounded-lg border border-customBlue px-2 text-xs text-customBlue">
                 <IconLoading />
@@ -123,7 +123,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               <button class="rounded-lg px-2">3d</button>
               <button class="rounded-lg px-2">30d</button>
             </div>
-            {selectedWalletFromContext.value.isExecutable ? (
+            {selectedWalletDetails.value.isExecutable ? (
               <div class=""></div>
             ) : null}
             {/* <div class="">Menu</div> */}
@@ -133,14 +133,14 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               console.log("token", token);
               return (
                 <TokenRowWallets
-                  walletId={selectedWalletFromContext.value.id}
+                  walletId={selectedWalletDetails.value.id}
                   address={token.address}
                   key={token.id}
                   imagePath={token.imagePath}
                   name={token.name}
                   symbol={token.symbol}
                   decimals={token.decimals}
-                  isExecutable={selectedWalletFromContext.value.isExecutable}
+                  isExecutable={selectedWalletDetails.value.isExecutable}
                   allowance={token.allowance}
                   balance={token.balance}
                   balanceValueUSD={token.balanceValueUSD}

@@ -23,6 +23,7 @@ export const openWeb3Modal = async (wagmiContext: any, login: any) => {
     chains: [mainnet, sepolia],
     projectId: import.meta.env.PUBLIC_PROJECT_ID,
     metadata,
+    enableCoinbase: false,
   });
 
   wagmiContext.config = noSerialize(wconfig);

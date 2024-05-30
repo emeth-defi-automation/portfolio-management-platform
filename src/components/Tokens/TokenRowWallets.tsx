@@ -137,7 +137,6 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   await db.query(
     `DELETE FROM queryuuids WHERE queryUuid = '${latestTokenPriceQueryUuid[0]}';`,
   );
-  return;
 });
 
 export const TokenRowWallets = component$<TokenRowWalletsProps>(
@@ -169,16 +168,16 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ cleanup }) => {
-      if (walletId === undefined) {
-        throw new Error("walletId is undefined");
-      }
-      const data = await tokenRowWalletsInfoStream(walletId, symbol);
-
       cleanup(async () => {
         console.log("clenaup starts TokenRowWallets");
         await killLiveQuery(queryUuid.value);
         await killLiveQuery(latestTokenPriceQueryUuid.value);
       });
+
+      if (walletId === undefined) {
+        throw new Error("walletId is undefined");
+      }
+      const data = await tokenRowWalletsInfoStream(walletId, symbol);
 
       const queryUuid = await data.next();
       console.log("queryUuid", queryUuid);

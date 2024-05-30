@@ -121,6 +121,7 @@ export const ObsWallet = component$<ObservedWalletProps>(
         console.log("cleanup in ObsWallet", queryUuid.value);
         await killLiveQuery(queryUuid.value);
       });
+
       console.log("obsWallet useVisibleTask...");
       if (!observedWallet.id) throw new Error("observedWallet.id is undefined");
       const data = await observedWalletNameLiveStream(observedWallet.id);
