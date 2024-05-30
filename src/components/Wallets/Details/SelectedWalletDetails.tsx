@@ -83,33 +83,33 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             {/* <span class="flex items-center gap-2 text-nowrap rounded-lg border border-customBlue px-2 text-xs text-customBlue">
                 <IconLoading />
                 Loading Tokens 5/10
-              </span> */} 
+              </span> */}
             <Tag
-                variant="gradient"
-                text={
-                  selectedWallet.value.wallet.isExecutable
-                    ? "Executable"
-                    : "Read-only"
-                }
-                isBorder={true}
-                class="px-3"
-              />
-              <Tag
-                variant="greyText"
-                isBorder={true}
-                text={shortAddress}
-                icon={<IconWallet />}
-              />
-              <Tag
-                text={chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
-                icon={<IconEthereum class="h-5 w-5" />}
-              />
-              <Tag
-                variant="blueText"
-                isBorder={false}
-                text="Loading Tokens 5/10"
-                icon={<IconLoading class="h-4 w-4 fill-customBlue" />}
-              />
+              variant="gradient"
+              text={
+                selectedWallet.value.wallet.isExecutable
+                  ? "Executable"
+                  : "Read-only"
+              }
+              isBorder={true}
+              class="px-3"
+            />
+            <Tag
+              variant="greyText"
+              isBorder={true}
+              text={shortAddress}
+              icon={<IconWallet />}
+            />
+            <Tag
+              text={chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
+              icon={<IconEthereum class="h-5 w-5" />}
+            />
+            <Tag
+              variant="blueText"
+              isBorder={false}
+              text="Loading Tokens 5/10"
+              icon={<IconLoading class="h-4 w-4 fill-customBlue" />}
+            />
           </div>
         <div class="flex gap-2">
           <Tag

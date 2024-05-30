@@ -519,6 +519,7 @@ export default component$(() => {
               onInput={$((e) => {
                 const target = e.target as HTMLInputElement;
                 structureStore.name = target.value;
+                nameInputDebounce(target.value);
               })}
             />
             {!isValidName(structureStore.name) && (

@@ -201,7 +201,7 @@ export default component$<AddWalletFormFieldsProps>(
                   variant="success"
                   icon={<IconSuccess class="h-4 w-4 fill-customGreen" />}
                   size="large"
-                  class="mb-8 mt-4"
+                  class="mb-8 mt-4 flex-row-reverse"
                 />
               ) : (
                 <Tag
