@@ -13,8 +13,6 @@ import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { metadata } from "~/routes/layout";
 
 export const openWeb3Modal = async (wagmiContext: any, login: any) => {
-
-
   const projectId = import.meta.env.PUBLIC_PROJECT_ID;
   if (!projectId || typeof projectId !== "string") {
     throw new Error("Missing project ID");
@@ -39,10 +37,7 @@ export const openWeb3Modal = async (wagmiContext: any, login: any) => {
           window.location.pathname === "/signin" ||
           window.location.pathname === "/"
         ) {
-          localStorage.setItem(
-            "emmethUserWalletAddress",
-            `${account.address}`,
-          );
+          localStorage.setItem("emmethUserWalletAddress", `${account.address}`);
         } else {
           reconnect(wagmiContext.config as Config);
         }
