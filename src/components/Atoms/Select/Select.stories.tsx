@@ -3,6 +3,7 @@ import Select, { type SelectProps } from "./Select";
 import { $ } from "@builder.io/qwik";
 
 const meta: Meta<SelectProps> = {
+  title: "atoms/Select",
   component: Select,
 };
 

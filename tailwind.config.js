@@ -17,6 +17,9 @@ export default {
       borderRadius: {
         10: "40px",
       },
+      opacity: {
+        '3': '.03',
+      },
       keyframes: {
         arrival:{
           '0%, 100%': {

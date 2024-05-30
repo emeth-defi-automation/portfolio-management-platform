@@ -56,10 +56,15 @@ import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { Spinner } from "~/components/Spinner/Spinner";
 
 import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { hasExecutableWallet } from "~/utils/validators/availableStructure";
+import {
+  hasExecutableWallet,
+  isNameUnique,
+} from "~/utils/validators/availableStructure";
 
 import { SwapModal } from "./_components/Swap/Swap";
 import NoData from "~/components/Molecules/NoData/NoData";
+import { Input } from "~/components/Input/Input";
+import { useDebouncer } from "~/utils/debouncer";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -91,6 +96,21 @@ export default component$(() => {
   const allTokensFromDb = useSignal([]);
   const walletAddressOfTokenToSwap = useSignal("");
   const tokenFromSymbol = useSignal("");
+  const structureNameInputRef = useSignal<HTMLInputElement>();
+  const isStructureNameUnique = useSignal(true);
+
+  useTask$(async ({ track }) => {
+    track(() => {
+      structureNameInputRef.value?.focus();
+    });
+  });
+
+  const nameInputDebounce = useDebouncer(
+    $(async (value: string) => {
+      isStructureNameUnique.value = await isNameUnique(value);
+    }),
+    300,
+  );
 
   useTask$(async () => {
     const tokens: any = await fetchTokens();
@@ -399,6 +419,7 @@ export default component$(() => {
           <div class="flex gap-4">
             <Button
               variant="transparent"
+              type="button"
               text={stepsCounter.value === 1 ? "Cancel" : "Back"}
               onClick$={async () => {
                 if (stepsCounter.value === 2) {
@@ -462,6 +483,7 @@ export default component$(() => {
             selectedWallets.wallets = [];
             selectedTokens.balances = [];
             structureStore.name = "";
+            isStructureNameUnique.value = true;
           })}
         >
           <Form
@@ -474,30 +496,39 @@ export default component$(() => {
                 selectedWallets.wallets = [];
                 selectedTokens.balances = [];
                 structureStore.name = "";
+                isStructureNameUnique.value = true;
               }
             }}
             class="mt-8 text-sm"
           >
-            <label
-              for="name"
-              class="custom-text-50 mb-2 block text-xs uppercase"
-            >
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Structure name..."
-              class={`custom-border-1 mb-4 block h-12 w-full rounded-lg bg-transparent px-3 text-white  placeholder:text-white ${isValidName(structureStore.name) ? "bg-red-300" : ""}`}
-              value={structureStore.name}
-              onInput$={(e) => {
-                const target = e.target as HTMLInputElement;
-                structureStore.name = target.value;
-              }}
-            />
-            {!isValidName(structureStore.name) && (
-              <p class="mb-4 text-red-500">Name too short</p>
-            )}
+            <div>
+              {!isValidName(structureStore.name) && (
+                <span class="absolute end-6 pt-[1px] text-xs text-red-500">
+                  Name too short
+                </span>
+              )}
+              {!isStructureNameUnique.value &&
+                structureStore.name.length > 0 && (
+                  <span class="absolute end-6 pt-[1px] text-xs text-red-500">
+                    Structure Name already exists
+                  </span>
+                )}
+              <Input
+                text="Name"
+                ref={structureNameInputRef}
+                type="text"
+                name="name"
+                placeholder="Structure name..."
+                customClass={`
+              ${!isValidName(structureStore.name) ? "border-red-700" : ""}`}
+                value={structureStore.name}
+                onInput={$((e) => {
+                  const target = e.target as HTMLInputElement;
+                  structureStore.name = target.value;
+                  nameInputDebounce(target.value);
+                })}
+              />
+            </div>
 
             <label
               for="walletsId"
@@ -792,6 +823,7 @@ export default component$(() => {
             <div class="flex gap-4">
               <Button
                 variant="transparent"
+                type="button"
                 text="Cancel"
                 onClick$={() => {
                   isCreateNewStructureModalOpen.value = false;
@@ -800,13 +832,21 @@ export default component$(() => {
                   selectedWallets.wallets = [];
                   selectedTokens.balances = [];
                   structureStore.name = "";
+                  isStructureNameUnique.value = true;
                 }}
                 customClass="w-full"
               />
               <Button
                 variant="blue"
                 text="Add Token"
-                disabled={!isValidName(structureStore.name)}
+                disabled={
+                  !(
+                    isValidName(structureStore.name) &&
+                    isStructureNameUnique.value &&
+                    structureStore.name.length > 0 &&
+                    selectedTokens.balances.length > 0
+                  )
+                }
                 type="submit"
                 customClass="w-full"
               />

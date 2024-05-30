@@ -2,10 +2,11 @@ import { type Signal, component$ } from "@builder.io/qwik";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconWallet from "/public/assets/icons/wallets/wallet.svg?jsx";
-// import IconLoading from "/public/assets/icons/wallets/loading.svg?jsx";
+import IconLoading from "@material-design-icons/svg/round/sync.svg?jsx";
 import { TokenRowWallets } from "~/components/Tokens/TokenRowWallets";
 import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
 import Button from "~/components/Atoms/Buttons/Button";
+import Tag from "~/components/Atoms/Tags/Tag";
 import IconTrashRed from "@material-design-icons/svg/outlined/delete.svg?jsx";
 
 interface SelectedWalletProps {
@@ -37,26 +38,32 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               {selectedWallet.value.wallet.name}
             </h1>
             <div class="mt-4 flex gap-2">
-              <span class="custom-btn-gradient flex h-7 items-center rounded-lg px-[1px] text-xs ">
-                <div class="flex h-[26px] items-center rounded-lg bg-black px-3">
-                  {selectedWallet.value.wallet.isExecutable
+              <Tag
+                variant="gradient"
+                text={
+                  selectedWallet.value.wallet.isExecutable
                     ? "Executable"
-                    : "Read-only"}
-                </div>
-              </span>
-              <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">
-                <IconWallet />
-                {/* {selectedWallet.value.wallet.address} */}
-                {shortAddress}
-              </span>
-              <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">
-                <IconEthereum />
-                {chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
-              </span>
-              {/* <span class="flex items-center gap-2 text-nowrap rounded-lg border border-customBlue px-2 text-xs text-customBlue">
-                <IconLoading />
-                Loading Tokens 5/10
-              </span> */}
+                    : "Read-only"
+                }
+                isBorder={true}
+                class="px-3"
+              />
+              <Tag
+                variant="greyText"
+                isBorder={true}
+                text={shortAddress}
+                icon={<IconWallet />}
+              />
+              <Tag
+                text={chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
+                icon={<IconEthereum class="h-5 w-5" />}
+              />
+              <Tag
+                variant="blueText"
+                isBorder={false}
+                text="Loading Tokens 5/10"
+                icon={<IconLoading class="h-4 w-4 fill-customBlue" />}
+              />
             </div>
           </div>
           <div class="flex gap-2">

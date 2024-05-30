@@ -5,6 +5,7 @@ import {
   useContext,
   useVisibleTask$,
   useSignal,
+  useTask$,
 } from "@builder.io/qwik";
 import { getAddress } from "viem";
 import { Input } from "~/components/Input/Input";
@@ -17,10 +18,11 @@ import {
   isValidAddress,
   isValidName,
 } from "~/utils/validators/addWallet";
-import IconSuccess from "/public/assets/icons/dashboard/success.svg?jsx";
-import IconWarning from "/public/assets/icons/dashboard/warning.svg?jsx";
+import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
+import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
+import Tag from "../Atoms/Tags/Tag";
 import { WagmiConfigContext } from "../WalletConnect/context";
 import { type Config, watchAccount } from "@wagmi/core";
 export interface AddWalletFormFieldsProps {
@@ -30,6 +32,7 @@ export interface AddWalletFormFieldsProps {
 
 export default component$<AddWalletFormFieldsProps>(
   ({ addWalletFormStore, onConnectWalletClick }) => {
+    const newWalletNameInput = useSignal<HTMLInputElement>();
     const nameInputDebounce = useDebouncer(
       $(async (value: string) => {
         addWalletFormStore.isNameUniqueLoading = true;
@@ -58,6 +61,13 @@ export default component$<AddWalletFormFieldsProps>(
             connectedAddress.value = account.address;
           }
         },
+      });
+    });
+
+    useTask$(async ({ track }) => {
+      track(() => {
+        addWalletFormStore.isExecutable;
+        newWalletNameInput.value?.focus();
       });
     });
 
@@ -90,6 +100,7 @@ export default component$<AddWalletFormFieldsProps>(
           <Input
             text="Wallet Name"
             type="text"
+            ref={newWalletNameInput}
             name="name"
             customClass={`
               ${!isValidName(addWalletFormStore.name) ? "border-red-700" : ""}`}
@@ -174,22 +185,27 @@ export default component$<AddWalletFormFieldsProps>(
           ) : (
             <div>
               {connectedAddress.value ? (
-                <div
-                  class={`mb-8 mt-4 flex h-12 w-full items-center justify-between rounded-lg border border-customGreen bg-customGreen bg-opacity-10 p-3 text-customGreen`}
-                >
-                  <div></div>
-                  {connectedAddress.value.slice(0, 4) +
+                <Tag
+                  text={
+                    connectedAddress.value.slice(0, 4) +
                     "..." +
-                    connectedAddress.value.slice(-4)}
-                  <IconSuccess class="h-4 w-4" />
-                </div>
+                    connectedAddress.value.slice(-4)
+                  }
+                  isBorder={true}
+                  variant="success"
+                  icon={<IconSuccess class="h-4 w-4 fill-customGreen" />}
+                  size="large"
+                  class="mb-8 mt-4"
+                />
               ) : (
-                <div
-                  class={`relative mb-8 mt-4 flex h-12 w-full items-center justify-center rounded-lg border border-customWarning bg-customWarning bg-opacity-10 p-3 text-customWarning`}
-                >
-                  Wallet not connected
-                  <IconWarning class="absolute end-3 h-4 w-4" />
-                </div>
+                <Tag
+                  text="Wallet not connected"
+                  isBorder={true}
+                  variant="warning"
+                  icon={<IconWarning class="h-5 w-5 fill-customWarning" />}
+                  size="large"
+                  class="mb-8 mt-4"
+                />
               )}
             </div>
           )}
