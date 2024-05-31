@@ -31,10 +31,10 @@ export function isPrivateKeyHex(key: string): boolean {
     : true;
 }
 
-export const UniqueNameResult = z.object({
+const UniqueNameResult = z.object({
   name: z.string(),
 });
-export type UniqueNameResult = z.infer<typeof UniqueNameResult>;
+type UniqueNameResult = z.infer<typeof UniqueNameResult>;
 
 export const isNameUnique = server$(async function (name: string) {
   const db = await connectToDB(this.env);

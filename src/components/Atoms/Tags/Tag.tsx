@@ -11,7 +11,7 @@ export interface TagProps {
 
 const tagStyles = cva(
   [
-    "font-['Sora'] flex items-center gap-2 text-white custom-border-1 px-2 py-1.5 rounded-lg min-w-fit text-nowrap",
+    "font-['Sora'] flex items-center gap-1 text-white custom-border-1 px-2 py-1.5 rounded-lg min-w-fit text-nowrap",
   ],
   {
     variants: {
@@ -36,8 +36,8 @@ const tagStyles = cva(
         greyText: ["border-customGrey"],
       },
       size: {
-        small: ["text-xs font-medium w-fit"],
-        large: ["text-sm flex-row-reverse text-center py-3.5"],
+        small: ["text-xs font-medium w-fit h-7"],
+        large: ["text-sm text-center py-3.5"],
       },
     },
     defaultVariants: {
