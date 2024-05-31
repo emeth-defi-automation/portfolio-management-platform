@@ -48,39 +48,39 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                             ? "/assets/icons/dashboard/success.svg?jsx"
                             : undefined
                         }
-                        input={
-                          <input
-                            type="text"
-                            name={`${coin.symbol}${coin.wallet}Amount`}
-                            id={`${coin.symbol}${coin.wallet}Amount`}
-                            class={`custom-border-1 absolute end-4 block h-8 w-1/2 rounded-lg bg-transparent p-3 text-sm  placeholder-white placeholder-opacity-50
-                              ${checkPattern(coin.amount, /^\d*\.?\d*$/) && coin.amount != "0" && coin.amount.length > 0 && coin.amount[0] != "0" ? "border-[#24a148] text-[#24a148] focus:border-[#24a148]" : ""}`}
-                            placeholder={`${coin.symbol} approval limit`}
-                            value={coin.amount}
-                            onInput$={(e) => {
-                              const target = e.target as HTMLInputElement;
-                              const regex = /^\d*\.?\d*$/;
-                              target.value = replaceNonMatching(
-                                target.value,
-                                regex,
-                                "",
-                              );
+                      >
+                        {" "}
+                        <input
+                          type="text"
+                          name={`${coin.symbol}${coin.wallet}Amount`}
+                          id={`${coin.symbol}${coin.wallet}Amount`}
+                          class={`custom-border-1 absolute end-4 block h-8 w-1/2 rounded-lg bg-transparent p-3 text-sm  placeholder-white placeholder-opacity-50
+                        ${checkPattern(coin.amount, /^\d*\.?\d*$/) && coin.amount != "0" && coin.amount.length > 0 && coin.amount[0] != "0" ? "border-[#24a148] text-[#24a148] focus:border-[#24a148]" : ""}`}
+                          placeholder={`${coin.symbol} approval limit`}
+                          value={coin.amount}
+                          onInput$={(e) => {
+                            const target = e.target as HTMLInputElement;
+                            const regex = /^\d*\.?\d*$/;
+                            target.value = replaceNonMatching(
+                              target.value,
+                              regex,
+                              "",
+                            );
 
-                              const currentStructure =
-                                batchTransferFormStore.coinsToTransfer.find(
-                                  (item) => item.name === structure.name,
-                                );
-                              const currentCoin = currentStructure!.coins.find(
-                                (item) =>
-                                  item.wallet === coin.wallet &&
-                                  item.symbol === coin.symbol,
+                            const currentStructure =
+                              batchTransferFormStore.coinsToTransfer.find(
+                                (item) => item.name === structure.name,
                               );
+                            const currentCoin = currentStructure!.coins.find(
+                              (item) =>
+                                item.wallet === coin.wallet &&
+                                item.symbol === coin.symbol,
+                            );
 
-                              currentCoin!.amount = target.value;
-                            }}
-                          />
-                        }
-                      />
+                            currentCoin!.amount = target.value;
+                          }}
+                        />
+                      </FormBadge>
                       <span class="block pb-1 text-xs text-white">
                         {coin.amount.length < 1 &&
                         coin.amount[0] != "0" &&
