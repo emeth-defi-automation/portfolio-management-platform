@@ -19,10 +19,7 @@ import IconMinimalize from "@material-design-icons/svg/filled/close_fullscreen.s
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
 import { _totalPortfolioValue } from "~/routes/app/dashboard/server/getTotalPortfolioValue";
-import {
-  getPortfolioValuesForPeriod,
-  Period,
-} from "~/routes/app/dashboard/server/getPortfolio24hChange";
+import { Period } from "~/routes/app/dashboard/server/getPortfolio24hChange";
 
 export interface PortfolioValueProps {
   hideChartWhileLoading: Signal<boolean>;
@@ -53,8 +50,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
     const totalPortfolioValue = useSignal("0");
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async () => {
-      totalPortfolioValue.value = await _totalPortfolioValue();
-      await getPortfolioValuesForPeriod(Period.DAY);
+      await _totalPortfolioValue(Period.DAY);
     });
 
     const outputRef = useSignal<Element>();

@@ -159,21 +159,13 @@ const PeriodValues: { [key in Period]: PeriodValue } = {
     [Period.YEAR]: { hours: 8760, ticks: 12 }
 };
 
-
-export const getPortfolioValuesForPeriod = server$(async function (selectedPeriod: Period) {
-
-    const exactTickDates = getPortfolioDatesForSelectedPeriod(selectedPeriod);
-    console.log(exactTickDates);
-})
-
-
-const getPortfolioDatesForSelectedPeriod = (selectedPeriod: Period) => {
+export const getPortfolioDatesForSelectedPeriod = (selectedPeriod: Period) => {
     const periodValue = PeriodValues[selectedPeriod];
     const now = new Date();
     const start = new Date(now.getTime() - periodValue.hours * 60 * 60 * 1000);
     const tickInterval = periodValue.hours / periodValue.ticks;
 
-    const tickTimes = Array.from({ length: periodValue.ticks - 1 }, (_, i) => {
+    const tickTimes = Array.from({ length: periodValue.ticks }, (_, i) => {
         const tickTime = new Date(start.getTime() + i * tickInterval * 60 * 60 * 1000);
         return tickTime.toISOString();
     });

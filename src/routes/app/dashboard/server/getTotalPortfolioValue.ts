@@ -9,11 +9,15 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import { checksumAddress } from "viem";
 import { Wallet } from "~/interface/auth/Wallet";
 import { Balance } from "~/interface/balance/Balance";
-import { Period } from "./getPortfolio24hChange";
+import { getPortfolioDatesForSelectedPeriod, Period } from "./getPortfolio24hChange";
 
 
 
 export const _totalPortfolioValue = server$(async function (period: Period) {
+    const tickTimes = getPortfolioDatesForSelectedPeriod(period);
+    console.log("ticktimes from _totalportfoliovalue", tickTimes);
+
+
     const db = await connectToDB(this.env);
 
     const cookie = this.cookie.get("accessToken");
@@ -24,18 +28,36 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
 
     const [tokens]: any = await db.query(`SELECT symbol, decimals FROM token;`);
     console.log(tokens);
+
     const tokenValueMap = Object.fromEntries(
-        tokens.map((token: any) => [token.symbol, { quantity: Number(0) }])
-    )
+        tokens.map((token: any) => [
+            token.symbol,
+            Object.fromEntries(tickTimes.map((tickTime: string) => [tickTime, Number(0)]))
+        ])
+    );
 
     const [observedWalletsIds]: any = await db.query(`SELECT VALUE out from observes_wallet WHERE in = ${userId}`);
 
     let totalValue = 0;
     for (const token of tokens) {
         for (const observedWalletId of observedWalletsIds) {
+            // for(const tickTime of tickTimes) {
+            //     const [[tokenBalanceForWallet]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
+            //         WHERE walletId = ${observedWalletId} 
+            //         AND tokenSymbol = ${token.symbol}
+            //         AND timestamp <= ${tickTime}`);
+            //     if (!tokenBalanceForWallet) {
+            //         continue;
+            //     }
+            //     const currentBalanceOfToken = convertWeiToQuantity(
+            //         tokenBalanceForWallet.walletValue,
+            //         parseInt(token.decimals),
+            //     );
+            // }
+
             const [[tokenBalanceForWallet]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
                 WHERE walletId = ${observedWalletId} AND tokenSymbol = '${token.symbol}'
-                ORDER BY timestamp DESC LIMIT 1`);
+                ORDER BY timestamp DESC LIMIT 1;`);
             if (!tokenBalanceForWallet) {
                 continue;
             }
