@@ -173,10 +173,12 @@ const getPortfolioDatesForSelectedPeriod = (selectedPeriod: Period) => {
     const start = new Date(now.getTime() - periodValue.hours * 60 * 60 * 1000);
     const tickInterval = periodValue.hours / periodValue.ticks;
 
-    const tickTimes = Array.from({ length: periodValue.ticks }, (_, i) => {
+    const tickTimes = Array.from({ length: periodValue.ticks - 1 }, (_, i) => {
         const tickTime = new Date(start.getTime() + i * tickInterval * 60 * 60 * 1000);
         return tickTime.toISOString();
     });
 
-    return tickTimes; // may 31 3;42 ... - total balance w ticku ["date" - value,]
+    tickTimes.push(now.toISOString());
+
+    return tickTimes;
 }

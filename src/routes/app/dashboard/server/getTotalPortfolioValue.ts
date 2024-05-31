@@ -9,10 +9,11 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import { checksumAddress } from "viem";
 import { Wallet } from "~/interface/auth/Wallet";
 import { Balance } from "~/interface/balance/Balance";
+import { Period } from "./getPortfolio24hChange";
 
 
 
-export const _totalPortfolioValue = server$(async function () {
+export const _totalPortfolioValue = server$(async function (period: Period) {
     const db = await connectToDB(this.env);
 
     const cookie = this.cookie.get("accessToken");
