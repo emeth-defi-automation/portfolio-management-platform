@@ -139,3 +139,44 @@ export const getPortfolio24hChange = server$(async function () {
         ]) as [string, number][],
     };
 });
+
+export enum Period {
+    DAY = 'DAY',
+    WEEK = 'WEEK',
+    MONTH = 'MONTH',
+    YEAR = 'YEAR'
+}
+
+type PeriodValue = {
+    hours: number;
+    ticks: number;
+};
+
+const PeriodValues: { [key in Period]: PeriodValue } = {
+    [Period.DAY]: { hours: 24, ticks: 4 },
+    [Period.WEEK]: { hours: 168, ticks: 7 },
+    [Period.MONTH]: { hours: 744, ticks: 4 },
+    [Period.YEAR]: { hours: 8760, ticks: 12 }
+};
+
+
+export const getPortfolioValuesForPeriod = server$(async function (selectedPeriod: Period) {
+
+    const exactTickDates = getPortfolioDatesForSelectedPeriod(selectedPeriod);
+    console.log(exactTickDates);
+})
+
+
+const getPortfolioDatesForSelectedPeriod = (selectedPeriod: Period) => {
+    const periodValue = PeriodValues[selectedPeriod];
+    const now = new Date();
+    const start = new Date(now.getTime() - periodValue.hours * 60 * 60 * 1000);
+    const tickInterval = periodValue.hours / periodValue.ticks;
+
+    const tickTimes = Array.from({ length: periodValue.ticks }, (_, i) => {
+        const tickTime = new Date(start.getTime() + i * tickInterval * 60 * 60 * 1000);
+        return tickTime.toISOString();
+    });
+
+    return tickTimes; // may 31 3;42 ... - total balance w ticku ["date" - value,]
+}

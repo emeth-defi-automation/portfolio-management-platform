@@ -10,6 +10,63 @@ import { checksumAddress } from "viem";
 import { Wallet } from "~/interface/auth/Wallet";
 import { Balance } from "~/interface/balance/Balance";
 
+
+
+export const _totalPortfolioValue = server$(async function () {
+    const db = await connectToDB(this.env);
+
+    const cookie = this.cookie.get("accessToken");
+    if (!cookie) {
+        throw new Error("No cookie found");
+    }
+    const { userId } = jwt.decode(cookie.value) as JwtPayload;
+
+    const [tokens]: any = await db.query(`SELECT symbol, decimals FROM token;`);
+    console.log(tokens);
+    const tokenValueMap = Object.fromEntries(
+        tokens.map((token: any) => [token.symbol, { quantity: Number(0) }])
+    )
+
+    const [observedWalletsIds]: any = await db.query(`SELECT VALUE out from observes_wallet WHERE in = ${userId}`);
+
+    let totalValue = 0;
+    for (const token of tokens) {
+        for (const observedWalletId of observedWalletsIds) {
+            const [[tokenBalanceForWallet]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
+                WHERE walletId = ${observedWalletId} AND tokenSymbol = '${token.symbol}'
+                ORDER BY timestamp DESC LIMIT 1`);
+            if (!tokenBalanceForWallet) {
+                continue;
+            }
+            console.log(tokenBalanceForWallet);
+            const currentBalanceOfToken = convertWeiToQuantity(
+                tokenBalanceForWallet.walletValue,
+                parseInt(token.decimals),
+            );
+            tokenValueMap[token.symbol].quantity += Number(currentBalanceOfToken);
+        }
+
+        let latestTokenPrice: any = undefined;
+        if (token.symbol === "USDT") {
+            [[latestTokenPrice]] = await db.query(
+                `SELECT * FROM token_price_history WHERE symbol = 'USDC' ORDER BY timestamp DESC limit 1;`,
+            );
+        } else {
+            [[latestTokenPrice]] = await db.query(
+                `SELECT * FROM token_price_history WHERE symbol = '${token.symbol}' ORDER BY timestamp DESC limit 1;`,
+            );
+        }
+
+        if (!latestTokenPrice) {
+            continue;
+        }
+
+        totalValue += tokenValueMap[token.symbol].quantity * latestTokenPrice.price;
+    }
+
+    return totalValue.toFixed(2);
+})
+
 export const getTotalPortfolioValue = server$(async function () {
     const db = await connectToDB(this.env);
 

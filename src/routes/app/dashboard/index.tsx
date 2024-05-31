@@ -36,19 +36,15 @@ export {
 export default component$(() => {
   const nav = useNavigate();
   const isPortfolioFullScreen = useSignal(false);
-  const totalPortfolioValue = useSignal("0");
-  const totalPortfolioValueLoading = useSignal(true);
   const portfolioValueChange = useSignal<any>({});
   const portfolioValueChangeLoading = useSignal(true);
   const favoriteTokenLoading = useSignal(true);
   const favoriteTokens = useSignal<any[]>([]);
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     favoriteTokens.value = await getFavouriteTokens();
     favoriteTokenLoading.value = false;
-
-    totalPortfolioValue.value = await getTotalPortfolioValue();
-    totalPortfolioValueLoading.value = false;
 
     portfolioValueChange.value = await getPortfolio24hChange();
     portfolioValueChangeLoading.value = false;
@@ -99,8 +95,6 @@ export default component$(() => {
       hideChartWhileLoading={hideChartWhileLoading}
       redrawChart={redrawChart.value}
       portfolioValueChangeLoading={portfolioValueChangeLoading}
-      totalPortfolioValueLoading={totalPortfolioValueLoading.value}
-      totalPortfolioValue={totalPortfolioValue.value}
       isPortfolioFullScreen={isPortfolioFullScreen}
       portfolioValueChange={portfolioValueChange.value.totalValueChange}
       portfolioPercentageValueChange={
@@ -121,8 +115,6 @@ export default component$(() => {
           hideChartWhileLoading={hideChartWhileLoading}
           redrawChart={redrawChart.value}
           portfolioValueChangeLoading={portfolioValueChangeLoading}
-          totalPortfolioValueLoading={totalPortfolioValueLoading.value}
-          totalPortfolioValue={totalPortfolioValue.value}
           isPortfolioFullScreen={isPortfolioFullScreen}
           portfolioValueChange={portfolioValueChange.value.totalValueChange}
           portfolioPercentageValueChange={

@@ -18,11 +18,15 @@ import IconMaximize from "@material-design-icons/svg/filled/open_in_full.svg?jsx
 import IconMinimalize from "@material-design-icons/svg/filled/close_fullscreen.svg?jsx";
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
+import { _totalPortfolioValue } from "~/routes/app/dashboard/server/getTotalPortfolioValue";
+import {
+  getPortfolioValuesForPeriod,
+  Period,
+} from "~/routes/app/dashboard/server/getPortfolio24hChange";
 
 export interface PortfolioValueProps {
   hideChartWhileLoading: Signal<boolean>;
   redrawChart: boolean;
-  totalPortfolioValue: string;
   isPortfolioFullScreen: Signal<boolean>;
   portfolioValueChange: string;
   portfolioPercentageValueChange: string;
@@ -30,13 +34,11 @@ export interface PortfolioValueProps {
   onClick$?: QRL<(e: any) => void>;
   selectedPeriod: PeriodState;
   period: string;
-  totalPortfolioValueLoading: boolean;
   portfolioValueChangeLoading: Signal<boolean>;
 }
 
 export const PortfolioValue = component$<PortfolioValueProps>(
   ({
-    totalPortfolioValue,
     isPortfolioFullScreen,
     portfolioValueChange,
     portfolioPercentageValueChange,
@@ -44,11 +46,17 @@ export const PortfolioValue = component$<PortfolioValueProps>(
     selectedPeriod,
     chartData,
     period,
-    totalPortfolioValueLoading,
     portfolioValueChangeLoading,
     redrawChart,
     hideChartWhileLoading,
   }) => {
+    const totalPortfolioValue = useSignal("0");
+    // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(async () => {
+      totalPortfolioValue.value = await _totalPortfolioValue();
+      await getPortfolioValuesForPeriod(Period.DAY);
+    });
+
     const outputRef = useSignal<Element>();
     const chart = $(() => {
       if (!chartData) return;
@@ -196,14 +204,11 @@ export const PortfolioValue = component$<PortfolioValueProps>(
               class="custom-text-gradient text-xl font-semibold text-transparent"
               data-testid="portfolio-value"
             >
-              {totalPortfolioValueLoading ||
-              portfolioValueChangeLoading.value ||
-              hideChartWhileLoading.value
+              {totalPortfolioValue.value === "0"
                 ? "Loading..."
-                : `$${totalPortfolioValue}`}
+                : `$${totalPortfolioValue.value}`}
             </h1>
-            {totalPortfolioValueLoading ||
-            portfolioValueChangeLoading.value ||
+            {portfolioValueChangeLoading.value ||
             hideChartWhileLoading.value ? null : (
               <div>
                 {" "}
