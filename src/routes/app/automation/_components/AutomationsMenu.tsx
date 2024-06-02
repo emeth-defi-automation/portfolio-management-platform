@@ -78,6 +78,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
     deadline: "",
     delayDays: 0,
   });
+
   const handleAddAutomation = $(async function () {
     const account = getAccount(wagmiConfig.config as Config);
     const emethContractAddress = import.meta.env
@@ -170,7 +171,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   });
   return (
     <>
-      <div class="grid grid-rows-[32px_40px_1fr] gap-6 border-r border-white/10 bg-white/[0.03] p-6">
+      <div class="grid grid-rows-[32px_40px_1fr] gap-6 border-r border-white/10 bg-white/3 p-6">
         <div class="flex items-center justify-between gap-2">
           <Header variant="h4" text="Automations" class="font-normal" />
           <Button
