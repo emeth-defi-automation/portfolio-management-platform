@@ -25,6 +25,7 @@ import { server$ } from "@builder.io/qwik-city";
 import { Modal } from "~/components/Modal/Modal";
 import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
+import { AddAutomationModal } from "./AddAutomationModal";
 
 const addActionToDB = server$(
   async function (
@@ -52,6 +53,7 @@ const addActionToDB = server$(
 );
 const getActionsFromDb = server$(async function () {
   const db = await connectToDB(this.env);
+  // TODO handle logged user
   const [actions] = await db.query(
     `SELECT * FROM automations WHERE user = "0x8545845EF4BD63c9481Ae424F8147a6635dcEF87"`,
   );
@@ -79,91 +81,91 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
     delayDays: 0,
   });
 
-  const handleAddAutomation = $(async function () {
-    const account = getAccount(wagmiConfig.config as Config);
-    const emethContractAddress = import.meta.env
-      .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
-    const {
-      name,
-      actionId,
-      tokenIn,
-      tokenOut,
-      amountIn,
-      from,
-      to,
-      deadline,
-      delayDays,
-    } = addModalStore;
-    formMessageProvider.messages.push({
-      id: formMessageProvider.messages.length,
-      variant: "info",
-      message: "Creating action...",
-      isVisible: true,
-    });
+  // const handleAddAutomation = $(async function () {
+  //   const account = getAccount(wagmiConfig.config as Config);
+  //   const emethContractAddress = import.meta.env
+  //     .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
+  //   const {
+  //     name,
+  //     actionId,
+  //     tokenIn,
+  //     tokenOut,
+  //     amountIn,
+  //     from,
+  //     to,
+  //     deadline,
+  //     delayDays,
+  //   } = addModalStore;
+  //   formMessageProvider.messages.push({
+  //     id: formMessageProvider.messages.length,
+  //     variant: "info",
+  //     message: "Creating action...",
+  //     isVisible: true,
+  //   });
 
-    try {
-      console.log(addModalStore);
-      await addActionToDB(
-        name,
-        false,
-        BigInt(actionId),
-        tokenIn as `0x${string}`,
-        tokenOut as `0x${string}`,
-        BigInt(amountIn),
-        from as `0x${string}`,
-        to as `0x${string}`,
-        // 1715998201n,
-        BigInt(deadline),
-        BigInt(delayDays),
-        localStorage.getItem("emmethUserWalletAddress"),
-      );
-      const { request } = await simulateContract(wagmiConfig.config as Config, {
-        account: account.address as `0x${string}`,
-        abi: emethContractAbi,
-        address: emethContractAddress,
-        functionName: "addAction",
-        args: [
-          // 12991n,
-          // "0xD418937d10c9CeC9d20736b2701E506867fFD85f" as `0x${string}`,
-          // "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709" as `0x${string}`,
-          // 20000000000000000000n,
-          // "0x0577b55800816b6A2Da3BDbD3d862dce8e99505D" as `0x${string}`,
-          // "0x8545845EF4BD63c9481Ae424F8147a6635dcEF87" as `0x${string}`,
-          // 1715998201n,
-          // 1n,
-          BigInt(actionId),
-          tokenIn as `0x${string}`,
-          tokenOut as `0x${string}`,
-          BigInt(amountIn),
-          from as `0x${string}`,
-          to as `0x${string}`,
-          BigInt(deadline),
-          BigInt(delayDays),
-        ],
-      });
+  //   try {
+  //     console.log(addModalStore);
+  //     await addActionToDB(
+  //       name,
+  //       false,
+  //       BigInt(actionId),
+  //       tokenIn as `0x${string}`,
+  //       tokenOut as `0x${string}`,
+  //       BigInt(amountIn),
+  //       from as `0x${string}`,
+  //       to as `0x${string}`,
+  //       // 1715998201n,
+  //       BigInt(deadline),
+  //       BigInt(delayDays),
+  //       localStorage.getItem("emmethUserWalletAddress"),
+  //     );
+  //     const { request } = await simulateContract(wagmiConfig.config as Config, {
+  //       account: account.address as `0x${string}`,
+  //       abi: emethContractAbi,
+  //       address: emethContractAddress,
+  //       functionName: "addAction",
+  //       args: [
+  //         // 12991n,
+  //         // "0xD418937d10c9CeC9d20736b2701E506867fFD85f" as `0x${string}`,
+  //         // "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709" as `0x${string}`,
+  //         // 20000000000000000000n,
+  //         // "0x0577b55800816b6A2Da3BDbD3d862dce8e99505D" as `0x${string}`,
+  //         // "0x8545845EF4BD63c9481Ae424F8147a6635dcEF87" as `0x${string}`,
+  //         // 1715998201n,
+  //         // 1n,
+  //         BigInt(actionId),
+  //         tokenIn as `0x${string}`,
+  //         tokenOut as `0x${string}`,
+  //         BigInt(amountIn),
+  //         from as `0x${string}`,
+  //         to as `0x${string}`,
+  //         BigInt(deadline),
+  //         BigInt(delayDays),
+  //       ],
+  //     });
 
-      const transactionHash = await writeContract(
-        wagmiConfig.config as Config,
-        request,
-      );
-      formMessageProvider.messages.push({
-        id: formMessageProvider.messages.length,
-        variant: "success",
-        message: "Success!",
-        isVisible: true,
-      });
+  //     const transactionHash = await writeContract(
+  //       wagmiConfig.config as Config,
+  //       request,
+  //     );
+  //     formMessageProvider.messages.push({
+  //       id: formMessageProvider.messages.length,
+  //       variant: "success",
+  //       message: "Success!",
+  //       isVisible: true,
+  //     });
 
-      console.log(transactionHash);
-    } catch (err) {
-      console.log(err);
-      // formMessageProvider.messages.push({
-      //   id: formMessageProvider.messages.length,
-      //   variant: "error",
-      //   message: "Something went wrong.",
-      //   isVisible: true,
-      // });
-    }
-  });
+  //     console.log(transactionHash);
+  //   } catch (err) {
+  //     console.log(err);
+  //     // formMessageProvider.messages.push({
+  //     //   id: formMessageProvider.messages.length,
+  //     //   variant: "error",
+  //     //   message: "Something went wrong.",
+  //     //   isVisible: true,
+  //     // });
+  //   }
+  // });
   useVisibleTask$(async () => {
     const actionsFromDb = await getActionsFromDb();
     actions.value = actionsFromDb;
@@ -211,6 +213,9 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
         </div>
       </div>
       {isAddModalOpen.value ? (
+        <AddAutomationModal isAddModalOpen={isAddModalOpen} />
+      ) : null}
+      {/* {isAddModalOpen.value ? (
         <Modal
           title="Add action"
           isOpen={isAddModalOpen}
@@ -351,7 +356,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
             />
           </div>
         </Modal>
-      ) : null}
+      ) : null} */}
     </>
   );
 });
