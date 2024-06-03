@@ -40,6 +40,7 @@ export default component$<AmountOfCoinsProps>(
                     }
                     onInput$={(e) => {
                       const target = e.target as HTMLInputElement;
+                      // const regex = /^[0-9]*(\.[0-9]*)?$/;
                       const regex = /^\d*\.?\d*$/;
                       target.value = replaceNonMatching(
                         target.value,
