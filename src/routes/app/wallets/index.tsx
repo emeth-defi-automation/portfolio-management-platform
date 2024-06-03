@@ -6,57 +6,27 @@ import {
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { type JwtPayload } from "jsonwebtoken";
-import { contractABI } from "~/abi/abi";
-import { chainIdToNetworkName } from "~/utils/chains";
-import { Modal } from "~/components/Modal/Modal";
-import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { checksumAddress } from "viem";
-import { emethContractAbi } from "~/abi/emethContractAbi";
-import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
-import * as jwtDecode from "jwt-decode";
-import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import Button from "~/components/Atoms/Buttons/Button";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
+import { StreamStoreContext } from "~/interface/streamStore/streamStore";
+import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
+import { chainIdToNetworkName } from "~/utils/chains";
 
-import {
-  type Config,
-  getAccount,
-  readContract,
-  simulateContract,
-  writeContract,
-  getConnections,
-  watchAccount,
-} from "@wagmi/core";
-
+import { getConnections, watchAccount, type Config } from "@wagmi/core";
 
 import { ButtonWithIcon } from "~/components/Buttons/Buttons";
-import {
-  getObservedWallets,
-  ObservedWalletsList,
-} from "~/components/ObservedWalletsList/ObservedWalletsList";
+import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
   getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
-
-import { convertToFraction } from "~/utils/fractions";
-import {
-  isExecutableDisabled,
-  isNotExecutableDisabled,
-  isProceedDisabled,
-} from "~/utils/validators/addWallet";
-import { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
 export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
-import { type AddWalletFormStore } from "./interface";
-import { fetchTokens } from "~/database/tokens";
-import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
-import { balancesLiveStream } from "./server/balancesLiveStream";
-import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
-import { getAccessToken } from "~/utils/refresh";
-import { DeleteModal } from "./_components/wallets/DeleteModal";
+
+import { openWeb3Modal } from "~/utils/walletConnections";
 import { AddWalletModal } from "./_components/wallets/AddWalletModal";
+import { DeleteModal } from "./_components/wallets/DeleteModal";
+import { balancesLiveStream } from "./server/balancesLiveStream";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -109,7 +79,6 @@ export default component$(() => {
       },
     });
   });
-
 
   const connectWallet = $(async () => {
     await openWeb3Modal(wagmiConfig!.config);
