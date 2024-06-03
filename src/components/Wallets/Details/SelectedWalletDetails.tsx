@@ -4,9 +4,7 @@ import {
   useContext,
   useSignal,
   useTask$,
-  useVisibleTask$,
 } from "@builder.io/qwik";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconWallet from "/public/assets/icons/wallets/wallet.svg?jsx";
 // import IconLoading from "/public/assets/icons/wallets/loading.svg?jsx";

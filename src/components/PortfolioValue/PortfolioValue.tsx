@@ -2,6 +2,7 @@ import {
   $,
   component$,
   useSignal,
+  useTask$,
   useVisibleTask$,
   type QRL,
   type Signal,
@@ -19,42 +20,26 @@ import IconMinimalize from "@material-design-icons/svg/filled/close_fullscreen.s
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
 import { _totalPortfolioValue } from "~/routes/app/dashboard/server/getTotalPortfolioValue";
-import { Period } from "~/routes/app/dashboard/server/getPortfolio24hChange";
+import { Period, PeriodValues } from "~/routes/app/dashboard/server/getPortfolio24hChange";
+import { routeLoader$ } from "@builder.io/qwik-city";
 
 export interface PortfolioValueProps {
-  hideChartWhileLoading: Signal<boolean>;
-  redrawChart: boolean;
   isPortfolioFullScreen: Signal<boolean>;
-  portfolioValueChange: string;
-  portfolioPercentageValueChange: string;
-  chartData: [string, number][] | undefined;
-  onClick$?: QRL<(e: any) => void>;
-  selectedPeriod: PeriodState;
-  period: string;
-  portfolioValueChangeLoading: Signal<boolean>;
 }
 
 export const PortfolioValue = component$<PortfolioValueProps>(
   ({
     isPortfolioFullScreen,
-    portfolioValueChange,
-    portfolioPercentageValueChange,
-    onClick$,
-    selectedPeriod,
-    chartData,
-    period,
-    portfolioValueChangeLoading,
-    redrawChart,
-    hideChartWhileLoading,
   }) => {
     const totalPortfolioValue = useSignal("0");
-    // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(async () => {
-      await _totalPortfolioValue(Period.DAY);
-    });
-
+    const dataForChart = useSignal<[string, number][]>();
+    const selectedPeriodForChart = useSignal<Period>(Period.DAY);
+    const isDataForChartLoading = useSignal(true);
     const outputRef = useSignal<Element>();
-    const chart = $(() => {
+    const percentageChange = useSignal("");
+    const change = useSignal("");
+
+    const chart = $((chartData: [string, number][] | undefined) => {
       if (!chartData) return;
       const data: [Date, number][] = [];
 
@@ -102,23 +87,6 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       // Create the SVG container.
       const svg = d3.create("svg").attr("width", width).attr("height", height);
 
-      // Define the gradient
-      //const gradient = svg.append("defs")
-      //  .append("linearGradient")
-      //  .attr("id", "gradient")
-      //  .attr("x1", "0%")
-      //  .attr("y1", "0%")
-      //  .attr("x2", "100%")
-      //  .attr("y2", "100%");
-
-      //gradient.append("stop")
-      //  .attr("offset", "0%")
-      //  .attr("stop-color", "blue");
-
-      //gradient.append("stop")
-      //  .attr("offset", "100%")
-      //  .attr("stop-color", "green");
-
       // Add the x-axis.
       svg
         .append("g")
@@ -128,7 +96,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
           d3
             .axisBottom(scaleX)
             .tickValues(data.map((d) => d[0]))
-            .tickFormat((d) => axisXFormatter(d as Date, selectedPeriod))
+            .tickFormat((d) => axisXFormatter(d as Date, selectedPeriodForChart.value))
             .tickSize(-height + marginTop + marginBottom)
             .tickPadding(12),
         )
@@ -178,20 +146,27 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       outputRef.value!.replaceChildren(svg.node()!);
     });
 
-    // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(({ track }) => {
-      track(() => chartData);
-      chart();
-    });
+    routeLoader$
 
     // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(({ track }) => {
-      track(() => redrawChart);
-      chart();
+    useVisibleTask$(async ({track}) => {
+      track(() => {
+        selectedPeriodForChart.value;
+      })
+        isDataForChartLoading.value = false;
+        const data = await _totalPortfolioValue(selectedPeriodForChart.value);
+        console.log("data", data);
+        dataForChart.value =  data.values;
+        percentageChange.value = (data.percentageChange > 0 ? "+" : "") + data.percentageChange.toFixed(2) + "%";
+        change.value = (data.change > 0 ? "+" : "") + data.change.toFixed(2);
+        totalPortfolioValue.value = dataForChart.value[dataForChart.value.length - 1][1].toFixed(2);
+        await chart(dataForChart.value);
     });
+
+
     return (
       <div
-        class={`custom-border-1 custom-bg-opacity-5 ${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
+        class={`custom-border-1 custom-bg-opacity-5 ${isDataForChartLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
       >
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
           <h1 class="text-xl font-semibold">Portfolio Value</h1>
@@ -204,21 +179,21 @@ export const PortfolioValue = component$<PortfolioValueProps>(
                 ? "Loading..."
                 : `$${totalPortfolioValue.value}`}
             </h1>
-            {portfolioValueChangeLoading.value ||
-            hideChartWhileLoading.value ? null : (
+            {isDataForChartLoading.value ? null : (
               <div>
                 {" "}
                 <p class="text-xs">
-                  {period} change: {portfolioValueChange}{" "}
+                  {PeriodValues[selectedPeriodForChart.value].label} change: {" "}
+                  <span class="text-xs">{change.value} {" "}</span>
                   <span class="text-customGreen">
-                    {portfolioPercentageValueChange}
+                    {percentageChange.value}
                   </span>
                 </p>{" "}
               </div>
             )}
           </div>
         </div>
-        {portfolioValueChangeLoading.value || hideChartWhileLoading.value ? (
+        {isDataForChartLoading.value ? (
           <div class="flex-column flex h-full items-center justify-center">
             <Spinner isTextVisible={false} />
           </div>
@@ -230,44 +205,53 @@ export const PortfolioValue = component$<PortfolioValueProps>(
                 <button
                   name="24h"
                   class={
-                    selectedPeriod["24h"]
+                    selectedPeriodForChart.value === Period.DAY
                       ? "custom-bg-button rounded-lg px-2"
                       : "rounded-lg px-2"
                   }
-                  onClick$={onClick$}
+                  onClick$={() => {
+                    selectedPeriodForChart.value = Period.DAY;
+                  }}
                 >
                   24h
                 </button>
                 <button
                   name="1W"
                   class={
-                    selectedPeriod["1W"]
+                    selectedPeriodForChart.value === Period.WEEK
                       ? "custom-bg-button rounded-lg px-2"
                       : "rounded-lg px-2"
                   }
-                  onClick$={onClick$}
+                  onClick$={() => {
+                    selectedPeriodForChart.value = Period.WEEK;
+                  
+                  }}
                 >
                   1W
                 </button>
                 <button
                   name="1M"
                   class={
-                    selectedPeriod["1M"]
+                    selectedPeriodForChart.value === Period.MONTH
                       ? "custom-bg-button rounded-lg px-2"
                       : "rounded-lg px-2"
                   }
-                  onClick$={onClick$}
+                  onClick$={() => {
+                    selectedPeriodForChart.value = Period.MONTH;
+                  }}
                 >
                   1M
                 </button>
                 <button
                   name="1Y"
                   class={
-                    selectedPeriod["1Y"]
+                    selectedPeriodForChart.value === Period.YEAR
                       ? "custom-bg-button rounded-lg px-2"
                       : "rounded-lg px-2"
                   }
-                  onClick$={onClick$}
+                  onClick$={() => {
+                    selectedPeriodForChart.value = Period.YEAR;
+                  }}
                 >
                   1Y
                 </button>
@@ -298,13 +282,11 @@ export const PortfolioValue = component$<PortfolioValueProps>(
           </div>
         )}
 
-        {portfolioValueChangeLoading.value ||
-        hideChartWhileLoading.value ? null : (
+        {isDataForChartLoading.value ? null : (
           <div id="container" ref={outputRef}></div>
         )}
         {isPortfolioFullScreen.value &&
-          !portfolioValueChangeLoading.value &&
-          !hideChartWhileLoading.value && (
+          !isDataForChartLoading.value && (
             <div class="ml-7">
               <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
                 <div class="pr-timeline row-start-2"></div>

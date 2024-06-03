@@ -150,13 +150,14 @@ export enum Period {
 type PeriodValue = {
     hours: number;
     ticks: number;
+    label: string;
 };
 
-const PeriodValues: { [key in Period]: PeriodValue } = {
-    [Period.DAY]: { hours: 24, ticks: 4 },
-    [Period.WEEK]: { hours: 168, ticks: 7 },
-    [Period.MONTH]: { hours: 744, ticks: 4 },
-    [Period.YEAR]: { hours: 8760, ticks: 12 }
+export const PeriodValues: { [key in Period]: PeriodValue } = {
+    [Period.DAY]: { hours: 24, ticks: 4, label: '24h' },
+    [Period.WEEK]: { hours: 168, ticks: 7, label: "1W" },
+    [Period.MONTH]: { hours: 744, ticks: 4 , label: "1M"},
+    [Period.YEAR]: { hours: 8760, ticks: 12, label: "1Y" }
 };
 
 export const getPortfolioDatesForSelectedPeriod = (selectedPeriod: Period) => {

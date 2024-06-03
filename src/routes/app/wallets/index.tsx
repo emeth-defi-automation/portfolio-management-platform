@@ -104,6 +104,7 @@ export default component$(() => {
     coinsToCount: [],
     coinsToApprove: [],
   });
+  
   // const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
   // eslint-disable-next-line qwik/no-use-visible-task
@@ -450,25 +451,25 @@ export default component$(() => {
               onClick$={() => (isDeleteModalOpen.value = false)}
               customClass="w-full"
             />
-            {/* <Button
+             <Button
               variant="red"
               text="Yes, Let’s Do It!"
               customClass="w-full"
               onClick$={async () => {
-                if (selectedWallet.value && selectedWallet.value.wallet.id) {
+                if (selectedWalletDetails.value && selectedWalletDetails.value.id) {
                   const {
                     value: { success },
                   } = await removeWalletAction.submit({
-                    id: selectedWallet.value.wallet.id,
+                    id: selectedWalletDetails.value.id,
                   });
-                  selectedWallet.value = null;
+                  selectedWalletDetails.value = undefined;
                   isDeleteModalOpen.value = false;
-                  // if (success) {
-                  //   observedWallets.value = await getObservedWallets();
-                  // }
+                  if (success) {
+                    console.log("deleted wallet", success);
+                  }
                 }
               }}
-            /> */}
+            /> 
           </div>
         </Modal>
       )}

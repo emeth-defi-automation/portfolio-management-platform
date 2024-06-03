@@ -1,21 +1,42 @@
 import { type PeriodState } from "~/interface/balance/Balance";
 import { getSelectedPeriodKey } from "../timestamps/timestamp";
 import * as d3 from "d3";
+import { Period } from "~/routes/app/dashboard/server/getPortfolio24hChange";
 
-export const axisXFormatter = (value: Date, period: PeriodState): string => {
+// export const axisXFormatter = (value: Date, period: PeriodState): string => {
+//   let formatter = null;
+//   const key = getSelectedPeriodKey(period);
+//   switch (key) {
+//     case "24h":
+//       formatter = d3.utcFormat("%a %H:%M");
+//       return formatter(value as Date);
+//     case "1W":
+//       formatter = d3.utcFormat("%a %d.%m");
+//       return formatter(value as Date);
+//     case "1M":
+//       formatter = d3.utcFormat("%d.%m");
+//       return formatter(value as Date);
+//     case "1Y":
+//       formatter = d3.utcFormat("%Y %b");
+//       return formatter(value as Date);
+//   }
+//   return "";
+// };
+
+
+export const axisXFormatter = (value: Date, period: Period): string => {
   let formatter = null;
-  const key = getSelectedPeriodKey(period);
-  switch (key) {
-    case "24h":
+  switch (period) {
+    case Period.DAY:
       formatter = d3.utcFormat("%a %H:%M");
       return formatter(value as Date);
-    case "1W":
+    case Period.WEEK:
       formatter = d3.utcFormat("%a %d.%m");
       return formatter(value as Date);
-    case "1M":
+    case Period.MONTH:
       formatter = d3.utcFormat("%d.%m");
       return formatter(value as Date);
-    case "1Y":
+    case Period.YEAR:
       formatter = d3.utcFormat("%Y %b");
       return formatter(value as Date);
   }

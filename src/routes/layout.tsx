@@ -64,7 +64,6 @@ export default component$(() => {
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
-    console.log("use visible task started", wagmiConfig.config);
     if (wagmiConfig.config) {
       console.log("wagmi config from index ", wagmiConfig.config);
       watchAccount(wagmiConfig.config!, {
