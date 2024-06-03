@@ -26,6 +26,7 @@ import { Modal } from "~/components/Modal/Modal";
 import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
 import { AddAutomationModal } from "./AddAutomationModal";
+import { AutomationPageContext } from "../AutomationPageContext";
 
 const updateIsActiveStatus = server$(async function (actionId, isActive) {
   const db = await connectToDB(this.env);
@@ -37,6 +38,26 @@ const updateIsActiveStatus = server$(async function (actionId, isActive) {
       { actionId: actionId, isActive: isActive },
     );
     console.log("chyba zmienilem");
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+const deleteActionFromDb = server$(async function (actionId, user) {
+  await updateIsActiveStatus(actionId, false);
+
+  const db = await connectToDB(this.env);
+  try {
+    console.log("deleting");
+    await db.query(
+      `DELETE FROM automations 
+      WHERE user = $user AND actionId = $automationId;`,
+      {
+        user: user,
+        actionId: actionId,
+      },
+    );
+    console.log("deleted");
   } catch (err) {
     console.log(err);
   }
@@ -80,6 +101,7 @@ interface AutomationsMenuProps {}
 
 export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
+  const automationPageContext = useContext(AutomationPageContext);
   const formMessageProvider = useContext(messagesContext);
   const isAddModalOpen = useSignal<boolean>(false);
   const actions = useSignal<any>([]);
@@ -183,8 +205,8 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   // });
   useVisibleTask$(async () => {
     const actionsFromDb = await getActionsFromDb();
-    actions.value = actionsFromDb;
-    console.log(actions.value);
+    automationPageContext.automations.value = actionsFromDb;
+    console.log(automationPageContext.automations.value);
   });
   return (
     <>
@@ -208,7 +230,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
         </div>
 
         <div class="">
-          {actions.value.map((action: any) => (
+          {automationPageContext.automations.value.map((action: any) => (
             // TODO odswiezyc gdy zamykany jest addModal
             <div class="flex items-center justify-between gap-12 p-4">
               <div class="flex flex-col gap-3">
