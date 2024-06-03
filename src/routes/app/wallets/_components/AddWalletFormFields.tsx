@@ -20,10 +20,10 @@ import {
 } from "~/utils/validators/addWallet";
 import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
 import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
-import Button from "../Atoms/Buttons/Button";
+import Button from "~/components/Atoms/Buttons/Button";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
-import Tag from "../Atoms/Tags/Tag";
-import { WagmiConfigContext } from "../WalletConnect/context";
+import Tag from "~/components/Atoms/Tags/Tag";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { type Config, watchAccount } from "@wagmi/core";
 export interface AddWalletFormFieldsProps {
   addWalletFormStore: AddWalletFormStore;
@@ -142,7 +142,7 @@ export default component$<AddWalletFormFieldsProps>(
                   onClick$={onConnectWalletClick}
                   text={
                     connectedAddress.value !==
-                    localStorage.getItem("emmethUserWalletAddress")
+                      localStorage.getItem("emmethUserWalletAddress")
                       ? "Second Wallet connected."
                       : "Connect another wallet"
                   }

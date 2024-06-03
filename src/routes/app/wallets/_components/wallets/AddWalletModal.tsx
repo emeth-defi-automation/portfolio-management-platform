@@ -38,10 +38,10 @@ import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
 import { messagesContext } from "../../../layout";
 
 import Button from "~/components/Atoms/Buttons/Button";
-import AddWalletFormFields from "~/components/Forms/AddWalletFormFields";
-import AmountOfCoins from "~/components/Forms/AmountOfCoins";
-import CoinsToApprove from "~/components/Forms/CoinsToApprove";
-import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
+import AddWalletFormFields from "../AddWalletFormFields";
+import AmountOfCoins from "../AmountOfCoins";
+import CoinsToApprove from "../CoinsToApprove";
+import IsExecutableSwitch from "../isExecutableSwitch"
 import { Modal } from "~/components/Modal/Modal";
 import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
