@@ -251,21 +251,6 @@ export const AddWalletModal = component$<AddWalletModal>(
       });
     });
 
-    // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(async ({ track }) => {
-      track(() => wagmiConfig.config);
-      watchAccount(wagmiConfig.config!, {
-        onChange() {
-          const connections = getConnections(wagmiConfig.config as Config);
-          if (connections.length > 1) {
-            isSecondWalletConnected.value = true;
-          } else {
-            isSecondWalletConnected.value = false;
-          }
-        },
-      });
-    });
-
     return (
       <Modal
         isOpen={isAddWalletModalOpen}
