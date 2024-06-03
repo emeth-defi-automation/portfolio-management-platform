@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { AutomationsMenu } from "./_components/AutomationsMenu";
 import { CentralView } from "./_components/CentralView";
+import { TriggerDrawer } from "./_components/TriggerDrawer";
 
 export default component$(() => {
   return (
@@ -8,6 +9,7 @@ export default component$(() => {
       <div class="grid grid-cols-[1fr_2.5fr]">
         <AutomationsMenu />
         <CentralView />
+        <TriggerDrawer />
       </div>
     </>
   );

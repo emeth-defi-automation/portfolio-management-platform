@@ -27,6 +27,21 @@ import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
 import { AddAutomationModal } from "./AddAutomationModal";
 
+const updateIsActiveStatus = server$(async function (actionId, isActive) {
+  const db = await connectToDB(this.env);
+  console.log("id: ", actionId, "isActive: ", isActive);
+  try {
+    console.log("zmieniam");
+    await db.query(
+      `UPDATE automations SET isActive = $isActive WHERE actionId = $actionId;`,
+      { actionId: actionId, isActive: isActive },
+    );
+    console.log("chyba zmienilem");
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 const addActionToDB = server$(
   async function (
     name,
@@ -57,7 +72,7 @@ const getActionsFromDb = server$(async function () {
   const [actions] = await db.query(
     `SELECT * FROM automations WHERE user = "0x8545845EF4BD63c9481Ae424F8147a6635dcEF87"`,
   );
-
+  console.log(actions);
   return actions;
 });
 
@@ -194,19 +209,24 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
 
         <div class="">
           {actions.value.map((action: any) => (
+            // TODO odswiezyc gdy zamykany jest addModal
             <div class="flex items-center justify-between gap-12 p-4">
               <div class="flex flex-col gap-3">
                 <Header variant="h5" text={action.name} />
                 <Paragraph
                   size="xs"
                   variant="secondaryText"
-                  text={action.actionId}
+                  text={action.desc}
                 />
               </div>
               <Checkbox
                 variant="toggleTick"
                 isChecked={action.isActive}
                 class=""
+                onClick={$(async () => {
+                  console.log("kliknalem sie");
+                  await updateIsActiveStatus(action.actionId, !action.isActive);
+                })}
               />
             </div>
           ))}
