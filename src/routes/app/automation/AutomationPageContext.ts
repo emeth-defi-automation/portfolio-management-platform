@@ -6,6 +6,7 @@ import {
   export interface AutomationPageInterface {
     automations: Signal<any | null>;
     activeAutomation: Signal<any | null>;
+    isDraverOpen: Signal<boolean>
   }
   
   export const AutomationPageContext = createContextId<AutomationPageInterface>(

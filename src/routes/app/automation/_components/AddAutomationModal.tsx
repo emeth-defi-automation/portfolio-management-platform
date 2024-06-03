@@ -1,10 +1,11 @@
-import { $, Signal, component$, useStore } from "@builder.io/qwik";
+import { $, Signal, component$, useContext, useStore } from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
 import Button from "~/components/Atoms/Buttons/Button";
 import Input from "~/components/Atoms/Input/Input";
 import Label from "~/components/Atoms/Label/Label";
 import { Modal } from "~/components/Modal/Modal";
 import { connectToDB } from "~/database/db";
+import { messagesContext } from "../../layout";
 
 interface AddAutomationModalProps {
   isAddModalOpen: Signal<boolean>;
@@ -55,17 +56,19 @@ export const AddAutomationModal = component$<AddAutomationModalProps>(
       name: "",
       desc: "",
     });
+    const formMessageProvider = useContext(messagesContext);
 
     const handleAddBasicAutomation = $(async function () {
       const id = generateRandomId();
-      console.log(id);
       const user = localStorage.getItem("emmethUserWalletAddress") || "";
-      console.log(user);
-      console.log("addind automation");
 
       if (!(user && newAutomationStore.name.length > 3 && id)) {
-        // handle visible error with messaging
-        console.log("cos nie halo");
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "error",
+          message: "Something went wrong",
+          isVisible: true,
+        });
         return;
       }
 
@@ -76,9 +79,21 @@ export const AddAutomationModal = component$<AddAutomationModalProps>(
           id,
           user,
         );
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "success",
+          message: "Successfully added automation!",
+          isVisible: true,
+        });
         console.log(`automation ${newAutomationStore.name} added to database`);
       } catch (err) {
         console.log(err);
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "error",
+          message: "Something went wrong",
+          isVisible: true,
+        });
       }
     });
 
