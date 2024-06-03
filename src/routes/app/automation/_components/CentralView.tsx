@@ -1,10 +1,10 @@
 import { $, component$, useContext } from "@builder.io/qwik";
 import Button from "~/components/Atoms/Buttons/Button";
-import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
+
 import Header from "~/components/Atoms/Headers/Header";
-import Paragraph from "~/components/Atoms/Paragraphs/Paragraphs";
+
 import IconEdit from "@material-design-icons/svg/outlined/edit.svg?jsx";
-import { TriggerDrawer } from "./TriggerDrawer";
+
 import { AutomationPageContext } from "../AutomationPageContext";
 import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
 import { connectToDB } from "~/database/db";

@@ -1,6 +1,5 @@
 import {
   $,
-  Slot,
   component$,
   useContext,
   useSignal,
@@ -15,7 +14,7 @@ import Button from "~/components/Atoms/Buttons/Button";
 import Label from "~/components/Atoms/Label/Label";
 import { getObservedWalletBalances } from "../../portfolio/server/observerWalletBalancesLoader";
 import {
-  Config,
+  type Config,
   getAccount,
   simulateContract,
   writeContract,
@@ -98,7 +97,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
     durationCount: 0,
     interval: 0,
   });
-
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => {
       automationPageContext.isDraverOpen.value;
@@ -114,7 +113,6 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
     const emethContractAddress = import.meta.env
       .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
     const {
-      name,
       isActive,
       actionId,
       tokenIn,

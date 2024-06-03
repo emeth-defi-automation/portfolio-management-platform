@@ -1,4 +1,10 @@
-import { $, Signal, component$, useContext, useStore } from "@builder.io/qwik";
+import {
+  $,
+  type Signal,
+  component$,
+  useContext,
+  useStore,
+} from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
 import Button from "~/components/Atoms/Buttons/Button";
 import Input from "~/components/Atoms/Input/Input";

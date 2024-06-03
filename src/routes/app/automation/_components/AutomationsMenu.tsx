@@ -3,28 +3,15 @@ import {
   component$,
   useContext,
   useSignal,
-  useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import {
-  Config,
-  getAccount,
-  simulateContract,
-  writeContract,
-} from "@wagmi/core";
 import Button from "~/components/Atoms/Buttons/Button";
 import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
 import Header from "~/components/Atoms/Headers/Header";
 import Paragraph from "~/components/Atoms/Paragraphs/Paragraphs";
 import { ButtonWithIcon } from "~/components/Buttons/Buttons";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
-import { messagesContext } from "../../layout";
-import { emethContractAbi } from "~/abi/emethContractAbi";
 import { connectToDB } from "~/database/db";
 import { server$ } from "@builder.io/qwik-city";
-import { Modal } from "~/components/Modal/Modal";
-import Input from "~/components/Atoms/Input/Input";
-import Select from "~/components/Atoms/Select/Select";
 import { AddAutomationModal } from "./AddAutomationModal";
 import { AutomationPageContext } from "../AutomationPageContext";
 
@@ -57,11 +44,9 @@ const getActionsFromDb = server$(async function (user) {
 interface AutomationsMenuProps {}
 
 export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
-  const wagmiConfig = useContext(WagmiConfigContext);
   const automationPageContext = useContext(AutomationPageContext);
-  const formMessageProvider = useContext(messagesContext);
   const isAddModalOpen = useSignal<boolean>(false);
-
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => {
       isAddModalOpen.value === false;
@@ -95,7 +80,10 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
 
         <div class="">
           {automationPageContext.automations.value.map((action: any) => (
-            <div class="flex cursor-pointer items-center justify-between gap-12 p-4">
+            <div
+              key={action.actionId}
+              class="flex cursor-pointer items-center justify-between gap-12 p-4"
+            >
               <div
                 class="flex flex-col gap-3"
                 onClick$={$(() => {
