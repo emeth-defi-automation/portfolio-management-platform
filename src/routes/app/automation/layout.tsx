@@ -10,7 +10,7 @@ import { AutomationPageContext } from "./AutomationPageContext";
 export default component$(() => {
   useContextProvider(AutomationPageContext, {
     automations: useSignal([]),
-    activeAutomation: useSignal({}),
+    activeAutomation: useSignal(null),
   });
 
   return <Slot />;

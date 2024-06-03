@@ -43,26 +43,6 @@ const updateIsActiveStatus = server$(async function (actionId, isActive) {
   }
 });
 
-const deleteActionFromDb = server$(async function (actionId, user) {
-  await updateIsActiveStatus(actionId, false);
-
-  const db = await connectToDB(this.env);
-  try {
-    console.log("deleting");
-    await db.query(
-      `DELETE FROM automations 
-      WHERE user = $user AND actionId = $automationId;`,
-      {
-        user: user,
-        actionId: actionId,
-      },
-    );
-    console.log("deleted");
-  } catch (err) {
-    console.log(err);
-  }
-});
-
 const addActionToDB = server$(
   async function (
     name,
@@ -104,7 +84,6 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   const automationPageContext = useContext(AutomationPageContext);
   const formMessageProvider = useContext(messagesContext);
   const isAddModalOpen = useSignal<boolean>(false);
-  const actions = useSignal<any>([]);
   const addModalStore = useStore({
     name: "",
     isActive: false,
@@ -232,8 +211,13 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
         <div class="">
           {automationPageContext.automations.value.map((action: any) => (
             // TODO odswiezyc gdy zamykany jest addModal
-            <div class="flex items-center justify-between gap-12 p-4">
-              <div class="flex flex-col gap-3">
+            <div class="flex cursor-pointer items-center justify-between gap-12 p-4">
+              <div
+                class="flex flex-col gap-3"
+                onClick$={$(() => {
+                  automationPageContext.activeAutomation.value = action;
+                })}
+              >
                 <Header variant="h5" text={action.name} />
                 <Paragraph
                   size="xs"
