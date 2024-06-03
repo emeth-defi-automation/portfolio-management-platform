@@ -1,15 +1,11 @@
 import {
-  $,
   component$,
-  useContext,
   useSignal,
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
 import Button from "~/components/Atoms/Buttons/Button";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
-import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { chainIdToNetworkName } from "~/utils/chains";
 
@@ -21,13 +17,11 @@ export {
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
 
-import { openWeb3Modal } from "~/utils/walletConnections";
 import { AddWalletModal } from "./_components/wallets/AddWalletModal";
 import { DeleteModal } from "./_components/wallets/DeleteModal";
 import { balancesLiveStream } from "./server/balancesLiveStream";
 
 export default component$(() => {
-  const wagmiConfig = useContext(WagmiConfigContext);
   const isAddWalletModalOpen = useSignal(false);
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });

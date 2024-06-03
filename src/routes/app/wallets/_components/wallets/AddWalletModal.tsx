@@ -7,7 +7,7 @@ import {
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
-import type { Signal } from "@builder.io/qwik";
+import { type Signal } from "@builder.io/qwik";
 
 import {
   getAccount,
@@ -29,7 +29,7 @@ import { fetchTokens } from "~/database/tokens";
 
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { AddWalletFormStore } from "~/routes/app/wallets/interface";
+import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 
 import { convertToFraction } from "~/utils/fractions";
 import { getAccessToken } from "~/utils/refresh";
