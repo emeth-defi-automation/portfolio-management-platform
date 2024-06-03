@@ -1,4 +1,5 @@
-import { component$, Signal, useSignal } from "@builder.io/qwik";
+import { component$, useSignal } from "@builder.io/qwik";
+import type { Signal } from "@builder.io/qwik";
 import Button from "~/components/Atoms/Buttons/Button";
 import { Modal } from "~/components/Modal/Modal";
 import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";

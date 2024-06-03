@@ -13,7 +13,6 @@ import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { chainIdToNetworkName } from "~/utils/chains";
 
-
 import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
@@ -46,7 +45,6 @@ export default component$(() => {
       msg.value = value;
     }
   });
-
 
   return (
     <>
@@ -100,9 +98,7 @@ export default component$(() => {
       </div>
 
       {isAddWalletModalOpen.value && (
-        <AddWalletModal
-          isAddWalletModalOpen={isAddWalletModalOpen}
-        />
+        <AddWalletModal isAddWalletModalOpen={isAddWalletModalOpen} />
       )}
 
       {isDeleteModalOpen.value && (
