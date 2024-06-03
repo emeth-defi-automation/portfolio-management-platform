@@ -142,7 +142,7 @@ export default component$<AddWalletFormFieldsProps>(
                   onClick$={onConnectWalletClick}
                   text={
                     connectedAddress.value !==
-                      localStorage.getItem("emmethUserWalletAddress")
+                    localStorage.getItem("emmethUserWalletAddress")
                       ? "Second Wallet connected."
                       : "Connect another wallet"
                   }

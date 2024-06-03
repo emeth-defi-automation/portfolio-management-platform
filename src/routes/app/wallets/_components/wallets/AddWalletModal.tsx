@@ -41,7 +41,7 @@ import Button from "~/components/Atoms/Buttons/Button";
 import AddWalletFormFields from "../AddWalletFormFields";
 import AmountOfCoins from "../AmountOfCoins";
 import CoinsToApprove from "../CoinsToApprove";
-import IsExecutableSwitch from "../isExecutableSwitch"
+import IsExecutableSwitch from "../isExecutableSwitch";
 import { Modal } from "~/components/Modal/Modal";
 import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
