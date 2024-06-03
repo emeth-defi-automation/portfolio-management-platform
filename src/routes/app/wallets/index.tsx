@@ -13,7 +13,6 @@ import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { chainIdToNetworkName } from "~/utils/chains";
 
-import { getConnections, watchAccount, type Config } from "@wagmi/core";
 
 import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
@@ -30,14 +29,11 @@ import { balancesLiveStream } from "./server/balancesLiveStream";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
-  const { streamId } = useContext(StreamStoreContext);
   const isAddWalletModalOpen = useSignal(false);
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
   const selectedWallet = useSignal<WalletTokensBalances | null>(null);
-  const isSecondWalletConnected = useSignal(false);
-  const stepsCounter = useSignal(1);
 
   const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
@@ -50,39 +46,7 @@ export default component$(() => {
       msg.value = value;
     }
   });
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async ({ track }) => {
-    track(() => wagmiConfig.config);
-    watchAccount(wagmiConfig.config!, {
-      onChange() {
-        const connections = getConnections(wagmiConfig.config as Config);
-        if (connections.length > 1) {
-          isSecondWalletConnected.value = true;
-        } else {
-          isSecondWalletConnected.value = false;
-        }
-      },
-    });
-  });
 
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async ({ track }) => {
-    track(() => wagmiConfig.config);
-    watchAccount(wagmiConfig.config!, {
-      onChange() {
-        const connections = getConnections(wagmiConfig.config as Config);
-        if (connections.length > 1) {
-          isSecondWalletConnected.value = true;
-        } else {
-          isSecondWalletConnected.value = false;
-        }
-      },
-    });
-  });
-
-  const connectWallet = $(async () => {
-    await openWeb3Modal(wagmiConfig!.config);
-  });
 
   return (
     <>
@@ -138,8 +102,6 @@ export default component$(() => {
       {isAddWalletModalOpen.value && (
         <AddWalletModal
           isAddWalletModalOpen={isAddWalletModalOpen}
-          stepsCounter={stepsCounter}
-          isSecondWalletConnected={isSecondWalletConnected}
         />
       )}
 

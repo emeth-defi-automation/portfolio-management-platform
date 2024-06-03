@@ -5,6 +5,7 @@ import {
   useContext,
   useSignal,
   useStore,
+  useVisibleTask$
 } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
 
@@ -13,8 +14,11 @@ import {
   readContract,
   simulateContract,
   writeContract,
+  getConnections,
+  watchAccount,
   type Config,
 } from "@wagmi/core";
+
 import { checksumAddress } from "viem";
 import { contractABI } from "~/abi/abi";
 import { emethContractAbi } from "~/abi/emethContractAbi";
@@ -63,14 +67,14 @@ export {
 
 interface AddWalletModal {
   isAddWalletModalOpen: Signal<boolean>;
-  isSecondWalletConnected: Signal<boolean>;
-  stepsCounter: Signal<number>;
 }
 
 export const AddWalletModal = component$<AddWalletModal>(
-  ({ isAddWalletModalOpen, stepsCounter, isSecondWalletConnected }) => {
+  ({ isAddWalletModalOpen }) => {
+    const isSecondWalletConnected = useSignal(false);
     const observedWallets = useSignal<WalletTokensBalances[]>([]);
     const walletTokenBalances = useSignal<any>([]);
+    const stepsCounter = useSignal(1);
 
     const addWalletFormStore = useStore<AddWalletFormStore>({
       name: "",
@@ -230,6 +234,36 @@ export const AddWalletModal = component$<AddWalletModal>(
           isVisible: true,
         });
       }
+    });
+
+    // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(async ({ track }) => {
+      track(() => wagmiConfig.config);
+      watchAccount(wagmiConfig.config!, {
+        onChange() {
+          const connections = getConnections(wagmiConfig.config as Config);
+          if (connections.length > 1) {
+            isSecondWalletConnected.value = true;
+          } else {
+            isSecondWalletConnected.value = false;
+          }
+        },
+      });
+    });
+
+    // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(async ({ track }) => {
+      track(() => wagmiConfig.config);
+      watchAccount(wagmiConfig.config!, {
+        onChange() {
+          const connections = getConnections(wagmiConfig.config as Config);
+          if (connections.length > 1) {
+            isSecondWalletConnected.value = true;
+          } else {
+            isSecondWalletConnected.value = false;
+          }
+        },
+      });
     });
 
     return (
