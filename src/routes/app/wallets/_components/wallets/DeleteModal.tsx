@@ -3,10 +3,10 @@ import Button from "~/components/Atoms/Buttons/Button";
 import { Modal } from "~/components/Modal/Modal";
 import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { useRemoveWallet } from "../../server";
+import { useRemoveWallet } from "~/routes/app/wallets/server";
 import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
 export { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
-export { useRemoveWallet } from "../../server";
+export { useRemoveWallet } from "~/routes/app/wallets/server";
 
 interface DeleteModalProps {
   isDeleteModalOpen: Signal<boolean>;

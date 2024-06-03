@@ -25,7 +25,7 @@ import { fetchTokens } from "~/database/tokens";
 
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { AddWalletFormStore } from "../../interface";
+import { AddWalletFormStore } from "~/routes/app/wallets/interface";
 
 import { convertToFraction } from "~/utils/fractions";
 import { getAccessToken } from "~/utils/refresh";
@@ -35,19 +35,22 @@ import {
   isProceedDisabled,
 } from "~/utils/validators/addWallet";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
-import { messagesContext } from "../../../layout";
+import { messagesContext } from "~/routes/app/layout";
 
 import Button from "~/components/Atoms/Buttons/Button";
-import AddWalletFormFields from "../AddWalletFormFields";
-import AmountOfCoins from "../AmountOfCoins";
-import CoinsToApprove from "../CoinsToApprove";
-import IsExecutableSwitch from "../isExecutableSwitch";
+import AddWalletFormFields from "~/routes/app/wallets/_components/AddWalletFormFields";
+import AmountOfCoins from "~/routes/app/wallets/_components/AmountOfCoins";
+import CoinsToApprove from "~/routes/app/wallets/_components/CoinsToApprove";
+import IsExecutableSwitch from "~/routes/app/wallets/_components/isExecutableSwitch";
 import { Modal } from "~/components/Modal/Modal";
 import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 
 import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
-import { useAddWallet, useGetBalanceHistory } from "../../server";
+import {
+  useAddWallet,
+  useGetBalanceHistory,
+} from "~/routes/app/wallets/server";
 export {
   ObservedWalletsList,
   getObservedWallets,
@@ -56,7 +59,7 @@ export {
   useAddWallet,
   useGetBalanceHistory,
   useRemoveWallet,
-} from "../../server";
+} from "~/routes/app/wallets/server";
 
 interface AddWalletModal {
   isAddWalletModalOpen: Signal<boolean>;
