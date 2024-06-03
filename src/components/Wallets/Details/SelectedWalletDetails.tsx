@@ -128,7 +128,6 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
           </div>
           <div>
             {tokens.value.map((token: any) => {
-              console.log("token", token);
               return (
                 <TokenRowWallets
                   walletId={selectedWalletDetails.value.id}

@@ -42,12 +42,9 @@ export default component$<CoinsToApproveProps>(
               //   value={symbol}
               //   checked={addWalletFormStore.coinsToCount.includes(symbol)}
               //   onClick={$(() => {
-              //     console.log("coins: ", addWalletFormStore.coinsToCount);
               //     if (!addWalletFormStore.coinsToCount.includes(symbol)) {
               //       addWalletFormStore.coinsToCount = [...addWalletFormStore.coinsToCount, symbol];
-              //       console.log('tu jest ifu')
               //     } else {
-              //       console.log('tu jest elsu')
               //       const indexToRemove =
               //         addWalletFormStore.coinsToCount.indexOf(symbol);
 

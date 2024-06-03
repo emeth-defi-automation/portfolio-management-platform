@@ -43,11 +43,11 @@ export const observedWalletsLiveStream = server$(async function* () {
             throw new Error("No cookie found");
         }
         const { userId } = jwt.decode(cookie) as JwtPayload;
-        console.log("userId", userId);
+
         const [walletId]: any = db.query(`SELECT VALUE out FROM observes_wallet WHERE in = ${userId};`);
-        console.log("walletId", walletId);
+
         if (!walletId) {
-            console.log("User doesnt observe", result);
+
             return;
         }
 

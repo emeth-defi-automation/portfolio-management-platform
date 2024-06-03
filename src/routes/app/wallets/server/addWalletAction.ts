@@ -25,23 +25,23 @@ export const useAddWallet = routeAction$(
         await db.query(
             `DEFINE INDEX walletAddressChainIndex ON TABLE wallet COLUMNS address, chainId UNIQUE;`,
         );
-        console.log("define index")
+        
 
         const cookie = requestEvent.cookie.get("accessToken");
         if (!cookie) {
             throw new Error("No cookie found");
         }
-        console.log("cookie found")
+        
 
         const { userId } = jwt.decode(cookie.value) as JwtPayload;
-        console.log("userId", userId);
+        ;
         const existingWallet = await getExistingWallet(db, data.address.toString());
-        console.log("existing wallet", existingWallet)
+        
         let walletId;
         if (existingWallet.at(0)) {
             walletId = existingWallet[0].id;
         } else {
-            console.log("Adding new wallet...")
+            
             const nativeBalance = await testPublicClient.getBalance({
                 address: data.address as `0x${string}`,
             });
@@ -51,7 +51,7 @@ export const useAddWallet = routeAction$(
                 isExecutable: data.isExecutable === "1" ? true : false,
                 nativeBalance: nativeBalance.toString(),
             });
-            console.log("Wallet added", createWalletQueryResult);
+            
 
             walletId = createWalletQueryResult.id;
 
@@ -83,6 +83,7 @@ export const useAddWallet = routeAction$(
                 `RELATE ONLY ${userId}->observes_wallet->${walletId} SET name = '${data.name}';`,
             );
         }
+
         return {
             success: true,
             wallet: { id: walletId, chainId: 1, address: data.address },

@@ -129,14 +129,11 @@ export default component$(() => {
 
     const emethContractAddress = import.meta.env
       .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
-    console.log("starting try catch");
+
     try {
       if (addWalletFormStore.isExecutable) {
         if (wagmiConfig.config) {
-          console.log("config", wagmiConfig.config);
-          console.log("before get account");
           const account = getAccount(wagmiConfig.config);
-          console.log("account", account);
 
           addWalletFormStore.address = account.address as `0x${string}`;
 
@@ -145,7 +142,6 @@ export default component$(() => {
           }
 
           const tokens: any = await fetchTokens();
-          console.log("tokens", tokens);
 
           for (const token of tokens) {
             if (addWalletFormStore.coinsToCount.includes(token.symbol)) {
@@ -156,7 +152,6 @@ export default component$(() => {
                 functionName: "balanceOf",
                 args: [account.address as `0x${string}`],
               });
-              console.log("tokenBalance", tokenBalance);
 
               const amount = addWalletFormStore.coinsToApprove.find(
                 (item) => item.symbol === token.symbol,
@@ -176,13 +171,12 @@ export default component$(() => {
                   functionName: "approve",
                   args: [emethContractAddress, BigInt(calculation)],
                 });
-                console.log("approval", approval);
 
                 // keep receipts for now, to use waitForTransactionReceipt
                 try {
                   await writeContract(wagmiConfig.config, approval.request);
                 } catch (err) {
-                  console.error("Error: ", err);
+                  console.error(err);
                 }
               }
             }
@@ -235,7 +229,6 @@ export default component$(() => {
       addWalletFormStore.coinsToApprove = [];
       stepsCounter.value = 1;
     } catch (err) {
-      console.error("error: ", err);
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "error",
@@ -464,7 +457,7 @@ export default component$(() => {
                   selectedWalletDetails.value = undefined;
                   isDeleteModalOpen.value = false;
                   if (success) {
-                    console.log("deleted wallet", success);
+                    console.log("Wallet successfully removed.");
                   }
                 }
               }}

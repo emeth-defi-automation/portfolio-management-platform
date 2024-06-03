@@ -24,14 +24,10 @@ export const openWeb3Modal = async (wagmiContext: any, login: any) => {
   });
 
   wagmiContext.config = noSerialize(wconfig);
-  console.log("set wagmiContext.config to", wagmiContext.config);
 
   if (wagmiContext.config) {
-    console.log("wagmi config from index ", wagmiContext.config);
     watchAccount(wagmiContext.config!, {
       onChange(account) {
-        console.log("watchAccount account:", account);
-
         if (
           window.location.pathname === "/signin" ||
           window.location.pathname === "/"
@@ -47,7 +43,6 @@ export const openWeb3Modal = async (wagmiContext: any, login: any) => {
     });
   }
 
-  console.log("wagmi config just created", wagmiContext.config);
   if (wagmiContext.config) await reconnect(wagmiContext.config!);
   const modal = createWeb3Modal({
     wagmiConfig: wagmiContext.config!,

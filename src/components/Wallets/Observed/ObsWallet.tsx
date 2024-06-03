@@ -35,7 +35,7 @@ export const fetchObservedWalletName = server$(async function (
       `SELECT VALUE name FROM observes_wallet WHERE out = ${observedWalletId};`,
     )
   ).at(0);
-  console.log(GetWalletNameResult.array().parse(observedWalletName));
+
   return GetWalletNameResult.array().parse(observedWalletName);
 });
 
@@ -56,27 +56,23 @@ export const observedWalletNameLiveStream = server$(async function* (
   const queryUuid: any =
     await db.query(`LIVE SELECT name FROM observes_wallet WHERE 
   (out = ${walletId} AND in = ${userId})`);
-  console.log("obsWallet queryUuid", queryUuid);
 
   await db.query(
     `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${queryUuid}', ${true});`,
   );
-  console.log("instered queryUuid", queryUuid[0], true);
 
   yield queryUuid;
 
   const observedWalletName = (await fetchObservedWalletName(walletId)).at(0);
-  console.log("ObsWallet observedWalletName", observedWalletName);
+
   yield observedWalletName;
 
   const queryUuidEnabledLive: any = await db.query(
     `LIVE SELECT enabled FROM queryuuids WHERE queryUuid = '${queryUuid[0]}';`,
   );
 
-  await db.listenLive(queryUuidEnabledLive[0], ({ action, result }) => {
+  await db.listenLive(queryUuidEnabledLive[0], ({ action }) => {
     if (action === "UPDATE") {
-      console.log("result", result);
-      console.log("pushing null to resultStream");
       resultsStream.push(null);
       db.kill(queryUuidEnabledLive[0]);
     }
@@ -99,12 +95,11 @@ export const observedWalletNameLiveStream = server$(async function* (
 
   for await (const result of resultsStream) {
     if (!result) {
-      console.log("breaking obsWallet, result null");
       break;
     }
     yield result;
   }
-  console.log("exit async for");
+
   await db.query(`DELETE FROM queryuuids WHERE queryUuid = '${queryUuid[0]}';`);
   return;
 });
@@ -118,30 +113,20 @@ export const ObsWallet = component$<ObservedWalletProps>(
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ cleanup }) => {
       cleanup(async () => {
-        console.log("cleanup in ObsWallet", queryUuid.value);
         await killLiveQuery(queryUuid.value);
       });
 
-      console.log("obsWallet useVisibleTask...");
       if (!observedWallet.id) throw new Error("observedWallet.id is undefined");
       const data = await observedWalletNameLiveStream(observedWallet.id);
       const queryUuid = await data.next();
-      console.log("queryUuid", queryUuid);
 
       observedWalletNameSignal.value = (await data.next()).value;
 
-      console.log("observedWalletName", observedWalletNameSignal.value);
-
       for await (const value of data) {
-        console.log("obsWallet value", value);
         if (value.action === "CREATE" || value.action === "UPDATE") {
-          console.log("create", value.action);
           observedWalletNameSignal.value = value.result.name;
         } else if (value.action === "DELETE") {
-          console.log("delete", value.action);
           observedWalletNameSignal.value = "";
-        } else {
-          console.log("else", value.action);
         }
       }
     });

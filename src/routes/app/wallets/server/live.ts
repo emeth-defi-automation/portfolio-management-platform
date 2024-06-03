@@ -12,7 +12,6 @@ export const observedWalletsLiveStream = server$(async function* () {
     });
 
     await db.live("wallet", async ({ action, result }) => {
-        console.log("WE ARE LIVE");
         if (action === "CLOSE") {
             resultsStream.push(null);
             return;

@@ -74,7 +74,6 @@ export const tokenRowWalletsInfoStream = server$(async function* (
     `SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}' 
     ORDER BY timestamp DESC LIMIT 1;`,
   );
-  console.log("latestTokenPrice", latestTokenPrice);
   yield latestTokenPrice;
 
   const queryUuidEnabledLive: any = await db.query(
@@ -85,26 +84,19 @@ export const tokenRowWalletsInfoStream = server$(async function* (
     `LIVE SELECT enabled FROM queryuuids WHERE queryUuid = '${latestTokenPriceQueryUuid[0]}';`,
   );
 
-  await db.listenLive(queryUuidEnabledLive[0], ({ action, result }) => {
+  await db.listenLive(queryUuidEnabledLive[0], ({ action }) => {
     if (action === "UPDATE") {
-      console.log("result", result);
-      console.log("pushing null to resultStream");
       resultsStream.push(null);
       db.kill(queryUuidEnabledLive[0]);
     }
   });
 
-  await db.listenLive(
-    queryUuidTokenPriceEnabledLive[0],
-    ({ action, result }) => {
-      if (action === "UPDATE") {
-        console.log("result", result);
-        console.log("pushing null to resultStream");
-        resultsStream.push(null);
-        db.kill(queryUuidTokenPriceEnabledLive[0]);
-      }
-    },
-  );
+  await db.listenLive(queryUuidTokenPriceEnabledLive[0], ({ action }) => {
+    if (action === "UPDATE") {
+      resultsStream.push(null);
+      db.kill(queryUuidTokenPriceEnabledLive[0]);
+    }
+  });
 
   await db.listenLive(queryUuid, ({ action, result }) => {
     if (action === "CLOSE") {
@@ -117,12 +109,10 @@ export const tokenRowWalletsInfoStream = server$(async function* (
 
   for await (const result of resultsStream) {
     if (!result) {
-      console.log("result is NULL");
       break;
     }
     yield result;
   }
-  console.log("exit async for in tokenrowwallets");
   await db.query(`DELETE FROM queryuuids WHERE queryUuid = '${queryUuid[0]}';`);
   await db.query(
     `DELETE FROM queryuuids WHERE queryUuid = '${latestTokenPriceQueryUuid[0]}';`,
@@ -149,7 +139,6 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ cleanup }) => {
       cleanup(async () => {
-        console.log("clenaup starts TokenRowWallets");
         await killLiveQuery(queryUuid.value);
         await killLiveQuery(latestTokenPriceQueryUuid.value);
       });
@@ -160,28 +149,22 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       const data = await tokenRowWalletsInfoStream(walletId, symbol);
 
       const queryUuid = await data.next();
-      console.log("queryUuid", queryUuid);
+
       currentBalanceOfToken.value = convertWeiToQuantity(
         (await data.next()).value[0][0]["walletValue"],
         parseInt(decimals),
       );
-      console.log("currentBalanceOfToken", currentBalanceOfToken.value);
 
       const latestTokenPriceQueryUuid = await data.next();
-      console.log("latestTokenPriceQueryUuid", latestTokenPriceQueryUuid);
 
       latestTokenPrice.value = (await data.next()).value[0][0]["price"];
-      console.log("latestTokenPrice", latestTokenPrice);
 
       latestBalanceUSD.value = (
         Number(currentBalanceOfToken.value) * Number(latestTokenPrice.value)
       ).toFixed(2);
 
       for await (const value of data) {
-        console.log("value", value);
         if (value.action === "CREATE") {
-          console.log("CREATE BLLOCK");
-
           currentBalanceOfToken.value = convertWeiToQuantity(
             value.result.balance,
             parseInt(decimals),

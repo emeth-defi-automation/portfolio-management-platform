@@ -182,11 +182,6 @@ export const fetchObservedWallets = server$(async function () {
     await db.query(`SELECT * FROM  
   (SELECT VALUE out FROM observes_wallet WHERE in = ${userId});`)
   ).at(0);
-
-  console.log(
-    "observedWallets from fetchobservedwallets",
-    FetchObservedWalletsResult.parse(observedWallets),
-  );
   return FetchObservedWalletsResult.parse(observedWallets);
 });
 
@@ -202,14 +197,12 @@ export const observedWalletsLiveStream = server$(async function* () {
     throw new Error("No cookie found");
   }
   const { userId } = jwt.decode(cookie) as JwtPayload;
-  console.log("userId", userId);
-  const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet WHERE
-  (SELECT VALUE out FROM observes_wallet where in = ${userId});`);
+  const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet WHERE id IN
+  (SELECT VALUE out FROM observes_wallet WHERE in = ${userId});`);
   // const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet`);
   await db.query(
     `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${queryUuid}', ${true});`,
   );
-  console.log("instered queryUuid", queryUuid[0], true);
   yield queryUuid;
 
   const walletsObservedByLoggedInUser = await fetchObservedWallets();
@@ -219,10 +212,8 @@ export const observedWalletsLiveStream = server$(async function* () {
     `LIVE SELECT enabled FROM queryuuids WHERE queryUuid = '${queryUuid[0]}';`,
   );
 
-  await db.listenLive(queryUuidEnabledLive[0], ({ action, result }) => {
+  await db.listenLive(queryUuidEnabledLive[0], ({ action }) => {
     if (action === "UPDATE") {
-      console.log("result", result);
-      console.log("pushing null to resultStream");
       resultsStream.push(null);
       db.kill(queryUuidEnabledLive[0]);
     }
@@ -246,25 +237,20 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   for await (const result of resultsStream) {
     if (!result) {
-      console.log("result is NULL");
       break;
     }
-    console.log("result", result);
     yield result;
   }
-  console.log("exit async for");
   await db.query(`DELETE FROM queryuuids WHERE queryUuid = '${queryUuid[0]}';`);
   return;
 });
 
 export const killLiveQuery = server$(async function (queryUuid: string) {
   const db = await connectToDB(this.env);
-  console.log("killing live query", queryUuid[0]);
   await db.kill(queryUuid[0]);
-  const dataAfterUpdate = await db.query(
+  await db.query(
     `UPDATE queryuuids SET enabled = ${false} WHERE queryUuid = '${queryUuid[0]}';`,
   );
-  console.log("dataAfterUpdate", dataAfterUpdate);
 });
 
 export const ObservedWalletsList = component$(() => {
@@ -272,47 +258,31 @@ export const ObservedWalletsList = component$(() => {
   const isLoading = useSignal(true);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ cleanup }) => {
-    const data = await observedWalletsLiveStream();
     cleanup(async () => {
-      console.log("cleanup starts ObservedWalletsList", queryUuid.value);
       await killLiveQuery(queryUuid.value);
     });
+    const data = await observedWalletsLiveStream();
 
     const queryUuid = await data.next();
-    console.log("queryUuid", queryUuid);
 
     walletsObservedByLoggedInUser.value = (await data.next()).value;
     isLoading.value = false;
 
-    console.log(
-      "walletsObservedByLoggedInUser",
-      walletsObservedByLoggedInUser.value,
-    );
-
     for await (const value of data) {
-      console.log("value", value);
       if (value.action === "CREATE") {
-        console.log("create", value.action);
         walletsObservedByLoggedInUser.value = [
           ...walletsObservedByLoggedInUser.value,
           value.result,
         ];
       }
       if (value.action === "DELETE") {
-        console.log("delete", value.action);
         walletsObservedByLoggedInUser.value = [
           ...walletsObservedByLoggedInUser.value.filter(
             (wallet) => wallet.id !== value.result.id,
           ),
         ];
       }
-
-      console.log(
-        "walletsObservedByLoggedInUser after add/delete",
-        walletsObservedByLoggedInUser.value,
-      );
     }
-    console.log("EXIT ASYNC FOR IN VISIBEL TASK");
   });
 
   return (

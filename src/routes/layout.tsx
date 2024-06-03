@@ -63,11 +63,8 @@ export default component$(() => {
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
     if (wagmiConfig.config) {
-      console.log("wagmi config from index ", wagmiConfig.config);
       watchAccount(wagmiConfig.config!, {
         onChange(account) {
-          console.log("watchAccount account:", account);
-
           if (
             window.location.pathname === "/signin" ||
             window.location.pathname === "/"
@@ -92,7 +89,6 @@ export default component$(() => {
     // });
 
     // wagmiConfig.config = noSerialize(wconfig);
-    // console.log("wagmi config just created", wagmiConfig.config);
   });
 
   useContextProvider(StreamStoreContext, { streamId: "" });
@@ -102,7 +98,6 @@ export default component$(() => {
     await initializeStreamIfNeeded(setupStream);
     const stream = await getStream();
     streamStore.streamId = stream["jsonResponse"]["id"];
-    console.log(streamStore.streamId);
   });
 
   return (
