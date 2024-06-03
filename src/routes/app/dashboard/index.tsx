@@ -1,11 +1,4 @@
-import {
-  $,
-  component$,
-  useSignal,
-  useStore,
-  useTask$,
-  useVisibleTask$,
-} from "@builder.io/qwik";
+import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import { PortfolioValue } from "~/components/PortfolioValue/PortfolioValue";
 import { ActionAlertMessage } from "~/components/ActionAlertsMessage/ActionAlertsMessage";
 import {
@@ -17,17 +10,11 @@ import { useNavigate } from "@builder.io/qwik-city";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Spinner } from "~/components/Spinner/Spinner";
-import {
-  getFavouriteTokens,
-  getTotalPortfolioValue,
-  getPortfolio24hChange,
-  toggleChart,
-} from "./server";
-import { type PeriodState } from "~/interface/balance/Balance";
+import { getFavouriteTokens } from "./server";
+
 import Button from "~/components/Atoms/Buttons/Button";
 import NoData from "~/components/Molecules/NoData/NoData";
-import { Period } from "./server/getPortfolio24hChange";
-import { _totalPortfolioValue } from "./server/getTotalPortfolioValue";
+
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -38,8 +25,6 @@ export {
 export default component$(() => {
   const nav = useNavigate();
   const isPortfolioFullScreen = useSignal(false);
-  const portfolioValueChange = useSignal<any>({});
-  const portfolioValueChangeLoading = useSignal(true);
   const favoriteTokenLoading = useSignal(true);
   const favoriteTokens = useSignal<any[]>([]);
 
@@ -47,96 +32,14 @@ export default component$(() => {
   useVisibleTask$(async () => {
     favoriteTokens.value = await getFavouriteTokens();
     favoriteTokenLoading.value = false;
-
-    // portfolioValueChange.value = await getPortfolio24hChange();
-    // console.log("before portfoliovaluechange.value.chartdata", portfolioValueChange.value.chartData);
-    // portfolioValueChange.value.chartData = await _totalPortfolioValue(Period.DAY);
-    // console.log("afetr portfoliovaluechange.value.chartdata", portfolioValueChange.value.chartData);
-    // portfolioValueChangeLoading.value = false;
   });
 
-  // const changePeriod = useSignal(false);
-  // const selectedPeriod: PeriodState = useStore({
-  //   "24h": true,
-  //   "1W": false,
-  //   "1M": false,
-  //   "1Y": false,
-  // });
-
-  // const togglePeriod = $(function togglePeriod(button: string) {
-  //   for (const key in selectedPeriod) {
-  //     selectedPeriod[key] = false;
-  //   }
-  //   selectedPeriod[button] = true;
-  // });
-
-  // const redrawChart = useSignal<boolean>(false);
-  // const hideChartWhileLoading = useSignal<boolean>(false);
-
-  // useTask$(async ({ track }) => {
-  //   track(async () => {
-  //     selectedPeriod["24h"];
-  //     selectedPeriod["1W"];
-  //     selectedPeriod["1M"];
-  //     selectedPeriod["1Y"];
-
-  //     if (changePeriod.value !== false) {
-  //       hideChartWhileLoading.value = true;
-  //       const newChartData = await toggleChart(selectedPeriod);
-  //       console.log("toggle chart before", newChartData.chartData);
-  //       const data = await _totalPortfolioValue(Period.DAY);
-  //       console.log("toggle chart after", data);
-  //       portfolioValueChange.value.chartData = data;
-  //       console.log("portfoliovaluechange.value.chartdata", portfolioValueChange.value.chartData);
-  //       portfolioValueChange.value.period = newChartData.period;
-  //       portfolioValueChange.value.totalValueChange =
-  //         newChartData.totalValueChange;
-  //       portfolioValueChange.value.percentageOfTotalValueChange =
-  //         newChartData.percentageOfTotalValueChange;
-  //       redrawChart.value = !redrawChart.value;
-  //       hideChartWhileLoading.value = false;
-  //     }
-  //   });
-  // });
-
   return isPortfolioFullScreen.value ? (
-    <PortfolioValue
-      // hideChartWhileLoading={hideChartWhileLoading}
-      // redrawChart={redrawChart.value}
-      // portfolioValueChangeLoading={portfolioValueChangeLoading}
-      isPortfolioFullScreen={isPortfolioFullScreen}
-      // portfolioValueChange={portfolioValueChange.value.totalValueChange}
-      // portfolioPercentageValueChange={
-      //   portfolioValueChange.value.percentageOfTotalValueChange
-      // }
-      // chartData={portfolioValueChange.value.chartData}
-      // selectedPeriod={selectedPeriod}
-      // period={portfolioValueChange.value.period}
-      // onClick$={(e: any) => {
-      //   togglePeriod(e.target.name);
-      //   changePeriod.value = true;
-      // }}
-    />
+    <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
   ) : (
     <div class="grid grid-rows-[max(460px)_auto] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
-        <PortfolioValue
-          // hideChartWhileLoading={hideChartWhileLoading}
-          // redrawChart={redrawChart.value}
-          // portfolioValueChangeLoading={portfolioValueChangeLoading}
-          isPortfolioFullScreen={isPortfolioFullScreen}
-          // portfolioValueChange={portfolioValueChange.value.totalValueChange}
-          // portfolioPercentageValueChange={
-          //   portfolioValueChange.value.percentageOfTotalValueChange
-          // }
-          // chartData={portfolioValueChange.value.chartData}
-          // selectedPeriod={selectedPeriod}
-          // period={portfolioValueChange.value.period}
-          // onClick$={(e: any) => {
-          //   togglePeriod(e.target.name);
-          //   changePeriod.value = true;
-          // }}
-        />
+        <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
 
         <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">

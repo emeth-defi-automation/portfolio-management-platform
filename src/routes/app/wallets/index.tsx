@@ -15,7 +15,6 @@ import { contractABI } from "~/abi/abi";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Modal } from "~/components/Modal/Modal";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { checksumAddress } from "viem";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import IsExecutableSwitch from "~/components/Forms/isExecutableSwitch";
@@ -42,10 +41,7 @@ import CoinsToApprove from "~/components/Forms/CoinsToApprove";
 import AmountOfCoins from "~/components/Forms/AmountOfCoins";
 import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
-import {
-  getObservedWallets,
-  ObservedWalletsList,
-} from "~/components/ObservedWalletsList/ObservedWalletsList";
+import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
   getObservedWallets,
   ObservedWalletsList,
@@ -104,7 +100,7 @@ export default component$(() => {
     coinsToCount: [],
     coinsToApprove: [],
   });
-  
+
   // const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
   // eslint-disable-next-line qwik/no-use-visible-task
@@ -451,12 +447,15 @@ export default component$(() => {
               onClick$={() => (isDeleteModalOpen.value = false)}
               customClass="w-full"
             />
-             <Button
+            <Button
               variant="red"
               text="Yes, Let’s Do It!"
               customClass="w-full"
               onClick$={async () => {
-                if (selectedWalletDetails.value && selectedWalletDetails.value.id) {
+                if (
+                  selectedWalletDetails.value &&
+                  selectedWalletDetails.value.id
+                ) {
                   const {
                     value: { success },
                   } = await removeWalletAction.submit({
@@ -469,7 +468,7 @@ export default component$(() => {
                   }
                 }
               }}
-            /> 
+            />
           </div>
         </Modal>
       )}

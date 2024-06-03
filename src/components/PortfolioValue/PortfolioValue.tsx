@@ -2,13 +2,10 @@ import {
   $,
   component$,
   useSignal,
-  useTask$,
   useVisibleTask$,
-  type QRL,
   type Signal,
 } from "@builder.io/qwik";
 import * as d3 from "d3";
-import { type PeriodState } from "~/interface/balance/Balance";
 import {
   axisXFormatter,
   axisYFormatter,
@@ -20,7 +17,10 @@ import IconMinimalize from "@material-design-icons/svg/filled/close_fullscreen.s
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
 import { _totalPortfolioValue } from "~/routes/app/dashboard/server/getTotalPortfolioValue";
-import { Period, PeriodValues } from "~/routes/app/dashboard/server/getPortfolio24hChange";
+import {
+  Period,
+  PeriodValues,
+} from "~/routes/app/dashboard/server/getPortfolio24hChange";
 import { routeLoader$ } from "@builder.io/qwik-city";
 
 export interface PortfolioValueProps {
@@ -28,9 +28,7 @@ export interface PortfolioValueProps {
 }
 
 export const PortfolioValue = component$<PortfolioValueProps>(
-  ({
-    isPortfolioFullScreen,
-  }) => {
+  ({ isPortfolioFullScreen }) => {
     const totalPortfolioValue = useSignal("0");
     const dataForChart = useSignal<[string, number][]>();
     const selectedPeriodForChart = useSignal<Period>(Period.DAY);
@@ -96,7 +94,9 @@ export const PortfolioValue = component$<PortfolioValueProps>(
           d3
             .axisBottom(scaleX)
             .tickValues(data.map((d) => d[0]))
-            .tickFormat((d) => axisXFormatter(d as Date, selectedPeriodForChart.value))
+            .tickFormat((d) =>
+              axisXFormatter(d as Date, selectedPeriodForChart.value),
+            )
             .tickSize(-height + marginTop + marginBottom)
             .tickPadding(12),
         )
@@ -146,23 +146,26 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       outputRef.value!.replaceChildren(svg.node()!);
     });
 
-    routeLoader$
+    routeLoader$;
 
     // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(async ({track}) => {
+    useVisibleTask$(async ({ track }) => {
       track(() => {
         selectedPeriodForChart.value;
-      })
-        isDataForChartLoading.value = false;
-        const data = await _totalPortfolioValue(selectedPeriodForChart.value);
-        console.log("data", data);
-        dataForChart.value =  data.values;
-        percentageChange.value = (data.percentageChange > 0 ? "+" : "") + data.percentageChange.toFixed(2) + "%";
-        change.value = (data.change > 0 ? "+" : "") + data.change.toFixed(2);
-        totalPortfolioValue.value = dataForChart.value[dataForChart.value.length - 1][1].toFixed(2);
-        await chart(dataForChart.value);
+      });
+      isDataForChartLoading.value = false;
+      const data = await _totalPortfolioValue(selectedPeriodForChart.value);
+      console.log("data", data);
+      dataForChart.value = data.values;
+      percentageChange.value =
+        (data.percentageChange > 0 ? "+" : "") +
+        data.percentageChange.toFixed(2) +
+        "%";
+      change.value = (data.change > 0 ? "+" : "") + data.change.toFixed(2);
+      totalPortfolioValue.value =
+        dataForChart.value[dataForChart.value.length - 1][1].toFixed(2);
+      await chart(dataForChart.value);
     });
-
 
     return (
       <div
@@ -183,11 +186,9 @@ export const PortfolioValue = component$<PortfolioValueProps>(
               <div>
                 {" "}
                 <p class="text-xs">
-                  {PeriodValues[selectedPeriodForChart.value].label} change: {" "}
-                  <span class="text-xs">{change.value} {" "}</span>
-                  <span class="text-customGreen">
-                    {percentageChange.value}
-                  </span>
+                  {PeriodValues[selectedPeriodForChart.value].label} change:{" "}
+                  <span class="text-xs">{change.value} </span>
+                  <span class="text-customGreen">{percentageChange.value}</span>
                 </p>{" "}
               </div>
             )}
@@ -224,7 +225,6 @@ export const PortfolioValue = component$<PortfolioValueProps>(
                   }
                   onClick$={() => {
                     selectedPeriodForChart.value = Period.WEEK;
-                  
                   }}
                 >
                   1W
@@ -285,42 +285,41 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         {isDataForChartLoading.value ? null : (
           <div id="container" ref={outputRef}></div>
         )}
-        {isPortfolioFullScreen.value &&
-          !isDataForChartLoading.value && (
-            <div class="ml-7">
-              <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
-                <div class="pr-timeline row-start-2"></div>
-                <Button
-                  variant="iconBox"
-                  leftIcon={<ImgPfButton />}
-                  size="small"
-                  customClass="absolute left-3/4 top-1/3 !bg-white/10 !px-1"
-                />
-                <Button
-                  variant="iconBox"
-                  leftIcon={<ImgPfButton />}
-                  size="small"
-                  customClass="absolute left-2/4 top-1/3 !bg-white/10 !px-1"
-                />
-              </div>
-              <div class="custom-text-50 mt-3 flex justify-between text-xs">
-                <span>2011</span>
-                <span>2012</span>
-                <span>2013</span>
-                <span>2014</span>
-                <span>2015</span>
-                <span>2016</span>
-                <span>2017</span>
-                <span>2018</span>
-                <span>2019</span>
-                <span>2020</span>
-                <span>2021</span>
-                <span>2022</span>
-                <span>2023</span>
-                <span>2024</span>
-              </div>
+        {isPortfolioFullScreen.value && !isDataForChartLoading.value && (
+          <div class="ml-7">
+            <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
+              <div class="pr-timeline row-start-2"></div>
+              <Button
+                variant="iconBox"
+                leftIcon={<ImgPfButton />}
+                size="small"
+                customClass="absolute left-3/4 top-1/3 !bg-white/10 !px-1"
+              />
+              <Button
+                variant="iconBox"
+                leftIcon={<ImgPfButton />}
+                size="small"
+                customClass="absolute left-2/4 top-1/3 !bg-white/10 !px-1"
+              />
             </div>
-          )}
+            <div class="custom-text-50 mt-3 flex justify-between text-xs">
+              <span>2011</span>
+              <span>2012</span>
+              <span>2013</span>
+              <span>2014</span>
+              <span>2015</span>
+              <span>2016</span>
+              <span>2017</span>
+              <span>2018</span>
+              <span>2019</span>
+              <span>2020</span>
+              <span>2021</span>
+              <span>2022</span>
+              <span>2023</span>
+              <span>2024</span>
+            </div>
+          </div>
+        )}
       </div>
     );
   },

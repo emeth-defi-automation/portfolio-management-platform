@@ -5,8 +5,6 @@ import {
   useSignal,
   useVisibleTask$,
 } from "@builder.io/qwik";
-// import Button from "../Atoms/Buttons/Button";
-// import IconMenuDots from "@material-design-icons/svg/outlined/more_vert.svg?jsx";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
 import {
   Image,
@@ -16,7 +14,6 @@ import {
 import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
 import { server$ } from "@builder.io/qwik-city";
 import { connectToDB } from "~/database/db";
-import jwt, { type JwtPayload } from "jsonwebtoken";
 import { Readable } from "stream";
 import { killLiveQuery } from "../ObservedWalletsList/ObservedWalletsList";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
@@ -47,11 +44,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   });
 
   // live query for latest balance of token for wallet
-  console.log("walletId", walletId);
-  console.log("tokenSymbol", tokenSymbol);
-  // const queryUuid: any = await db.query(
-  //   `LIVE SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1;`,
-  // );
+
   const queryUuid: any = await db.query(
     `LIVE SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' AND walletId = ${walletId};`,
   );
@@ -63,18 +56,15 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const latestBalanceOfTokenForWallet =
     await db.query(`SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
       AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1;`);
-  console.log("latestBalanceOfTokenForWallet", latestBalanceOfTokenForWallet);
+
   yield latestBalanceOfTokenForWallet;
 
   if (tokenSymbol === "USDT") {
     tokenSymbol = "USDC";
   }
-  const latestTokenPriceQueryUuid: any =
-    //   await db.query(`LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}'
-    // ORDER BY timestamp DESC LIMIT 1;`);
-    await db.query(
-      `LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}';`,
-    );
+  const latestTokenPriceQueryUuid: any = await db.query(
+    `LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}';`,
+  );
   await db.query(
     `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${latestTokenPriceQueryUuid}', ${true});`,
   );
@@ -140,17 +130,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
 });
 
 export const TokenRowWallets = component$<TokenRowWalletsProps>(
-  ({
-    walletId,
-    name,
-    symbol,
-    decimals,
-    balance,
-    imagePath,
-    balanceValueUSD,
-    allowance,
-    address,
-  }) => {
+  ({ walletId, name, symbol, decimals, imagePath, allowance }) => {
     const imageTransformer$ = $(
       ({ src, width, height }: ImageTransformerProps): string => {
         return `${src}?height=${height}&width=${width}&format=webp&fit=fill`;

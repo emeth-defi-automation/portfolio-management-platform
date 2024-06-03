@@ -9,7 +9,6 @@ import {
 } from "@wagmi/core";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, sepolia } from "viem/chains";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { metadata } from "~/routes/layout";
 
 export const openWeb3Modal = async (wagmiContext: any, login: any) => {
