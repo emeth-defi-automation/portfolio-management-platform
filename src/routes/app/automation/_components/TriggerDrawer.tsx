@@ -376,8 +376,12 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
               text="Approve"
               onClick$={$(async () => {
                 console.log(addModalStore);
-                await handleAddAutomation();
-                automationPageContext.isDraverOpen.value = false;
+                try {
+                  await handleAddAutomation();
+                  automationPageContext.isDraverOpen.value = false;
+                } catch (err) {
+                  console.log(err);
+                }
               })}
             />
           </div>

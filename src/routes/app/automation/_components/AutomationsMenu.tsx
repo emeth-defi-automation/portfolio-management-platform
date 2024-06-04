@@ -56,6 +56,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   useVisibleTask$(async ({ track }) => {
     track(() => {
       isAddModalOpen.value === false;
+      automationPageContext.isDraverOpen.value = false;
     });
     const user = localStorage.getItem("emmethUserWalletAddress");
     const actionsFromDb = await getActionsFromDb(user);
