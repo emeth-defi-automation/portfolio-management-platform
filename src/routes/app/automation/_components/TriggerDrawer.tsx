@@ -159,7 +159,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
           BigInt(actionId),
           tokenIn as `0x${string}`,
           tokenOut as `0x${string}`,
-          BigInt(amountIn),
+          BigInt(calculatedAmountIn),
           from as `0x${string}`,
           to as `0x${string}`,
           BigInt(timeZeroCalculated),
@@ -298,7 +298,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
               <Input
                 name="to"
                 placeholder="Address to send coins to"
-                value={addModalStore.amountIn}
+                value={addModalStore.to}
                 type="text"
                 onInput={$((e) => {
                   const target = e.target;
@@ -355,7 +355,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
               <Input
                 name="durationCount"
                 placeholder="0"
-                value={addModalStore.amountIn}
+                value={addModalStore.durationCount}
                 type="number"
                 onInput={$((e) => {
                   const target = e.target;
