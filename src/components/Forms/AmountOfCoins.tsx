@@ -25,33 +25,34 @@ export default component$<AmountOfCoinsProps>(
                   image={`/assets/icons/tokens/${symbol.toLowerCase()}.svg`}
                   description={symbol}
                   class="w-[98%]"
-                  input={
-                    <input
-                      type="text"
-                      name={`${symbol}Amount`}
-                      class={` absolute end-[56px] block h-9 w-1/2 rounded border border-[#24a148] bg-transparent p-3 text-sm text-[#24a148] placeholder-white placeholder-opacity-50`}
-                      placeholder={`${symbol} approval limit`}
-                      value={
-                        addWalletFormStore.coinsToApprove.find(
-                          (item) => item.symbol === symbol,
-                        )!.amount
-                      }
-                      onInput$={(e) => {
-                        const target = e.target as HTMLInputElement;
-                        const regex = /^\d*\.?\d*$/;
-                        target.value = replaceNonMatching(
-                          target.value,
-                          regex,
-                          "",
-                        );
-                        addWalletFormStore.coinsToApprove.find(
-                          (item) => item.symbol === symbol,
-                        )!.amount = target.value;
-                      }}
-                    />
-                  }
                   hasImg={"/assets/icons/dashboard/success.svg?jsx"}
-                />
+                >
+                  {" "}
+                  <input
+                    type="text"
+                    name={`${symbol}Amount`}
+                    class={` absolute end-[56px] block h-9 w-1/2 rounded border border-[#24a148] bg-transparent p-3 text-sm text-[#24a148] placeholder-white placeholder-opacity-50`}
+                    placeholder={`${symbol} approval limit`}
+                    value={
+                      addWalletFormStore.coinsToApprove.find(
+                        (item) => item.symbol === symbol,
+                      )!.amount
+                    }
+                    onInput$={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      // const regex = /^[0-9]*(\.[0-9]*)?$/;
+                      const regex = /^\d*\.?\d*$/;
+                      target.value = replaceNonMatching(
+                        target.value,
+                        regex,
+                        "",
+                      );
+                      addWalletFormStore.coinsToApprove.find(
+                        (item) => item.symbol === symbol,
+                      )!.amount = target.value;
+                    }}
+                  />
+                </FormBadge>
                 <Button
                   text="max"
                   variant="transparent"
