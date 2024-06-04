@@ -42,7 +42,6 @@ const getActionsFromDb = server$(async function (user) {
     `SELECT * FROM automations WHERE user = $user;`,
     { user: user },
   );
-  console.log(actions);
   return actions;
 });
 
@@ -62,7 +61,6 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
     const user = localStorage.getItem("emmethUserWalletAddress");
     const actionsFromDb = await getActionsFromDb(user);
     automationPageContext.automations.value = actionsFromDb;
-    console.log(automationPageContext.automations.value);
   });
 
   const handleActiveStatus = $(async function (
@@ -71,7 +69,6 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
     deployed: boolean,
   ) {
     try {
-      console.log(isActive);
       if (deployed) {
         const account = getAccount(wagmiConfig.config as Config);
         const emethContractAddress = import.meta.env
@@ -144,7 +141,6 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
                 isChecked={action.isActive}
                 class=""
                 onClick={$(async () => {
-                  console.log("kliknalem sie");
                   await handleActiveStatus(
                     action.actionId,
                     !action.isActive,

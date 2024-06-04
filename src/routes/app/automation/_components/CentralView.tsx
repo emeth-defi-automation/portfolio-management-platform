@@ -16,7 +16,6 @@ const deleteActionFromDb = server$(async function (actionId, user) {
 
   const db = await connectToDB(this.env);
   try {
-    console.log("deleting");
     await db.query(
       `DELETE FROM automations 
       WHERE user = $user AND actionId = $actionId;`,
@@ -25,7 +24,6 @@ const deleteActionFromDb = server$(async function (actionId, user) {
         actionId: actionId,
       },
     );
-    console.log("deleted");
   } catch (err) {
     console.log(err);
   }
