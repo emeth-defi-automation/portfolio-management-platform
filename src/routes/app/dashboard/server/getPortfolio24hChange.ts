@@ -139,3 +139,39 @@ export const getPortfolio24hChange = server$(async function () {
         ]) as [string, number][],
     };
 });
+
+export enum Period {
+    DAY = 'DAY',
+    WEEK = 'WEEK',
+    MONTH = 'MONTH',
+    YEAR = 'YEAR'
+}
+
+type PeriodValue = {
+    hours: number;
+    ticks: number;
+    label: string;
+};
+
+export const PeriodValues: { [key in Period]: PeriodValue } = {
+    [Period.DAY]: { hours: 24, ticks: 4, label: '24h' },
+    [Period.WEEK]: { hours: 168, ticks: 7, label: "1W" },
+    [Period.MONTH]: { hours: 744, ticks: 4 , label: "1M"},
+    [Period.YEAR]: { hours: 8760, ticks: 12, label: "1Y" }
+};
+
+export const getPortfolioDatesForSelectedPeriod = (selectedPeriod: Period) => {
+    const periodValue = PeriodValues[selectedPeriod];
+    const now = new Date();
+    const start = new Date(now.getTime() - periodValue.hours * 60 * 60 * 1000);
+    const tickInterval = periodValue.hours / periodValue.ticks;
+
+    const tickTimes = Array.from({ length: periodValue.ticks }, (_, i) => {
+        const tickTime = new Date(start.getTime() + i * tickInterval * 60 * 60 * 1000);
+        return tickTime.toISOString();
+    });
+
+    tickTimes.push(now.toISOString());
+
+    return tickTimes;
+}
