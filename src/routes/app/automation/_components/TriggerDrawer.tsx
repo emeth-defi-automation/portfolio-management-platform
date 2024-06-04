@@ -137,11 +137,12 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
       const timeZeroCalculated = Math.floor(
         new Date(timeZero).getTime() / 1000,
       );
+      const calculatedAmountIn = BigInt(amountIn) * 10n ** 18n;
       console.log(
         BigInt(actionId),
         tokenIn as `0x${string}`,
         tokenOut as `0x${string}`,
-        BigInt(amountIn),
+        BigInt(calculatedAmountIn),
         from as `0x${string}`,
         to as `0x${string}`,
         BigInt(timeZeroCalculated),
