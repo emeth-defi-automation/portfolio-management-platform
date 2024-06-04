@@ -14,17 +14,22 @@ import { connectToDB } from "~/database/db";
 import { server$ } from "@builder.io/qwik-city";
 import { AddAutomationModal } from "./AddAutomationModal";
 import { AutomationPageContext } from "../AutomationPageContext";
+import {
+  Config,
+  getAccount,
+  simulateContract,
+  writeContract,
+} from "@wagmi/core";
+import { emethContractAbi } from "~/abi/emethContractAbi";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 
 const updateIsActiveStatus = server$(async function (actionId, isActive) {
   const db = await connectToDB(this.env);
-  console.log("id: ", actionId, "isActive: ", isActive);
   try {
-    console.log("zmieniam");
     await db.query(
       `UPDATE automations SET isActive = $isActive WHERE actionId = $actionId;`,
       { actionId: actionId, isActive: isActive },
     );
-    console.log("chyba zmienilem");
   } catch (err) {
     console.log(err);
   }
@@ -46,6 +51,7 @@ interface AutomationsMenuProps {}
 export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   const automationPageContext = useContext(AutomationPageContext);
   const isAddModalOpen = useSignal<boolean>(false);
+  const wagmiConfig = useContext(WagmiConfigContext);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => {
@@ -55,6 +61,40 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
     const actionsFromDb = await getActionsFromDb(user);
     automationPageContext.automations.value = actionsFromDb;
     console.log(automationPageContext.automations.value);
+  });
+
+  const handleActiveStatus = $(async function (
+    actionId: string,
+    isActive: boolean,
+    deployed: boolean,
+  ) {
+    try {
+      console.log(isActive);
+      if (deployed) {
+        const account = getAccount(wagmiConfig.config as Config);
+        const emethContractAddress = import.meta.env
+          .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
+        const { request } = await simulateContract(
+          wagmiConfig.config as Config,
+          {
+            account: account.address as `0x${string}`,
+            abi: emethContractAbi,
+            address: emethContractAddress,
+            functionName: "setAutomationActiveState",
+            args: [BigInt(actionId), isActive],
+          },
+        );
+
+        const transactionHash = await writeContract(
+          wagmiConfig.config as Config,
+          request,
+        );
+        console.log(transactionHash);
+      }
+      await updateIsActiveStatus(actionId, isActive);
+    } catch (err) {
+      console.log(err);
+    }
   });
 
   return (
@@ -103,7 +143,11 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
                 class=""
                 onClick={$(async () => {
                   console.log("kliknalem sie");
-                  await updateIsActiveStatus(action.actionId, !action.isActive);
+                  await handleActiveStatus(
+                    action.actionId,
+                    !action.isActive,
+                    action.deployed,
+                  );
                 })}
               />
             </div>

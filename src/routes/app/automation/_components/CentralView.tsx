@@ -91,14 +91,16 @@ export const CentralView = component$<CentralViewProps>(() => {
             </div>
           </div>
           <div class="grow-1 flex h-full items-center justify-center">
-            <Button
-              text="Add trigger!"
-              customClass="mb-1"
-              variant="blue"
-              onClick$={async () => {
-                automationPageContext.isDraverOpen.value = true;
-              }}
-            />
+            {!automationPageContext.activeAutomation.value.deployed ? (
+              <Button
+                text="Add trigger!"
+                customClass="mb-1"
+                variant="blue"
+                onClick$={async () => {
+                  automationPageContext.isDraverOpen.value = true;
+                }}
+              />
+            ) : null}
           </div>
         </div>
       ) : null}

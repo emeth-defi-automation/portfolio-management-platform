@@ -45,13 +45,14 @@ const addActionBasicToDB = server$(async function (
   const db = await connectToDB(this.env);
 
   await db.query(
-    `INSERT INTO automations (name, isActive, desc, user, actionId) VALUES ($name, $isActive, $desc, $user, $actionId);`,
+    `INSERT INTO automations (name, isActive, desc, user, actionId, deployed) VALUES ($name, $isActive, $desc, $user, $actionId, $deployed);`,
     {
       name: name,
       isActive: false,
       desc: desc,
       user: user,
       actionId: actionId,
+      deployed: false,
     },
   );
 });
