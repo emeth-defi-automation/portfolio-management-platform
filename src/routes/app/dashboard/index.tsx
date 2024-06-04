@@ -10,7 +10,8 @@ import { useNavigate } from "@builder.io/qwik-city";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Spinner } from "~/components/Spinner/Spinner";
-import { getFavouriteTokens } from "./server";
+import { getFavouriteTokens, getTotalPortfolioValue } from "./server";
+import { _totalPortfolioValue } from "./server/getTotalPortfolioValue";
 
 import Button from "~/components/Atoms/Buttons/Button";
 import NoData from "~/components/Molecules/NoData/NoData";
@@ -22,11 +23,14 @@ export {
   toggleChart,
 } from "./server";
 
+export { _totalPortfolioValue } from "./server/getTotalPortfolioValue";
+
 export default component$(() => {
   const nav = useNavigate();
   const isPortfolioFullScreen = useSignal(false);
   const favoriteTokenLoading = useSignal(true);
   const favoriteTokens = useSignal<any[]>([]);
+  const totalValue = useSignal<any>();
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
