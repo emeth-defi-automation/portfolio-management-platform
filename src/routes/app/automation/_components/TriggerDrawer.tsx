@@ -281,7 +281,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
                 name="AddressFrom"
                 options={[
                   { value: "", text: "Select wallet" },
-                  ...observedWallets.value?.map((wallet: any) => {
+                  ...observedWallets.value.map((wallet: any) => {
                     return {
                       text: wallet.walletName,
                       value: wallet.wallet.address,

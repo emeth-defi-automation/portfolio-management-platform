@@ -15,7 +15,7 @@ import { server$ } from "@builder.io/qwik-city";
 import { AddAutomationModal } from "./AddAutomationModal";
 import { AutomationPageContext } from "../AutomationPageContext";
 import {
-  Config,
+  type Config,
   getAccount,
   simulateContract,
   writeContract,
