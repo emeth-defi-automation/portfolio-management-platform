@@ -52,6 +52,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   const automationPageContext = useContext(AutomationPageContext);
   const isAddModalOpen = useSignal<boolean>(false);
   const wagmiConfig = useContext(WagmiConfigContext);
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => {
