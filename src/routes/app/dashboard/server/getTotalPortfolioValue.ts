@@ -180,10 +180,13 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             }
         }
     }
+    let percentageChange = 0;
     const oldestValue = timestampValueMap[Object.keys(timestampValueMap)[0]];
     const latestValue = timestampValueMap[Object.keys(timestampValueMap)[Object.keys(timestampValueMap).length - 1]];
     const change = latestValue - oldestValue;
-    const percentageChange = ((change) / oldestValue) * 100;
+    if (oldestValue !== 0) {
+        percentageChange = ((change) / oldestValue) * 100;
+    }
 
     return {
         change, percentageChange,
