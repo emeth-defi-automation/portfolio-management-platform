@@ -132,24 +132,16 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             const lessEqualTimestampBalanceArr = lessEqualTimestampBalanceResults.flat();
             const greaterTimestampBalanceArr = greaterTimestampBalanceResults.flat();
 
+            closestBalance = { timestamp: tickTime, walletValue: '0' };
 
-            if (!greaterTimestampBalanceArr || greaterTimestampBalanceArr.length === 0) {
-                closestBalance = lessEqualTimestampBalanceArr[lessEqualTimestampBalanceArr.length - 1];
-            } else if (!lessEqualTimestampBalanceArr || lessEqualTimestampBalanceArr.length === 0) {
-                closestBalance = greaterTimestampBalanceArr[greaterTimestampBalanceArr.length - 1];
-            } else if (greaterTimestampBalance.length == 0 && lessEqualTimestampBalanceArr.length === 0) {
-                closestBalance = { timestamp: tickTime, walletValue: 0 };
-            } else if (greaterTimestampBalanceArr.length !== 0 && lessEqualTimestampBalanceArr.length !== 0) {
+            for (const lessEqualTimestampBalance of lessEqualTimestampBalanceArr) {
+                closestBalance = lessEqualTimestampBalance;
+                for (const greaterTimestampBalance of greaterTimestampBalanceArr) {
 
-                for (const lessEqualTimestampBalance of lessEqualTimestampBalanceArr) {
-                    for (const greaterTimestampBalance of greaterTimestampBalanceArr) {
-                        const diffGreater = Math.abs(new Date(tickTime).getTime() - new Date(lessEqualTimestampBalance.timestamp).getTime());
-                        const diffLess = Math.abs(new Date(tickTime).getTime() - new Date(greaterTimestampBalance.timestamp).getTime());
-                        closestBalance = diffGreater < diffLess ? lessEqualTimestampBalance : greaterTimestampBalance;
-                    }
                 }
 
             }
+
 
             const balanceOfTokenQuantity = closestBalance ? convertWeiToQuantity(closestBalance.walletValue, parseInt(token.decimals)) : 0;
             tokenBalanceMap[token.symbol][tickTime] += Number(balanceOfTokenQuantity);
