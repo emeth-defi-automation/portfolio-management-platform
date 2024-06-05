@@ -60,24 +60,10 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             ORDER BY timestamp DESC LIMIT 1;`);
 
 
-
-            // lessEqualTimestampQueries.push(`SELECT timestamp FROM token_price_history 
-            // WHERE symbol = '${token.symbol}' 
-            // AND timestamp <= '${tickTime}' 
-            // ORDER BY timestamp DESC LIMIT 1;`);
-
-
             const [[greaterTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
             WHERE symbol = '${token.symbol}'
             AND timestamp > '${tickTime}' 
-            ORDER BY timestamp ASC LIMIT 1;`);
-
-            // greaterTimestampQueries.push(`SELECT timestamp FROM token_price_history 
-            // WHERE symbol = '${token.symbol}'
-            // AND timestamp > '${tickTime}' 
-            // ORDER BY timestamp ASC LIMIT 1;`)
-
-
+            ORDER BY timestamp ASC LIMIT 1;`)
 
             let closestTimestamp;
             if (!lessEqualTimestamp) {
@@ -98,24 +84,12 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             tokenPriceMap[token.symbol][tickTime] = tokenPriceForClosestTimestamp.price;
 
 
-
-            // tokenPriceForClosestTimestampQueries.push(`SELECT timestamp FROM token_price_history 
-            // WHERE symbol = '${token.symbol}'
-            // AND timestamp > '${tickTime}' 
-            // ORDER BY timestamp ASC LIMIT 1;`)
-
         }
 
 
         for (const observedWalletId of observedWalletsIds) {
 
-            // let closestBalance;
             for (const tickTime of tickTimes) {
-                // const [[lessEqualTimestampBalance]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
-                // WHERE walletId = ${observedWalletId} 
-                // AND tokenSymbol = '${token.symbol}' 
-                // AND timestamp <= '${tickTime}' 
-                // ORDER BY timestamp DESC LIMIT 1;`);
 
                 lessEqualTimestampBalanceQueries.push(`SELECT walletValue, timestamp FROM wallet_balance 
                 WHERE walletId = ${observedWalletId} 
@@ -123,40 +97,12 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
                 AND timestamp <= '${tickTime}' 
                 ORDER BY timestamp DESC LIMIT 1;`)
 
-
-                // const [[greaterTimestampBalance]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
-                // WHERE walletId = ${observedWalletId} 
-                // AND tokenSymbol = '${token.symbol}'
-                // AND timestamp > '${tickTime}'
-                // ORDER BY timestamp ASC LIMIT 1;`);
-
                 greaterTimestampBalance.push(`SELECT walletValue, timestamp FROM wallet_balance 
                 WHERE walletId = ${observedWalletId} 
                 AND tokenSymbol = '${token.symbol}'
                 AND timestamp > '${tickTime}'
                 ORDER BY timestamp ASC LIMIT 1;`)
 
-                // if (!lessEqualTimestampBalance) {
-
-                //     closestBalance = greaterTimestampBalance;
-                // } else if (!greaterTimestampBalance) {
-
-                //     closestBalance = lessEqualTimestampBalance;
-                // } else if (!greaterTimestampBalance && !lessEqualTimestampBalance) {
-
-                //     closestBalance = { timestamp: tickTime, walletValue: 0 };
-                // } else {
-
-                //     const diffGreater = Math.abs(new Date(tickTime).getTime() - new Date(lessEqualTimestampBalance.timestamp).getTime());
-                //     const diffLess = Math.abs(new Date(tickTime).getTime() - new Date(greaterTimestampBalance.timestamp).getTime());
-                //     closestBalance = diffGreater < diffLess ? lessEqualTimestampBalance : greaterTimestampBalance;
-                // }
-
-                // console.log(closestBalance);
-
-
-                // const balanceOfTokenQuatity = convertWeiToQuantity(closestBalance.walletValue, parseInt(token.decimals));
-                // tokenBalanceMap[token.symbol][tickTime] += Number(balanceOfTokenQuatity);
             }
 
 
@@ -330,5 +276,6 @@ export const getTotalPortfolioValue = server$(async function () {
             }
         }
     }
+
     return totalValue.toFixed(2);
 });
