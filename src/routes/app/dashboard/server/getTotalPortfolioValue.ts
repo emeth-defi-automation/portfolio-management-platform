@@ -91,7 +91,7 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
         for (const observedWalletId of observedWalletsIds) {
 
             for (const tickTime of tickTimes) {
-                lessEqualTimestampBalanceQueries.push([tickTime, token.decimals, `SELECT * FROM wallet_balance 
+                lessEqualTimestampBalanceQueries.push([tickTime, token.decimals, token.symbol, `SELECT * FROM wallet_balance 
                 WHERE walletId = ${observedWalletId} 
                 AND tokenSymbol = '${token.symbol}' 
                 AND timestamp <= '${tickTime}' 
@@ -101,6 +101,7 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
         }
 
     }
+
 
     if (!lessEqualTimestampQueries.length || !greaterTimestampQueries.length) {
         console.log("no queries to excecute");
@@ -150,6 +151,7 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
 
 
 
+
         const tokenPriceForClosestTimestampResults: any = (await db.query(tokenPriceForClosestTimestampQueries.join(" "))).flat();
 
 
@@ -165,19 +167,22 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
     if (!lessEqualTimestampBalanceQueries.length) {
         console.log('No lessEqualTimestampBalanceQueries to execute');
     } else {
-        const queries = lessEqualTimestampBalanceQueries.map(data => data[2]);
+        const queries = lessEqualTimestampBalanceQueries.map(data => data[3]);
         const query = queries.join('');
 
         const lessEqualTimestampBalance: any = await db.query(query);
-        lessEqualTimestampBalance.flat().forEach((element: any, index: number) => {
-            const balanceOfTokenQuantity = convertWeiToQuantity(element.walletValue, parseInt(lessEqualTimestampBalanceQueries[index][1]));
-            tokenBalanceMap[element.tokenSymbol][lessEqualTimestampBalanceQueries[index][0]] += Number(balanceOfTokenQuantity);
+
+
+        lessEqualTimestampBalance.forEach((element: any, index: number) => {
+            if (!element || !element[0]) {
+                tokenBalanceMap[lessEqualTimestampBalanceQueries[index][2]][lessEqualTimestampBalanceQueries[index][0]] = 0;
+            } else {
+                const balanceOfTokenQuantity: any = convertWeiToQuantity(element[0].walletValue, parseInt(lessEqualTimestampBalanceQueries[index][1]));
+                tokenBalanceMap[element[0].tokenSymbol][lessEqualTimestampBalanceQueries[index][0]] += Number(balanceOfTokenQuantity);
+            }
         });
 
     }
-
-
-    console.log(period, tokenBalanceMap)
 
 
     let tokenValueMap: { [tokenSymbol: string]: { [timestamp: string]: number } } = {};
