@@ -15,10 +15,13 @@ import { getPortfolioDatesForSelectedPeriod, Period } from "./getPortfolio24hCha
 
 export const _totalPortfolioValue = server$(async function (period: Period) {
 
-    const queries: string[] = [];
+    const lessEqualTimestampBalanceQueries: string[][] = [];
+    const lessEqualTimestampQueries: string[][] = [];
+    const greaterTimestampQueries: string[][] = [];
+    const tokenPriceForClosestTimestampQueries: string[] = [];
+    const closerTimestamps: string[] = [];
 
     const tickTimes = getPortfolioDatesForSelectedPeriod(period);
-    console.log("test")
 
     const db = await connectToDB(this.env);
 
@@ -46,117 +49,127 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             for (const tickTime of tickTimes) {
                 tokenPriceMap[token.symbol][tickTime] = 1;
             }
-            continue;
-        }
+        } else {
 
-        for (const tickTime of tickTimes) {
-            const [[lessEqualTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
-            WHERE symbol = '${token.symbol}' 
-            AND timestamp <= '${tickTime}' 
-            ORDER BY timestamp DESC LIMIT 1;`);
+            for (const tickTime of tickTimes) {
+                //     const [[lessEqualTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
+                // WHERE symbol = '${token.symbol}' 
+                // AND timestamp <= '${tickTime}' 
+                // ORDER BY timestamp DESC LIMIT 1;`);
+
+                lessEqualTimestampQueries.push([tickTime, token.symbol,
+                    `SELECT timestamp FROM token_price_history 
+                    WHERE symbol = '${token.symbol}' 
+                     AND timestamp <= '${tickTime}' 
+                    ORDER BY timestamp DESC LIMIT 1;`
+                ])
 
 
+                //     const [[greaterTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
+                // WHERE symbol = '${token.symbol}'
+                // AND timestamp > '${tickTime}' 
+                // ORDER BY timestamp ASC LIMIT 1;`);
 
-            // queries.push(`SELECT timestamp FROM token_price_history 
-            // WHERE symbol = '${token.symbol}' 
-            // AND timestamp <= '${tickTime}' 
-            // ORDER BY timestamp DESC LIMIT 1;`);
-
-
-            const [[greaterTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
+                greaterTimestampQueries.push([tickTime, token.symbol,
+                    `SELECT timestamp FROM token_price_history 
             WHERE symbol = '${token.symbol}'
             AND timestamp > '${tickTime}' 
-            ORDER BY timestamp ASC LIMIT 1;`);
-
-            // queries.push(`SELECT timestamp FROM token_price_history 
-            // WHERE symbol = '${token.symbol}'
-            // AND timestamp > '${tickTime}' 
-            // ORDER BY timestamp ASC LIMIT 1;`)
+            ORDER BY timestamp ASC LIMIT 1;`
+                ])
 
 
+                // let closestTimestamp;
+                // if (!lessEqualTimestamp) {
+                //     closestTimestamp = greaterTimestamp;
+                // } else if (!greaterTimestamp) {
+                //     closestTimestamp = lessEqualTimestamp;
+                // } else {
+                //     const diffGreater = Math.abs(new Date(tickTime).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
+                //     const diffLess = Math.abs(new Date(tickTime).getTime() - new Date(greaterTimestamp.timestamp).getTime());
+                //     closestTimestamp = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
+                // }
 
-            let closestTimestamp;
-            if (!lessEqualTimestamp) {
-                closestTimestamp = greaterTimestamp;
-            } else if (!greaterTimestamp) {
-                closestTimestamp = lessEqualTimestamp;
-            } else {
-                const diffGreater = Math.abs(new Date(tickTime).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
-                const diffLess = Math.abs(new Date(tickTime).getTime() - new Date(greaterTimestamp.timestamp).getTime());
-                closestTimestamp = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
+
+
+                //     const [[tokenPriceForClosestTimestamp]]: any = await db.query(`SELECT price FROM token_price_history 
+                // WHERE timestamp = '${closestTimestamp.timestamp}' 
+                // AND symbol = '${token.symbol}'`);
+                //     tokenPriceMap[token.symbol][tickTime] = tokenPriceForClosestTimestamp.price;
+
+
+
+                // tokenPriceForClosestTimestampQueries.push([token.symbol, closestTimestamp, `SELECT price FROM token_price_history 
+                // WHERE timestamp = '${closestTimestamp.timestamp}' 
+                // AND symbol = '${token.symbol}'`])
+
+
             }
-
-
-
-            const [[tokenPriceForClosestTimestamp]]: any = await db.query(`SELECT price FROM token_price_history 
-            WHERE timestamp = '${closestTimestamp.timestamp}' 
-            AND symbol = '${token.symbol}'`);
-            tokenPriceMap[token.symbol][tickTime] = tokenPriceForClosestTimestamp.price;
-
-
-
-            // queries.push(`SELECT timestamp FROM token_price_history 
-            // WHERE symbol = '${token.symbol}'
-            // AND timestamp > '${tickTime}' 
-            // ORDER BY timestamp ASC LIMIT 1;`)
-
         }
+
+
+
+
+
 
 
         for (const observedWalletId of observedWalletsIds) {
 
-            let closestBalance;
             for (const tickTime of tickTimes) {
-                const [[lessEqualTimestampBalance]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
+                lessEqualTimestampBalanceQueries.push([tickTime, token.decimals, `SELECT * FROM wallet_balance 
                 WHERE walletId = ${observedWalletId} 
                 AND tokenSymbol = '${token.symbol}' 
                 AND timestamp <= '${tickTime}' 
-                ORDER BY timestamp DESC LIMIT 1;`);
-
-                // queries.push(`SELECT walletValue, timestamp FROM wallet_balance 
-                // WHERE walletId = ${observedWalletId} 
-                // AND tokenSymbol = '${token.symbol}' 
-                // AND timestamp <= '${tickTime}' 
-                // ORDER BY timestamp DESC LIMIT 1;`)
-
-
-                const [[greaterTimestampBalance]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
-                WHERE walletId = ${observedWalletId} 
-                AND tokenSymbol = '${token.symbol}'
-                AND timestamp > '${tickTime}'
-                ORDER BY timestamp ASC LIMIT 1;`);
-
-                // queries.push(`SELECT walletValue, timestamp FROM wallet_balance 
-                // WHERE walletId = ${observedWalletId} 
-                // AND tokenSymbol = '${token.symbol}'
-                // AND timestamp > '${tickTime}'
-                // ORDER BY timestamp ASC LIMIT 1;`)
-
-                if (!lessEqualTimestampBalance) {
-                    closestBalance = greaterTimestampBalance;
-                } else if (!greaterTimestampBalance) {
-                    closestBalance = lessEqualTimestampBalance;
-                } else if (!greaterTimestampBalance && !lessEqualTimestampBalance) {
-                    closestBalance = { timestamp: tickTime, walletValue: 0 };
-                } else {
-                    const diffGreater = Math.abs(new Date(tickTime).getTime() - new Date(lessEqualTimestampBalance.timestamp).getTime());
-                    const diffLess = Math.abs(new Date(tickTime).getTime() - new Date(greaterTimestampBalance.timestamp).getTime());
-                    closestBalance = diffGreater < diffLess ? lessEqualTimestampBalance : greaterTimestampBalance;
-
-                }
-
-                const balanceOfTokenQuatity = convertWeiToQuantity(closestBalance.walletValue, parseInt(token.decimals));
-                tokenBalanceMap[token.symbol][tickTime] += Number(balanceOfTokenQuatity);
+                ORDER BY timestamp DESC LIMIT 1;`])
             }
-
 
         }
 
     }
 
-    // const results = await db.query(queries.join('; '))
+    if (!lessEqualTimestampQueries.length || !greaterTimestampQueries.length) {
+        console.log("no queries to excecute");
+    } else {
+        const lessTimestampQueries = lessEqualTimestampQueries.map(data => data[2]);
+        const greaterTimestampQueries1 = greaterTimestampQueries.map(data => data[2]);
+        const query1 = lessTimestampQueries.join('');
+        const query2 = greaterTimestampQueries1.join('');
+        const lessEqualTimestampResult: any = (await db.query(query1)).flat();
+        const greaterEqualTimestampResult: any = (await db.query(query2)).flat();
 
-    // console.log(results);
+        let closestTime;
+        for (let i = 0; i < lessTimestampQueries.length; i++) {
+            const diffGreater = Math.abs(new Date(lessEqualTimestampQueries[i][0]).getTime() - new Date(lessEqualTimestampResult[i].timestamp).getTime());
+            const diffLess = Math.abs(new Date(greaterTimestampQueries1[i][0]).getTime() - new Date(greaterEqualTimestampResult[i].timestamp).getTime());
+            closestTime = diffGreater < diffLess ? lessEqualTimestampResult[i] : greaterEqualTimestampResult[i];
+            closerTimestamps.push(closestTime)
+            tokenPriceForClosestTimestampQueries.push(`SELECT price FROM token_price_history 
+            WHERE timestamp = '${closestTime.timestamp}' 
+            AND symbol = '${lessEqualTimestampQueries[i][1]}';`)
+        }
+
+        const tokenPriceForClosestTimestampResults: any = (await db.query(tokenPriceForClosestTimestampQueries.join(" "))).flat();
+
+        for (let j = 0; j < lessEqualTimestampQueries.length; j++) {
+            tokenPriceMap[lessEqualTimestampQueries[j][1]][lessEqualTimestampQueries[j][0]] = tokenPriceForClosestTimestampResults[j].price;
+        }
+    }
+
+
+
+
+    if (!lessEqualTimestampBalanceQueries.length) {
+        console.log('No lessEqualTimestampBalanceQueries to execute');
+    } else {
+        const queries = lessEqualTimestampBalanceQueries.map(data => data[2]);
+        const query = queries.join('');
+
+        const lessEqualTimestampBalance: any = await db.query(query);
+        lessEqualTimestampBalance.flat().forEach((element: any, index: number) => {
+            const balanceOfTokenQuantity = convertWeiToQuantity(element.walletValue, parseInt(lessEqualTimestampBalanceQueries[index][1]));
+            tokenBalanceMap[element.tokenSymbol][lessEqualTimestampBalanceQueries[index][0]] += Number(balanceOfTokenQuantity);
+        });
+    }
+    console.log(tokenBalanceMap)
 
     let tokenValueMap: { [tokenSymbol: string]: { [timestamp: string]: number } } = {};
 
@@ -181,11 +194,13 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             }
         }
     }
+    let percentageChange = 0;
     const oldestValue = timestampValueMap[Object.keys(timestampValueMap)[0]];
     const latestValue = timestampValueMap[Object.keys(timestampValueMap)[Object.keys(timestampValueMap).length - 1]];
     const change = latestValue - oldestValue;
-    const percentageChange = ((change) / oldestValue) * 100;
-
+    if (oldestValue !== 0) {
+        percentageChange = ((change) / oldestValue) * 100;
+    }
     return {
         change, percentageChange,
         values: Object.entries(timestampValueMap).map(([timestamp, value]) => [timestamp, value]) as [string, number][]
