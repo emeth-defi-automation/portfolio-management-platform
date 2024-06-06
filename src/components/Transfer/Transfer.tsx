@@ -2,7 +2,7 @@ import { component$, useSignal } from "@builder.io/qwik";
 import { Modal } from "~/components/Modal/Modal";
 import Button from "../Atoms/Buttons/Button";
 import { ProgressBar } from "./ProgressBar";
-import { Step2 } from "./Step2";
+import { Step3 } from "./Step3";
 
 export const Transfer = component$(() => {
   const isTransferModalOpen = useSignal(true);
@@ -15,7 +15,7 @@ export const Transfer = component$(() => {
     >
       <div class="grid gap-8 overflow-auto">
         {/* CHOOSE STEP */}
-        <Step2 />
+        <Step3 />
         {/* <Destination>
           IF STEP 2:
           <Input
