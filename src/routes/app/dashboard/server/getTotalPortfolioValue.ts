@@ -50,61 +50,36 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             for (const tickTime of tickTimes) {
                 tokenPriceMap[token.symbol][tickTime] = 1;
             }
-        } else {
+            continue;
+        }
 
-            for (const tickTime of tickTimes) {
-                //     const [[lessEqualTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
-                // WHERE symbol = '${token.symbol}' 
-                // AND timestamp <= '${tickTime}' 
-                // ORDER BY timestamp DESC LIMIT 1;`);
+        for (const tickTime of tickTimes) {
+            //     const [[lessEqualTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
+            // WHERE symbol = '${token.symbol}' 
+            // AND timestamp <= '${tickTime}' 
+            // ORDER BY timestamp DESC LIMIT 1;`);
 
-                lessEqualTimestampQueries.push([tickTime, token.symbol,
-                    `SELECT timestamp FROM token_price_history 
+            lessEqualTimestampQueries.push([tickTime, token.symbol,
+                `SELECT timestamp FROM token_price_history 
                     WHERE symbol = '${token.symbol}' 
                      AND timestamp <= '${tickTime}' 
                     ORDER BY timestamp DESC LIMIT 1;`
-                ])
+            ])
 
 
-                //     const [[greaterTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
-                // WHERE symbol = '${token.symbol}'
-                // AND timestamp > '${tickTime}' 
-                // ORDER BY timestamp ASC LIMIT 1;`);
+            //     const [[greaterTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
+            // WHERE symbol = '${token.symbol}'
+            // AND timestamp > '${tickTime}' 
+            // ORDER BY timestamp ASC LIMIT 1;`);
 
-                greaterTimestampQueries.push([tickTime, token.symbol,
-                    `SELECT timestamp FROM token_price_history 
+            greaterTimestampQueries.push([tickTime, token.symbol,
+                `SELECT timestamp FROM token_price_history 
             WHERE symbol = '${token.symbol}'
             AND timestamp > '${tickTime}' 
             ORDER BY timestamp ASC LIMIT 1;`
-                ])
+            ])
 
 
-                // let closestTimestamp;
-                // if (!lessEqualTimestamp) {
-                //     closestTimestamp = greaterTimestamp;
-                // } else if (!greaterTimestamp) {
-                //     closestTimestamp = lessEqualTimestamp;
-                // } else {
-                //     const diffGreater = Math.abs(new Date(tickTime).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
-                //     const diffLess = Math.abs(new Date(tickTime).getTime() - new Date(greaterTimestamp.timestamp).getTime());
-                //     closestTimestamp = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
-                // }
-
-
-
-                //     const [[tokenPriceForClosestTimestamp]]: any = await db.query(`SELECT price FROM token_price_history 
-                // WHERE timestamp = '${closestTimestamp.timestamp}' 
-                // AND symbol = '${token.symbol}'`);
-                //     tokenPriceMap[token.symbol][tickTime] = tokenPriceForClosestTimestamp.price;
-
-
-
-                // tokenPriceForClosestTimestampQueries.push([token.symbol, closestTimestamp, `SELECT price FROM token_price_history 
-                // WHERE timestamp = '${closestTimestamp.timestamp}' 
-                // AND symbol = '${token.symbol}'`])
-
-
-            }
         }
 
 
@@ -137,31 +112,38 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
         const lessEqualTimestampResult: any = (await db.query(query1)).flat();
         const greaterEqualTimestampResult: any = (await db.query(query2)).flat();
 
+
         const length = lessEqualTimestampResult.length > greaterEqualTimestampResult.length ? lessEqualTimestampResult.length : greaterEqualTimestampResult.length
 
         let closestTime;
-        console.log("length", length)
+        let tokenSymbol;
         for (let i = 0; i < length; i++) {
 
             const lessEqualTimestamp = lessEqualTimestampResult[i];
             const greaterTimestamp = greaterEqualTimestampResult[i];
 
+
             if (!lessEqualTimestamp) {
                 closestTime = greaterTimestamp;
             } else if (!greaterTimestamp) {
                 closestTime = lessEqualTimestamp;
-                greaterTimestampQueries[i][0]
             } else {
                 const diffGreater = Math.abs(new Date(lessEqualTimestampQueries[i][0]).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
                 const diffLess = Math.abs(new Date(greaterTimestampQueries[i][0]).getTime() - new Date(greaterTimestamp.timestamp).getTime());
                 closestTime = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
             }
-            console.log(period, closestTime)
+
+            if (lessEqualTimestampResult.includes(closestTime)) {
+                tokenSymbol = lessEqualTimestampQueries[i][1]
+            } else if (greaterEqualTimestampResult.includes(closestTime)) {
+                tokenSymbol = greaterTimestampQueries[i][1]
+            }
+
 
             closerTimestamps.push(closestTime)
             tokenPriceForClosestTimestampQueries.push(`SELECT price FROM token_price_history 
             WHERE timestamp = '${closestTime.timestamp}' 
-            AND symbol = '${lessEqualTimestampQueries[i][1]}';`)
+            AND symbol = '${tokenSymbol}';`)
 
         }
 
@@ -191,7 +173,6 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             const balanceOfTokenQuantity = convertWeiToQuantity(element.walletValue, parseInt(lessEqualTimestampBalanceQueries[index][1]));
             tokenBalanceMap[element.tokenSymbol][lessEqualTimestampBalanceQueries[index][0]] += Number(balanceOfTokenQuantity);
         });
-
 
     }
 
