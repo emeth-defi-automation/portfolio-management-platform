@@ -10,6 +10,7 @@ import { checksumAddress } from "viem";
 import { Wallet } from "~/interface/auth/Wallet";
 import { Balance } from "~/interface/balance/Balance";
 import { getPortfolioDatesForSelectedPeriod, Period } from "./getPortfolio24hChange";
+import { Console } from "node:console";
 
 
 
@@ -187,8 +188,13 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             const balanceOfTokenQuantity = convertWeiToQuantity(element.walletValue, parseInt(lessEqualTimestampBalanceQueries[index][1]));
             tokenBalanceMap[element.tokenSymbol][lessEqualTimestampBalanceQueries[index][0]] += Number(balanceOfTokenQuantity);
         });
-        console.log(tokenBalanceMap)
+
+
     }
+
+
+    console.log(period, tokenBalanceMap)
+
 
     let tokenValueMap: { [tokenSymbol: string]: { [timestamp: string]: number } } = {};
 
