@@ -136,22 +136,41 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
         const lessEqualTimestampResult: any = (await db.query(query1)).flat();
         const greaterEqualTimestampResult: any = (await db.query(query2)).flat();
 
+        const length = lessEqualTimestampResult.length > greaterEqualTimestampResult.length ? lessEqualTimestampResult.length : greaterEqualTimestampResult.length
+
         let closestTime;
-        for (let i = 0; i < lessTimestampQueries.length; i++) {
-            const diffGreater = Math.abs(new Date(lessEqualTimestampQueries[i][0]).getTime() - new Date(lessEqualTimestampResult[i].timestamp).getTime());
-            const diffLess = Math.abs(new Date(greaterTimestampQueries1[i][0]).getTime() - new Date(greaterEqualTimestampResult[i].timestamp).getTime());
-            closestTime = diffGreater < diffLess ? lessEqualTimestampResult[i] : greaterEqualTimestampResult[i];
+        console.log("length", length)
+        for (let i = 0; i < length; i++) {
+
+            const lessEqualTimestamp = lessEqualTimestampResult[i];
+            const greaterTimestamp = greaterEqualTimestampResult[i];
+
+            if (!lessEqualTimestamp) {
+                closestTime = greaterTimestamp;
+            } else if (!greaterTimestamp) {
+                closestTime = lessEqualTimestamp;
+            } else {
+                const diffGreater = Math.abs(new Date(tickTimes[i]).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
+                const diffLess = Math.abs(new Date(tickTimes[i]).getTime() - new Date(greaterTimestamp.timestamp).getTime());
+                closestTime = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
+            }
             closerTimestamps.push(closestTime)
             tokenPriceForClosestTimestampQueries.push(`SELECT price FROM token_price_history 
             WHERE timestamp = '${closestTime.timestamp}' 
             AND symbol = '${lessEqualTimestampQueries[i][1]}';`)
+
         }
+
+
+
 
         const tokenPriceForClosestTimestampResults: any = (await db.query(tokenPriceForClosestTimestampQueries.join(" "))).flat();
 
-        for (let j = 0; j < lessEqualTimestampQueries.length; j++) {
+
+        for (let j = 0; j < length; j++) {
             tokenPriceMap[lessEqualTimestampQueries[j][1]][lessEqualTimestampQueries[j][0]] = tokenPriceForClosestTimestampResults[j].price;
         }
+
     }
 
 
@@ -168,8 +187,8 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             const balanceOfTokenQuantity = convertWeiToQuantity(element.walletValue, parseInt(lessEqualTimestampBalanceQueries[index][1]));
             tokenBalanceMap[element.tokenSymbol][lessEqualTimestampBalanceQueries[index][0]] += Number(balanceOfTokenQuantity);
         });
+        console.log(tokenBalanceMap)
     }
-    console.log(tokenBalanceMap)
 
     let tokenValueMap: { [tokenSymbol: string]: { [timestamp: string]: number } } = {};
 
