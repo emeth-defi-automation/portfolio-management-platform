@@ -9,7 +9,10 @@ import Annotation from "../Atoms/Annotation/Annotation";
 
 export const Step3 = component$(() => {
   return (
-    <Box variant="box" customClass="flex flex-col gap-6 !shadow-none !overflow-x-hidden h-[550px]">
+    <Box
+      variant="box"
+      customClass="flex flex-col gap-6 !shadow-none !overflow-x-hidden h-[550px]"
+    >
       <Header text="Summary" variant="h4" />
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-5">

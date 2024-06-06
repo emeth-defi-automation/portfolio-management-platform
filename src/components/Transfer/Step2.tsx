@@ -11,7 +11,10 @@ import Annotation from "../Atoms/Annotation/Annotation";
 
 export const Step2 = component$(() => {
   return (
-    <Box variant="box" customClass="flex flex-col gap-6 !shadow-none !overflow-x-hidden h-[550px]">
+    <Box
+      variant="box"
+      customClass="flex flex-col gap-6 !shadow-none !overflow-x-hidden h-[550px]"
+    >
       <Header text="Quantities & Destination" variant="h4" />
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-5">
@@ -53,7 +56,7 @@ export const Step2 = component$(() => {
                     variant="onlyIcon"
                     leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
                   />
-                  <Input size="xs"/>
+                  <Input size="xs" />
                 </div>
               </div>
               <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] rounded-lg py-3">
@@ -79,7 +82,7 @@ export const Step2 = component$(() => {
                     variant="onlyIcon"
                     leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
                   />
-                  <Input size="xs"/>
+                  <Input size="xs" />
                 </div>
               </div>
             </div>
@@ -124,7 +127,7 @@ export const Step2 = component$(() => {
                     variant="onlyIcon"
                     leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
                   />
-                  <Input size="xs"/>
+                  <Input size="xs" />
                 </div>
               </div>
               <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] rounded-lg py-3">
@@ -150,7 +153,7 @@ export const Step2 = component$(() => {
                     variant="onlyIcon"
                     leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
                   />
-                  <Input size="xs"/>
+                  <Input size="xs" />
                 </div>
               </div>
             </div>
