@@ -172,7 +172,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
     return (
       <Box
-        customClass={`${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"} h-full ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
+        customClass={`${isDataForChartLoading.value ? "" : "grid gap-4"} h-full ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
       >
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
           <Header variant="h3" text="Portfolio Value" />
@@ -296,26 +296,25 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         {isDataForChartLoading.value ? null : (
           <div id="container" ref={outputRef}></div>
         )}
-        {isPortfolioFullScreen.value &&
-          !isDataForChartLoading.value && (
-            <div class="ml-7">
-              <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
-                <div class="pr-timeline row-start-2"></div>
-                <Button
-                  variant="iconBox"
-                  leftIcon={<ImgPfButton />}
-                  size="small"
-                  customClass="absolute left-3/4 top-1/3 !bg-white/10 !px-1"
-                />
-                <Button
-                  variant="iconBox"
-                  leftIcon={<ImgPfButton />}
-                  size="small"
-                  customClass="absolute left-2/4 top-1/3 !bg-white/10 !px-1"
-                />
-              </div>
+        {isPortfolioFullScreen.value && !isDataForChartLoading.value && (
+          <div class="ml-7">
+            <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
+              <div class="pr-timeline row-start-2"></div>
+              <Button
+                variant="iconBox"
+                leftIcon={<ImgPfButton />}
+                size="small"
+                customClass="absolute left-3/4 top-1/3 !bg-white/10 !px-1"
+              />
+              <Button
+                variant="iconBox"
+                leftIcon={<ImgPfButton />}
+                size="small"
+                customClass="absolute left-2/4 top-1/3 !bg-white/10 !px-1"
+              />
             </div>
-          )}
+          </div>
+        )}
       </Box>
     );
   },

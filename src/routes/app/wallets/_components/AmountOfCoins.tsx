@@ -23,14 +23,14 @@ export default component$<AmountOfCoinsProps>(
                   key={symbol}
                   image={`/assets/icons/tokens/${symbol.toLowerCase()}.svg`}
                   description={symbol}
-                  class="w-[98%]"
+                  class="w-[98%] flex-row-reverse"
                   hasImg={"/assets/icons/dashboard/success.svg?jsx"}
                 >
                   {" "}
                   <input
                     type="text"
                     name={`${symbol}Amount`}
-                    class={` absolute end-[56px] block h-9 w-1/2 rounded border border-[#24a148] bg-transparent p-3 text-sm text-[#24a148] placeholder-white placeholder-opacity-50`}
+                    class={` absolute end-2 z-10 block h-8 min-w-max rounded border border-[#24a148] bg-transparent p-3 pr-6 text-sm text-[#24a148] placeholder-white placeholder-opacity-50 `}
                     placeholder={`${symbol} approval limit`}
                     value={
                       addWalletFormStore.coinsToApprove.find(
