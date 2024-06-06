@@ -47,7 +47,7 @@ export const Step1 = component$(() => {
           </div>
         </div>
       </Box>
-      <Box customClass="flex flex-col gap-6 p-6 !overflow-hidden">
+      <Box customClass="flex flex-col gap-6 p-6 !overflow-x-hidden h-[550px]">
         <Header variant="h4" text="Tokens" class="font-normal" />
         <div class="flex gap-2">
           <Input
@@ -97,7 +97,9 @@ export const Step1 = component$(() => {
                 <div class="flex items-center justify-center">
                   <span class="text-center text-sm">TreasuryWBTC</span>
                 </div>
-                <Checkbox variant="checkTick" isChecked={true} />
+                <div class="flex items-center justify-center">
+                  <Checkbox variant="checkTick" isChecked={true} />
+                </div>
               </div>
               <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_24px] rounded-lg px-4 py-3">
                 <div class="flex items-center gap-4">
@@ -116,7 +118,9 @@ export const Step1 = component$(() => {
                 <div class="flex items-center justify-center">
                   <span class="text-center text-sm">TreasuryWBTC</span>
                 </div>
-                <Checkbox variant="checkTick" isChecked={true} />
+                <div class="flex items-center justify-center">
+                  <Checkbox variant="checkTick" isChecked={true} />
+                </div>
               </div>
             </div>
           </div>
@@ -154,7 +158,9 @@ export const Step1 = component$(() => {
                 <div class="flex items-center justify-center">
                   <span class="text-center text-sm">TreasuryWBTC</span>
                 </div>
-                <Checkbox variant="checkTick" isChecked={true} />
+                <div class="flex items-center justify-center">
+                  <Checkbox variant="checkTick" isChecked={true} />
+                </div>
               </div>
             </div>
           </div>
