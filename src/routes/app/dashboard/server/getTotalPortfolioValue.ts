@@ -150,11 +150,14 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
                 closestTime = greaterTimestamp;
             } else if (!greaterTimestamp) {
                 closestTime = lessEqualTimestamp;
+                greaterTimestampQueries[i][0]
             } else {
-                const diffGreater = Math.abs(new Date(tickTimes[i]).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
-                const diffLess = Math.abs(new Date(tickTimes[i]).getTime() - new Date(greaterTimestamp.timestamp).getTime());
+                const diffGreater = Math.abs(new Date(lessEqualTimestampQueries[i][0]).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
+                const diffLess = Math.abs(new Date(greaterTimestampQueries[i][0]).getTime() - new Date(greaterTimestamp.timestamp).getTime());
                 closestTime = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
             }
+            console.log(period, closestTime)
+
             closerTimestamps.push(closestTime)
             tokenPriceForClosestTimestampQueries.push(`SELECT price FROM token_price_history 
             WHERE timestamp = '${closestTime.timestamp}' 
