@@ -1,7 +1,6 @@
-import { component$, Slot } from "@builder.io/qwik";
-import { cva, type VariantProps } from "class-variance-authority";
+import { component$, Slot, useSignal } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
-import DialogTitle from "../Molecules/DialogTitle/DialogTitle";
+import BoxHeader from "../Molecules/BoxHeader/BoxHeader";
 import Button from "../Atoms/Buttons/Button";
 import IconClose from "@material-design-icons/svg/filled/close.svg?jsx";
 
@@ -9,42 +8,50 @@ export interface DialogProps {
   class?: string;
   hasButton?: boolean;
   title?: string;
-  // onClose?: QRL<() => void>;
-  // isOpen: Signal<boolean>;
 }
 
-const DialogStyles = cva([
-  "custom-border-1 custom-bg-opacity-5 relative h-fit w-1/3 min-w-[455px] overflow-auto rounded-2xl p-6 backdrop-blur-2xl text-white flex flex-col gap-8",
-]);
-
-export type DialogType = VariantProps<typeof DialogStyles> & DialogProps;
-
-const Dialog = component$(({ ...props }: DialogType) => {
+const Dialog = component$(({ ...props }: DialogProps) => {
+  const isOpen = useSignal(false);
   return (
-    <dialog
-      {...props}
-      class={twMerge(DialogStyles(), props.class)}
-      onClick$={(event) => {
-        event.stopPropagation();
-      }}
-    >
-      {props.hasButton ? (
-        <DialogTitle variantHeader="h3" title={props.title}>
-          <Button
-            variant="onlyIcon"
-            leftIcon={<IconClose class="h-6 w-6 fill-white" />}
-            // TODO
-            // onClick$={() => {
-            //   isOpen.value = !isOpen.value;
-            //   if (onClose) {
-            //     onClose();
-            //   }
-            // }}
-          />
-        </DialogTitle>
-      ) : null}
-      <Slot />
-    </dialog>
+    <>
+      <Button
+        variant="transparent"
+        text="Add wallet"
+        onClick$={() => {
+          isOpen.value = !isOpen.value;
+        }}
+      />
+      <dialog
+        {...props}
+        class={twMerge(
+          `custom-border-1 custom-bg-opacity-5 relative flex h-fit w-1/3 min-w-[455px] flex-col gap-8 overflow-auto rounded-2xl p-6 text-white backdrop-blur-2xl backdrop:bg-black backdrop:bg-opacity-70 ${isOpen.value ? "block" : "hidden"}`,
+          props.class,
+        )}
+        onClick$={(event) => {
+          event.stopPropagation();
+        }}
+        ref={(e) => {
+          if (isOpen.value) {
+            e.showModal();
+          } else {
+            e.close();
+          }
+        }}
+      >
+        {props.hasButton ? (
+          <BoxHeader variantHeader="h3" title={props.title}>
+            <Button
+              variant="onlyIcon"
+              leftIcon={<IconClose class="h-6 w-6 fill-white" />}
+              onClick$={() => {
+                isOpen.value = !isOpen.value;
+              }}
+            />
+          </BoxHeader>
+        ) : null}
+        <Slot />
+      </dialog>
+    </>
   );
 });
 
