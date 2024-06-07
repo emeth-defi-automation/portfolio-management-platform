@@ -24,7 +24,7 @@ export const Transfer = component$(() => {
           /> 
           IF STEP 3/4:
           <Tag
-            text="Addres"
+            text="Address"
             isBorder={true}
             variant="success"
             icon={<IconSuccess class="h-5 w-5 fill-customGreen" />}
