@@ -8,63 +8,60 @@ export interface TokenIconProps {
   customClass?: string;
 }
 
-const TokenIconStyles = cva(
-  [
-    "rounded-lg",
-  ],
-  {
-    variants: {
-      border: {
-        gradient: ["gradient-border before:rounded-lg before:p-[1px]"],
-        default: ["custom-border-1"],
-        clear: [""] 
-      },
-      background: {
-        transparent: ["bg-transparent"],
-        white: ["bg-white/10"]
-      },
-      boxSize: {
-        small: ["h-8 w-8 p-1.5"],
-        large: ["h-11 w-11 p-2"]
-      }
+const TokenIconStyles = cva(["rounded-lg"], {
+  variants: {
+    border: {
+      gradient: ["gradient-border before:rounded-lg before:p-[1px]"],
+      default: ["custom-border-1"],
+      clear: [""],
     },
-    defaultVariants: {
-      border: "default",
-      background: "transparent",
-      boxSize: "large"
+    background: {
+      transparent: ["bg-transparent"],
+      white: ["bg-white/10"],
+    },
+    boxSize: {
+      small: ["h-8 w-8 p-1.5"],
+      large: ["h-11 w-11 p-2"],
     },
   },
-);
+  defaultVariants: {
+    border: "default",
+    background: "transparent",
+    boxSize: "large",
+  },
+});
 
 export type TokenIconType = VariantProps<typeof TokenIconStyles> &
   TokenIconProps;
 
 const TokenIcon = component$(
-  ({ border, background, imagePath, tokenName, boxSize, ...props }: TokenIconType) => {
+  ({
+    border,
+    background,
+    imagePath,
+    tokenName,
+    boxSize,
+    ...props
+  }: TokenIconType) => {
     return (
       <>
-        <div class={twMerge(TokenIconStyles({ border, boxSize, background }), props.customClass)}>
-          {boxSize == "large" ? (
-            <img
-              width={24}
-              height={24}
-              alt={`${tokenName} logo`}
-              src={imagePath}
-              class="w-full"
-            />
-          ) :
-            (<img
-              width={16}
-              height={16}
-              alt={`${tokenName} logo`}
-              src={imagePath}
-              class="w-full"
-            />)
-          } 
+        <div
+          class={twMerge(
+            TokenIconStyles({ border, boxSize, background }),
+            props.customClass,
+          )}
+        >
+          <img
+            width={boxSize == "large" ? 24 : 16}
+            height={boxSize == "large" ? 24 : 16}
+            alt={`${tokenName} logo`}
+            src={imagePath}
+            class="w-full"
+          />
         </div>
       </>
     );
   },
 );
 
-export default TokenIcon
+export default TokenIcon;

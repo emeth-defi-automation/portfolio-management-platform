@@ -13,5 +13,5 @@ Token.args = {
   tokenName: "Bitcoin",
   imagePath: "/public/assets/icons/tokens/btc.svg",
   border: "default",
-  background: "white"
+  background: "white",
 };
