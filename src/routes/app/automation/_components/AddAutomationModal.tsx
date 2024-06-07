@@ -92,7 +92,6 @@ export const AddAutomationModal = component$<AddAutomationModalProps>(
           message: "Successfully added automation!",
           isVisible: true,
         });
-        console.log(`automation ${newAutomationStore.name} added to database`);
       } catch (err) {
         console.log(err);
         formMessageProvider.messages.push({
@@ -145,7 +144,6 @@ export const AddAutomationModal = component$<AddAutomationModalProps>(
           <Button
             text="Approve"
             onClick$={async () => {
-              // console.log(newAutomationStore);
               await handleAddBasicAutomation();
               isAddModalOpen.value = false;
               newAutomationStore.name = "";

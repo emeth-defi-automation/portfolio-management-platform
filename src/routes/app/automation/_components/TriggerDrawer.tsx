@@ -42,7 +42,6 @@ const updateAutomationAction = server$(
   ) {
     const db = await connectToDB(this.env);
     try {
-      console.log("dzialam");
       await db.query(
         `UPDATE automations 
         SET isActive = $isActive, 
@@ -70,7 +69,6 @@ const updateAutomationAction = server$(
           amountIn: amountIn,
         },
       );
-      console.log("chyba zmienilem");
     } catch (err) {
       console.log(err);
     }
@@ -131,24 +129,11 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
       isVisible: true,
     });
     try {
-      console.log(addModalStore);
-
       const duration = BigInt(durationCount) * BigInt(interval);
       const timeZeroCalculated = Math.floor(
         new Date(timeZero).getTime() / 1000,
       );
       const calculatedAmountIn = BigInt(amountIn) * 10n ** 18n;
-      console.log(
-        BigInt(actionId),
-        tokenIn as `0x${string}`,
-        tokenOut as `0x${string}`,
-        BigInt(calculatedAmountIn),
-        from as `0x${string}`,
-        to as `0x${string}`,
-        BigInt(timeZeroCalculated),
-        BigInt(duration),
-        isActive,
-      );
 
       const { request } = await simulateContract(wagmiConfig.config as Config, {
         account: account.address as `0x${string}`,
@@ -193,7 +178,6 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
         message: "Success!",
         isVisible: true,
       });
-      console.log(transactionHash);
     } catch (err) {
       console.log(err);
       formMessageProvider.messages.push({
@@ -376,7 +360,6 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
             <Button
               text="Approve"
               onClick$={$(async () => {
-                console.log(addModalStore);
                 try {
                   await handleAddAutomation();
                   automationPageContext.isDraverOpen.value = false;
