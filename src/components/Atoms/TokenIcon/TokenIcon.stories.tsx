@@ -12,6 +12,6 @@ export function Token(args: TokenIconProps) {
 Token.args = {
   tokenName: "Bitcoin",
   imagePath: "/public/assets/icons/tokens/btc.svg",
-  iconSize: "large",
-  boxSize: "large"
+  border: "default",
+  background: "white"
 };

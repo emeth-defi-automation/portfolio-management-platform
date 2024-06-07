@@ -1,7 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { component$ } from "@builder.io/qwik";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Image } from "qwik-image";
 
 export interface TokenIconProps {
   imagePath?: string;
@@ -11,30 +10,28 @@ export interface TokenIconProps {
 
 const TokenIconStyles = cva(
   [
-    "rounded-lg p-2.5",
+    "rounded-lg",
   ],
   {
     variants: {
-      variant: {
-        gradient: ["border-gradient"],
-        default: ["custom-border-1"], 
+      border: {
+        gradient: ["gradient-border before:rounded-lg before:p-[1px]"],
+        default: ["custom-border-1"],
+        clear: [""] 
       },
       background: {
         transparent: ["bg-transparent"],
         white: ["bg-white/10"]
       },
-      iconSize: {
-        small: ["!h-6 !w-6"],
-        large: ["!h-10 !w-10"],
-      },
       boxSize: {
-        small: ["h-8 w-8"],
-        large: ["h-11 w-11"]
+        small: ["h-8 w-8 p-1.5"],
+        large: ["h-11 w-11 p-2"]
       }
     },
     defaultVariants: {
-      variant: "default",
-      iconSize: "large",
+      border: "default",
+      background: "transparent",
+      boxSize: "large"
     },
   },
 );
@@ -43,17 +40,27 @@ export type TokenIconType = VariantProps<typeof TokenIconStyles> &
   TokenIconProps;
 
 const TokenIcon = component$(
-  ({ variant, iconSize, imagePath, tokenName, boxSize, ...props }: TokenIconType) => {
+  ({ border, background, imagePath, tokenName, boxSize, ...props }: TokenIconType) => {
     return (
       <>
-        <div class={twMerge(TokenIconStyles({ variant, boxSize, }), props.customClass)}>
-          <img
-            width={24}
-            height={24}
-            class={iconSize}
-            alt={`${tokenName} logo`}
-            src={imagePath}
-          />
+        <div class={twMerge(TokenIconStyles({ border, boxSize, background }), props.customClass)}>
+          {boxSize == "large" ? (
+            <img
+              width={24}
+              height={24}
+              alt={`${tokenName} logo`}
+              src={imagePath}
+              class="w-full"
+            />
+          ) :
+            (<img
+              width={16}
+              height={16}
+              alt={`${tokenName} logo`}
+              src={imagePath}
+              class="w-full"
+            />)
+          } 
         </div>
       </>
     );

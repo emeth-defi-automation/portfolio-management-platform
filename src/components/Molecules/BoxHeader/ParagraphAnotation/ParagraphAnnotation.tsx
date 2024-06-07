@@ -39,7 +39,10 @@ const ParagraphAnnotationStyles = cva(
   },
 );
 
-export type ParagraphAnnotationType = VariantProps<typeof ParagraphAnnotationStyles> & ParagraphAnnotationProps;
+export type ParagraphAnnotationType = VariantProps<
+  typeof ParagraphAnnotationStyles
+> &
+  ParagraphAnnotationProps;
 
 // const ParagraphAnnotation = component$<ParagraphAnnotationType>(
 //   return <>
