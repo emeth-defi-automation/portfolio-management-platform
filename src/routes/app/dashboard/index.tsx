@@ -10,7 +10,6 @@ import { getFavouriteTokens } from "./server";
 import Button from "~/components/Atoms/Buttons/Button";
 import NoData from "~/components/Molecules/NoData/NoData";
 import Box from "~/components/Atoms/Box/Box";
-import Header from "~/components/Atoms/Headers/Header";
 import Annotation from "../../../components/Atoms/Annotation/Annotation";
 import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
 import Tag from "~/components/Atoms/Tags/Tag";
