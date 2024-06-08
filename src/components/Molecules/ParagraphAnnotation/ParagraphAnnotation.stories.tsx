@@ -4,6 +4,7 @@ import ParagraphAnnotation, {
 } from "./ParagraphAnnotation";
 import IconSchedule from "@material-design-icons/svg/round/schedule.svg?jsx";
 import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
+import IconAlarm from "@material-design-icons/svg/round/alarm.svg?jsx";
 
 export default {
   title: "molecules/ParagraphAnnotation",
@@ -39,42 +40,57 @@ export function Action(args: ParagraphAnnotationProps) {
   );
 }
 
+export function Trigger(args: ParagraphAnnotationProps) {
+  return <ParagraphAnnotation {...args} />;
+}
+
 TokenBlock.args = {
-  hasTokenIcon: true,
-  tokenIconBoxSize: "small",
-  tokenIconPath: "/public/assets/icons/tokens/btc.svg",
-  tokenIconBorder: "default",
-  tokenIconBackground: "transprent",
+  hasIconBox: true,
+  iconBoxSize: "small",
+  iconBoxBorder: "default",
+  iconBoxBackground: "transparent",
+  iconBoxTokenPath: "/public/assets/icons/tokens/btc.svg",
   annotationText: "BTC",
   paragraphText: "Bitcoin",
   variant: "annotationNear",
 };
 
 TokenBlock2.args = {
-  hasTokenIcon: true,
-  tokenIconBoxSize: "large",
-  tokenIconPath: "/public/assets/icons/tokens/eth.svg",
-  tokenIconBorder: "clear",
-  tokenIconBackground: "white",
+  hasIconBox: true,
+  iconBoxSize: "large",
+  iconBoxBorder: "clear",
+  iconBoxBackground: "white",
+  iconBoxTokenPath: "/public/assets/icons/tokens/eth.svg",
   annotationText: "ETH",
   paragraphText: "Ethereum",
   variant: "annotationBelow",
 };
 
 WalletBlock.args = {
-  hasTokenIcon: true,
-  tokenIconBoxSize: "small",
-  tokenIconPath: "/public/assets/icons/tokens/eth.svg",
-  tokenIconBorder: "default",
-  tokenIconBackground: "white",
+  hasIconBox: true,
+  iconBoxSize: "small",
+  iconBoxBorder: "default",
+  iconBoxBackground: "white",
+  iconBoxTokenPath: "/public/assets/icons/tokens/eth.svg",
   annotationText: "Ethereum",
   paragraphText: "Treasury WBTC",
   variant: "annotationBelow",
 };
 
 Action.args = {
-  hasTokenIcon: false,
+  hasIconBox: false,
   annotationText: "6 hours ago",
   paragraphText: "Automation name #1",
+  variant: "annotationBelow",
+};
+
+Trigger.args = {
+  hasIconBox: true,
+  iconBoxSize: "small",
+  iconBoxBorder: "gradient",
+  iconBoxBackground: "transparent",
+  iconBoxCustomIcon: <IconAlarm class="h-full w-full fill-white" />,
+  annotationText: "Every 7 days at 09:00",
+  paragraphText: "Time Trigger #1",
   variant: "annotationBelow",
 };

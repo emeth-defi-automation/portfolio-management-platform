@@ -1,21 +1,20 @@
 import { twMerge } from "tailwind-merge";
-import { component$ } from "@builder.io/qwik";
+import { component$, type JSXOutput, Slot } from "@builder.io/qwik";
 import { cva, type VariantProps } from "class-variance-authority";
 import Paragraph from "~/components/Atoms/Paragraphs/Paragraphs";
-import { Slot } from "@builder.io/qwik";
-import TokenIcon from "~/components/Atoms/TokenIcon/TokenIcon";
+import IconBox from "~/components/Atoms/IconBox/IconBox";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 
 export interface ParagraphAnnotationProps {
-  isToken?: boolean;
-  hasTokenIcon?: boolean;
-  tokenIconBoxSize?: "small" | "large";
-  tokenIconBorder?: "gradient" | "default" | "clear";
-  tokenIconBackground?: "transparent" | "white";
-  tokenIconPath?: string;
-  customClass?: string;
-  tokenIconCustomClass?: string;
+  hasIconBox?: boolean;
+  iconBoxSize?: "small" | "large";
+  iconBoxBorder?: "gradient" | "default" | "clear";
+  iconBoxBackground?: "transparent" | "white";
+  iconBoxTokenPath?: string;
+  iconBoxCustomIcon?: JSXOutput | null;
+  iconBoxCustomClass?: string;
 
+  customClass?: string;
   paragraphText?: string;
   annotationText?: string;
 }
@@ -38,25 +37,21 @@ export type ParagraphAnnotationType = VariantProps<
   ParagraphAnnotationProps;
 
 const ParagraphAnnotation = component$<ParagraphAnnotationType>(
-  ({
-    hasTokenIcon,
-    customClass,
-    variant,
-    ...props
-  }: ParagraphAnnotationType) => {
+  ({ hasIconBox, customClass, variant, ...props }: ParagraphAnnotationType) => {
     return (
       <>
         <div class="flex items-center justify-between gap-4">
           <div class="flex items-center justify-between gap-4">
-            {hasTokenIcon ? (
-              <TokenIcon
-                imagePath={props.tokenIconPath}
+            {hasIconBox ? (
+              <IconBox
+                tokenPath={props.iconBoxTokenPath}
                 tokenName={props.paragraphText}
-                boxSize={props.tokenIconBoxSize}
-                customClass={props.tokenIconCustomClass}
-                border={props.tokenIconBorder}
-                background={props.tokenIconBackground}
-              ></TokenIcon>
+                boxSize={props.iconBoxSize}
+                customClass={props.iconBoxCustomClass}
+                border={props.iconBoxBorder}
+                background={props.iconBoxBackground}
+                customIcon={props.iconBoxCustomIcon}
+              ></IconBox>
             ) : null}
             <div
               class={twMerge(

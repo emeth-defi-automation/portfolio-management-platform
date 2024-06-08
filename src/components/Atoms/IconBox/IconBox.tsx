@@ -1,14 +1,15 @@
 import { twMerge } from "tailwind-merge";
-import { component$ } from "@builder.io/qwik";
+import { component$, type JSXOutput } from "@builder.io/qwik";
 import { cva, type VariantProps } from "class-variance-authority";
 
-export interface TokenIconProps {
-  imagePath?: string;
+export interface IconBoxProps {
+  tokenPath?: string;
   tokenName?: string;
   customClass?: string;
+  customIcon?: JSXOutput | null;
 }
 
-const TokenIconStyles = cva(["rounded-lg"], {
+const IconBoxStyles = cva(["rounded-lg"], {
   variants: {
     border: {
       gradient: ["gradient-border before:rounded-lg before:p-[1px]"],
@@ -31,37 +32,41 @@ const TokenIconStyles = cva(["rounded-lg"], {
   },
 });
 
-export type TokenIconType = VariantProps<typeof TokenIconStyles> &
-  TokenIconProps;
+export type IconBoxType = VariantProps<typeof IconBoxStyles> & IconBoxProps;
 
-const TokenIcon = component$(
+const IconBox = component$(
   ({
     border,
     background,
-    imagePath,
+    tokenPath,
     tokenName,
     boxSize,
-    ...props
-  }: TokenIconType) => {
+    customClass,
+    customIcon,
+  }: IconBoxType) => {
     return (
       <>
         <div
           class={twMerge(
-            TokenIconStyles({ border, boxSize, background }),
-            props.customClass,
+            IconBoxStyles({ border, boxSize, background }),
+            customClass,
           )}
         >
-          <img
-            width={boxSize == "large" ? 24 : 16}
-            height={boxSize == "large" ? 24 : 16}
-            alt={`${tokenName} logo`}
-            src={imagePath}
-            class="w-full"
-          />
+          {!customIcon ? (
+            <img
+              width={boxSize == "large" ? 24 : 16}
+              height={boxSize == "large" ? 24 : 16}
+              alt={`${tokenName} logo`}
+              src={tokenPath}
+              class="w-full"
+            />
+          ) : (
+            customIcon
+          )}
         </div>
       </>
     );
   },
 );
 
-export default TokenIcon;
+export default IconBox;
