@@ -11,10 +11,6 @@ export default defineConfig((): UserConfig => {
             headers: {
                 "Cache-Control": "public, max-age=0",
             },
-            https: {
-                key: './ssl/private.key',
-                cert: './ssl/certificate.crt',
-            },
             proxy: {}
         },
         preview: {
