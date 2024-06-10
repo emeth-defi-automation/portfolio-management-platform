@@ -39,7 +39,7 @@
     "qwik": "qwik"
   },
   "devDependencies": {
-   "@builder.io/qwik": "1.5.5",
+    "@builder.io/qwik": "1.5.5",
     "@builder.io/qwik-city": "1.5.5",
     "@playwright/test": "1.44.1",
     "@storybook/addon-essentials": "8.1.4",
@@ -72,7 +72,7 @@
     "vite-tsconfig-paths": "4.3.2"
   },
   "dependencies": {
-   "@material-design-icons/svg": "0.14.13",
+    "@material-design-icons/svg": "0.14.13",
     "@moralisweb3/common-evm-utils": "2.26.2",
     "@wagmi/connectors": "5.0.6",
     "@wagmi/core": "2.10.4",
