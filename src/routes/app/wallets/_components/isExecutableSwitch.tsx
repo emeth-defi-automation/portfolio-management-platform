@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
-import Label from "../Atoms/Label/Label";
+import Label from "~/components/Atoms/Label/Label";
 
 export interface AddWalletFormProps {
   addWalletFormStore: AddWalletFormStore;

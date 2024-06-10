@@ -508,6 +508,12 @@ export default component$(() => {
             })}
             class="mt-8 text-sm"
           >
+            {!isValidName(structureStore.name) && (
+              <Annotation
+                text="Name too short"
+                class="absolute end-6 mb-4 pt-[1px] !text-customRed"
+              />
+            )}
             <InputField
               id="name"
               name="name"
@@ -522,10 +528,6 @@ export default component$(() => {
                 nameInputDebounce(target.value);
               })}
             />
-            {!isValidName(structureStore.name) && (
-              <Annotation text="Name too short" class="mb-4 text-customRed" />
-            )}
-
             <Label name="Select Wallets" class="mb-2" />
 
             <div class="mb-3 w-full text-sm">

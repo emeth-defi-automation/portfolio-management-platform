@@ -7,10 +7,10 @@ import {
   useVisibleTask$,
   useSignal,
 } from "@builder.io/qwik";
-import Box from "../../../../../components/Atoms/Box/Box";
-import Button from "../../../../../components/Atoms/Buttons/Button";
-import Input from "../../../../../components/Atoms/Input/Input";
-import Select from "../../../../../components/Atoms/Select/Select";
+import Box from "~/components/Atoms/Box/Box";
+import Button from "~/components/Atoms/Buttons/Button";
+import Input from "~/components/Atoms/Input/Input";
+import Select from "~/components/Atoms/Select/Select";
 import { Modal } from "~/components/Modal/Modal";
 import { server$ } from "@builder.io/qwik-city";
 import Moralis from "moralis";

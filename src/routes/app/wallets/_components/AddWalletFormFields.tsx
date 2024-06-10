@@ -24,11 +24,11 @@ import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 import Tag from "~/components/Atoms/Tags/Tag";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { type Config, watchAccount } from "@wagmi/core";
-import SelectField from "../Molecules/SelectField/SelectField";
-import Annotation from "../Atoms/Annotation/Annotation";
-import InputField from "../Molecules/InputField/InputField";
-import Input from "../Atoms/Input/Input";
-import Label from "../Atoms/Label/Label";
+import SelectField from "~/components/Molecules/SelectField/SelectField";
+import Annotation from "~/components/Atoms/Annotation/Annotation";
+import InputField from "~/components/Molecules/InputField/InputField";
+import Input from "~/components/Atoms/Input/Input";
+import Label from "~/components/Atoms/Label/Label";
 export interface AddWalletFormFieldsProps {
   addWalletFormStore: AddWalletFormStore;
   onConnectWalletClick: QRL<() => void>;
@@ -121,7 +121,7 @@ export default component$<AddWalletFormFieldsProps>(
         <div>
           {!addWalletFormStore.isAddressUnique && (
             <Annotation
-              class="absolute end-6 pt-[1px] !text-red-500"
+              class="absolute end-6 pt-[1px] !text-customRed"
               text="Wallet already exists"
             />
           )}
@@ -133,7 +133,7 @@ export default component$<AddWalletFormFieldsProps>(
             {!addWalletFormStore.isExecutable ? (
               <div>
                 {!isValidAddress(addWalletFormStore.address) ? (
-                  <Annotation class=" !text-red-500" text="Invalid address" />
+                  <Annotation class="!text-customRed" text="Invalid address" />
                 ) : !isCheckSum(addWalletFormStore.address) ? (
                   <Annotation
                     class="text-wrap text-right !text-red-500"

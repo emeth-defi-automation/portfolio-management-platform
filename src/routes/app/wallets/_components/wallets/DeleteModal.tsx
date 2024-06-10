@@ -6,6 +6,7 @@ import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWal
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { useRemoveWallet } from "~/routes/app/wallets/server";
 import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
+import Header from "~/components/Atoms/Headers/Header";
 export { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export { useRemoveWallet } from "~/routes/app/wallets/server";
 
@@ -28,9 +29,11 @@ export const DeleteModal = component$<DeleteModalProps>(
       >
         <div class="flex flex-col items-center gap-4">
           <IconWarning class="h-14 w-14 fill-customRed" />
-          <h1 class="text-center text-xl">
-            You are going to permanently delete your wallet!
-          </h1>
+          <Header
+            variant="h3"
+            text="You are going to permanently delete your wallet!"
+            class="text-center"
+          />
         </div>
         <div class="my-8 flex justify-center">
           <ul class="custom-text-50 text-sm">

@@ -52,7 +52,7 @@ const Select = component$(({ size, onValueChange, ...props }: SelectProps) => {
         disabled={props.disabled ? props.disabled : false}
         onInput$={(e: any) => {
           const target = e.target as any;
-          if (onValueChange){
+          if (onValueChange) {
             onValueChange(target.value);
           }
         }}
