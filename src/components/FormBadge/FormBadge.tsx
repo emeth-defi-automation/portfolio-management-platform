@@ -1,4 +1,4 @@
-import { type JSXOutput, component$ } from "@builder.io/qwik";
+import { type JSXOutput, component$, Slot } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
 export interface FormBadgeProps {
@@ -19,7 +19,7 @@ export interface FormBadgeProps {
 export const FormBadge = component$<FormBadgeProps>((props) => {
   return (
     <div class={twMerge("relative flex min-h-11 items-center", props.class)}>
-      {props.input ? props.input : null}
+      <Slot />
       <label
         for={props.for}
         class={twMerge(

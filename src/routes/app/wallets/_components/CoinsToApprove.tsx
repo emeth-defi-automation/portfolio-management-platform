@@ -57,41 +57,37 @@ export default component$<CoinsToApproveProps>(
               //     }
               //   })}
 
-              //  />}
-              input={
-                <input
-                  id={symbol.symbol}
-                  type="checkbox"
-                  name={symbol.symbol}
-                  value={symbol.symbol}
-                  class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                  checked={addWalletFormStore.coinsToCount.includes(
-                    symbol.symbol,
-                  )}
-                  onClick$={() => {
-                    if (
-                      !addWalletFormStore.coinsToCount.includes(symbol.symbol)
-                    ) {
-                      addWalletFormStore.coinsToCount = [
-                        ...addWalletFormStore.coinsToCount,
-                        symbol.symbol,
-                      ];
-                    } else {
-                      const indexToRemove =
-                        addWalletFormStore.coinsToCount.indexOf(symbol.symbol);
-
-                      if (indexToRemove !== -1) {
-                        addWalletFormStore.coinsToCount.splice(
-                          indexToRemove,
-                          1,
-                        );
-                      }
-                    }
-                  }}
-                />
-              }
+              //  />
               customClass="border-gradient"
-            />
+            >
+              <input
+                id={symbol.symbol}
+                type="checkbox"
+                name={symbol.symbol}
+                value={symbol.symbol}
+                class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
+                checked={addWalletFormStore.coinsToCount.includes(
+                  symbol.symbol,
+                )}
+                onClick$={() => {
+                  if (
+                    !addWalletFormStore.coinsToCount.includes(symbol.symbol)
+                  ) {
+                    addWalletFormStore.coinsToCount = [
+                      ...addWalletFormStore.coinsToCount,
+                      symbol.symbol,
+                    ];
+                  } else {
+                    const indexToRemove =
+                      addWalletFormStore.coinsToCount.indexOf(symbol.symbol);
+
+                    if (indexToRemove !== -1) {
+                      addWalletFormStore.coinsToCount.splice(indexToRemove, 1);
+                    }
+                  }
+                }}
+              />
+            </FormBadge>
           ))}
         </div>
       </>

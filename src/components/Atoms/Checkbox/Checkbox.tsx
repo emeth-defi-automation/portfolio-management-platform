@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 
 export interface CheckboxProps {
   value?: string | number;
-  onClick?: QRL<() => void>;
+  onClick?: QRL<() => void> | (() => void);
   isChecked: boolean;
   name?: string;
   class?: string;
@@ -37,7 +37,7 @@ const CheckboxStyles = cva(["cursor-pointer"], {
 export type CheckboxType = VariantProps<typeof CheckboxStyles> & CheckboxProps;
 
 const Checkbox = component$<CheckboxType>(
-  ({ isChecked, variant, size, ...props }) => {
+  ({ isChecked, variant, size, onClick, ...props }) => {
     const isInputChecked = useSignal<boolean>(isChecked);
     return (
       <div class={`${variant === "toggleTick" ? "h-5 w-8" : null} relative`}>
@@ -47,7 +47,7 @@ const Checkbox = component$<CheckboxType>(
           type="checkbox"
           class={twMerge(CheckboxStyles({ variant, size }), props.class)}
           value={props.value}
-          onClick$={props.onClick}
+          onClick$={onClick}
           checked={isChecked}
         />
         {variant === "toggleTick" ? (
@@ -58,7 +58,9 @@ const Checkbox = component$<CheckboxType>(
                 .childNodes[0] as HTMLInputElement;
               isInputChecked.value = !isInputChecked.value;
               input.checked = isInputChecked.value;
-              console.log(input.checked);
+              if (onClick) {
+                onClick();
+              }
             }}
             class={`absolute h-5 w-8 cursor-pointer rounded-full before:absolute before:left-1 before:top-1/2 before:h-3 before:w-3 before:-translate-y-1/2 before:rounded-full before:bg-white after:absolute after:left-2 after:top-1/2 after:h-1.5 after:w-1 after:-translate-y-1/2 after:rotate-45 after:border-2 after:border-l-0 after:border-t-0 after:border-solid ${isInputChecked.value ? "bg-customGreen before:translate-x-3 after:translate-x-3 after:border-customGreen" : "bg-gray-400 after:border-gray-400"}`}
           />

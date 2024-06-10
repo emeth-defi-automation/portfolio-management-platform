@@ -1,30 +1,20 @@
-import {
-  $,
-  component$,
-  useSignal,
-  useStore,
-  useTask$,
-  useVisibleTask$,
-} from "@builder.io/qwik";
+import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import { PortfolioValue } from "~/components/PortfolioValue/PortfolioValue";
 import { ActionAlertMessage } from "~/components/ActionAlertsMessage/ActionAlertsMessage";
+import {
+  SuccessStatus,
+  WarningStatus,
+} from "~/components/ActionAlertsMessage/ActionStatus";
 import { TokenRow } from "~/components/Tokens/TokenRow";
 import { useNavigate } from "@builder.io/qwik-city";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Spinner } from "~/components/Spinner/Spinner";
-import {
-  getFavouriteTokens,
-  getTotalPortfolioValue,
-  getPortfolio24hChange,
-  toggleChart,
-} from "./server";
-import { type PeriodState } from "~/interface/balance/Balance";
+import { getFavouriteTokens } from "./server";
+
 import Button from "~/components/Atoms/Buttons/Button";
 import NoData from "~/components/Molecules/NoData/NoData";
-import Tag from "~/components/Atoms/Tags/Tag";
-import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
-import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
+
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -35,108 +25,23 @@ export {
 export default component$(() => {
   const nav = useNavigate();
   const isPortfolioFullScreen = useSignal(false);
-  const totalPortfolioValue = useSignal("0");
-  const totalPortfolioValueLoading = useSignal(true);
-  const portfolioValueChange = useSignal<any>({});
-  const portfolioValueChangeLoading = useSignal(true);
   const favoriteTokenLoading = useSignal(true);
   const favoriteTokens = useSignal<any[]>([]);
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
     favoriteTokens.value = await getFavouriteTokens();
     favoriteTokenLoading.value = false;
-
-    totalPortfolioValue.value = await getTotalPortfolioValue();
-    totalPortfolioValueLoading.value = false;
-
-    portfolioValueChange.value = await getPortfolio24hChange();
-    portfolioValueChangeLoading.value = false;
-  });
-
-  const changePeriod = useSignal(false);
-  const selectedPeriod: PeriodState = useStore({
-    "24h": true,
-    "1W": false,
-    "1M": false,
-    "1Y": false,
-  });
-
-  const togglePeriod = $(function togglePeriod(button: string) {
-    for (const key in selectedPeriod) {
-      selectedPeriod[key] = false;
-    }
-    selectedPeriod[button] = true;
-  });
-
-  const redrawChart = useSignal<boolean>(false);
-  const hideChartWhileLoading = useSignal<boolean>(false);
-
-  useTask$(async ({ track }) => {
-    track(async () => {
-      selectedPeriod["24h"];
-      selectedPeriod["1W"];
-      selectedPeriod["1M"];
-      selectedPeriod["1Y"];
-
-      if (changePeriod.value !== false) {
-        hideChartWhileLoading.value = true;
-        const newChartData = await toggleChart(selectedPeriod);
-        portfolioValueChange.value.chartData = newChartData.chartData;
-        portfolioValueChange.value.period = newChartData.period;
-        portfolioValueChange.value.totalValueChange =
-          newChartData.totalValueChange;
-        portfolioValueChange.value.percentageOfTotalValueChange =
-          newChartData.percentageOfTotalValueChange;
-        redrawChart.value = !redrawChart.value;
-        hideChartWhileLoading.value = false;
-      }
-    });
   });
 
   return isPortfolioFullScreen.value ? (
-    <PortfolioValue
-      hideChartWhileLoading={hideChartWhileLoading}
-      redrawChart={redrawChart.value}
-      portfolioValueChangeLoading={portfolioValueChangeLoading}
-      totalPortfolioValueLoading={totalPortfolioValueLoading.value}
-      totalPortfolioValue={totalPortfolioValue.value}
-      isPortfolioFullScreen={isPortfolioFullScreen}
-      portfolioValueChange={portfolioValueChange.value.totalValueChange}
-      portfolioPercentageValueChange={
-        portfolioValueChange.value.percentageOfTotalValueChange
-      }
-      chartData={portfolioValueChange.value.chartData}
-      selectedPeriod={selectedPeriod}
-      period={portfolioValueChange.value.period}
-      onClick$={(e: any) => {
-        togglePeriod(e.target.name);
-        changePeriod.value = true;
-      }}
-    />
+    <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
   ) : (
     <div class="grid grid-rows-[max(460px)_auto] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
-        <PortfolioValue
-          hideChartWhileLoading={hideChartWhileLoading}
-          redrawChart={redrawChart.value}
-          portfolioValueChangeLoading={portfolioValueChangeLoading}
-          totalPortfolioValueLoading={totalPortfolioValueLoading.value}
-          totalPortfolioValue={totalPortfolioValue.value}
-          isPortfolioFullScreen={isPortfolioFullScreen}
-          portfolioValueChange={portfolioValueChange.value.totalValueChange}
-          portfolioPercentageValueChange={
-            portfolioValueChange.value.percentageOfTotalValueChange
-          }
-          chartData={portfolioValueChange.value.chartData}
-          selectedPeriod={selectedPeriod}
-          period={portfolioValueChange.value.period}
-          onClick$={(e: any) => {
-            togglePeriod(e.target.name);
-            changePeriod.value = true;
-          }}
-        />
+        <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
 
-        <div class="custom-border-1 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl bg-white/3 p-6">
+        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Alerts</h1>
             <Button text="See All" variant="transparent" size="small" />
@@ -165,7 +70,7 @@ export default component$(() => {
           </div>
         </div>
 
-        <div class="custom-border-1 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl bg-white/3 p-6">
+        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-2">
             <h1 class="text-xl font-semibold">Actions</h1>
             <Button text="See All" variant="transparent" size="small" />
@@ -175,59 +80,34 @@ export default component$(() => {
               title="Automation name #1"
               description="6 hours ago"
             >
-              <Tag
-                variant="success"
-                text="Success"
-                icon={<IconSuccess class="h-3 w-3 fill-customGreen" />}
-                isBorder={true}
-              />
+              <SuccessStatus />
             </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #2"
               description="6 hours ago"
             >
-              <Tag
-                variant="success"
-                text="Success"
-                icon={<IconSuccess class="h-3 w-3 fill-customGreen" />}
-                isBorder={true}
-              />
+              <SuccessStatus />
             </ActionAlertMessage>
             <ActionAlertMessage title="DCA" description="1 day ago">
-              <Tag
-                variant="warning"
-                text="Warning"
-                icon={<IconWarning class="h-3 w-3 fill-customWarning" />}
-                isBorder={true}
-              />
+              <WarningStatus />
             </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #3"
               description="6 hours ago"
             >
-              <Tag
-                variant="success"
-                text="Success"
-                icon={<IconSuccess class="h-3 w-3 fill-customGreen" />}
-                isBorder={true}
-              />
+              <SuccessStatus />
             </ActionAlertMessage>
             <ActionAlertMessage
               title="Automation name #4"
               description="6 hours ago"
             >
-              <Tag
-                variant="success"
-                text="Success"
-                icon={<IconSuccess class="h-3 w-3 fill-customGreen" />}
-                isBorder={true}
-              />
+              <SuccessStatus />
             </ActionAlertMessage>
           </div>
         </div>
       </div>
 
-      <div class="custom-border-1 custom-shadow grid grid-rows-[32px_1fr] gap-6 rounded-2xl bg-white/3 p-6">
+      <div class="custom-border-1 custom-shadow custom-bg-opacity-5 grid grid-rows-[32px_1fr] gap-6 rounded-2xl p-6">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold">Favourite Tokens</h1>
           <Button

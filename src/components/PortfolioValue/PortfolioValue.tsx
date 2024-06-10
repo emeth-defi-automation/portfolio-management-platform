@@ -3,11 +3,9 @@ import {
   component$,
   useSignal,
   useVisibleTask$,
-  type QRL,
   type Signal,
 } from "@builder.io/qwik";
 import * as d3 from "d3";
-import { type PeriodState } from "~/interface/balance/Balance";
 import {
   axisXFormatter,
   axisYFormatter,
@@ -18,39 +16,28 @@ import IconMaximize from "@material-design-icons/svg/filled/open_in_full.svg?jsx
 import IconMinimalize from "@material-design-icons/svg/filled/close_fullscreen.svg?jsx";
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
+import { _totalPortfolioValue } from "~/routes/app/dashboard/server/getTotalPortfolioValue";
+import {
+  Period,
+  PeriodValues,
+} from "~/routes/app/dashboard/server/getPortfolio24hChange";
+import { routeLoader$ } from "@builder.io/qwik-city";
 
 export interface PortfolioValueProps {
-  hideChartWhileLoading: Signal<boolean>;
-  redrawChart: boolean;
-  totalPortfolioValue: string;
   isPortfolioFullScreen: Signal<boolean>;
-  portfolioValueChange: string;
-  portfolioPercentageValueChange: string;
-  chartData: [string, number][] | undefined;
-  onClick$?: QRL<(e: any) => void>;
-  selectedPeriod: PeriodState;
-  period: string;
-  totalPortfolioValueLoading: boolean;
-  portfolioValueChangeLoading: Signal<boolean>;
 }
 
 export const PortfolioValue = component$<PortfolioValueProps>(
-  ({
-    totalPortfolioValue,
-    isPortfolioFullScreen,
-    portfolioValueChange,
-    portfolioPercentageValueChange,
-    onClick$,
-    selectedPeriod,
-    chartData,
-    period,
-    totalPortfolioValueLoading,
-    portfolioValueChangeLoading,
-    redrawChart,
-    hideChartWhileLoading,
-  }) => {
+  ({ isPortfolioFullScreen }) => {
+    const totalPortfolioValue = useSignal("0");
+    const dataForChart = useSignal<[string, number][]>();
+    const selectedPeriodForChart = useSignal<Period>(Period.DAY);
+    const isDataForChartLoading = useSignal(true);
     const outputRef = useSignal<Element>();
-    const chart = $(() => {
+    const percentageChange = useSignal("");
+    const change = useSignal("");
+
+    const chart = $((chartData: [string, number][] | undefined) => {
       if (!chartData) return;
       const data: [Date, number][] = [];
 
@@ -98,23 +85,6 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       // Create the SVG container.
       const svg = d3.create("svg").attr("width", width).attr("height", height);
 
-      // Define the gradient
-      //const gradient = svg.append("defs")
-      //  .append("linearGradient")
-      //  .attr("id", "gradient")
-      //  .attr("x1", "0%")
-      //  .attr("y1", "0%")
-      //  .attr("x2", "100%")
-      //  .attr("y2", "100%");
-
-      //gradient.append("stop")
-      //  .attr("offset", "0%")
-      //  .attr("stop-color", "blue");
-
-      //gradient.append("stop")
-      //  .attr("offset", "100%")
-      //  .attr("stop-color", "green");
-
       // Add the x-axis.
       svg
         .append("g")
@@ -124,7 +94,9 @@ export const PortfolioValue = component$<PortfolioValueProps>(
           d3
             .axisBottom(scaleX)
             .tickValues(data.map((d) => d[0]))
-            .tickFormat((d) => axisXFormatter(d as Date, selectedPeriod))
+            .tickFormat((d) =>
+              axisXFormatter(d as Date, selectedPeriodForChart.value),
+            )
             .tickSize(-height + marginTop + marginBottom)
             .tickPadding(12),
         )
@@ -174,20 +146,30 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       outputRef.value!.replaceChildren(svg.node()!);
     });
 
-    // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(({ track }) => {
-      track(() => chartData);
-      chart();
-    });
+    routeLoader$;
 
     // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(({ track }) => {
-      track(() => redrawChart);
-      chart();
+    useVisibleTask$(async ({ track }) => {
+      track(() => {
+        selectedPeriodForChart.value;
+      });
+      isDataForChartLoading.value = false;
+      const data = await _totalPortfolioValue(selectedPeriodForChart.value);
+      console.log("data", data);
+      dataForChart.value = data.values;
+      percentageChange.value =
+        (data.percentageChange > 0 ? "+" : "") +
+        data.percentageChange.toFixed(2) +
+        "%";
+      change.value = (data.change > 0 ? "+" : "") + data.change.toFixed(2);
+      totalPortfolioValue.value =
+        dataForChart.value[dataForChart.value.length - 1][1].toFixed(2);
+      await chart(dataForChart.value);
     });
+
     return (
       <div
-        class={`custom-border-1 bg-white/3 ${portfolioValueChangeLoading.value || hideChartWhileLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
+        class={`custom-border-1 custom-bg-opacity-5 ${isDataForChartLoading.value ? "" : "grid gap-4"}  rounded-2xl p-6 ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
       >
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
           <h1 class="text-xl font-semibold">Portfolio Value</h1>
@@ -196,28 +178,23 @@ export const PortfolioValue = component$<PortfolioValueProps>(
               class="custom-text-gradient text-xl font-semibold text-transparent"
               data-testid="portfolio-value"
             >
-              {totalPortfolioValueLoading ||
-              portfolioValueChangeLoading.value ||
-              hideChartWhileLoading.value
+              {totalPortfolioValue.value === "0"
                 ? "Loading..."
-                : `$${totalPortfolioValue}`}
+                : `$${totalPortfolioValue.value}`}
             </h1>
-            {totalPortfolioValueLoading ||
-            portfolioValueChangeLoading.value ||
-            hideChartWhileLoading.value ? null : (
+            {isDataForChartLoading.value ? null : (
               <div>
                 {" "}
                 <p class="text-xs">
-                  {period} change: {portfolioValueChange}{" "}
-                  <span class="text-customGreen">
-                    {portfolioPercentageValueChange}
-                  </span>
+                  {PeriodValues[selectedPeriodForChart.value].label} change:{" "}
+                  <span class="text-xs">{change.value} </span>
+                  <span class="text-customGreen">{percentageChange.value}</span>
                 </p>{" "}
               </div>
             )}
           </div>
         </div>
-        {portfolioValueChangeLoading.value || hideChartWhileLoading.value ? (
+        {isDataForChartLoading.value ? (
           <div class="flex-column flex h-full items-center justify-center">
             <Spinner isTextVisible={false} />
           </div>
@@ -229,44 +206,52 @@ export const PortfolioValue = component$<PortfolioValueProps>(
                 <button
                   name="24h"
                   class={
-                    selectedPeriod["24h"]
+                    selectedPeriodForChart.value === Period.DAY
                       ? "custom-bg-button rounded-lg px-2"
                       : "rounded-lg px-2"
                   }
-                  onClick$={onClick$}
+                  onClick$={() => {
+                    selectedPeriodForChart.value = Period.DAY;
+                  }}
                 >
                   24h
                 </button>
                 <button
                   name="1W"
                   class={
-                    selectedPeriod["1W"]
+                    selectedPeriodForChart.value === Period.WEEK
                       ? "custom-bg-button rounded-lg px-2"
                       : "rounded-lg px-2"
                   }
-                  onClick$={onClick$}
+                  onClick$={() => {
+                    selectedPeriodForChart.value = Period.WEEK;
+                  }}
                 >
                   1W
                 </button>
                 <button
                   name="1M"
                   class={
-                    selectedPeriod["1M"]
+                    selectedPeriodForChart.value === Period.MONTH
                       ? "custom-bg-button rounded-lg px-2"
                       : "rounded-lg px-2"
                   }
-                  onClick$={onClick$}
+                  onClick$={() => {
+                    selectedPeriodForChart.value = Period.MONTH;
+                  }}
                 >
                   1M
                 </button>
                 <button
                   name="1Y"
                   class={
-                    selectedPeriod["1Y"]
+                    selectedPeriodForChart.value === Period.YEAR
                       ? "custom-bg-button rounded-lg px-2"
                       : "rounded-lg px-2"
                   }
-                  onClick$={onClick$}
+                  onClick$={() => {
+                    selectedPeriodForChart.value = Period.YEAR;
+                  }}
                 >
                   1Y
                 </button>
@@ -297,47 +282,44 @@ export const PortfolioValue = component$<PortfolioValueProps>(
           </div>
         )}
 
-        {portfolioValueChangeLoading.value ||
-        hideChartWhileLoading.value ? null : (
+        {isDataForChartLoading.value ? null : (
           <div id="container" ref={outputRef}></div>
         )}
-        {isPortfolioFullScreen.value &&
-          !portfolioValueChangeLoading.value &&
-          !hideChartWhileLoading.value && (
-            <div class="ml-7">
-              <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
-                <div class="pr-timeline row-start-2"></div>
-                <Button
-                  variant="iconBox"
-                  leftIcon={<ImgPfButton />}
-                  size="small"
-                  customClass="absolute left-3/4 top-1/3 !bg-white/10 !px-1"
-                />
-                <Button
-                  variant="iconBox"
-                  leftIcon={<ImgPfButton />}
-                  size="small"
-                  customClass="absolute left-2/4 top-1/3 !bg-white/10 !px-1"
-                />
-              </div>
-              <div class="custom-text-50 mt-3 flex justify-between text-xs">
-                <span>2011</span>
-                <span>2012</span>
-                <span>2013</span>
-                <span>2014</span>
-                <span>2015</span>
-                <span>2016</span>
-                <span>2017</span>
-                <span>2018</span>
-                <span>2019</span>
-                <span>2020</span>
-                <span>2021</span>
-                <span>2022</span>
-                <span>2023</span>
-                <span>2024</span>
-              </div>
+        {isPortfolioFullScreen.value && !isDataForChartLoading.value && (
+          <div class="ml-7">
+            <div class="custom-border-1 relative grid h-[84px] grid-rows-2 rounded-lg">
+              <div class="pr-timeline row-start-2"></div>
+              <Button
+                variant="iconBox"
+                leftIcon={<ImgPfButton />}
+                size="small"
+                customClass="absolute left-3/4 top-1/3 !bg-white/10 !px-1"
+              />
+              <Button
+                variant="iconBox"
+                leftIcon={<ImgPfButton />}
+                size="small"
+                customClass="absolute left-2/4 top-1/3 !bg-white/10 !px-1"
+              />
             </div>
-          )}
+            <div class="custom-text-50 mt-3 flex justify-between text-xs">
+              <span>2011</span>
+              <span>2012</span>
+              <span>2013</span>
+              <span>2014</span>
+              <span>2015</span>
+              <span>2016</span>
+              <span>2017</span>
+              <span>2018</span>
+              <span>2019</span>
+              <span>2020</span>
+              <span>2021</span>
+              <span>2022</span>
+              <span>2023</span>
+              <span>2024</span>
+            </div>
+          </div>
+        )}
       </div>
     );
   },
