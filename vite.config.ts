@@ -3,6 +3,7 @@ import { qwikVite } from "@builder.io/qwik/optimizer";
 import { qwikCity } from "@builder.io/qwik-city/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import basicSsl from "@vitejs/plugin-basic-ssl";
+// import mkcert from "vite-plugin-mkcert"
 
 export default defineConfig((): UserConfig => {
     return {
@@ -11,7 +12,10 @@ export default defineConfig((): UserConfig => {
             headers: {
                 "Cache-Control": "public, max-age=0",
             },
-            proxy: {}
+            https: {
+                key: './ssl/127.0.0.1-key.pem',
+                cert: './ssl/127.0.0.1.pem',
+            },
         },
         preview: {
             headers: {
