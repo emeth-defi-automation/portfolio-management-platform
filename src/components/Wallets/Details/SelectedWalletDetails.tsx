@@ -8,6 +8,7 @@ import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
 import Button from "~/components/Atoms/Buttons/Button";
 import Tag from "~/components/Atoms/Tags/Tag";
 import IconTrashRed from "@material-design-icons/svg/outlined/delete.svg?jsx";
+import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
 
 interface SelectedWalletProps {
   selectedWallet: Signal<WalletTokensBalances | null>;
@@ -31,41 +32,12 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
       shortAddress = shortAddress.slice(0, 4) + "..." + shortAddress.slice(-4);
     }
     return (
-      <div class="grid grid-rows-[64px_1fr] gap-6">
-        <div class="flex justify-between">
-          <div class="">
-            <h1 class="text-xl font-semibold">
-              {selectedWallet.value.wallet.name}
-            </h1>
-            <div class="mt-4 flex gap-2">
-              <Tag
-                variant="gradient"
-                text={
-                  selectedWallet.value.wallet.isExecutable
-                    ? "Executable"
-                    : "Read-only"
-                }
-                isBorder={true}
-                class="px-3"
-              />
-              <Tag
-                variant="greyText"
-                isBorder={true}
-                text={shortAddress}
-                icon={<IconWallet />}
-              />
-              <Tag
-                text={chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
-                icon={<IconEthereum class="h-5 w-5" />}
-              />
-              <Tag
-                variant="blueText"
-                isBorder={false}
-                text="Loading Tokens 5/10"
-                icon={<IconLoading class="h-4 w-4 fill-customBlue" />}
-              />
-            </div>
-          </div>
+      <>
+        <BoxHeader
+          title={selectedWallet.value.wallet.name}
+          variantHeader="h3"
+          class="gap-12"
+        >
           <div class="flex gap-2">
             <Button
               variant="transparent"
@@ -90,6 +62,34 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               }}
             />
           </div>
+        </BoxHeader>
+        <div class="flex gap-2">
+          <Tag
+            variant="gradient"
+            text={
+              selectedWallet.value.wallet.isExecutable
+                ? "Executable"
+                : "Read-only"
+            }
+            isBorder={true}
+            class="px-3"
+          />
+          <Tag
+            variant="greyText"
+            isBorder={true}
+            text={shortAddress}
+            icon={<IconWallet />}
+          />
+          <Tag
+            text={chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
+            icon={<IconEthereum class="h-5 w-5" />}
+          />
+          <Tag
+            variant="blueText"
+            isBorder={false}
+            text="Loading Tokens 5/10"
+            icon={<IconLoading class="h-4 w-4 fill-customBlue" />}
+          />
         </div>
         <div class="grid gap-4">
           <div class="custom-text-50 grid grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 text-left text-xs uppercase">
@@ -127,7 +127,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             })}
           </div>
         </div>
-      </div>
+      </>
     );
   },
 );

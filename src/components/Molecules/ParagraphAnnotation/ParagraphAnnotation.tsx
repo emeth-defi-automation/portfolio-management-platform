@@ -22,7 +22,6 @@ export interface ParagraphAnnotationProps {
     | (() => void)
     | QRL<() => Promise<void>>
     | (() => Promise<void>);
-  key?: string;
 }
 
 const ParagraphAnnotationStyles = cva(["flex"], {
@@ -47,8 +46,8 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
     return (
       <>
         <div
-          class="cusor-poiner flex items-center justify-between gap-4"
-          key={props.key}
+          class="flex cursor-pointer items-center justify-between gap-4"
+          onClick$={props.onClick$}
         >
           <div class="flex items-center justify-between gap-4">
             {hasIconBox ? (

@@ -99,14 +99,18 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   return (
     <>
       <div class="grid grid-rows-[32px_40px_1fr] gap-6 border-r border-white/10 bg-white/3 p-6">
-        <BoxHeader title="Automations" variantHeader="h4" headerClass="font-normal">
+        <BoxHeader
+          title="Automations"
+          variantHeader="h4"
+          headerClass="font-normal"
+        >
           <Button
-              text="Add New"
-              variant="transparent"
-              size="small"
-              customClass="font-normal bg-white/10 !border-0"
-              onClick$={() => (isAddModalOpen.value = !isAddModalOpen.value)}
-            />
+            text="Add New"
+            variant="transparent"
+            size="small"
+            customClass="font-normal bg-white/10 !border-0"
+            onClick$={() => (isAddModalOpen.value = !isAddModalOpen.value)}
+          />
         </BoxHeader>
         <Input
           variant="search"
@@ -122,7 +126,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
               onClick$={$(() => {
                 automationPageContext.activeAutomation.value = action;
               })}
-             customClass="py-4"
+              customClass="py-4"
             >
               <Checkbox
                 variant="toggleTick"
