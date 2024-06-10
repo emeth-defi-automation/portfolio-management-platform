@@ -264,43 +264,6 @@ export const SwapModal = component$<SwapModalProps>(
                     }
                   })}
                 />
-                {/* <div class="flex flex-col gap-2">
-                  <Label name="You pay"/>
-                  <Input
-                    id="amount"
-                    placeholder="00.00"
-                    customClass="!border-0 p-0 text-[28px] h-fit"
-                    value={swapValues.chosenToken.value}
-                    type="text"
-                    name="amount"
-                    onInput={$(async (e) => {
-                      const target = e.target as HTMLInputElement;
-
-                      const regex = /^\d*\.?\d*$/;
-                      target.value = replaceNonMatching(
-                        target.value,
-                        regex,
-                        "",
-                      );
-
-                      swapValues.chosenToken.value = target.value;
-                      if (
-                        swapValues.chosenToken.address.value != "" &&
-                        swapValues.tokenToSwapOn.address != "" &&
-                        swapValues.chosenToken.value != "0"
-                      ) {
-                        const amountIn = target.value;
-                        await tokenFromAmountDebounce({
-                          amountIn: amountIn,
-                          tokenInAddress: swapValues.chosenToken.address
-                            .value as `0x${string}`,
-                          tokenOutAddress: swapValues.tokenToSwapOn
-                            .address as `0x${string}`,
-                        });
-                      }
-                    })}
-                  />
-                </div> */}
                 <span class="text-xs font-normal text-white/60">
                   ${swapValues.chosenToken.dolarValue}
                 </span>
@@ -327,16 +290,6 @@ export const SwapModal = component$<SwapModalProps>(
                   value={swapValues.tokenToSwapOn.value}
                   placeholder="00.00"
                 />
-                {/*<div class="flex flex-col gap-2"> 
-                  <Label name="You receive"/>
-                  <Input
-                    id="receive"
-                    type="text"
-                    placeholder="00.00"
-                    customClass="!border-0 p-0 text-[28px] h-fit"
-                    value={swapValues.tokenToSwapOn.value}
-                  /> 
-                </div>*/}
                 <span class="text-xs font-normal text-white/60">
                   ${swapValues.tokenToSwapOn.value}
                 </span>
