@@ -13,8 +13,8 @@ export default defineConfig((): UserConfig => {
                 "Cache-Control": "public, max-age=0",
             },
             https: {
-                key: process.env.CERT_KEY,
-                cert: process.env.CERT,
+                key: process.env.CERT_KEY_PATH,
+                cert: process.env.CERT_PATH,
             },
         },
         preview: {
