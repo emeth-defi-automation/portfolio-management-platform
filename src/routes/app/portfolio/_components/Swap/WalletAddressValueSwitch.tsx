@@ -16,7 +16,7 @@ const WalletAddressValueSwitch = component$<AddressValueSwitchProps>(
             type="button"
             class={`${isManualAddress.value ? "bg-black" : "custom-bg-button"}  col-span-1 rounded p-2.5 text-white`}
           >
-            Observer wallets
+            Observable
           </button>
           <button
             onClick$={() => {
@@ -25,7 +25,7 @@ const WalletAddressValueSwitch = component$<AddressValueSwitchProps>(
             type="button"
             class={`${isManualAddress.value ? "custom-bg-button" : "bg-black"} col-span-1 rounded p-2.5  text-white`}
           >
-            Other
+            Executable
           </button>
         </div>
       </div>
