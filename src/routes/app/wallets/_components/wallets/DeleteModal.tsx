@@ -6,20 +6,18 @@ import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWal
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { useRemoveWallet } from "~/routes/app/wallets/server";
 import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
-import { Wallet } from "~/interface/auth/Wallet";
 export { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export { useRemoveWallet } from "~/routes/app/wallets/server";
 
 interface DeleteModalProps {
   isDeleteModalOpen: Signal<boolean>;
-  selectedWallet: Signal<Wallet | undefined>;
+  selectedWallet: Signal<WalletTokensBalances | null>;
 }
 
 export const DeleteModal = component$<DeleteModalProps>(
   ({ isDeleteModalOpen, selectedWallet }) => {
     const removeWalletAction = useRemoveWallet();
     const observedWallets = useSignal<WalletTokensBalances[]>([]);
-
 
     return (
       <Modal
@@ -62,14 +60,13 @@ export const DeleteModal = component$<DeleteModalProps>(
             text="Yes, Let’s Do It!"
             customClass="w-full"
             onClick$={async () => {
-              if (selectedWallet.value && selectedWallet.value.id) {
-                console.log(selectedWallet.value?.id)
+              if (selectedWallet.value && selectedWallet.value.wallet.id) {
                 const {
                   value: { success },
                 } = await removeWalletAction.submit({
-                  id: selectedWallet.value?.id,
+                  id: selectedWallet.value.wallet.id,
                 });
-                selectedWallet.value = undefined;
+                selectedWallet.value = null;
                 isDeleteModalOpen.value = false;
                 if (success) {
                   observedWallets.value = await getObservedWallets();

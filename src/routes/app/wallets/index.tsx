@@ -1,10 +1,5 @@
 import {
-  $,
   component$,
-  createContextId,
-  type Signal,
-  useContext,
-  useContextProvider,
   useSignal,
   useStore,
   useVisibleTask$,
@@ -26,31 +21,12 @@ import { AddWalletModal } from "./_components/wallets/AddWalletModal";
 import { DeleteModal } from "./_components/wallets/DeleteModal";
 import { balancesLiveStream } from "./server/balancesLiveStream";
 
-import { type Wallet } from "~/interface/auth/Wallet";
-
-export const SelectedWalletDetailsContext = createContextId<Signal<Wallet>>(
-  "selected-wallet-details-context",
-);
-export const SelectedWalletNameContext = createContextId<Signal<string>>(
-  "selected-wallet-name-context",
-);
-
-
 export default component$(() => {
-  // context start
-  const selectedWalletDetails = useSignal<Wallet | undefined>(undefined);
-  useContextProvider(SelectedWalletDetailsContext, selectedWalletDetails);
-
-  const selectedWalletName = useSignal<string>("");
-  useContextProvider(SelectedWalletNameContext, selectedWalletName);
-  // context end
   const isAddWalletModalOpen = useSignal(false);
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
   const selectedWallet = useSignal<WalletTokensBalances | null>(null);
-  const selWallet = useSignal<Wallet | null>(null);
-
 
   const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
@@ -92,16 +68,19 @@ export default component$(() => {
               class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
             />
           </div>
-          <ObservedWalletsList />
+          <ObservedWalletsList
+            observedWallets={observedWallets}
+            selectedWallet={selectedWallet}
+          />
         </div>
 
         <div class="grid gap-6">
           {/* <PendingAuthorization/> */}
           <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[64px_24px_1fr] gap-4 rounded-2xl p-6">
-            {selectedWalletDetails.value && (
+            {selectedWallet.value && (
               <SelectedWalletDetails
-                selWallet={selWallet}
-                key={selectedWalletDetails.value.id}
+                key={selectedWallet.value.wallet.address}
+                selectedWallet={selectedWallet}
                 chainIdToNetworkName={chainIdToNetworkName}
                 isDeleteModalopen={isDeleteModalOpen}
                 isTransferModalOpen={isTransferModalOpen}
@@ -119,7 +98,7 @@ export default component$(() => {
       {isDeleteModalOpen.value && (
         <DeleteModal
           isDeleteModalOpen={isDeleteModalOpen}
-          selectedWallet={selectedWalletDetails}
+          selectedWallet={selectedWallet}
         />
       )}
     </>
