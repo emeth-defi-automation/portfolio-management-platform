@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
 
-import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
+import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 import { hasExecutableWallet } from "~/utils/validators/availableStructure";
 
@@ -24,7 +24,7 @@ export default component$<CoinsToTransferProps>(
                     key={`${structure.name}${index}`}
                   >
                     <div class="flex gap-2">
-                      <IconArrowDown />
+                      <IconArrowDown class="h-4 w-4 fill-white" />
                       <p class="text-sm">{structure.structure.name}</p>
                     </div>
                     <div class="mr-2 flex flex-col py-2">

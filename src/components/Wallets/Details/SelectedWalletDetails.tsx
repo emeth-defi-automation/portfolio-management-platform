@@ -1,7 +1,7 @@
 import { type Signal, component$ } from "@builder.io/qwik";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
-import IconWallet from "/public/assets/icons/wallets/wallet.svg?jsx";
+import IconWallet from "@material-design-icons/svg/round/wallet.svg?jsx";
 import IconLoading from "@material-design-icons/svg/round/sync.svg?jsx";
 import { TokenRowWallets } from "~/components/Tokens/TokenRowWallets";
 import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
@@ -78,7 +78,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             variant="greyText"
             isBorder={true}
             text={shortAddress}
-            icon={<IconWallet />}
+            icon={<IconWallet class="h-4 w-4 fill-white" />}
           />
           <Tag
             text={chainIdToNetworkName[selectedWallet.value.wallet.chainId]}

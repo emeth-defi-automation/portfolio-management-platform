@@ -5,7 +5,7 @@ import { Modal } from "~/components/Modal/Modal";
 import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { useRemoveWallet } from "~/routes/app/wallets/server";
-import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
+import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 export { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export { useRemoveWallet } from "~/routes/app/wallets/server";
 
@@ -27,7 +27,7 @@ export const DeleteModal = component$<DeleteModalProps>(
         customClass="py-8 px-14 w-fit"
       >
         <div class="flex flex-col items-center gap-4">
-          <ImgWarningRed />
+          <IconWarning class="h-14 w-14 fill-customRed" />
           <h1 class="text-center text-xl">
             You are going to permanently delete your wallet!
           </h1>

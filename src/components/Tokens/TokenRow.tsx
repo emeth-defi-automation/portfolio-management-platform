@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import IconStar from "/public/assets/icons/dashboard/star.svg?jsx";
+import IconStar from "@material-design-icons/svg/filled/star.svg?jsx";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
 import ParagraphAnnotation from "../Molecules/ParagraphAnnotation/ParagraphAnnotation";
 
@@ -44,7 +44,7 @@ export const TokenRow = component$<TokenRowProps>(
         <div class="overflow-auto">{wallet}</div>
         <div class="overflow-auto">{networkName}</div>
         <div class="overflow-auto">{subportfolio}</div>
-        <IconStar />
+        <IconStar class="h-4 w-4 fill-customWarning" />
       </div>
     );
   },

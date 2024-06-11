@@ -1,7 +1,7 @@
 import { type Signal, component$ } from "@builder.io/qwik";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
-import IconClock from "/public/assets/icons/wallets/clock.svg?jsx";
+import IconSchedule from "@material-design-icons/svg/round/schedule.svg?jsx";
 import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
 
 interface ObservedWalletProps {
@@ -24,7 +24,7 @@ export const ObservedWallet = component$<ObservedWalletProps>(
         iconBoxCustomIcon={<IconEthereum class="h-full w-full" />}
         customClass="py-4"
       >
-        <IconClock />
+        <IconSchedule class="h-5 w-5 fill-customWarning" />
       </ParagraphAnnotation>
     );
   },
