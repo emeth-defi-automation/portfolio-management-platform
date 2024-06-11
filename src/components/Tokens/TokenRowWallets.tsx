@@ -1,6 +1,10 @@
-import { $, type Signal, component$ } from "@builder.io/qwik";
-// import Button from "../Atoms/Buttons/Button";
-// import IconMenuDots from "@material-design-icons/svg/outlined/more_vert.svg?jsx";
+import {
+  $,
+  type Signal,
+  component$,
+  useSignal,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
 import {
   Image,
@@ -8,8 +12,15 @@ import {
   useImageProvider,
 } from "qwik-image";
 import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
+import { server$ } from "@builder.io/qwik-city";
+import { connectToDB } from "~/database/db";
+import { Readable } from "stream";
+import { killLiveQuery } from "../ObservedWalletsList/ObservedWalletsList";
+import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
 type TokenRowWalletsProps = {
+  walletId?: string;
+  decimals: string;
   name: string;
   symbol: string;
   balance: string;
@@ -22,8 +33,94 @@ type TokenRowWalletsProps = {
   isExecutable: boolean | undefined;
 };
 
+export const tokenRowWalletsInfoStream = server$(async function* (
+  walletId: string,
+  tokenSymbol: string,
+) {
+  const db = await connectToDB(this.env);
+  const resultsStream = new Readable({
+    objectMode: true,
+    read() { },
+  });
+
+  // live query for latest balance of token for wallet
+
+  const queryUuid: any = await db.query(
+    `LIVE SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' AND walletId = ${walletId};`,
+  );
+  await db.query(
+    `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${queryUuid}', ${true});`,
+  );
+  yield queryUuid;
+
+  const latestBalanceOfTokenForWallet =
+    await db.query(`SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
+      AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1;`);
+
+  yield latestBalanceOfTokenForWallet;
+
+  if (tokenSymbol === "USDT") {
+    tokenSymbol = "USDC";
+  }
+  const latestTokenPriceQueryUuid: any = await db.query(
+    `LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}';`,
+  );
+  await db.query(
+    `INSERT INTO queryuuids (queryUuid, enabled) VALUES ('${latestTokenPriceQueryUuid}', ${true});`,
+  );
+  yield latestTokenPriceQueryUuid;
+
+  const latestTokenPrice = await db.query(
+    `SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}' 
+    ORDER BY timestamp DESC LIMIT 1;`,
+  );
+  yield latestTokenPrice;
+
+  const queryUuidEnabledLive: any = await db.query(
+    `LIVE SELECT enabled FROM queryuuids WHERE queryUuid = '${queryUuid[0]}';`,
+  );
+
+  const queryUuidTokenPriceEnabledLive: any = await db.query(
+    `LIVE SELECT enabled FROM queryuuids WHERE queryUuid = '${latestTokenPriceQueryUuid[0]}';`,
+  );
+
+  await db.listenLive(queryUuidEnabledLive[0], ({ action }) => {
+    if (action === "UPDATE") {
+      resultsStream.push(null);
+      db.kill(queryUuidEnabledLive[0]);
+    }
+  });
+
+  await db.listenLive(queryUuidTokenPriceEnabledLive[0], ({ action }) => {
+    if (action === "UPDATE") {
+      resultsStream.push(null);
+      db.kill(queryUuidTokenPriceEnabledLive[0]);
+    }
+  });
+
+  await db.listenLive(queryUuid, ({ action, result }) => {
+    if (action === "CLOSE") {
+      resultsStream.push(null);
+      return;
+    }
+
+    resultsStream.push({ action, result });
+  });
+
+  for await (const result of resultsStream) {
+    if (!result) {
+      break;
+    }
+    yield result;
+  }
+  await db.query(`DELETE FROM queryuuids WHERE queryUuid = '${queryUuid[0]}';`);
+  await db.query(
+    `DELETE FROM queryuuids WHERE queryUuid = '${latestTokenPriceQueryUuid[0]}';`,
+  );
+});
+
 export const TokenRowWallets = component$<TokenRowWalletsProps>(
-  ({ name, symbol, balance, imagePath, balanceValueUSD, allowance }) => {
+  ({ walletId, name, symbol, decimals, imagePath, allowance }) => {
     const imageTransformer$ = $(
       ({ src, width, height }: ImageTransformerProps): string => {
         return `${src}?height=${height}&width=${width}&format=webp&fit=fill`;
@@ -34,6 +131,48 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       resolutions: [1920, 1280],
       imageTransformer$,
     });
+
+    const currentBalanceOfToken = useSignal("");
+    const latestTokenPrice = useSignal("");
+    const latestBalanceUSD = useSignal("");
+
+    // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(async ({ cleanup }) => {
+      cleanup(async () => {
+        await killLiveQuery(queryUuid.value);
+        await killLiveQuery(latestTokenPriceQueryUuid.value);
+      });
+
+      if (walletId === undefined) {
+        throw new Error("walletId is undefined");
+      }
+      const data = await tokenRowWalletsInfoStream(walletId, symbol);
+
+      const queryUuid = await data.next();
+
+      currentBalanceOfToken.value = convertWeiToQuantity(
+        (await data.next()).value[0][0]["walletValue"],
+        parseInt(decimals),
+      );
+
+      const latestTokenPriceQueryUuid = await data.next();
+
+      latestTokenPrice.value = (await data.next()).value[0][0]["price"];
+
+      latestBalanceUSD.value = (
+        Number(currentBalanceOfToken.value) * Number(latestTokenPrice.value)
+      ).toFixed(2);
+
+      for await (const value of data) {
+        if (value.action === "CREATE") {
+          currentBalanceOfToken.value = convertWeiToQuantity(
+            value.result.balance,
+            parseInt(decimals),
+          );
+        }
+      }
+    });
+
     return (
       <>
         <div class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm">
@@ -52,19 +191,14 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
               {name} <span class="custom-text-50 pl-1 text-xs">{symbol}</span>
             </p>
           </div>
-          <div class="overflow-auto">{balance}</div>
-          <div class="overflow-auto">${balanceValueUSD}</div>
+          <div class="overflow-auto">{currentBalanceOfToken.value}</div>
+          <div class="overflow-auto">${latestBalanceUSD.value}</div>
           <div class="">{allowance}</div>
           <div class="flex h-full items-center gap-4">
             <span class="text-customGreen">3,6%</span>
             <IconGraph />
           </div>
-          <div class="text-right">
-            {/* <Button
-              variant="onlyIcon"
-              leftIcon={<IconMenuDots class="w-4 h-4 fill-white/>}
-            /> */}
-          </div>
+          <div class="text-right"></div>
         </div>
       </>
     );

@@ -15,12 +15,16 @@ import "dotenv/config";
 import qwikCityPlan from "@qwik-city-plan";
 import { manifest } from "@qwik-client-manifest";
 import render from "./entry.ssr";
+// import express from "express";
 import express from "express";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
+import http2 from "http2";
+import fs from "fs";
+import http2Express from "http2-express-bridge";
 
 declare global {
-  interface QwikCityPlatform extends PlatformNode {}
+  interface QwikCityPlatform extends PlatformNode { }
 }
 
 // Directories where the static assets are located
@@ -28,7 +32,7 @@ const distDir = join(fileURLToPath(import.meta.url), "..", "..", "dist");
 const buildDir = join(distDir, "build");
 
 // Allow for dynamic port
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT ?? 4000;
 
 // Create the Qwik City Node middleware
 const { router, notFound } = createQwikCity({
@@ -47,7 +51,7 @@ const { router, notFound } = createQwikCity({
 
 // Create the express server
 // https://expressjs.com/
-const app = express();
+const app = http2Express(express);
 
 // Enable gzip compression
 // app.use(compression());
@@ -63,8 +67,13 @@ app.use(router);
 // Use Qwik City's 404 handler
 app.use(notFound);
 
+const httpsOptions = {
+  key: fs.readFileSync("./ssl/127.0.0.1-key.pem"),
+  cert: fs.readFileSync("./ssl/127.0.0.1.pem"),
+  allowHTTP1: true,
+};
+
 // Start the express server
-app.listen(PORT, () => {
-  /* eslint-disable */
-  console.log(`Server started: http://localhost:${PORT}/`);
+http2.createSecureServer(httpsOptions, app).listen(PORT, () => {
+  console.log(`Server started: https://localhost:${PORT}/`);
 });

@@ -42,12 +42,12 @@ export const onGet: RequestHandler = async ({ cacheControl }) => {
 };
 
 export default component$(() => {
-  const metadata = {
-    name: import.meta.env.PUBLIC_METADATA_NAME,
-    description: import.meta.env.PUBLIC_METADATA_DESCRIPTION,
-    url: "https://web3modal.com",
-    icons: ["https://avatars.githubusercontent.com/u/37784886"],
-  };
+  // const metadata = {
+  //   name: import.meta.env.PUBLIC_METADATA_NAME,
+  //   description: import.meta.env.PUBLIC_METADATA_DESCRIPTION,
+  //   url: "https://web3modal.com",
+  //   icons: ["https://avatars.githubusercontent.com/u/37784886"],
+  // };
 
   useContextProvider(WagmiConfigContext, {
     config: noSerialize({} as Config),
@@ -63,13 +63,13 @@ export default component$(() => {
   const login = useContext(LoginContext);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
-    const wconfig = defaultWagmiConfig({
-      chains: [mainnet, sepolia],
-      projectId: import.meta.env.PUBLIC_PROJECT_ID,
-      metadata,
-    });
+    // const wconfig = defaultWagmiConfig({
+    //   chains: [mainnet, sepolia],
+    //   projectId: import.meta.env.PUBLIC_PROJECT_ID,
+    //   metadata,
+    // });
 
-    wagmiConfig.config = noSerialize(wconfig);
+    // wagmiConfig.config = noSerialize(wconfig);
 
     if (wagmiConfig.config) {
       watchAccount(wagmiConfig.config!, {

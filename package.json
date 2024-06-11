@@ -81,6 +81,7 @@
     "@web3modal/wagmi": "4.1.9",
     "class-variance-authority": "^0.7.0",
     "d3": "7.9.0",
+    "http2-express-bridge": "^1.0.7",
     "jsonwebtoken": "9.0.2",
     "jwt-decode": "4.0.0",
     "moralis": "2.25.4",

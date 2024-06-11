@@ -60,6 +60,9 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
             blockNumber: balanceHistory[i].blockNumber,
             timestamp: balanceHistory[i].timestamp,
             walletAddress: data.address,
+            tokenSymbol: "USDC",
+            walletValue: '123',
+            walletId: "abc",
             [tokenAddresses.GLM]: currentBalance[tokenAddresses.GLM]
                 ? currentBalance[tokenAddresses.GLM]
                 : "0",
@@ -69,7 +72,9 @@ export const useGetBalanceHistory = routeAction$(async (data, requestEvent) => {
             [tokenAddresses.USDT]: currentBalance[tokenAddresses.USDT]
                 ? currentBalance[tokenAddresses.USDT]
                 : "0",
+
         };
+        console.log(dbObject)
 
         await db.create("wallet_balance", dbObject);
     }
