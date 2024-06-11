@@ -19,7 +19,7 @@ export async function getErc20TokenTransfers(
   let allEntries: any = [];
   try {
     const response = await Moralis.EvmApi.token.getWalletTokenTransfers({
-      chain: EvmChain.SEPOLIA,
+      chain: EvmChain.SEPOLIA.hex,
       order: "ASC",
       cursor: cursor as string,
       contractAddresses: [
@@ -78,7 +78,7 @@ export const addAddressToStreamConfig = server$(async function (
   streamId: string,
   address: string,
 ) {
-  await Moralis.Streams.addAddress({ address, id: streamId });
+  await Moralis.Streams.addAddress({ id: streamId, address });
 });
 
 /**
