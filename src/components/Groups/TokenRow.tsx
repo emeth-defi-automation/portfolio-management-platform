@@ -7,6 +7,7 @@ import { getTokenSymbolByAddress } from "~/database/tokens";
 import Button from "../Atoms/Buttons/Button";
 import IconSwap from "@material-design-icons/svg/round/swap_vert.svg?jsx";
 import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
+import ParagraphAnnotation from "../Molecules/ParagraphAnnotation/ParagraphAnnotation";
 
 const getWalletAddressById = server$(async function (walletId: string) {
   const db = await connectToDB(this.env);
@@ -45,15 +46,14 @@ export const TokenRow = component$<TokenRowProps>((props) => {
   return (
     <>
       <div class="custom-border-b-1-opacity-5 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-nowrap py-4 text-sm last:border-b-0 last:pb-0">
-        <div class="flex h-10 items-center gap-1">
-          <div class="custom-border-1 flex items-center justify-center rounded-lg p-2">
-            {props.icon && <img src={props.icon} width="20" height="20" />}
-          </div>
-          <div class="flex h-full items-center gap-1 overflow-x-auto">
-            <p>{props.tokenName}</p>
-            <span class="custom-text-50">{props.symbol}</span>
-          </div>
-        </div>
+        <ParagraphAnnotation
+          paragraphText={props.tokenName}
+          annotationText={props.symbol}
+          variant="annotationNear"
+          hasIconBox={true}
+          iconBoxSize="small"
+          iconBoxTokenPath={props.icon}
+        />
         <div class="flex h-full items-center overflow-auto">
           {props.quantity}
         </div>

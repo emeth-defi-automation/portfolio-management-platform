@@ -352,7 +352,7 @@ export default component$(() => {
                   class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
                 />
               </div>
-              <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
+              <div class="grid h-fit items-start gap-4 text-left text-sm">
                 <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
                   <div class="">TOKEN NAME</div>
                   <div class="">QUANTITY</div>
