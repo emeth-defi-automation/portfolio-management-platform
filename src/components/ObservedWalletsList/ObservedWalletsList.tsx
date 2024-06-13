@@ -26,7 +26,6 @@ import { chainIdToNetworkName } from "~/utils/chains";
 import { Spinner } from "../Spinner/Spinner";
 import { z } from "@builder.io/qwik-city";
 import { Readable } from "stream";
-import { after } from "node:test";
 
 export const getObservedWallets = server$(async function () {
   const db = await connectToDB(this.env);
