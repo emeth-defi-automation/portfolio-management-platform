@@ -67,9 +67,7 @@ export const useAddWallet = routeAction$(
             let result: any;
             try {
                 result = await db.query(query);
-                console.log(result)
                 walletId = result[2].out
-                console.log(walletId)
 
             } catch (error) {
                 await db.query("ROLLBACK;")

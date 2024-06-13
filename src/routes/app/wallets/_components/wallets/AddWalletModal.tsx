@@ -189,7 +189,6 @@ export const AddWalletModal = component$<AddWalletModal>(
 
           const { address, userId } = jwtDecode.jwtDecode(cookie) as JwtPayload;
 
-          console.log(userId)
 
           const { request } = await simulateContract(
             wagmiConfig.config as Config,

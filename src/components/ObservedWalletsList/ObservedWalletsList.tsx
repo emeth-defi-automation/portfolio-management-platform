@@ -236,15 +236,21 @@ export const observedWalletsLiveStream = server$(async function* () {
     await db.listenLive(
       queryUuid[0],
       async ({ action, result }) => {
-        if (action === "CLOSE") {
-          resultStream.push(null);
-          return;
-        }
-        const query = `SELECT * FROM observes_wallet WHERE in=${userId} AND out=${result.id};`;
-        const [response]: any = await db.query(query);
-
-        if (userId == response[0].in) {
-          resultStream.push({ action, result });
+        switch (action) {
+          case "CLOSE":
+            resultStream.push(null);
+            break;
+          case "DELETE":
+            resultStream.push({ action, result });
+            break;
+          case "CREATE":
+            const query = `SELECT * FROM observes_wallet WHERE in=${userId} AND out=${result.id};`;
+            const [response]: any = await db.query(query);
+            if (userId == response[0].in) {
+              resultStream.push({ action, result });
+            }
+            break;
+          default: resultStream.push({ action, result });
         }
       }
     );
@@ -257,7 +263,6 @@ export const observedWalletsLiveStream = server$(async function* () {
       console.log("stream empty")
       break;
     }
-
     yield result
   }
 })
