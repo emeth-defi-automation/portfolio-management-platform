@@ -10,6 +10,7 @@ import {
 import Button from "~/components/Atoms/Buttons/Button";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
+
 import { chainIdToNetworkName } from "~/utils/chains";
 
 import { ButtonWithIcon } from "~/components/Buttons/Buttons";
@@ -22,6 +23,7 @@ export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
 
 import { AddWalletModal } from "./_components/wallets/AddWalletModal";
 import { DeleteModal } from "./_components/wallets/DeleteModal";
+
 import { balancesLiveStream } from "./server/balancesLiveStream";
 
 export const SelectedWalletDetailsContext = createContextId<Signal<any>>(
