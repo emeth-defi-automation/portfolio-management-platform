@@ -21,6 +21,7 @@ import { Token } from "~/interface/token/Token";
 // eslint-disable-next-line qwik/loader-location
 export const useAddWallet = routeAction$(
     async (data, requestEvent) => {
+
         const db = await connectToDB(requestEvent.env);
         await db.query(
             `DEFINE INDEX walletAddressChainIndex ON TABLE wallet COLUMNS address, chainId UNIQUE;`,
@@ -42,17 +43,47 @@ export const useAddWallet = routeAction$(
             const nativeBalance = await testPublicClient.getBalance({
                 address: data.address as `0x${string}`,
             });
-            const [createWalletQueryResult] = await db.create<Wallet>("wallet", {
-                chainId: 1,
-                address: data.address.toString(),
-                isExecutable: data.isExecutable === "1" ? true : false,
-                nativeBalance: nativeBalance.toString(),
-            });
-            walletId = createWalletQueryResult.id;
 
-            await db.query(
-                `UPDATE ${walletId} SET nativeBalance = '${nativeBalance}';`,
-            );
+
+            // const [createWalletQueryResult] = await db.create<Wallet>("wallet", {
+            //     chainId: 1,
+            //     address: data.address.toString(),
+            //     isExecutable: data.isExecutable === "1" ? true : false,
+            //     nativeBalance: nativeBalance.toString(),
+            // });
+
+            const chainId = 1;
+            const address = data.address.toString();
+            const isExecutable = data.isExecutable === "1" ? true : false;
+
+            const query = `
+                BEGIN TRANSACTION;
+                LET $ins = (INSERT INTO wallet (chainId, address, isExecutable, nativeBalance)
+                VALUES (${chainId}, '${address}', ${isExecutable}, '${nativeBalance}'));  
+                $ins; 
+                RELATE ONLY ${userId}->observes_wallet->$ins SET name = '${data.name}';
+                COMMIT;
+                `;
+            let result: any;
+            try {
+                result = await db.query(query);
+                console.log(result)
+                walletId = result[2].out
+                console.log(walletId)
+
+            } catch (error) {
+                await db.query("ROLLBACK;")
+                console.error("error inserting wallet and creating relation", error)
+            }
+
+
+
+
+            // await db.query(
+            //     `RELATE ONLY ${userId}->observes_wallet->${walletId} SET name = '${data.name}';`,
+            // );
+
+
 
             // create balances for tokens
             const tokens = await db.select<Token>("token");
@@ -61,7 +92,7 @@ export const useAddWallet = routeAction$(
                     address: token.address as `0x${string}`,
                     abi: contractABI,
                     functionName: "balanceOf",
-                    args: [createWalletQueryResult.address as `0x${string}`],
+                    args: [result[1][0].address as `0x${string}`],
                 });
                 if (readBalance < 0) {
                     continue;
@@ -72,7 +103,7 @@ export const useAddWallet = routeAction$(
                 // balance -> token && balance -> wallet
                 await db.query(`RELATE ONLY ${balance.id}->for_token->${token.id}`);
                 await db.query(
-                    `RELATE ONLY ${balance.id}->for_wallet->${createWalletQueryResult.id}`,
+                    `RELATE ONLY ${balance.id}->for_wallet->${result[1][0].id}`,
                 );
             }
         }

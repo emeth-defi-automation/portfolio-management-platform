@@ -1,21 +1,30 @@
-import { type Signal, component$ } from "@builder.io/qwik";
+import { type Signal, component$, useContext, useSignal } from "@builder.io/qwik";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconClock from "/public/assets/icons/wallets/clock.svg?jsx";
+import {
+  SelectedWalletDetailsContext,
+  SelectedWalletNameContext,
+} from "~/routes/app/wallets";
 
 interface ObservedWalletProps {
-  observedWallet: WalletTokensBalances;
-  selectedWallet: Signal<WalletTokensBalances | null>;
+  observedWallet: any;
   chainIdToNetworkName: { [key: string]: string };
 }
 
 export const ObservedWallet = component$<ObservedWalletProps>(
-  ({ observedWallet, selectedWallet, chainIdToNetworkName }) => {
+  ({ observedWallet, chainIdToNetworkName }) => {
+
+    const selectedWalletDetails = useContext(SelectedWalletDetailsContext);
+    const observedWalletNameContext = useContext(SelectedWalletNameContext);
+    // const observedWalletNameSignal = useSignal("Loading name...");
+
     return (
       <div
         class="flex h-14 cursor-pointer items-center justify-between rounded-lg"
         onClick$={() => {
-          selectedWallet.value = observedWallet;
+          selectedWalletDetails.value = observedWallet;
+          observedWalletNameContext.value = "example name"
         }}
       >
         <div class="flex items-center gap-3">
@@ -23,9 +32,9 @@ export const ObservedWallet = component$<ObservedWalletProps>(
             <IconEthereum />
           </div>
           <div class="">
-            <div class="text-sm">{observedWallet.wallet.name}</div>
+            <div class="text-sm">{observedWallet.id}</div>
             <div class="custom-text-50 text-xs">
-              {chainIdToNetworkName[observedWallet.wallet.chainId]}
+              {chainIdToNetworkName[observedWallet.chainId]}
             </div>
           </div>
         </div>

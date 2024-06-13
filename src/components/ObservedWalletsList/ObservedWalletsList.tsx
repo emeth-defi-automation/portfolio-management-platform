@@ -13,7 +13,7 @@ import {
   getDBTokensAddresses,
   getTokenImagePath,
 } from "~/interface/wallets/observedWallets";
-import { checksumAddress } from "viem";
+import { checksumAddress, hexToBytes } from "viem";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { type Wallet } from "~/interface/auth/Wallet";
 import { testPublicClient } from "~/routes/app/wallets/testconfig";
@@ -25,6 +25,8 @@ import { type Balance } from "~/interface/balance/Balance";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Spinner } from "../Spinner/Spinner";
 import { z } from "@builder.io/qwik-city";
+import { Readable } from "stream";
+import { after } from "node:test";
 
 export const getObservedWallets = server$(async function () {
   const db = await connectToDB(this.env);
@@ -161,41 +163,182 @@ export const getObservedWallets = server$(async function () {
   return observedWallets;
 });
 
-interface ObservedWalletsListProps {
-  selectedWallet: Signal<WalletTokensBalances | null>;
-  observedWallets: Signal<WalletTokensBalances[]>;
-}
 
-export const ObservedWalletsList = component$<ObservedWalletsListProps>(
-  ({ selectedWallet, observedWallets }) => {
-    const isLoading = useSignal(true);
-    // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(async () => {
-      observedWallets.value = await getObservedWallets();
-      isLoading.value = false;
-    });
 
-    return (
-      <div class="">
-        {isLoading.value ? ( // if loading --> display spinner
-          <div class="flex flex-col items-center pt-12">
-            <Spinner />
-          </div>
-        ) : observedWallets.value.length === 0 ? ( // if no wallets --> display message
-          <div class="flex flex-col items-center pt-12">
-            <span>No wallets added yet</span>
-          </div>
-        ) : (
-          observedWallets.value.map((observedWallet) => (
-            <ObservedWallet
-              key={observedWallet.wallet.address}
-              observedWallet={observedWallet}
-              selectedWallet={selectedWallet}
-              chainIdToNetworkName={chainIdToNetworkName}
-            />
-          ))
-        )}
-      </div>
+
+export const fetchObservedWallets = server$(async function () {
+  const db = await connectToDB(this.env);
+
+  const cookie = this.cookie.get("accessToken")?.value;
+  if (!cookie) {
+    throw new Error("No cookie found");
+  }
+  const { userId } = jwt.decode(cookie) as JwtPayload;
+
+  const observedWallets = (
+    await db.query(`SELECT * FROM 
+    (SELECT VALUE out FROM observes_wallet WHERE in = ${userId})`)
+  ).at(0);
+
+  return observedWallets
+})
+
+
+
+export const observedWalletsLiveStream = server$(async function* () {
+
+  const db = await connectToDB(this.env);
+
+  const resultStream = new Readable({
+    objectMode: true,
+    read() { },
+  });
+
+  const cookie = this.cookie.get("accessToken")?.value;
+  if (!cookie) {
+    throw new Error("No cookie found");
+  }
+  const { userId } = jwt.decode(cookie) as JwtPayload;
+
+  const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet;`)
+
+  await db.query(`
+    INSERT INTO queryuuids (queryuuid,enabled) VALUES ('${queryUuid[0]}',${true});
+    `)
+
+  const queryUuidEnaledLive: any = await db.query(
+    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid[0]};'`
+  )
+
+  yield queryUuid;
+
+
+  const userObservedWallets = await fetchObservedWallets();
+  yield userObservedWallets;
+
+
+
+
+  await db.listenLive(
+    queryUuidEnaledLive[0],
+    ({ action }) => {
+      if (action === "UPDATE") {
+        resultStream.push(null);
+        db.kill(queryUuidEnaledLive[0]);
+      }
+    }
+  )
+
+
+
+
+  try {
+    await db.listenLive(
+      queryUuid[0],
+      async ({ action, result }) => {
+        if (action === "CLOSE") {
+          resultStream.push(null);
+          return;
+        }
+        const query = `SELECT * FROM observes_wallet WHERE in=${userId} AND out=${result.id};`;
+        const [response]: any = await db.query(query);
+
+        if (userId == response[0].in) {
+          resultStream.push({ action, result });
+        }
+      }
     );
-  },
+  } catch (err) {
+    console.error("Error during db.listenLive", err)
+  }
+
+  for await (const result of resultStream) {
+    if (!result) {
+      console.log("stream empty")
+      break;
+    }
+
+    yield result
+  }
+})
+
+export const killLiveQuery = server$(async function (queryUuid: string) {
+  const db = await connectToDB(this.env);
+  await db.kill(queryUuid);
+  await db.query(
+    `UPDATE queryuuids SET enabled = ${false} WHERE queryuuid = '${queryUuid}'; `
+  )
+})
+
+export const fetchObservesWallet = server$(async function (out: any) {
+  const db = await connectToDB(this.env);
+  const cookie = this.cookie.get("accessToken")?.value;
+  if (!cookie) {
+    throw new Error("No cookie found");
+  }
+  const { userId } = jwt.decode(cookie) as JwtPayload;
+
+  const res = await db.query(
+    `SELECT * FROM observes_wallet where in = ${userId} and out=${out};`
+  )
+
+  return res;
+
+})
+
+
+export const ObservedWalletsList = component$(() => {
+  const usersObservedWallets = useSignal<any>([]);
+  const isLoading = useSignal(true);
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(async ({ cleanup }) => {
+    cleanup(async () => {
+      await killLiveQuery(queryUuid.value[0]);
+    })
+    // observedWallets.value = await getObservedWallets();
+    const data = await observedWalletsLiveStream();
+    const queryUuid = await data.next();
+    usersObservedWallets.value = (await data.next()).value
+    isLoading.value = false;
+
+
+    for await (const value of data) {
+      if (value.action === "CREATE") {
+        usersObservedWallets.value = [
+          ...usersObservedWallets.value,
+          value.result
+        ]
+      }
+      if (value.action === "DELETE") {
+        usersObservedWallets.value = [
+          ...usersObservedWallets.value.filter(
+            (wallet: any) => wallet.id !== value.result.id,
+          ),
+        ];
+      }
+    }
+  });
+
+  return (
+    <div class="">
+      {isLoading.value ? ( // if loading --> display spinner
+        <div class="flex flex-col items-center pt-12">
+          <Spinner />
+        </div>
+      ) : usersObservedWallets.value.length === 0 ? ( // if no wallets --> display message
+        <div class="flex flex-col items-center pt-12">
+          <span>No wallets added yet</span>
+        </div>
+      ) : (
+        usersObservedWallets.value.map((observedWallet: any) => (
+          <ObservedWallet
+            key={observedWallet.address}
+            observedWallet={observedWallet}
+            chainIdToNetworkName={chainIdToNetworkName}
+          />
+        ))
+      )}
+    </div>
+  );
+},
 );
