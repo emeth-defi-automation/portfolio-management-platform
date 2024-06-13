@@ -10,6 +10,8 @@ import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
 import { connectToDB } from "~/database/db";
 import { server$ } from "@builder.io/qwik-city";
 import { messagesContext } from "../../layout";
+import Annotation from "~/components/Atoms/Annotation/Annotation";
+import IconAdd from "@material-design-icons/svg/outlined/add.svg?jsx";
 
 const deleteActionFromDb = server$(async function (actionId, user) {
   // await updateIsActiveStatus(actionId, false);
@@ -77,7 +79,7 @@ export const CentralView = component$<CentralViewProps>(() => {
               <Button
                 customClass="mb-1"
                 variant="onlyIcon"
-                leftIcon={<IconTrash class="h-4 w-4 fill-customRed" />}
+                leftIcon={<IconTrash class="h-4 w-4 fill-white" />}
                 onClick$={$(async () => {
                   await handleDeleteAction();
                 })}
@@ -88,16 +90,20 @@ export const CentralView = component$<CentralViewProps>(() => {
         </div> */}
             </div>
           </div>
-          <div class="grow-1 flex h-full items-center justify-center">
+          <div class="flex h-full items-center justify-center">
             {!automationPageContext.activeAutomation.value.deployed ? (
-              <Button
-                text="Add trigger!"
-                customClass="mb-1"
-                variant="blue"
-                onClick$={async () => {
-                  automationPageContext.isDraverOpen.value = true;
-                }}
-              />
+              <div class="flex w-80 flex-col gap-4">
+                <Annotation text="Trigger" />
+                <Button
+                  text="Add Trigger"
+                  customClass=""
+                  variant="dashed"
+                  leftIcon={<IconAdd class="h-4 w-4" />}
+                  onClick$={async () => {
+                    automationPageContext.isDraverOpen.value = true;
+                  }}
+                />
+              </div>
             ) : null}
           </div>
         </div>

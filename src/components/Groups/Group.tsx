@@ -1,6 +1,6 @@
 import { component$, type JSXOutput } from "@builder.io/qwik";
 import type { QRL, Signal } from "@builder.io/qwik";
-import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
+import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import {
   type Structure,
   type StructureBalance,
@@ -89,7 +89,7 @@ export const Group = component$<GroupProps>((props) => {
       <div class="">
         <div class="item-center flex gap-6 text-sm">
           <div class="flex items-center gap-2">
-            <IconArrowDown />
+            <IconArrowDown class="h-4 w-4 fill-white" />
             <h3>{props.createdStructure.structure.name}</h3>
             <Button
               variant="onlyIcon"
