@@ -18,7 +18,8 @@ const IconBoxStyles = cva(["rounded-lg"], {
     },
     background: {
       transparent: ["bg-transparent"],
-      white: ["bg-white/10"],
+      white10: ["bg-white/10"],
+      white3: ["bg-white/3"],
     },
     boxSize: {
       small: ["h-8 w-8 p-1.5"],

@@ -9,7 +9,7 @@ export interface ParagraphAnnotationProps {
   hasIconBox?: boolean;
   iconBoxSize?: "small" | "large";
   iconBoxBorder?: "gradient" | "default" | "clear";
-  iconBoxBackground?: "transparent" | "white";
+  iconBoxBackground?: "transparent" | "white10" | "white3";
   iconBoxTokenPath?: string;
   iconBoxCustomIcon?: JSXOutput | null;
   iconBoxCustomClass?: string;

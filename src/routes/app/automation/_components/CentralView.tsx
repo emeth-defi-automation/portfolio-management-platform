@@ -72,14 +72,12 @@ export const CentralView = component$<CentralViewProps>(() => {
                 class="font-normal"
               />
               <Button
-                customClass="mb-1"
-                variant="onlyIcon"
-                leftIcon={<IconEdit class="h-4 w-4 fill-white" />}
+                leftIcon={<IconEdit class="h-3 w-3 fill-white" />}
+                customClass="bg-white/10 h-8 w-8 p-0"
               />
               <Button
-                customClass="mb-1"
-                variant="onlyIcon"
-                leftIcon={<IconTrash class="h-4 w-4 fill-white" />}
+                leftIcon={<IconTrash class="h-4 w-4 fill-customRed" />}
+                customClass="bg-customRed/10 h-8 w-8 p-0"
                 onClick$={$(async () => {
                   await handleDeleteAction();
                 })}
@@ -92,7 +90,7 @@ export const CentralView = component$<CentralViewProps>(() => {
           </div>
           <div class="flex h-full items-center justify-center">
             {!automationPageContext.activeAutomation.value.deployed ? (
-              <div class="flex w-80 flex-col gap-4">
+              <div class="flex w-[438px] flex-col gap-4">
                 <Annotation text="Trigger" />
                 <Button
                   text="Add Trigger"
