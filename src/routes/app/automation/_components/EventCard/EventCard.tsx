@@ -13,7 +13,7 @@ export interface EventCardProps {
 
 export const EventCard = component$<EventCardProps>((props) => {
   return (
-    // TODO: when Card is active ("choosen") add this classes to box - "!border-0 gradient-border before:rounded-lg"
+    // TODO: when Card is active ("chosen") add this classes to box - "!border-0 gradient-border before:rounded-lg"
     <Box customClass="p-4 rounded-lg">
       <ParagraphAnnotation
         hasIconBox={true}
@@ -27,7 +27,7 @@ export const EventCard = component$<EventCardProps>((props) => {
           ) : null
         }
         iconBoxBackground="white3"
-        // iconBoxBorder="gradient" TODO: when Card is active ("choosen") border is gradient
+        // iconBoxBorder="gradient" TODO: when Card is active ("chosen") border is gradient
         paragraphText="Swap #1"
         annotationText="Swap Description"
       >
