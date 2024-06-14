@@ -63,7 +63,6 @@ export default component$(() => {
   const login = useContext(LoginContext);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
-
     const wconfig = defaultWagmiConfig({
       chains: [mainnet, sepolia],
       projectId: import.meta.env.PUBLIC_PROJECT_ID,

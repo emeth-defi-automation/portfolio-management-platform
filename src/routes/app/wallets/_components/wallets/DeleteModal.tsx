@@ -16,7 +16,7 @@ interface DeleteModalProps {
 
 export const DeleteModal = component$<DeleteModalProps>(
   ({ isDeleteModalOpen }) => {
-    const selectedWalletDetails = useContext(SelectedWalletDetailsContext)
+    const selectedWalletDetails = useContext(SelectedWalletDetailsContext);
     const removeWalletAction = useRemoveWallet();
     const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
@@ -61,7 +61,10 @@ export const DeleteModal = component$<DeleteModalProps>(
             text="Yes, Let’s Do It!"
             customClass="w-full"
             onClick$={async () => {
-              if (selectedWalletDetails.value && selectedWalletDetails.value.id) {
+              if (
+                selectedWalletDetails.value &&
+                selectedWalletDetails.value.id
+              ) {
                 const {
                   value: { success },
                 } = await removeWalletAction.submit({

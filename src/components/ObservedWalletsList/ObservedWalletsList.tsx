@@ -162,9 +162,6 @@ export const getObservedWallets = server$(async function () {
   return observedWallets;
 });
 
-
-
-
 export const fetchObservedWallets = server$(async function () {
   const db = await connectToDB(this.env);
 
@@ -179,18 +176,15 @@ export const fetchObservedWallets = server$(async function () {
     (SELECT VALUE out FROM observes_wallet WHERE in = ${userId})`)
   ).at(0);
 
-  return observedWallets
-})
-
-
+  return observedWallets;
+});
 
 export const observedWalletsLiveStream = server$(async function* () {
-
   const db = await connectToDB(this.env);
 
   const resultStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const cookie = this.cookie.get("accessToken")?.value;
@@ -199,80 +193,68 @@ export const observedWalletsLiveStream = server$(async function* () {
   }
   const { userId } = jwt.decode(cookie) as JwtPayload;
 
-  const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet;`)
+  const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet;`);
 
   await db.query(`
     INSERT INTO queryuuids (queryuuid,enabled) VALUES ('${queryUuid[0]}',${true});
-    `)
+    `);
 
   const queryUuidEnaledLive: any = await db.query(
-    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid[0]};'`
-  )
+    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid[0]};'`,
+  );
 
   yield queryUuid;
-
 
   const userObservedWallets = await fetchObservedWallets();
   yield userObservedWallets;
 
-
-
-
-  await db.listenLive(
-    queryUuidEnaledLive[0],
-    ({ action }) => {
-      if (action === "UPDATE") {
-        resultStream.push(null);
-        db.kill(queryUuidEnaledLive[0]);
-      }
+  await db.listenLive(queryUuidEnaledLive[0], ({ action }) => {
+    if (action === "UPDATE") {
+      resultStream.push(null);
+      db.kill(queryUuidEnaledLive[0]);
     }
-  )
-
-
-
+  });
 
   try {
-    await db.listenLive(
-      queryUuid[0],
-      async ({ action, result }) => {
-        switch (action) {
-          case "CLOSE":
-            resultStream.push(null);
-            break;
-          case "DELETE":
+    await db.listenLive(queryUuid[0], async ({ action, result }) => {
+      switch (action) {
+        case "CLOSE":
+          resultStream.push(null);
+          break;
+        case "DELETE":
+          resultStream.push({ action, result });
+          break;
+        case "CREATE":
+          const query = `SELECT * FROM observes_wallet WHERE in=${userId} AND out=${result.id};`;
+          const [response]: any = await db.query(query);
+          if (userId == response[0].in) {
             resultStream.push({ action, result });
-            break;
-          case "CREATE":
-            const query = `SELECT * FROM observes_wallet WHERE in=${userId} AND out=${result.id};`;
-            const [response]: any = await db.query(query);
-            if (userId == response[0].in) {
-              resultStream.push({ action, result });
-            }
-            break;
-          default: resultStream.push({ action, result });
-        }
+          }
+          break;
+        default:
+          resultStream.push({ action, result });
       }
-    );
+    });
   } catch (err) {
-    console.error("Error during db.listenLive", err)
+    console.error("Error during db.listenLive", err);
   }
 
   for await (const result of resultStream) {
     if (!result) {
-      console.log("stream empty")
+      console.log("stream empty");
       break;
     }
-    yield result
+    yield result;
   }
-})
+});
 
 export const killLiveQuery = server$(async function (queryUuid: string) {
   const db = await connectToDB(this.env);
   await db.kill(queryUuid);
   await db.query(
-    `UPDATE queryuuids SET enabled = ${false} WHERE queryuuid = '${queryUuid}'; `
-  )
-})
+    `UPDATE queryuuids SET enabled = ${false} WHERE queryuuid = '${queryUuid}'; `,
+  );
+});
 
 export const fetchObservesWallet = server$(async function (out: any) {
   const db = await connectToDB(this.env);
@@ -283,13 +265,11 @@ export const fetchObservesWallet = server$(async function (out: any) {
   const { userId } = jwt.decode(cookie) as JwtPayload;
 
   const res = await db.query(
-    `SELECT * FROM observes_wallet where in = ${userId} and out=${out};`
-  )
+    `SELECT * FROM observes_wallet where in = ${userId} and out=${out};`,
+  );
 
   return res;
-
-})
-
+});
 
 export const ObservedWalletsList = component$(() => {
   const usersObservedWallets = useSignal<any>([]);
@@ -298,20 +278,19 @@ export const ObservedWalletsList = component$(() => {
   useVisibleTask$(async ({ cleanup }) => {
     cleanup(async () => {
       await killLiveQuery(queryUuid.value[0]);
-    })
+    });
     // observedWallets.value = await getObservedWallets();
     const data = await observedWalletsLiveStream();
     const queryUuid = await data.next();
-    usersObservedWallets.value = (await data.next()).value
+    usersObservedWallets.value = (await data.next()).value;
     isLoading.value = false;
-
 
     for await (const value of data) {
       if (value.action === "CREATE") {
         usersObservedWallets.value = [
           ...usersObservedWallets.value,
-          value.result
-        ]
+          value.result,
+        ];
       }
       if (value.action === "DELETE") {
         usersObservedWallets.value = [
@@ -344,5 +323,4 @@ export const ObservedWalletsList = component$(() => {
       )}
     </div>
   );
-},
-);
+});

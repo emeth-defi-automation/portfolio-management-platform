@@ -1,4 +1,10 @@
-import { type Signal, component$, useContext, useSignal, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  type Signal,
+  component$,
+  useContext,
+  useSignal,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconClock from "/public/assets/icons/wallets/clock.svg?jsx";
@@ -17,37 +23,36 @@ interface ObservedWalletProps {
   chainIdToNetworkName: { [key: string]: string };
 }
 
-
 export const fetchObservedWalletName = server$(async function (
-  observedWalletId: string
+  observedWalletId: string,
 ) {
   const db = await connectToDB(this.env);
   const [[observedWalletName]]: any = await db.query(
-    `SELECT VALUE name FROM observes_wallet WHERE out = ${observedWalletId}`
+    `SELECT VALUE name FROM observes_wallet WHERE out = ${observedWalletId}`,
   );
 
   return observedWalletName;
+});
 
-})
-
-export const observedWalletNameLiveStream = server$(async function* (walletId: string) {
-  const db = await connectToDB(this.env)
+export const observedWalletNameLiveStream = server$(async function* (
+  walletId: string,
+) {
+  const db = await connectToDB(this.env);
 
   const resultStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const cookie = this.cookie.get("accessToken")?.value;
   if (!cookie) {
     throw new Error("No cookie found");
   }
-  const { userId } = jwt.decode(cookie) as JwtPayload
+  const { userId } = jwt.decode(cookie) as JwtPayload;
 
   const queryUuid: any = await db.query(`
     LIVE SELECT name FROM observes_wallet WHERE in=${userId} and out=${walletId}
-    `)
-
+    `);
 
   yield queryUuid[0];
 
@@ -55,35 +60,28 @@ export const observedWalletNameLiveStream = server$(async function* (walletId: s
     INSERT INTO queryuuids (queryuuid, enabled) VALUES ('${queryUuid[0]}',${true});
     `);
 
-
   const queryUuidEnabledLive: any = await db.query(`
     LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid[0]}';
     `);
 
-  await db.listenLive(queryUuidEnabledLive[0],
-    ({ action }) => {
-      if (action === "UPDATE") {
-        resultStream.push(null);
-        db.kill(queryUuidEnabledLive[0]);
-      }
-    });
+  await db.listenLive(queryUuidEnabledLive[0], ({ action }) => {
+    if (action === "UPDATE") {
+      resultStream.push(null);
+      db.kill(queryUuidEnabledLive[0]);
+    }
+  });
 
-
-  const observedWalletName = (await fetchObservedWalletName(walletId));
+  const observedWalletName = await fetchObservedWalletName(walletId);
 
   yield observedWalletName;
 
-  await db.listenLive(
-    queryUuid[0],
-    async ({ action, result }) => {
-      if (action === "CLOSE") {
-        resultStream.push(null);
-        await db.kill(queryUuid[0])
-        return;
-      }
-      resultStream.push({ action, result })
+  await db.listenLive(queryUuid[0], async ({ action, result }) => {
+    if (action === "CLOSE") {
+      resultStream.push(null);
+      return;
     }
-  );
+    resultStream.push({ action, result });
+  });
 
   for await (const result of resultStream) {
     if (!result) {
@@ -92,12 +90,12 @@ export const observedWalletNameLiveStream = server$(async function* (walletId: s
     yield result;
   }
 
-})
-
+  await db.query(`DELETE FROM queryuuids WHERE queryuuid='${queryUuid[0]}';`);
+  return;
+});
 
 export const ObservedWallet = component$<ObservedWalletProps>(
   ({ observedWallet, chainIdToNetworkName }) => {
-
     const observedWalletNameSignal = useSignal("Loading name...");
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ cleanup }) => {
@@ -119,9 +117,7 @@ export const ObservedWallet = component$<ObservedWalletProps>(
           observedWalletNameSignal.value = "";
         }
       }
-
-
-    })
+    });
 
     const selectedWalletDetails = useContext(SelectedWalletDetailsContext);
     const observedWalletNameContext = useContext(SelectedWalletNameContext);
@@ -132,7 +128,7 @@ export const ObservedWallet = component$<ObservedWalletProps>(
         class="flex h-14 cursor-pointer items-center justify-between rounded-lg"
         onClick$={() => {
           selectedWalletDetails.value = observedWallet;
-          observedWalletNameContext.value = "example name"
+          observedWalletNameContext.value = "example name";
         }}
       >
         <div class="flex items-center gap-3">

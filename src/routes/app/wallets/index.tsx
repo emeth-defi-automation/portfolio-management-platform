@@ -5,7 +5,7 @@ import {
   useVisibleTask$,
   createContextId,
   useContextProvider,
-  type Signal
+  type Signal,
 } from "@builder.io/qwik";
 import Button from "~/components/Atoms/Buttons/Button";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
@@ -33,10 +33,8 @@ export const SelectedWalletNameContext = createContextId<Signal<string>>(
   "selected-wallet-name-context",
 );
 
-
 export default component$(() => {
-
-  const selectedWalletDetails = useSignal<any | undefined>(undefined)
+  const selectedWalletDetails = useSignal<any | undefined>(undefined);
   useContextProvider(SelectedWalletDetailsContext, selectedWalletDetails);
   const selectedWalletName = useSignal<string>("");
   useContextProvider(SelectedWalletNameContext, selectedWalletName);
@@ -46,7 +44,6 @@ export default component$(() => {
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
   const selectedWallet = useSignal<any>(null);
-
 
   const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
@@ -112,9 +109,7 @@ export default component$(() => {
       )}
 
       {isDeleteModalOpen.value && (
-        <DeleteModal
-          isDeleteModalOpen={isDeleteModalOpen}
-        />
+        <DeleteModal isDeleteModalOpen={isDeleteModalOpen} />
       )}
     </>
   );

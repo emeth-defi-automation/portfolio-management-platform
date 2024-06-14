@@ -78,7 +78,6 @@ export const AddWalletModal = component$<AddWalletModal>(
     const walletTokenBalances = useSignal<any>([]);
     const stepsCounter = useSignal(1);
 
-
     const addWalletFormStore = useStore<AddWalletFormStore>({
       name: "",
       address: "",
@@ -89,9 +88,6 @@ export const AddWalletModal = component$<AddWalletModal>(
       coinsToCount: [],
       coinsToApprove: [],
     });
-
-
-
 
     const wagmiConfig = useContext(WagmiConfigContext);
     const login = useContext(LoginContext);
@@ -119,7 +115,6 @@ export const AddWalletModal = component$<AddWalletModal>(
 
       const { userId } = jwtDecode.jwtDecode(cookie) as JwtPayload;
 
-
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "info",
@@ -134,7 +129,7 @@ export const AddWalletModal = component$<AddWalletModal>(
         if (addWalletFormStore.isExecutable) {
           if (wagmiConfig.config) {
             const account = getAccount(wagmiConfig.config as Config);
-            console.log("address", account)
+            console.log("address", account);
 
             addWalletFormStore.address = account.address as `0x${string}`;
 
@@ -188,7 +183,6 @@ export const AddWalletModal = component$<AddWalletModal>(
           if (!cookie) throw new Error("No accessToken cookie found");
 
           const { address, userId } = jwtDecode.jwtDecode(cookie) as JwtPayload;
-
 
           const { request } = await simulateContract(
             wagmiConfig.config as Config,

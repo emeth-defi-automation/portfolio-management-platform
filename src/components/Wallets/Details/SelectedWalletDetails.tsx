@@ -1,4 +1,10 @@
-import { type Signal, component$, useContext, useSignal, useTask$ } from "@builder.io/qwik";
+import {
+  type Signal,
+  component$,
+  useContext,
+  useSignal,
+  useTask$,
+} from "@builder.io/qwik";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconWallet from "/public/assets/icons/wallets/wallet.svg?jsx";
@@ -37,11 +43,9 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
     isTransferModalOpen,
     transferredCoin,
   }) => {
-
     const selectedWalletDetails = useContext(SelectedWalletDetailsContext);
     const selectedWalletName = useContext(SelectedWalletNameContext);
     const tokens = useSignal<Token[]>([]);
-
 
     if (!selectedWalletDetails.value) return <></>;
     let shortAddress = selectedWalletDetails.value.address;
@@ -58,9 +62,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
       <div class="grid grid-rows-[64px_1fr] gap-6">
         <div class="flex justify-between">
           <div class="">
-            <h1 class="text-xl font-semibold">
-              {selectedWalletName.value}
-            </h1>
+            <h1 class="text-xl font-semibold">{selectedWalletName.value}</h1>
             <div class="mt-4 flex gap-2">
               <Tag
                 variant="gradient"

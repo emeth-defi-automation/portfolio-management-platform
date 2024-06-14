@@ -5,7 +5,7 @@ import {
   getConnectors,
   reconnect,
   getConnections,
-  watchAccount
+  watchAccount,
 } from "@wagmi/core";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, sepolia } from "viem/chains";
@@ -25,7 +25,6 @@ export const openWeb3Modal = async (wagmiContext: any, login: any) => {
   });
 
   wagmiContext.config = noSerialize(wconfig);
-
 
   if (wagmiContext.config) {
     watchAccount(wagmiContext.config!, {
