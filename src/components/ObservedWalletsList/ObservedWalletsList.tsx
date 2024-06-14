@@ -184,7 +184,7 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   const resultStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
   const cookie = this.cookie.get("accessToken")?.value;
@@ -200,7 +200,7 @@ export const observedWalletsLiveStream = server$(async function* () {
     `);
 
   const queryUuidEnaledLive: any = await db.query(
-    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid[0]};'`,
+    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid[0]}';`,
   );
 
   yield queryUuid;
@@ -210,6 +210,7 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   await db.listenLive(queryUuidEnaledLive[0], ({ action }) => {
     if (action === "UPDATE") {
+      console.log("------------logs------------------")
       resultStream.push(null);
       db.kill(queryUuidEnaledLive[0]);
     }
@@ -240,12 +241,17 @@ export const observedWalletsLiveStream = server$(async function* () {
   }
 
   for await (const result of resultStream) {
+    console.log(result)
     if (!result) {
       console.log("stream empty");
       break;
     }
     yield result;
   }
+
+  await db.query(`DELETE FROM queryuuids WHERE queryuuid='${queryUuid[0]}';`);
+  return;
+
 });
 
 export const killLiveQuery = server$(async function (queryUuid: string) {

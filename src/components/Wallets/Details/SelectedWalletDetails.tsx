@@ -137,6 +137,8 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             {tokens.value.map((token: any) => {
               return (
                 <TokenRowWallets
+                  decimals={token.decimals}
+                  walletId={selectedWalletDetails.value.id}
                   key={token.id}
                   allowance={token.allowance}
                   address={token.address}

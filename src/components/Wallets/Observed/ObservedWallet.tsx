@@ -41,7 +41,7 @@ export const observedWalletNameLiveStream = server$(async function* (
 
   const resultStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
   const cookie = this.cookie.get("accessToken")?.value;
@@ -128,7 +128,7 @@ export const ObservedWallet = component$<ObservedWalletProps>(
         class="flex h-14 cursor-pointer items-center justify-between rounded-lg"
         onClick$={() => {
           selectedWalletDetails.value = observedWallet;
-          observedWalletNameContext.value = "example name";
+          observedWalletNameContext.value = observedWalletNameSignal.value;
         }}
       >
         <div class="flex items-center gap-3">
