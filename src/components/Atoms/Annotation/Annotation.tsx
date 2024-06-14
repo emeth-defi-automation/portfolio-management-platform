@@ -6,26 +6,31 @@ export interface AnnotationProps {
   class?: string;
 }
 
-const AnnotationStyles = cva(["font-['Sora'] custom-text-50 text-xs"], {
+const AnnotationStyles = cva(["font-['Sora'] text-xs"], {
   variants: {
     transform: {
       upper: ["uppercase"],
       normal: ["normal-case"],
     },
+    variant: {
+      default: ["custom-text-50"],
+      white: ["text-white"],
+    },
   },
   defaultVariants: {
     transform: "normal",
+    variant: "default",
   },
 });
 
 export type AnnotationType = VariantProps<typeof AnnotationStyles> &
   AnnotationProps;
 
-const Annotation = ({ transform, ...props }: AnnotationType) => {
+const Annotation = ({ transform, variant, ...props }: AnnotationType) => {
   return (
     <span
       {...props}
-      class={twMerge(AnnotationStyles({ transform }), props.class)}
+      class={twMerge(AnnotationStyles({ transform, variant }), props.class)}
     >
       {props.text}
     </span>

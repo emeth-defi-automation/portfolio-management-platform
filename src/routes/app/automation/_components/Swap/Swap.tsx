@@ -4,18 +4,17 @@ import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/Para
 import IconError from "@material-design-icons/svg/outlined/error_outline.svg?jsx";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 import Button from "~/components/Atoms/Buttons/Button";
+import Select from "~/components/Atoms/Select/Select";
 
 export const Swap = component$(() => {
   return (
     <div class="flex flex-col justify-center gap-6">
-      <div class="custom-border-1 flex gap-1 rounded-lg p-1">
-        <button class="custom-bg-button h-6 w-1/2 rounded-md text-center text-xs">
-          Swap
-        </button>
-        <button class="h-6 w-1/2 rounded-md text-center text-xs">
-          Transfer
-        </button>
-      </div>
+      <Select
+        options={[
+          { value: "", text: "Swap" },
+          { value: "", text: "Transfer" },
+        ]}
+      />
       <InputField
         name="Action name"
         size="medium"
@@ -28,26 +27,69 @@ export const Swap = component$(() => {
         placeholder="Swap Description"
       />
       <hr class="h-[1px] border-0 bg-white/10" />
-      <div class="flex flex-col gap-4">
-        <div class="flex items-center justify-between">
-          <Annotation text="You Swap" />
-          <Button
-            text="Choose tokens"
-            variant="transparent"
-            size="small"
-            customClass="font-normal bg-white/10 !border-0"
-          />
-        </div>
-        <ParagraphAnnotation
-          hasIconBox={true}
-          iconBoxBorder="clear"
-          iconBoxSize="large"
-          iconBoxCustomClass="p-0 w-8 h-8"
-          iconBoxCustomIcon={<IconError class="h-8 w-8 fill-white" />}
-          customClass="gap-2 custom-border-1 p-4 rounded-lg w-full"
-          paragraphText="You didn’t choose tokens yet"
-          annotationText="Please select the tokens you wish to exchange."
+      <div class="flex items-center justify-between">
+        <Annotation text="Swap Summary" />
+        <Button
+          text="Choose options"
+          variant="transparent"
+          size="small"
+          customClass="font-normal bg-white/10 !border-0"
         />
+      </div>
+      <ParagraphAnnotation
+        hasIconBox={true}
+        iconBoxBorder="clear"
+        iconBoxSize="large"
+        iconBoxCustomClass="p-0 w-8 h-8"
+        iconBoxCustomIcon={<IconError class="h-8 w-8 fill-customWarning" />}
+        customClass="gap-2 border border-customWarning bg-customWarning/10 p-4 rounded-lg w-full"
+        paragraphText="You didn’t choose tokens yet"
+        annotationText="Please select the tokens you wish to exchange."
+      />
+      <div class="flex flex-col gap-4">
+        <Annotation text="Details" />
+        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
+          <Annotation text="Type" />
+          <Annotation text="My Wallet" variant="white" />
+        </div>
+        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
+          <Annotation text="From" />
+          <Annotation text="Wallet #1" variant="white" />
+        </div>
+        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
+          <Annotation text="To" />
+          <Annotation text="Wallet #2" variant="white" />
+        </div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <Annotation text="Send" />
+        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
+          <div class="flex items-center gap-2">
+            <img
+              width={16}
+              height={16}
+              src="/public/assets/icons/tokens/usdc.svg"
+              alt="USDC"
+            />
+            <Annotation text="67,059.95" variant="white" />
+          </div>
+          <Annotation text="$67,059.95" variant="white" />
+        </div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <Annotation text="Send" />
+        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
+          <div class="flex items-center gap-2">
+            <img
+              width={16}
+              height={16}
+              src="/public/assets/icons/tokens/btc.svg"
+              alt="BTC"
+            />
+            <Annotation text="1.00" variant="white" />
+          </div>
+          <Annotation text="$67,059.95" variant="white" />
+        </div>
       </div>
     </div>
   );
