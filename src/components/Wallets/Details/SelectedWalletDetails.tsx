@@ -33,84 +33,36 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
       shortAddress = shortAddress.slice(0, 4) + "..." + shortAddress.slice(-4);
     }
     return (
-      <>
-          <BoxHeader
-            variantHeader="h3"
-            title={selectedWallet.value.wallet.name}
-          >
-            <div class="flex gap-2">
-              <Button
-                variant="transparent"
-                text="Edit"
-                size="small"
-                customClass="font-normal"
-              />
-              <Button
-                variant="transparent"
-                text="Deactivate"
-                size="small"
-                customClass="font-normal"
-              />
-              <Button
-                variant="danger"
-                text="Delete Wallet"
-                size="small"
-                leftIcon={<IconTrashRed class="h-4 w-4" />}
-                customClass="font-medium"
-                onClick$={() => {
-                  isDeleteModalopen.value = !isDeleteModalopen.value;
-                }}
-              />
-            </div>
-          </BoxHeader>
-          <div class="mt-4 flex gap-2">
-            {/* <span class="custom-btn-gradient flex h-7 items-center rounded-lg px-[1px] text-xs ">
-              <div class="flex h-[26px] items-center rounded-lg bg-black px-3">
-                {selectedWallet.value.wallet.isExecutable
-                  ? "Executable"
-                  : "Read-only"}
-              </div>
-            </span>
-            <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">
-              <IconWallet />
-              {/* {selectedWallet.value.wallet.address} 
-              {shortAddress}
-            </span>
-            <span class="custom-text-50 custom-border-1 flex items-center gap-2 rounded-lg px-2 text-xs">
-              <IconEthereum />
-              {chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
-            </span>
-            {/* <span class="flex items-center gap-2 text-nowrap rounded-lg border border-customBlue px-2 text-xs text-customBlue">
-                <IconLoading />
-                Loading Tokens 5/10
-              </span> */}
-            <Tag
-              variant="gradient"
-              text={
-                selectedWallet.value.wallet.isExecutable
-                  ? "Executable"
-                  : "Read-only"
-              }
-              isBorder={true}
-              class="px-3"
+      <div class="grid grid-rows-[32px_28px_1fr] gap-6">
+        <BoxHeader
+          variantHeader="h3"
+          title={selectedWallet.value.wallet.name}
+        >
+          <div class="flex gap-2">
+            <Button
+              variant="transparent"
+              text="Edit"
+              size="small"
+              customClass="font-normal"
             />
-            <Tag
-              variant="greyText"
-              isBorder={true}
-              text={shortAddress}
-              icon={<IconWallet />}
+            <Button
+              variant="transparent"
+              text="Deactivate"
+              size="small"
+              customClass="font-normal"
             />
-            <Tag
-              text={chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
-              icon={<IconEthereum class="h-5 w-5" />}
-            />
-            <Tag
-              variant="blueText"
-              isBorder={false}
-              text="Loading Tokens 5/10"
-              icon={<IconLoading class="h-4 w-4 fill-customBlue" />}
+            <Button
+              variant="danger"
+              text="Delete Wallet"
+              size="small"
+              leftIcon={<IconTrashRed class="h-4 w-4" />}
+              customClass="font-medium"
+              onClick$={() => {
+                isDeleteModalopen.value = !isDeleteModalopen.value;
+              }}
             />
           </div>
+        </BoxHeader>
         <div class="flex gap-2">
           <Tag
             variant="gradient"
@@ -153,7 +105,6 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             {selectedWallet.value.wallet.isExecutable ? (
               <div class=""></div>
             ) : null}
-            {/* <div class="">Menu</div> */}
           </div>
           <div>
             {selectedWallet.value.tokens.map((token: any) => {
@@ -175,7 +126,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             })}
           </div>
         </div>
-      </>
+      </div>
     );
   },
 );
