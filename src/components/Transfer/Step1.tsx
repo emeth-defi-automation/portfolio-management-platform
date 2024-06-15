@@ -26,9 +26,10 @@ export const Step1 = component$(() => {
           </div>
         </BoxHeader>
         <Input
+          id="portfolio"
           variant="search"
           placeholder="Search for Portfolio"
-          customClass="flex-row-reverse h-10 w-[300px] text-xs"
+          InputClass="flex-row-reverse h-10 w-[300px] text-xs"
         />
         <div>
           <div class="flex items-center justify-between gap-4 p-4">
@@ -51,17 +52,22 @@ export const Step1 = component$(() => {
         <Header variant="h4" text="Tokens" class="font-normal" />
         <div class="flex gap-2">
           <Input
+            id="token"
             variant="search"
             placeholder="Search Token"
-            customClass="flex-row-reverse h-10 w-[300px] text-xs"
+            InputClass="flex-row-reverse h-10 w-[300px] text-xs"
           />
           <Select
+            name="filterSubPortfolio"
+            id="filterSubPortfolio"
             options={[{ value: "", text: "Filter by SubPortfolio" }]}
-            class="h-10 w-56 text-xs"
+            selectClass="h-10 w-56 text-xs"
           />
           <Select
+            name="filterSubPortfolio"
+            id="filterSubPortfolio"
             options={[{ value: "", text: "Filter by Wallet" }]}
-            class="h-10 w-56 text-xs"
+            selectClass="h-10 w-56 text-xs"
           />
         </div>
         <div class="flex flex-col gap-5">
