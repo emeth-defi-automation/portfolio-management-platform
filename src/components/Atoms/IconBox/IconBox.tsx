@@ -12,7 +12,7 @@ export interface IconBoxProps {
 const IconBoxStyles = cva(["rounded-lg"], {
   variants: {
     border: {
-      gradient: ["gradient-border before:rounded-lg before:p-[1px]"],
+      gradient: ["gradient-border before:rounded-lg before:p-[1px] before:w-[calc(100%+1px)] before:h-[calc(100%+1px)] top-[2px] left-[2px]"],
       default: ["custom-border-1"],
       clear: [""],
     },
