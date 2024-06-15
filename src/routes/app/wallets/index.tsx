@@ -23,7 +23,7 @@ import { balancesLiveStream } from "./server/balancesLiveStream";
 import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
 import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
-import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx"
+import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
 
 export default component$(() => {
   const isAddWalletModalOpen = useSignal(false);

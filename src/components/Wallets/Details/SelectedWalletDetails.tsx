@@ -34,10 +34,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
     }
     return (
       <div class="grid grid-rows-[32px_28px_1fr] gap-6">
-        <BoxHeader
-          variantHeader="h3"
-          title={selectedWallet.value.wallet.name}
-        >
+        <BoxHeader variantHeader="h3" title={selectedWallet.value.wallet.name}>
           <div class="flex gap-2">
             <Button
               variant="transparent"
