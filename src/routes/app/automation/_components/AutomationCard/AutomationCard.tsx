@@ -14,12 +14,12 @@ export interface  AutomationCardProps {
 
 export const  AutomationCard = component$< AutomationCardProps>((props) => {
   return (
-    <Box customClass={`!shadow-none p-4 rounded-md ${props.isActive ? "!border-0 gradient-border before:rounded-lg overflow-hidden before:top-[0px] before:left-[0px] before:w-[calc(100%+1px)] before:h-[calc(100%+1px)]" : ""}`}>
+    <Box customClass={`!shadow-none p-4 w-[500px] h-[70px] rounded-lg flex items-center ${props.isActive ? "!border-transaprent !overflow-visible !before:p-0 gradient-border before:rounded-lg before:w-[calc(100%+2px)] before:h-[calc(100%+2px)]" : ""}`}>
       <ParagraphAnnotation
         hasIconBox={true}
         iconBoxCustomIcon={
           props.variant == "swap" ? (
-            <IconSwap class="w-full h-full fill-white" />
+            <IconSwap class="w-6 h-6 fill-white" />
           ) : props.variant == "transfer" ? (
             <IconSend class="w-full h-full fill-white" />
           ) : props.variant == "trigger" ? (
