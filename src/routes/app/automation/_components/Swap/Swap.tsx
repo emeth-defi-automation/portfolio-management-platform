@@ -1,34 +1,44 @@
-import { component$ } from "@builder.io/qwik";
+import { $, component$, useStore } from "@builder.io/qwik";
 import InputField from "~/components/Molecules/InputField/InputField";
 import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
 import IconError from "@material-design-icons/svg/outlined/error_outline.svg?jsx";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 import Button from "~/components/Atoms/Buttons/Button";
-import Select from "~/components/Atoms/Select/Select";
+import SelectField from "~/components/Molecules/SelectField/SelectField";
 
 export const Swap = component$(() => {
+  const state = useStore({ actionType: "Swap" });
+
   return (
     <div class="flex flex-col justify-center gap-6">
-      <Select
+      <SelectField
+        name="Action Type"
+        variant="largeArrow"
+        size="large"
+        labelClass="normal-case"
         options={[
-          { value: "", text: "Swap" },
-          { value: "", text: "Transfer" },
+          { value: "Swap", text: "Swap" },
+          { value: "Transfer", text: "Transfer" },
         ]}
+        onValueChange={$((value: string) => {
+          state.actionType = value;
+        })}
       />
       <InputField
         name="Action name"
         size="medium"
-        placeholder="Swap #1"
-        class=""
+        placeholder={`${state.actionType} #1`}
+        labelClass="normal-case"
       />
       <InputField
         name="Action description"
         size="medium"
-        placeholder="Swap Description"
+        placeholder={`${state.actionType} Description`}
+        labelClass="normal-case"
       />
       <hr class="h-[1px] border-0 bg-white/10" />
       <div class="flex items-center justify-between">
-        <Annotation text="Swap Summary" />
+        <Annotation text={`${state.actionType} Summary`} />
         <Button
           text="Choose options"
           variant="transparent"
@@ -44,7 +54,7 @@ export const Swap = component$(() => {
         iconBoxCustomIcon={<IconError class="h-8 w-8 fill-customWarning" />}
         customClass="gap-2 border border-customWarning bg-customWarning/10 p-4 rounded-lg w-full"
         paragraphText="You didn’t choose tokens yet"
-        annotationText="Please select the tokens you wish to exchange."
+        annotationText={`Please select the tokens you wish to ${state.actionType == "Swap" ? "exchange" : "transfer"}.`}
       />
       <div class="flex flex-col gap-4">
         <Annotation text="Details" />
