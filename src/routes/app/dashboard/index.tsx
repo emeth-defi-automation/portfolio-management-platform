@@ -50,27 +50,27 @@ export default component$(() => {
             <ParagraphAnnotation
               paragraphText="Bitcoin share exceeded 20%"
               annotationText="6 hours ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             />
             <ParagraphAnnotation
               paragraphText="Bitcoin share exceeded 20%"
               annotationText="6 hours ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             />
             <ParagraphAnnotation
               paragraphText="Bitcoin share exceeded 20%"
               annotationText="6 hours ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             />
             <ParagraphAnnotation
               paragraphText="Bitcoin share exceeded 20%"
               annotationText="6 hours ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             />
             <ParagraphAnnotation
               paragraphText="Bitcoin share exceeded 20%"
               annotationText="6 hours ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             />
           </div>
         </Box>
@@ -83,7 +83,7 @@ export default component$(() => {
             <ParagraphAnnotation
               paragraphText="Automation name #1"
               annotationText="6 hours ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             >
               <Tag
                 text="Success"
@@ -95,7 +95,7 @@ export default component$(() => {
             <ParagraphAnnotation
               paragraphText="Automation name #2"
               annotationText="6 hours ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             >
               <Tag
                 text="Success"
@@ -107,7 +107,7 @@ export default component$(() => {
             <ParagraphAnnotation
               paragraphText="DCA"
               annotationText="1 day ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             >
               <Tag
                 text="Warning"
@@ -119,7 +119,7 @@ export default component$(() => {
             <ParagraphAnnotation
               paragraphText="Automation name #3"
               annotationText="6 hours ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             >
               <Tag
                 text="Success"
@@ -131,7 +131,7 @@ export default component$(() => {
             <ParagraphAnnotation
               paragraphText="Automation name #4"
               annotationText="6 hours ago"
-              customClass="py-4"
+              textBoxClass="py-4"
             >
               <Tag
                 text="Success"
