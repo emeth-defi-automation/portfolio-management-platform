@@ -9,10 +9,12 @@ export interface IconBoxProps {
   customIcon?: JSXOutput | null;
 }
 
-const IconBoxStyles = cva(["rounded-lg"], {
+const IconBoxStyles = cva(["rounded-lg flex items-center justify-center"], {
   variants: {
     border: {
-      gradient: ["gradient-border before:rounded-lg before:w-[calc(100%+1px)] before:h-[calc(100%+1px)]"],
+      gradient: [
+        "gradient-border before:rounded-lg before:w-full before:h-full before:top-0 before:left-0",
+      ],
       default: ["custom-border-1"],
       clear: [""],
     },

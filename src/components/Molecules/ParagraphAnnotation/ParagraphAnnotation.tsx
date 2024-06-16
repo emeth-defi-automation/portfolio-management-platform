@@ -42,11 +42,16 @@ export type ParagraphAnnotationType = VariantProps<
   ParagraphAnnotationProps;
 
 const ParagraphAnnotation = component$<ParagraphAnnotationType>(
-  ({ hasIconBox, textBoxClass, variant, ...props }: ParagraphAnnotationType) => {
+  ({
+    hasIconBox,
+    textBoxClass,
+    variant,
+    ...props
+  }: ParagraphAnnotationType) => {
     return (
       <>
         <div
-          class="flex cursor-pointer w-full items-center justify-between gap-4"
+          class="flex w-full cursor-pointer items-center justify-between gap-4"
           onClick$={props.onClick$}
         >
           <div class="flex items-center gap-4">

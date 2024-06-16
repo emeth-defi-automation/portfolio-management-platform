@@ -7,23 +7,25 @@ import IconSwap from "@material-design-icons/svg/round/swap_horiz.svg?jsx";
 import IconSend from "@material-design-icons/svg/filled/send.svg?jsx";
 import IconAlarm from "@material-design-icons/svg/round/alarm.svg?jsx";
 
-export interface  AutomationCardProps {
+export interface AutomationCardProps {
   variant: "swap" | "transfer" | "trigger" | null;
   isActive: boolean;
 }
 
-export const  AutomationCard = component$< AutomationCardProps>((props) => {
+export const AutomationCard = component$<AutomationCardProps>((props) => {
   return (
-    <Box customClass={`!shadow-none p-4 w-[500px] h-[70px] rounded-lg flex items-center ${props.isActive ? "!border-transaprent !overflow-visible !before:p-0 gradient-border before:rounded-lg before:w-[calc(100%+2px)] before:h-[calc(100%+2px)]" : ""}`}>
+    <Box
+      customClass={`!shadow-cards p-4 rounded-lg flex items-center ${props.isActive ? "!overflow-visible gradient-border before:rounded-lg" : ""}`}
+    >
       <ParagraphAnnotation
         hasIconBox={true}
         iconBoxCustomIcon={
           props.variant == "swap" ? (
-            <IconSwap class="w-6 h-6 fill-white" />
+            <IconSwap class="h-6.5 w-6.5 fill-white" />
           ) : props.variant == "transfer" ? (
-            <IconSend class="w-full h-full fill-white" />
+            <IconSend class="h-6.5 w-6.5 fill-white" />
           ) : props.variant == "trigger" ? (
-            <IconAlarm class="w-full h-full fill-white" />
+            <IconAlarm class="h-6.5 w-6.5 fill-white" />
           ) : null
         }
         iconBoxBackground="white3"
