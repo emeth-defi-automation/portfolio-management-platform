@@ -8,14 +8,16 @@ import {
 } from "@wagmi/core";
 import { createWeb3Modal } from "@web3modal/wagmi";
 
-export const openWeb3Modal = async (config: NoSerialize<Config>) => {
+export const openWeb3Modal = async (config: any) => {
+// export const openWeb3Modal = async (config: NoSerialize<Config>) => {
+  console.log('configerinio: ',config.value)
   const projectId = import.meta.env.PUBLIC_PROJECT_ID;
   if (!projectId || typeof projectId !== "string") {
     throw new Error("Missing project ID");
   }
-  if (config) await reconnect(config!);
+  if (config.value) reconnect(config.value);
   const modal = createWeb3Modal({
-    wagmiConfig: config!,
+    wagmiConfig: config.value,
     projectId,
   });
 
@@ -25,25 +27,26 @@ export const openWeb3Modal = async (config: NoSerialize<Config>) => {
 };
 
 export const disconnectWallets = async (
-  config: NoSerialize<Config>,
+  // config: NoSerialize<Config>,
+  config: any,
   logout?: boolean,
 ) => {
   if (!logout) {
     const loginAddress = localStorage.getItem("emmethUserWalletAddress");
-    const connectors = await getConnectors(config as Config);
+    const connectors = await getConnectors(config.value as Config);
 
     for (const connector of connectors) {
       const accounts = await connector.getAccounts();
       if (accounts.indexOf(loginAddress as `0x${string}`) < 0) {
-        await disconnect(config as Config, { connector });
+        await disconnect(config.value as Config, { connector });
       }
     }
   } else {
-    const connections = await getConnections(config as Config);
+    const connections = await getConnections(config.value as Config);
     if (connections.length > 0) {
       for (const connection of connections) {
         const connector = connection.connector;
-        await disconnect(config as Config, { connector });
+        await disconnect(config.value as Config, { connector });
       }
     }
 
@@ -51,6 +54,6 @@ export const disconnectWallets = async (
       localStorage.removeItem("emmethUserWalletAddress");
     }
 
-    await disconnect(config as Config);
+    await disconnect(config.value as Config);
   }
 };

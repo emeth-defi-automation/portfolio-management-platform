@@ -7,10 +7,19 @@ import { type GetAccountReturnType, type Config } from "@wagmi/core";
 import { type Address } from "viem";
 
 export interface WagmiConfig {
-  config: NoSerialize<Config>;
+  config: any;
+  // config: NoSerialize<Config>;
 }
 
 export const WagmiConfigContext = createContextId<WagmiConfig>(
+  "wagmi-config-context",
+);
+export interface OnClient {
+  onClient: Signal<boolean>;
+  // config: NoSerialize<Config>;
+}
+
+export const OnClientContext = createContextId<OnClient>(
   "wagmi-config-context",
 );
 

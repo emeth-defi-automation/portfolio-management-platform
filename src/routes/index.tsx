@@ -25,8 +25,8 @@ export default component$(() => {
       localStorage.removeItem("emmethUserWalletAddress");
     }
 
-    if (wagmiConfig.config) {
-      await disconnectWallets(wagmiConfig.config);
+    if (wagmiConfig.config.value) {
+      await disconnectWallets(wagmiConfig.config.value);
     }
   });
   // eslint-disable-next-line qwik/no-use-visible-task

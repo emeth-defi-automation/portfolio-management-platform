@@ -7,14 +7,16 @@ import {
   useTask$,
   useContext,
   useSignal,
+  useComputed$,
 } from "@builder.io/qwik";
 import { type RequestHandler } from "@builder.io/qwik-city";
-import { type Config, reconnect, watchAccount } from "@wagmi/core";
+import { type Config, reconnect, watchAccount, getAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, sepolia } from "viem/chains";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import {
   LoginContext,
+  OnClientContext,
   WagmiConfigContext,
 } from "~/components/WalletConnect/context";
 import {
@@ -49,8 +51,26 @@ export default component$(() => {
     icons: ["https://avatars.githubusercontent.com/u/37784886"],
   };
 
+  useContextProvider(OnClientContext, {
+    onClient: useSignal(false),
+  });
+
+  const onClient = useContext(OnClientContext);
+
+  const config = useComputed$(
+    () =>
+      onClient.onClient.value &&
+      noSerialize(
+        defaultWagmiConfig({
+          chains: [mainnet],
+          projectId: import.meta.env.PUBLIC_PROJECT_ID,
+          metadata,
+        }),
+      ),
+  );
+
   useContextProvider(WagmiConfigContext, {
-    config: noSerialize({} as Config),
+    config: config,
   });
 
   useContextProvider(LoginContext, {
@@ -63,33 +83,36 @@ export default component$(() => {
   const login = useContext(LoginContext);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
-    const wconfig = defaultWagmiConfig({
-      chains: [mainnet, sepolia],
-      projectId: import.meta.env.PUBLIC_PROJECT_ID,
-      metadata,
+    onClient.onClient.value = true;
+  });
+  useVisibleTask$(({ track }) => {
+    track(() => {
+      onClient.onClient.value;
     });
-
-    wagmiConfig.config = noSerialize(wconfig);
-
-    if (wagmiConfig.config) {
-      watchAccount(wagmiConfig.config!, {
-        onChange(account) {
-          if (
-            window.location.pathname === "/signin" ||
-            window.location.pathname === "/"
-          ) {
-            localStorage.setItem(
-              "emmethUserWalletAddress",
-              `${account.address}`,
-            );
-          } else {
-            reconnect(wagmiConfig.config as Config);
-          }
-          login.account = noSerialize(account);
-          login.address.value = account.address;
-          login.chainId.value = account.chainId;
-        },
-      });
+    if (wagmiConfig.config.value) {
+      if (
+        window.location.pathname === "/signin" ||
+        window.location.pathname === "/"
+      ) {
+        watchAccount(wagmiConfig.config.value!, {
+          onChange(account) {
+            {
+              localStorage.setItem(
+                "emmethUserWalletAddress",
+                `${account.address}`,
+              );
+            }
+            login.account = noSerialize(account);
+            login.address.value = account.address;
+            login.chainId.value = account.chainId;
+          },
+        });
+      } else {
+        reconnect(wagmiConfig.config.value as Config);
+        const { address, chainId } = getAccount(wagmiConfig.config.value);
+        login.address.value = address;
+        login.chainId.value = chainId;
+      }
     }
   });
 

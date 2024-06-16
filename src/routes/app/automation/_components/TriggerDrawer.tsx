@@ -107,7 +107,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
   });
 
   const handleAddAutomation = $(async function () {
-    const account = getAccount(wagmiConfig.config as Config);
+    const account = getAccount(wagmiConfig.config.value as Config);
     const emethContractAddress = import.meta.env
       .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
     const {
@@ -135,26 +135,29 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
       );
       const calculatedAmountIn = BigInt(amountIn) * 10n ** 18n;
 
-      const { request } = await simulateContract(wagmiConfig.config as Config, {
-        account: account.address as `0x${string}`,
-        abi: emethContractAbi,
-        address: emethContractAddress,
-        functionName: "addAction",
-        args: [
-          BigInt(actionId),
-          tokenIn as `0x${string}`,
-          tokenOut as `0x${string}`,
-          BigInt(calculatedAmountIn),
-          from as `0x${string}`,
-          to as `0x${string}`,
-          BigInt(timeZeroCalculated),
-          BigInt(duration),
-          isActive,
-        ],
-      });
+      const { request } = await simulateContract(
+        wagmiConfig.config.value as Config,
+        {
+          account: account.address as `0x${string}`,
+          abi: emethContractAbi,
+          address: emethContractAddress,
+          functionName: "addAction",
+          args: [
+            BigInt(actionId),
+            tokenIn as `0x${string}`,
+            tokenOut as `0x${string}`,
+            BigInt(calculatedAmountIn),
+            from as `0x${string}`,
+            to as `0x${string}`,
+            BigInt(timeZeroCalculated),
+            BigInt(duration),
+            isActive,
+          ],
+        },
+      );
 
       const transactionHash = await writeContract(
-        wagmiConfig.config as Config,
+        wagmiConfig.config.value as Config,
         request,
       );
       const user = localStorage.getItem("emmethUserWalletAddress");

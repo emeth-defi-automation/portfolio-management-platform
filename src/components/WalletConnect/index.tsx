@@ -12,7 +12,7 @@ export default component$<buttonType>((props) => {
   const wagmiConfig = useContext(WagmiConfigContext);
 
   const openModal = $(async () => {
-    await openWeb3Modal(wagmiConfig!.config);
+    await openWeb3Modal(wagmiConfig!.config.value);
   });
 
   return (

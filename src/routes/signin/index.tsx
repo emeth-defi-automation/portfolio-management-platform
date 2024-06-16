@@ -41,7 +41,7 @@ export default component$(() => {
         statement: "Sign to continue...",
       }).prepareMessage();
 
-      const signature = await signMessage(wagmiConfig.config!, {
+      const signature = await signMessage(wagmiConfig.config.value!, {
         message,
       });
 
@@ -54,7 +54,7 @@ export default component$(() => {
   });
 
   const cancelHandler = $(async () => {
-    await disconnectWallets(wagmiConfig.config, true);
+    await disconnectWallets(wagmiConfig.config.value, true);
     login.account = undefined;
     login.address.value = undefined;
     login.chainId.value = undefined;
