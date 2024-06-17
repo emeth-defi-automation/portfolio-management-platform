@@ -60,7 +60,6 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   await db.listenLive(queryUuidEnaledLive[0], ({ action }) => {
     if (action === "UPDATE") {
-      console.log("------------logs------------------")
       resultStream.push(null);
       db.kill(queryUuidEnaledLive[0]);
     }
@@ -91,7 +90,6 @@ export const observedWalletsLiveStream = server$(async function* () {
   }
 
   for await (const result of resultStream) {
-    console.log(result)
     if (!result) {
       console.log("stream empty");
       break;

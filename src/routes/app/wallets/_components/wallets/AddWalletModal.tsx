@@ -127,7 +127,6 @@ export const AddWalletModal = component$<AddWalletModal>(
         if (addWalletFormStore.isExecutable) {
           if (wagmiConfig.config) {
             const account = getAccount(wagmiConfig.config as Config);
-            console.log("address", account);
 
             addWalletFormStore.address = account.address as `0x${string}`;
 

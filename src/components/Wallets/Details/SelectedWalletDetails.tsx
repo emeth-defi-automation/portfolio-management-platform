@@ -55,7 +55,6 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
 
     useTask$(async () => {
       tokens.value = await fetchAllTokens();
-      console.log("tokens", tokens.value);
     });
 
     return (

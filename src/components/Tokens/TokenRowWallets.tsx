@@ -31,6 +31,13 @@ type TokenRowWalletsProps = {
   isExecutable: boolean | undefined;
 };
 
+type actionType = "PRICE" | "BALANCE";
+interface UpdateResult {
+  action: any;
+  result: any;
+  type: actionType;
+}
+
 export const tokenRowWalletsInfoStream = server$(async function* (walletId: string, tokenSymbol: string) {
 
   const db = await connectToDB(this.env);
@@ -100,8 +107,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (walletId: stri
       resultsStream.push(null);
       return;
     }
-    result.isBalance = true;
-    resultsStream.push({ action, result });
+    resultsStream.push({ action, result, type: "BALANCE" as actionType });
   });
 
   await db.listenLive(
@@ -111,8 +117,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (walletId: stri
         resultsStream.push(null)
         return;
       }
-      result.isBalance = false;
-      resultsStream.push({ action, result })
+      resultsStream.push({ action, result, type: "PRICE" as actionType })
     }
   )
 
@@ -125,6 +130,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (walletId: stri
   }
 
   await db.query(`DELETE FROM queryuuids WHERE queryuuid = '${queryUuid[0]}';`);
+  await db.query(`DELETE FROM queryuuids WHERE queryuuid = '${latestTokenPriceQueryUuid[0]}';`)
 
 })
 
@@ -148,18 +154,18 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(({ track }) => {
-      track(() => {
-        latestTokenPrice;
-        currentBalanceOfToken;
-      })
+      const trackedValues = track(() => ({
+        latestTokenPrice: latestTokenPrice.value,
+        currentBalanceOfToken: currentBalanceOfToken.value
+      }));
 
       if (symbol === "USDT") {
         latestBalanceUSD.value = (
-          Number(currentBalanceOfToken.value) * 1
+          Number(trackedValues.currentBalanceOfToken) * 1
         ).toFixed(2);
       } else {
         latestBalanceUSD.value = (
-          Number(currentBalanceOfToken.value) * Number(latestTokenPrice.value)
+          Number(trackedValues.currentBalanceOfToken) * Number(trackedValues.latestTokenPrice)
         ).toFixed(2);
       }
     })
@@ -188,21 +194,31 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       latestTokenPrice.value = (await data.next()).value[0][0]["price"];
 
 
+      if (symbol === "USDT") {
+        latestBalanceUSD.value = (
+          Number(currentBalanceOfToken.value) * 1
+        ).toFixed(2);
+      } else {
+        latestBalanceUSD.value = (
+          Number(currentBalanceOfToken.value) * Number(latestTokenPrice.value)
+        ).toFixed(2);
+      }
+
 
       for await (const value of data) {
         if (value.action === "CREATE") {
-          if (value.result.isBalance) {
+          if (value.type === "BALANCE") {
             currentBalanceOfToken.value = convertWeiToQuantity(
               value.result["walletValue"],
               parseInt(decimals)
             );
           } else {
-            console.log("CREATE PRICE")
             latestTokenPrice.value = value.result["price"];
           }
         } else if (value.action === "UPDATE") {
-          console.log("UPDATE PRICE")
-          console.log(value)
+          if (value.type === "PRICE") {
+            latestTokenPrice.value = value.result["price"];
+          }
         }
       }
     })
