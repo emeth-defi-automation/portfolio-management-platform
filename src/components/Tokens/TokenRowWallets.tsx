@@ -96,6 +96,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (walletId: stri
       resultsStream.push(null);
       return;
     }
+    result.isBalance = true;
     resultsStream.push({ action, result });
   });
 
@@ -156,9 +157,10 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       for await (const value of data) {
         if (value.action === "CREATE") {
           currentBalanceOfToken.value = convertWeiToQuantity(
-            (await data.next()).value[0][0]["walletValue"],
+            value.result["walletValue"],
             parseInt(decimals)
           );
+          console.log(value)
         }
       }
 
