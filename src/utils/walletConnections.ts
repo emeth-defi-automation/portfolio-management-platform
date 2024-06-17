@@ -66,6 +66,7 @@ export const disconnectWallets = async (
     for (const connector of connectors) {
       const accounts = await connector.getAccounts();
       if (accounts.indexOf(loginAddress as `0x${string}`) < 0) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!connector.disconnect) {
           await disconnect(config as Config, { connector });
         }
@@ -76,6 +77,7 @@ export const disconnectWallets = async (
     if (connections.length > 0) {
       for (const connection of connections) {
         const connector = connection.connector;
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!connector.disconnect) {
           await disconnect(config as Config, { connector });
         }

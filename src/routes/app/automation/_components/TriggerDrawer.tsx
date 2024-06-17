@@ -6,25 +6,20 @@ import {
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import Header from "~/components/Atoms/Headers/Header";
-import { AutomationPageContext } from "../AutomationPageContext";
-import Input from "~/components/Atoms/Input/Input";
-import Select from "~/components/Atoms/Select/Select";
-import Button from "~/components/Atoms/Buttons/Button";
-import Label from "~/components/Atoms/Label/Label";
-import { getObservedWalletBalances } from "../../portfolio/server/observerWalletBalancesLoader";
-import {
-  type Config,
-  getAccount,
-  simulateContract,
-  writeContract,
-} from "@wagmi/core";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
-import { messagesContext } from "../../layout";
-import { emethContractAbi } from "~/abi/emethContractAbi";
-import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
 import { server$ } from "@builder.io/qwik-city";
+import { getAccount, simulateContract, type Config } from "@wagmi/core";
+import { emethContractAbi } from "~/abi/emethContractAbi";
+import Button from "~/components/Atoms/Buttons/Button";
+import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
+import Header from "~/components/Atoms/Headers/Header";
+import Input from "~/components/Atoms/Input/Input";
+import Label from "~/components/Atoms/Label/Label";
+import Select from "~/components/Atoms/Select/Select";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { connectToDB } from "~/database/db";
+import { messagesContext } from "../../layout";
+import { getObservedWalletBalances } from "../../portfolio/server/observerWalletBalancesLoader";
+import { AutomationPageContext } from "../AutomationPageContext";
 
 const updateAutomationAction = server$(
   async function (
@@ -135,7 +130,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
       );
       const calculatedAmountIn = BigInt(amountIn) * 10n ** 18n;
 
-      const { request } = await simulateContract(wagmiConfig.config as Config, {
+      await simulateContract(wagmiConfig.config as Config, {
         account: account.address as `0x${string}`,
         abi: emethContractAbi,
         address: emethContractAddress,
@@ -153,10 +148,10 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
         ],
       });
 
-      const transactionHash = await writeContract(
-        wagmiConfig.config as Config,
-        request,
-      );
+      // const transactionHash = await writeContract(
+      //   wagmiConfig.config as Config,
+      //   request,
+      // );
       const user = localStorage.getItem("emmethUserWalletAddress");
       await updateAutomationAction(
         isActive,

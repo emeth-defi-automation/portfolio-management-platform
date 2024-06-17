@@ -1,30 +1,27 @@
 import {
   component$,
+  createContextId,
+  useContextProvider,
   useSignal,
   useStore,
   useVisibleTask$,
-  createContextId,
-  useContextProvider,
   type Signal,
 } from "@builder.io/qwik";
 import Button from "~/components/Atoms/Buttons/Button";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 
-import { chainIdToNetworkName } from "~/utils/chains";
 import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
-export {
-  ObservedWalletsList,
-} from "~/components/ObservedWalletsList/ObservedWalletsList";
+import { chainIdToNetworkName } from "~/utils/chains";
+export { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
 
 import { AddWalletModal } from "./_components/wallets/AddWalletModal";
 import { DeleteModal } from "./_components/wallets/DeleteModal";
 
-import { balancesLiveStream } from "./server/balancesLiveStream";
-import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
 import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
+import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
+import { balancesLiveStream } from "./server/balancesLiveStream";
 
 export const SelectedWalletDetailsContext = createContextId<Signal<any>>(
   "selected-wallet-details-context",
@@ -43,9 +40,6 @@ export default component$(() => {
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
-  const selectedWallet = useSignal<any>(null);
-
-  const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
   const msg = useSignal("1");
 

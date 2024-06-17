@@ -1,8 +1,4 @@
-import {
-  component$,
-  useSignal,
-  useVisibleTask$
-} from "@builder.io/qwik";
+import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { Readable } from "stream";
@@ -10,7 +6,6 @@ import { connectToDB } from "~/database/db";
 import { chainIdToNetworkName } from "~/utils/chains";
 import { Spinner } from "../Spinner/Spinner";
 import { ObservedWallet } from "../Wallets/Observed/ObservedWallet";
-
 
 export const fetchObservedWallets = server$(async function () {
   const db = await connectToDB(this.env);
@@ -34,7 +29,7 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   const resultStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const cookie = this.cookie.get("accessToken")?.value;
@@ -99,7 +94,6 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   await db.query(`DELETE FROM queryuuids WHERE queryuuid='${queryUuid[0]}';`);
   return;
-
 });
 
 export const killLiveQuery = server$(async function (queryUuid: string) {

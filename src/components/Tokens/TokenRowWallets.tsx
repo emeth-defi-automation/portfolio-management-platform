@@ -1,8 +1,14 @@
-import { $, component$, useSignal, useVisibleTask$, type Signal } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  useSignal,
+  useVisibleTask$,
+  type Signal,
+} from "@builder.io/qwik";
 // import Button from "../Atoms/Buttons/Button";
 // import IconMenuDots from "@material-design-icons/svg/outlined/more_vert.svg?jsx";
 import { server$ } from "@builder.io/qwik-city";
-import { ImageTransformerProps, useImageProvider } from "qwik-image";
+import { type ImageTransformerProps, useImageProvider } from "qwik-image";
 import { Readable } from "stream";
 import { connectToDB } from "~/database/db";
 import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
@@ -27,23 +33,20 @@ type TokenRowWalletsProps = {
 };
 
 type actionType = "PRICE" | "BALANCE";
-interface UpdateResult {
-  action: any;
-  result: any;
-  type: actionType;
-}
 
-export const tokenRowWalletsInfoStream = server$(async function* (walletId: string, tokenSymbol: string) {
-
+export const tokenRowWalletsInfoStream = server$(async function* (
+  walletId: string,
+  tokenSymbol: string,
+) {
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const queryUuid: any = await db.query(`
     LIVE SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' and walletId = ${walletId};
-    `)
+    `);
 
   await db.query(
     `INSERT INTO queryuuids (queryuuid, enabled) VALUES ('${queryUuid}', ${true});`,
@@ -71,7 +74,9 @@ export const tokenRowWalletsInfoStream = server$(async function* (walletId: stri
 
   yield latestTokenPriceQueryUuid[0];
 
-  const latestTokenPrice = await db.query(`SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}' ORDER BY timestamp DESC LIMIT 1;`);
+  const latestTokenPrice = await db.query(
+    `SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}' ORDER BY timestamp DESC LIMIT 1;`,
+  );
 
   yield latestTokenPrice;
 
@@ -105,17 +110,13 @@ export const tokenRowWalletsInfoStream = server$(async function* (walletId: stri
     resultsStream.push({ action, result, type: "BALANCE" as actionType });
   });
 
-  await db.listenLive(
-    latestTokenPriceQueryUuid[0],
-    ({ action, result }) => {
-      if (action === "CLOSE") {
-        resultsStream.push(null)
-        return;
-      }
-      resultsStream.push({ action, result, type: "PRICE" as actionType })
+  await db.listenLive(latestTokenPriceQueryUuid[0], ({ action, result }) => {
+    if (action === "CLOSE") {
+      resultsStream.push(null);
+      return;
     }
-  )
-
+    resultsStream.push({ action, result, type: "PRICE" as actionType });
+  });
 
   for await (const result of resultsStream) {
     if (!result) {
@@ -125,13 +126,13 @@ export const tokenRowWalletsInfoStream = server$(async function* (walletId: stri
   }
 
   await db.query(`DELETE FROM queryuuids WHERE queryuuid = '${queryUuid[0]}';`);
-  await db.query(`DELETE FROM queryuuids WHERE queryuuid = '${latestTokenPriceQueryUuid[0]}';`)
-
-})
-
+  await db.query(
+    `DELETE FROM queryuuids WHERE queryuuid = '${latestTokenPriceQueryUuid[0]}';`,
+  );
+});
 
 export const TokenRowWallets = component$<TokenRowWalletsProps>(
-  ({ name, symbol, balance, imagePath, balanceValueUSD, allowance, walletId, decimals, isExecutable, address, transferredCoin, isTransferModalOpen }) => {
+  ({ name, symbol, imagePath, allowance, walletId, decimals }) => {
     const imageTransformer$ = $(
       ({ src, width, height }: ImageTransformerProps): string => {
         return `${src}?height=${height}&width=${width}&format=webp&fit=fill`;
@@ -151,7 +152,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     useVisibleTask$(({ track }) => {
       const trackedValues = track(() => ({
         latestTokenPrice: latestTokenPrice.value,
-        currentBalanceOfToken: currentBalanceOfToken.value
+        currentBalanceOfToken: currentBalanceOfToken.value,
       }));
 
       if (symbol === "USDT") {
@@ -160,20 +161,21 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         ).toFixed(2);
       } else {
         latestBalanceUSD.value = (
-          Number(trackedValues.currentBalanceOfToken) * Number(trackedValues.latestTokenPrice)
+          Number(trackedValues.currentBalanceOfToken) *
+          Number(trackedValues.latestTokenPrice)
         ).toFixed(2);
       }
-    })
+    });
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ cleanup }) => {
       cleanup(async () => {
         await killLiveQuery(queryUuid.value);
-        await killLiveQuery(latestTokenPriceQueryUuid.value)
+        await killLiveQuery(latestTokenPriceQueryUuid.value);
       });
 
       if (!walletId) {
-        throw new Error("No wallet id")
+        throw new Error("No wallet id");
       }
 
       const data = await tokenRowWalletsInfoStream(walletId, symbol);
@@ -182,12 +184,11 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
 
       currentBalanceOfToken.value = convertWeiToQuantity(
         (await data.next()).value[0][0]["walletValue"],
-        parseInt(decimals)
+        parseInt(decimals),
       );
 
       const latestTokenPriceQueryUuid = await data.next();
       latestTokenPrice.value = (await data.next()).value[0][0]["price"];
-
 
       if (symbol === "USDT") {
         latestBalanceUSD.value = (
@@ -199,13 +200,12 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         ).toFixed(2);
       }
 
-
       for await (const value of data) {
         if (value.action === "CREATE") {
           if (value.type === "BALANCE") {
             currentBalanceOfToken.value = convertWeiToQuantity(
               value.result["walletValue"],
-              parseInt(decimals)
+              parseInt(decimals),
             );
           } else {
             latestTokenPrice.value = value.result["price"];
@@ -216,8 +216,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
           }
         }
       }
-    })
-
+    });
 
     return (
       <>

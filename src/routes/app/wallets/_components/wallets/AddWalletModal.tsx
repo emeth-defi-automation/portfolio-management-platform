@@ -5,17 +5,17 @@ import {
   useSignal,
   useStore,
   useVisibleTask$,
+  type Signal,
 } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
-import { type Signal } from "@builder.io/qwik";
 
 import {
   getAccount,
+  getConnections,
   readContract,
   simulateContract,
-  writeContract,
-  getConnections,
   watchAccount,
+  writeContract,
   type Config,
 } from "@wagmi/core";
 
@@ -28,9 +28,9 @@ import * as jwtDecode from "jwt-decode";
 import { fetchTokens } from "~/database/tokens";
 
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 
+import { messagesContext } from "~/routes/app/layout";
 import { convertToFraction } from "~/utils/fractions";
 import { getAccessToken } from "~/utils/refresh";
 import {
@@ -39,31 +39,27 @@ import {
   isProceedDisabled,
 } from "~/utils/validators/addWallet";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
-import { messagesContext } from "~/routes/app/layout";
 
 import Button from "~/components/Atoms/Buttons/Button";
+import { Modal } from "~/components/Modal/Modal";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import AddWalletFormFields from "~/routes/app/wallets/_components/AddWalletFormFields";
 import AmountOfCoins from "~/routes/app/wallets/_components/AmountOfCoins";
 import CoinsToApprove from "~/routes/app/wallets/_components/CoinsToApprove";
 import IsExecutableSwitch from "~/routes/app/wallets/_components/isExecutableSwitch";
-import { Modal } from "~/components/Modal/Modal";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
 
-import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
+import { LoginContext } from "~/components/WalletConnect/context";
 import {
   useAddWallet,
   useGetBalanceHistory,
 } from "~/routes/app/wallets/server";
-export {
-  ObservedWalletsList,
-} from "~/components/ObservedWalletsList/ObservedWalletsList";
+import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
+export { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
   useAddWallet,
   useGetBalanceHistory,
   useRemoveWallet,
 } from "~/routes/app/wallets/server";
-import { LoginContext } from "~/components/WalletConnect/context";
-import jwt from "jsonwebtoken";
 
 interface AddWalletModal {
   isAddWalletModalOpen: Signal<boolean>;
@@ -72,7 +68,6 @@ interface AddWalletModal {
 export const AddWalletModal = component$<AddWalletModal>(
   ({ isAddWalletModalOpen }) => {
     const isSecondWalletConnected = useSignal(false);
-    const observedWallets = useSignal<WalletTokensBalances[]>([]);
     const walletTokenBalances = useSignal<any>([]);
     const stepsCounter = useSignal(1);
 
@@ -110,8 +105,6 @@ export const AddWalletModal = component$<AddWalletModal>(
 
       const cookie = await getAccessToken();
       if (!cookie) throw new Error("No accessToken cookie found");
-
-      const { userId } = jwtDecode.jwtDecode(cookie) as JwtPayload;
 
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
@@ -179,7 +172,7 @@ export const AddWalletModal = component$<AddWalletModal>(
           const cookie = await getAccessToken();
           if (!cookie) throw new Error("No accessToken cookie found");
 
-          const { address, userId } = jwtDecode.jwtDecode(cookie) as JwtPayload;
+          const { address } = jwtDecode.jwtDecode(cookie) as JwtPayload;
 
           const { request } = await simulateContract(
             wagmiConfig.config as Config,

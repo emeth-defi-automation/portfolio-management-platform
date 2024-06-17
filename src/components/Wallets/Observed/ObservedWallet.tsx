@@ -1,23 +1,21 @@
 import {
-  type Signal,
   component$,
   useContext,
   useSignal,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
+import { server$ } from "@builder.io/qwik-city";
 import IconSchedule from "@material-design-icons/svg/round/schedule.svg?jsx";
+import jwt, { type JwtPayload } from "jsonwebtoken";
+import { Readable } from "stream";
 import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
+import { killLiveQuery } from "~/components/ObservedWalletsList/ObservedWalletsList";
+import { connectToDB } from "~/database/db";
 import {
   SelectedWalletDetailsContext,
   SelectedWalletNameContext,
 } from "~/routes/app/wallets";
-import { server$ } from "@builder.io/qwik-city";
-import { connectToDB } from "~/database/db";
-import { Readable } from "stream";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { killLiveQuery } from "~/components/ObservedWalletsList/ObservedWalletsList";
+import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 
 interface ObservedWalletProps {
   observedWallet: any;
@@ -42,7 +40,7 @@ export const observedWalletNameLiveStream = server$(async function* (
 
   const resultStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const cookie = this.cookie.get("accessToken")?.value;

@@ -1,14 +1,12 @@
-import { component$, useContext, useSignal } from "@builder.io/qwik";
 import type { Signal } from "@builder.io/qwik";
+import { component$, useContext } from "@builder.io/qwik";
+import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 import Button from "~/components/Atoms/Buttons/Button";
 import { Modal } from "~/components/Modal/Modal";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { useRemoveWallet } from "~/routes/app/wallets/server";
-import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
-import { SelectedWalletDetailsContext } from "../..";
 import { messagesContext } from "~/routes/app/layout";
+import { useRemoveWallet } from "~/routes/app/wallets/server";
+import { SelectedWalletDetailsContext } from "../..";
 export { useRemoveWallet } from "~/routes/app/wallets/server";
-
 
 interface DeleteModalProps {
   isDeleteModalOpen: Signal<boolean>;
