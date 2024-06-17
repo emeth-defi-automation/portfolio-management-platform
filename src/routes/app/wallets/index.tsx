@@ -23,11 +23,13 @@ import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
 
 export default component$(() => {
-  const isAddWalletModalOpen = useSignal(false);
-  const isDeleteModalOpen = useSignal(false);
+  // const isAddWalletModalOpen = useSignal(false);
+  // const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
   const selectedWallet = useSignal<WalletTokensBalances | null>(null);
+  const AddWalletRef = useSignal<HTMLDialogElement | undefined>();
+  const DeleteWalletRef = useSignal<HTMLDialogElement | undefined>();
 
   const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
@@ -48,7 +50,8 @@ export default component$(() => {
           <BoxHeader title="Wallets" variantHeader="h3">
             <Button
               onClick$={() => {
-                isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
+                // isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
+                AddWalletRef.value?.showModal();
               }}
               text="Add New Wallet"
               variant="transparent"
@@ -86,7 +89,7 @@ export default component$(() => {
                 key={selectedWallet.value.wallet.address}
                 selectedWallet={selectedWallet}
                 chainIdToNetworkName={chainIdToNetworkName}
-                isDeleteModalopen={isDeleteModalOpen}
+                DeleteWalletRef={DeleteWalletRef}
                 isTransferModalOpen={isTransferModalOpen}
                 transferredCoin={transferredCoin}
               />
@@ -95,16 +98,9 @@ export default component$(() => {
         </div>
       </div>
 
-      {isAddWalletModalOpen.value && (
-        <AddWalletModal isAddWalletModalOpen={isAddWalletModalOpen} />
-      )}
+      <AddWalletModal ref={AddWalletRef} />
 
-      {isDeleteModalOpen.value && (
-        <DeleteModal
-          isDeleteModalOpen={isDeleteModalOpen}
-          selectedWallet={selectedWallet}
-        />
-      )}
+      <DeleteModal ref={DeleteWalletRef} selectedWallet={selectedWallet} />
     </>
   );
 });

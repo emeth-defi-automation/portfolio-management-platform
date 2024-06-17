@@ -33,14 +33,14 @@ export const Step1 = component$(() => {
         <div>
           <div class="flex items-center justify-between gap-4 p-4">
             <div class="flex flex-col gap-3">
-              <Header variant="h5" text="Investment" class="font-normal" />
+              <Header variant="h5" title="Investment" class="font-normal" />
               <Annotation text="$400,000.00" />
             </div>
             <Checkbox variant="toggleTick" isChecked={true} />
           </div>
           <div class="flex items-center justify-between gap-4 p-4">
             <div class="flex flex-col gap-3">
-              <Header variant="h5" text="Marcin" class="font-normal" />
+              <Header variant="h5" title="Marcin" class="font-normal" />
               <Annotation text="$20,000.00" />
             </div>
             <Checkbox variant="toggleTick" isChecked={true} />
@@ -48,7 +48,7 @@ export const Step1 = component$(() => {
         </div>
       </Box>
       <Box customClass="flex flex-col gap-6 p-6 !overflow-x-hidden h-[550px]">
-        <Header variant="h4" text="Tokens" class="font-normal" />
+        <Header variant="h4" title="Tokens" class="font-normal" />
         <div class="flex gap-2">
           <Input
             variant="search"

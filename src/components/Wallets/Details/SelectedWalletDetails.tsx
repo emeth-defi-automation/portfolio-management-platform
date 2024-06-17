@@ -13,16 +13,17 @@ import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
 interface SelectedWalletProps {
   selectedWallet: Signal<WalletTokensBalances | null>;
   chainIdToNetworkName: { [key: string]: string };
-  isDeleteModalopen: Signal<boolean>;
+  // isDeleteModalopen: Signal<boolean>;
   isTransferModalOpen: Signal<boolean>;
   transferredCoin: TransferredCoinInterface;
+  DeleteWalletRef: Signal<HTMLDialogElement | undefined>;
 }
 
 export const SelectedWalletDetails = component$<SelectedWalletProps>(
   ({
     selectedWallet,
     chainIdToNetworkName,
-    isDeleteModalopen,
+    DeleteWalletRef,
     isTransferModalOpen,
     transferredCoin,
   }) => {
@@ -58,7 +59,8 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               leftIcon={<IconTrashRed class="h-4 w-4" />}
               customClass="font-medium"
               onClick$={() => {
-                isDeleteModalopen.value = !isDeleteModalopen.value;
+                // isDeleteModalopen.value = !isDeleteModalopen.value;
+                DeleteWalletRef.value?.showModal();
               }}
             />
           </div>

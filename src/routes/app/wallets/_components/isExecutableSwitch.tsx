@@ -15,6 +15,7 @@ export default component$<AddWalletFormProps>(({ addWalletFormStore }) => {
           <button
             onClick$={() => {
               addWalletFormStore.isExecutable = 0;
+              console.log("[observable]: ", addWalletFormStore.isExecutable);
             }}
             type="button"
             class={`${addWalletFormStore.isExecutable ? "bg-black" : "custom-bg-button"}  col-span-1 rounded p-2.5 text-white`}
@@ -24,6 +25,7 @@ export default component$<AddWalletFormProps>(({ addWalletFormStore }) => {
           <button
             onClick$={() => {
               addWalletFormStore.isExecutable = 1;
+              console.log("[Executable]: ", addWalletFormStore.isExecutable);
             }}
             type="button"
             class={`${addWalletFormStore.isExecutable ? "custom-bg-button" : "bg-black"} col-span-1 rounded p-2.5  text-white`}
