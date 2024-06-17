@@ -26,7 +26,7 @@ export default component$(() => {
     }
 
     if (wagmiConfig.config.value) {
-      await disconnectWallets(wagmiConfig.config.value);
+      await disconnectWallets(wagmiConfig.config);
     }
   });
   // eslint-disable-next-line qwik/no-use-visible-task

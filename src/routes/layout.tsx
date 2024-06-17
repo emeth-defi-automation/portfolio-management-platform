@@ -62,7 +62,7 @@ export default component$(() => {
       onClient.onClient.value &&
       noSerialize(
         defaultWagmiConfig({
-          chains: [mainnet],
+          chains: [sepolia],
           projectId: import.meta.env.PUBLIC_PROJECT_ID,
           metadata,
         }),

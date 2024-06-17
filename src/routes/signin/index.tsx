@@ -54,7 +54,7 @@ export default component$(() => {
   });
 
   const cancelHandler = $(async () => {
-    await disconnectWallets(wagmiConfig.config.value, true);
+    await disconnectWallets(wagmiConfig.config, true);
     login.account = undefined;
     login.address.value = undefined;
     login.chainId.value = undefined;

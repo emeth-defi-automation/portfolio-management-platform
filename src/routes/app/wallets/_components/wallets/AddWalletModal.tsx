@@ -132,13 +132,16 @@ export const AddWalletModal = component$<AddWalletModal>(
 
             for (const token of tokens) {
               if (addWalletFormStore.coinsToCount.includes(token.symbol)) {
-                const tokenBalance = await readContract(wagmiConfig.config, {
-                  account: account.address as `0x${string}`,
-                  abi: contractABI,
-                  address: checksumAddress(token.address as `0x${string}`),
-                  functionName: "balanceOf",
-                  args: [account.address as `0x${string}`],
-                });
+                const tokenBalance = await readContract(
+                  wagmiConfig.config.value,
+                  {
+                    account: account.address as `0x${string}`,
+                    abi: contractABI,
+                    address: checksumAddress(token.address as `0x${string}`),
+                    functionName: "balanceOf",
+                    args: [account.address as `0x${string}`],
+                  },
+                );
 
                 const amount = addWalletFormStore.coinsToApprove.find(
                   (item) => item.symbol === token.symbol,
@@ -195,7 +198,7 @@ export const AddWalletModal = component$<AddWalletModal>(
           await writeContract(wagmiConfig.config.value as Config, request);
         }
         if (wagmiConfig.config.value) {
-          await disconnectWallets(wagmiConfig.config.value);
+          await disconnectWallets(wagmiConfig.config);
         }
 
         const {
@@ -233,6 +236,7 @@ export const AddWalletModal = component$<AddWalletModal>(
         stepsCounter.value = 1;
       } catch (err) {
         console.error("error: ", err);
+        await disconnectWallets(wagmiConfig.config);
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "error",
@@ -280,7 +284,7 @@ export const AddWalletModal = component$<AddWalletModal>(
           stepsCounter.value = 1;
 
           if (wagmiConfig.config.value) {
-            await disconnectWallets(wagmiConfig.config.value);
+            await disconnectWallets(wagmiConfig.config);
           }
         })}
       >
