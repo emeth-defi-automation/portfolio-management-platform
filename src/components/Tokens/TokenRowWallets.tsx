@@ -14,6 +14,7 @@ import { Readable } from "stream";
 import { killLiveQuery } from "../ObservedWalletsList/ObservedWalletsList";
 import { query } from "express";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
+import action from "~/routes/app/action";
 
 type TokenRowWalletsProps = {
   walletId?: string;
@@ -54,6 +55,9 @@ export const tokenRowWalletsInfoStream = server$(async function* (walletId: stri
 
   yield latestBalanceOfTokenForWallet;
 
+  if (tokenSymbol === "USDT") {
+    tokenSymbol = "USDC";
+  }
 
   const latestTokenPriceQueryUuid: any = await db.query(
     `LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}';`,
@@ -100,6 +104,19 @@ export const tokenRowWalletsInfoStream = server$(async function* (walletId: stri
     resultsStream.push({ action, result });
   });
 
+  await db.listenLive(
+    latestTokenPriceQueryUuid[0],
+    ({ action, result }) => {
+      if (action === "CLOSE") {
+        resultsStream.push(null)
+        return;
+      }
+      result.isBalance = false;
+      resultsStream.push({ action, result })
+    }
+  )
+
+
   for await (const result of resultsStream) {
     if (!result) {
       break;
@@ -130,6 +147,24 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     const latestBalanceUSD = useSignal("");
 
     // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(({ track }) => {
+      track(() => {
+        latestTokenPrice;
+        currentBalanceOfToken;
+      })
+
+      if (symbol === "USDT") {
+        latestBalanceUSD.value = (
+          Number(currentBalanceOfToken.value) * 1
+        ).toFixed(2);
+      } else {
+        latestBalanceUSD.value = (
+          Number(currentBalanceOfToken.value) * Number(latestTokenPrice.value)
+        ).toFixed(2);
+      }
+    })
+
+    // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ cleanup }) => {
       cleanup(async () => {
         await killLiveQuery(queryUuid.value);
@@ -150,20 +185,26 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       );
 
       const latestTokenPriceQueryUuid = await data.next();
-      console.log((await data.next()).value)
+      latestTokenPrice.value = (await data.next()).value[0][0]["price"];
 
 
 
       for await (const value of data) {
         if (value.action === "CREATE") {
-          currentBalanceOfToken.value = convertWeiToQuantity(
-            value.result["walletValue"],
-            parseInt(decimals)
-          );
+          if (value.result.isBalance) {
+            currentBalanceOfToken.value = convertWeiToQuantity(
+              value.result["walletValue"],
+              parseInt(decimals)
+            );
+          } else {
+            console.log("CREATE PRICE")
+            latestTokenPrice.value = value.result["price"];
+          }
+        } else if (value.action === "UPDATE") {
+          console.log("UPDATE PRICE")
           console.log(value)
         }
       }
-
     })
 
 
@@ -186,7 +227,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             </p>
           </div>
           <div class="overflow-auto">{currentBalanceOfToken.value}</div>
-          <div class="overflow-auto">${balanceValueUSD}</div>
+          <div class="overflow-auto">${latestBalanceUSD.value}</div>
           <div class="">{allowance}</div>
           <div class="flex h-full items-center gap-4">
             <span class="text-customGreen">3,6%</span>

@@ -16,7 +16,6 @@ import { chainIdToNetworkName } from "~/utils/chains";
 import { ButtonWithIcon } from "~/components/Buttons/Buttons";
 import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
-  getObservedWallets,
   ObservedWalletsList,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";

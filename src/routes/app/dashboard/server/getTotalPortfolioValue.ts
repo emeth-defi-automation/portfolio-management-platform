@@ -26,75 +26,75 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
     const [tokens]: any = await db.query(`SELECT symbol, decimals FROM token;`);
     const [observedWalletsIds]: any = await db.query(`SELECT VALUE out from observes_wallet WHERE in = ${userId}`);
 
-    let tokenPriceMap: {[tokenSymbol: string]: {[timestamp: string]: number}} = {};
-    let tokenBalanceMap: {[tokenSymbol: string]: {[timestamp: string]: number}} = {};
-    for (const token of tokens) {   
+    let tokenPriceMap: { [tokenSymbol: string]: { [timestamp: string]: number } } = {};
+    let tokenBalanceMap: { [tokenSymbol: string]: { [timestamp: string]: number } } = {};
+    for (const token of tokens) {
         tokenBalanceMap[token.symbol] = {};
         for (const tickTime of tickTimes) {
             tokenBalanceMap[token.symbol][tickTime] = 0;
         }
         tokenPriceMap[token.symbol] = {};
 
-        if(token.symbol === "USDT") {
-            for(const tickTime of tickTimes) {
+        if (token.symbol === "USDT") {
+            for (const tickTime of tickTimes) {
                 tokenPriceMap[token.symbol][tickTime] = 1;
             }
-            continue;
-        }
-
-        for(const tickTime of tickTimes) {
-            const [[lessEqualTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
+            // continue;
+        } else {
+            for (const tickTime of tickTimes) {
+                const [[lessEqualTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
             WHERE symbol = '${token.symbol}' 
             AND timestamp <= '${tickTime}' 
             ORDER BY timestamp DESC LIMIT 1`);
 
-            const [[greaterTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
+                const [[greaterTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
             WHERE symbol = '${token.symbol}'
             AND timestamp > '${tickTime}' 
             ORDER BY timestamp ASC LIMIT 1`);
 
-            let closestTimestamp;
-            if (!lessEqualTimestamp) {
-                closestTimestamp = greaterTimestamp;
-            } else if (!greaterTimestamp) {
-                closestTimestamp = lessEqualTimestamp;
-            } else {
-                const diffGreater = Math.abs(new Date(tickTime).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
-                const diffLess = Math.abs(new Date(tickTime).getTime() - new Date(greaterTimestamp.timestamp).getTime());
-                closestTimestamp = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
-                
-            }
+                let closestTimestamp;
+                if (!lessEqualTimestamp) {
+                    closestTimestamp = greaterTimestamp;
+                } else if (!greaterTimestamp) {
+                    closestTimestamp = lessEqualTimestamp;
+                } else {
+                    const diffGreater = Math.abs(new Date(tickTime).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
+                    const diffLess = Math.abs(new Date(tickTime).getTime() - new Date(greaterTimestamp.timestamp).getTime());
+                    closestTimestamp = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
 
-            const [[tokenPriceForClosestTimestamp]]: any = await db.query(`SELECT price FROM token_price_history 
+                }
+
+                const [[tokenPriceForClosestTimestamp]]: any = await db.query(`SELECT price FROM token_price_history 
             WHERE timestamp = '${closestTimestamp.timestamp}' 
             AND symbol = '${token.symbol}'`);
-            tokenPriceMap[token.symbol][tickTime] = tokenPriceForClosestTimestamp.price;
+                tokenPriceMap[token.symbol][tickTime] = tokenPriceForClosestTimestamp.price;
+            }
         }
 
         for (const observedWalletId of observedWalletsIds) {
             let closestBalance;
             for (const tickTime of tickTimes) {
 
-            const [[lessEqualTimestampBalance]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
+                const [[lessEqualTimestampBalance]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
                 WHERE walletId = ${observedWalletId} 
                 AND tokenSymbol = '${token.symbol}' 
                 AND timestamp < '${tickTime}' 
                 ORDER BY timestamp DESC LIMIT 1;`);
 
-            if (!lessEqualTimestampBalance) {
-                // closestBalance = greaterTimestampBalance;
-                closestBalance = {timestamp: tickTime, walletValue: "0"};
-            } else {
-                closestBalance = lessEqualTimestampBalance;
-            }
+                if (!lessEqualTimestampBalance) {
+                    // closestBalance = greaterTimestampBalance;
+                    closestBalance = { timestamp: tickTime, walletValue: "0" };
+                } else {
+                    closestBalance = lessEqualTimestampBalance;
+                }
 
-            const balanceOfTokenQuatity = convertWeiToQuantity(closestBalance.walletValue, parseInt(token.decimals));
-            tokenBalanceMap[token.symbol][tickTime] += Number(balanceOfTokenQuatity);
-        }
+                const balanceOfTokenQuatity = convertWeiToQuantity(closestBalance.walletValue, parseInt(token.decimals));
+                tokenBalanceMap[token.symbol][tickTime] += Number(balanceOfTokenQuatity);
+            }
         }
     }
 
-    let tokenValueMap: {[tokenSymbol: string]: {[timestamp: string]: number}} = {};
+    let tokenValueMap: { [tokenSymbol: string]: { [timestamp: string]: number } } = {};
 
     for (const tokenSymbol in tokenBalanceMap) {
         tokenValueMap[tokenSymbol] = {};
@@ -104,7 +104,7 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             tokenValueMap[tokenSymbol][timestamp] = quantity * price;
         }
     }
-    let timestampValueMap: {[timestamp: string]: number} = {};
+    let timestampValueMap: { [timestamp: string]: number } = {};
 
     for (const tokenSymbol in tokenValueMap) {
         for (const timestamp in tokenValueMap[tokenSymbol]) {
@@ -125,8 +125,10 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
         percentageChange = ((change) / oldestValue) * 100;
     }
 
-    return {change, percentageChange,
-        values: Object.entries(timestampValueMap).map(([timestamp, value]) => [timestamp, value]) as [string, number][]}
+    return {
+        change, percentageChange,
+        values: Object.entries(timestampValueMap).map(([timestamp, value]) => [timestamp, value]) as [string, number][]
+    }
 })
 
 export const getTotalPortfolioValue = server$(async function () {

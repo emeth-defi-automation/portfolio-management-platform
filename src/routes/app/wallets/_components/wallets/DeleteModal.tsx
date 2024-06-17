@@ -2,13 +2,13 @@ import { component$, useContext, useSignal } from "@builder.io/qwik";
 import type { Signal } from "@builder.io/qwik";
 import Button from "~/components/Atoms/Buttons/Button";
 import { Modal } from "~/components/Modal/Modal";
-import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { useRemoveWallet } from "~/routes/app/wallets/server";
 import ImgWarningRed from "/public/assets/icons/wallets/warning-red.svg?jsx";
 import { SelectedWalletDetailsContext } from "../..";
-export { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
+import { messagesContext } from "~/routes/app/layout";
 export { useRemoveWallet } from "~/routes/app/wallets/server";
+
 
 interface DeleteModalProps {
   isDeleteModalOpen: Signal<boolean>;
@@ -16,9 +16,9 @@ interface DeleteModalProps {
 
 export const DeleteModal = component$<DeleteModalProps>(
   ({ isDeleteModalOpen }) => {
+    const formMessageProvider = useContext(messagesContext);
     const selectedWalletDetails = useContext(SelectedWalletDetailsContext);
     const removeWalletAction = useRemoveWallet();
-    const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
     return (
       <Modal
@@ -73,7 +73,19 @@ export const DeleteModal = component$<DeleteModalProps>(
                 selectedWalletDetails.value = null;
                 isDeleteModalOpen.value = false;
                 if (success) {
-                  observedWallets.value = await getObservedWallets();
+                  formMessageProvider.messages.push({
+                    id: formMessageProvider.messages.length,
+                    variant: "success",
+                    message: "Wallet deleted",
+                    isVisible: true,
+                  });
+                } else {
+                  formMessageProvider.messages.push({
+                    id: formMessageProvider.messages.length,
+                    variant: "error",
+                    message: "Cannot delete wallet",
+                    isVisible: true,
+                  });
                 }
               }
             }}

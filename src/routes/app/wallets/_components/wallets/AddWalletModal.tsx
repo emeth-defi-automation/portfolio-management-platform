@@ -47,7 +47,6 @@ import AmountOfCoins from "~/routes/app/wallets/_components/AmountOfCoins";
 import CoinsToApprove from "~/routes/app/wallets/_components/CoinsToApprove";
 import IsExecutableSwitch from "~/routes/app/wallets/_components/isExecutableSwitch";
 import { Modal } from "~/components/Modal/Modal";
-import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 
 import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
@@ -57,7 +56,6 @@ import {
 } from "~/routes/app/wallets/server";
 export {
   ObservedWalletsList,
-  getObservedWallets,
 } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
   useAddWallet,
@@ -210,7 +208,6 @@ export const AddWalletModal = component$<AddWalletModal>(
         });
 
         if (success) {
-          observedWallets.value = await getObservedWallets();
           await getWalletBalanceHistory.submit({
             address: addWalletFormStore.address,
           });
