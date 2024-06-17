@@ -48,7 +48,10 @@ import CoinsToApprove from "~/routes/app/wallets/_components/CoinsToApprove";
 import IsExecutableSwitch from "~/routes/app/wallets/_components/isExecutableSwitch";
 import { Modal } from "~/components/Modal/Modal";
 import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import {
+  LoginContext,
+  WagmiConfigContext,
+} from "~/components/WalletConnect/context";
 
 import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
 import {
@@ -88,6 +91,7 @@ export const AddWalletModal = component$<AddWalletModal>(
     });
 
     const wagmiConfig = useContext(WagmiConfigContext);
+    const login = useContext(LoginContext);
     const { streamId } = useContext(StreamStoreContext);
     const formMessageProvider = useContext(messagesContext);
 
@@ -95,7 +99,7 @@ export const AddWalletModal = component$<AddWalletModal>(
     const addWalletAction = useAddWallet();
 
     const connectWallet = $(async () => {
-      await openWeb3Modal(wagmiConfig!.config);
+      await openWeb3Modal(wagmiConfig!.config, login);
     });
 
     const handleReadBalances = $(async (wallet: string) => {

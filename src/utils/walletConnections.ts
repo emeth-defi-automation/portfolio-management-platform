@@ -1,21 +1,52 @@
-import { type NoSerialize } from "@builder.io/qwik";
+import { noSerialize, type NoSerialize } from "@builder.io/qwik";
 import {
   type Config,
   disconnect,
   getConnectors,
   reconnect,
   getConnections,
+  watchAccount,
 } from "@wagmi/core";
-import { createWeb3Modal } from "@web3modal/wagmi";
+import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi";
+import { mainnet, sepolia } from "viem/chains";
 
-export const openWeb3Modal = async (config: NoSerialize<Config>) => {
+import { metadata } from "~/routes/layout";
+
+export const openWeb3Modal = async (wagmiContext: any, login: any) => {
   const projectId = import.meta.env.PUBLIC_PROJECT_ID;
   if (!projectId || typeof projectId !== "string") {
     throw new Error("Missing project ID");
   }
-  if (config) await reconnect(config!);
+  const wconfig = defaultWagmiConfig({
+    chains: [mainnet, sepolia],
+    projectId: import.meta.env.PUBLIC_PROJECT_ID,
+    metadata,
+    enableCoinbase: false,
+  });
+
+  wagmiContext.config = noSerialize(wconfig);
+
+  if (wagmiContext.config) {
+    watchAccount(wagmiContext.config!, {
+      onChange(account) {
+        if (
+          window.location.pathname === "/signin" ||
+          window.location.pathname === "/"
+        ) {
+          localStorage.setItem("emmethUserWalletAddress", `${account.address}`);
+        } else {
+          reconnect(wagmiContext.config as Config);
+        }
+        login.account = noSerialize(account);
+        login.address.value = account.address;
+        login.chainId.value = account.chainId;
+      },
+    });
+  }
+
+  if (wagmiContext.config) await reconnect(wagmiContext.config!);
   const modal = createWeb3Modal({
-    wagmiConfig: config!,
+    wagmiConfig: wagmiContext.config!,
     projectId,
   });
 

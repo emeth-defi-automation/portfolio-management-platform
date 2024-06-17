@@ -50,7 +50,6 @@ const Input = ({ variant, size, ...props }: InputType) => {
   return (
     <>
       <input
-        {...props}
         class={twMerge(
           InputStyles({ variant, size }),
           props.subValue ? "pr-[80px]" : null,
@@ -62,6 +61,7 @@ const Input = ({ variant, size, ...props }: InputType) => {
         value={props.value}
         onInput$={props.onInput}
         disabled={props.disabled}
+        {...props}
       />
       {props.subValue ? (
         <span class="custom-text-50 absolute right-8 top-8 -translate-y-1/2 text-xs">
