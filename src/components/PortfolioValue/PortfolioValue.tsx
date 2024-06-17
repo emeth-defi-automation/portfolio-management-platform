@@ -11,7 +11,7 @@ import {
   axisYFormatter,
 } from "~/utils/portfolio/axisFormatter";
 import { Spinner } from "../Spinner/Spinner";
-import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
+import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import IconMaximize from "@material-design-icons/svg/filled/open_in_full.svg?jsx";
 import IconMinimalize from "@material-design-icons/svg/filled/close_fullscreen.svg?jsx";
 import ImgPfButton from "/public/assets/icons/pfButton.svg?jsx";
@@ -261,7 +261,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
               <h2 class="custom-text-50 uppercase lg:hidden">Portfolio</h2>
               <button class="custom-border-1 custom-bg-opacity-5 flex h-8 items-center gap-2 rounded-lg px-2">
                 <p>All</p>
-                <IconArrowDown />
+                <IconArrowDown class="h-4 w-4 fill-white" />
               </button>
               <Button
                 onClick$={() => {

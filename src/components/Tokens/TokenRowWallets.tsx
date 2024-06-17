@@ -2,12 +2,8 @@ import { $, type Signal, component$, useSignal, useVisibleTask$ } from "@builder
 // import Button from "../Atoms/Buttons/Button";
 // import IconMenuDots from "@material-design-icons/svg/outlined/more_vert.svg?jsx";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
-import {
-  Image,
-  type ImageTransformerProps,
-  useImageProvider,
-} from "qwik-image";
 import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
+import ParagraphAnnotation from "../Molecules/ParagraphAnnotation/ParagraphAnnotation";
 import { server$ } from "@builder.io/qwik-city";
 import { connectToDB } from "~/database/db";
 import { Readable } from "stream";
@@ -227,21 +223,14 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     return (
       <>
         <div class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm">
-          <div class="flex items-center gap-4 py-2">
-            <div class="custom-border-1 rounded-lg p-[10px]">
-              <Image
-                layout="constrained"
-                objectFit="fill"
-                width={24}
-                height={24}
-                alt={`${name} logo`}
-                src={imagePath}
-              />
-            </div>
-            <p class="">
-              {name} <span class="custom-text-50 pl-1 text-xs">{symbol}</span>
-            </p>
-          </div>
+          <ParagraphAnnotation
+            paragraphText={name}
+            annotationText={symbol}
+            variant="annotationNear"
+            hasIconBox={true}
+            iconBoxSize="small"
+            iconBoxTokenPath={imagePath}
+          />
           <div class="overflow-auto">{currentBalanceOfToken.value}</div>
           <div class="overflow-auto">${latestBalanceUSD.value}</div>
           <div class="">{allowance}</div>

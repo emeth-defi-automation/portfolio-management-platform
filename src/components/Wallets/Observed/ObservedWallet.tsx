@@ -7,7 +7,8 @@ import {
 } from "@builder.io/qwik";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
-import IconClock from "/public/assets/icons/wallets/clock.svg?jsx";
+import IconSchedule from "@material-design-icons/svg/round/schedule.svg?jsx";
+import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
 import {
   SelectedWalletDetailsContext,
   SelectedWalletNameContext,
@@ -124,26 +125,20 @@ export const ObservedWallet = component$<ObservedWalletProps>(
     // const observedWalletNameSignal = useSignal("Loading name...");
 
     return (
-      <div
-        class="flex h-14 cursor-pointer items-center justify-between rounded-lg"
+      <ParagraphAnnotation
+        paragraphText={observedWalletNameSignal.value}
+        annotationText={chainIdToNetworkName[observedWallet.chainId]}
         onClick$={() => {
           selectedWalletDetails.value = observedWallet;
           observedWalletNameContext.value = observedWalletNameSignal.value;
         }}
+        hasIconBox={true}
+        iconBoxSize="small"
+        iconBoxCustomIcon={<IconEthereum class="h-full w-full" />}
+        customClass="py-4"
       >
-        <div class="flex items-center gap-3">
-          <div class="custom-border-1 flex h-6 w-6 items-center justify-center rounded bg-white bg-opacity-5">
-            <IconEthereum />
-          </div>
-          <div class="">
-            <div class="text-sm">{observedWalletNameSignal.value}</div>
-            <div class="custom-text-50 text-xs">
-              {chainIdToNetworkName[observedWallet.chainId]}
-            </div>
-          </div>
-        </div>
-        <IconClock />
-      </div>
+        <IconSchedule class="h-5 w-5 fill-customWarning" />
+      </ParagraphAnnotation>
     );
   },
 );

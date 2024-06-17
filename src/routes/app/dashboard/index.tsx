@@ -1,10 +1,5 @@
 import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import { PortfolioValue } from "~/components/PortfolioValue/PortfolioValue";
-import { ActionAlertMessage } from "~/components/ActionAlertsMessage/ActionAlertsMessage";
-import {
-  SuccessStatus,
-  WarningStatus,
-} from "~/components/ActionAlertsMessage/ActionStatus";
 import { TokenRow } from "~/components/Tokens/TokenRow";
 import { useNavigate } from "@builder.io/qwik-city";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
@@ -14,6 +9,10 @@ import { getFavouriteTokens } from "./server";
 
 import Button from "~/components/Atoms/Buttons/Button";
 import NoData from "~/components/Molecules/NoData/NoData";
+import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
+import Tag from "~/components/Atoms/Tags/Tag";
+import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
+import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 
 export {
   getFavouriteTokens,
@@ -37,7 +36,7 @@ export default component$(() => {
   return isPortfolioFullScreen.value ? (
     <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
   ) : (
-    <div class="grid grid-rows-[max(460px)_auto] gap-6 p-10">
+    <div class="grid grid-rows-[max(430px)_auto] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
 
@@ -47,25 +46,30 @@ export default component$(() => {
             <Button text="See All" variant="transparent" size="small" />
           </div>
           <div class="">
-            <ActionAlertMessage
-              title="Bitcoin share exceeded 20%"
-              description="6 hours ago"
+            <ParagraphAnnotation
+              paragraphText="Bitcoin share exceeded 20%"
+              annotationText="6 hours ago"
+              customClass="py-4"
             />
-            <ActionAlertMessage
-              title="Bitcoin share exceeded 20%"
-              description="6 hours ago"
+            <ParagraphAnnotation
+              paragraphText="Bitcoin share exceeded 20%"
+              annotationText="6 hours ago"
+              customClass="py-4"
             />
-            <ActionAlertMessage
-              title="Bitcoin share exceeded 20%"
-              description="6 hours ago"
+            <ParagraphAnnotation
+              paragraphText="Bitcoin share exceeded 20%"
+              annotationText="6 hours ago"
+              customClass="py-4"
             />
-            <ActionAlertMessage
-              title="Bitcoin share exceeded 20%"
-              description="6 hours ago"
+            <ParagraphAnnotation
+              paragraphText="Bitcoin share exceeded 20%"
+              annotationText="6 hours ago"
+              customClass="py-4"
             />
-            <ActionAlertMessage
-              title="Bitcoin share exceeded 20%"
-              description="6 hours ago"
+            <ParagraphAnnotation
+              paragraphText="Bitcoin share exceeded 20%"
+              annotationText="6 hours ago"
+              customClass="py-4"
             />
           </div>
         </div>
@@ -76,33 +80,66 @@ export default component$(() => {
             <Button text="See All" variant="transparent" size="small" />
           </div>
           <div>
-            <ActionAlertMessage
-              title="Automation name #1"
-              description="6 hours ago"
+            <ParagraphAnnotation
+              paragraphText="Automation name #1"
+              annotationText="6 hours ago"
+              customClass="py-4"
             >
-              <SuccessStatus />
-            </ActionAlertMessage>
-            <ActionAlertMessage
-              title="Automation name #2"
-              description="6 hours ago"
+              <Tag
+                text="Success"
+                variant="success"
+                icon={<IconSuccess class="h-3.5 w-3.5 fill-customGreen" />}
+                isBorder={true}
+              />
+            </ParagraphAnnotation>
+            <ParagraphAnnotation
+              paragraphText="Automation name #2"
+              annotationText="6 hours ago"
+              customClass="py-4"
             >
-              <SuccessStatus />
-            </ActionAlertMessage>
-            <ActionAlertMessage title="DCA" description="1 day ago">
-              <WarningStatus />
-            </ActionAlertMessage>
-            <ActionAlertMessage
-              title="Automation name #3"
-              description="6 hours ago"
+              <Tag
+                text="Success"
+                variant="success"
+                icon={<IconSuccess class="h-3.5 w-3.5 fill-customGreen" />}
+                isBorder={true}
+              />
+            </ParagraphAnnotation>
+            <ParagraphAnnotation
+              paragraphText="DCA"
+              annotationText="1 day ago"
+              customClass="py-4"
             >
-              <SuccessStatus />
-            </ActionAlertMessage>
-            <ActionAlertMessage
-              title="Automation name #4"
-              description="6 hours ago"
+              <Tag
+                text="Warning"
+                variant="warning"
+                icon={<IconWarning class="h-3.5 w-3.5 fill-customWarning" />}
+                isBorder={true}
+              />
+            </ParagraphAnnotation>
+            <ParagraphAnnotation
+              paragraphText="Automation name #3"
+              annotationText="6 hours ago"
+              customClass="py-4"
             >
-              <SuccessStatus />
-            </ActionAlertMessage>
+              <Tag
+                text="Success"
+                variant="success"
+                icon={<IconSuccess class="h-3.5 w-3.5 fill-customGreen" />}
+                isBorder={true}
+              />
+            </ParagraphAnnotation>
+            <ParagraphAnnotation
+              paragraphText="Automation name #4"
+              annotationText="6 hours ago"
+              customClass="py-4"
+            >
+              <Tag
+                text="Success"
+                variant="success"
+                icon={<IconSuccess class="h-3.5 w-3.5 fill-customGreen" />}
+                isBorder={true}
+              />
+            </ParagraphAnnotation>
           </div>
         </div>
       </div>

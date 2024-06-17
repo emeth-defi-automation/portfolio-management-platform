@@ -32,6 +32,9 @@ const buttonStyles = cva(
         gradient: ["gradient-border disabled:before:p-0 "],
         iconBox: ["custom-border-1 custom-bg-white rounded-lg !px-2 !py-2"],
         onlyIcon: ["!p-0 gap-0 !h-fit"],
+        dashed: [
+          "border-dashed border-customBlue border-[1px] rounded-lg w-full",
+        ],
       },
       size: {
         small: ["text-xs font-semibold h-8 px-4"],

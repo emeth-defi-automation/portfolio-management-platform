@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { component$, type JSXOutput, Slot } from "@builder.io/qwik";
+import { component$, type JSXOutput, Slot, type QRL } from "@builder.io/qwik";
 import { cva, type VariantProps } from "class-variance-authority";
 import Paragraph from "~/components/Atoms/Paragraphs/Paragraphs";
 import IconBox from "~/components/Atoms/IconBox/IconBox";
@@ -17,6 +17,11 @@ export interface ParagraphAnnotationProps {
   customClass?: string;
   paragraphText?: string;
   annotationText?: string;
+  onClick$?:
+    | QRL<() => void>
+    | (() => void)
+    | QRL<() => Promise<void>>
+    | (() => Promise<void>);
 }
 
 const ParagraphAnnotationStyles = cva(["flex"], {
@@ -40,7 +45,10 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
   ({ hasIconBox, customClass, variant, ...props }: ParagraphAnnotationType) => {
     return (
       <>
-        <div class="flex items-center justify-between gap-4">
+        <div
+          class="flex cursor-pointer items-center justify-between gap-4"
+          onClick$={props.onClick$}
+        >
           <div class="flex items-center justify-between gap-4">
             {hasIconBox ? (
               <IconBox

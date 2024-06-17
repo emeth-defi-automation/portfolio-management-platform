@@ -47,6 +47,14 @@ export function OnlyIcon(args: ButtonProps) {
   return <Button {...args} />;
 }
 
+export function Trigger(args: ButtonProps) {
+  return (
+    <div class="w-80">
+      <Button {...args} />
+    </div>
+  );
+}
+
 ConnectButton.args = {
   disabled: false,
   text: "Use Wallet Connect",
@@ -115,4 +123,13 @@ IconBox.args = {
 OnlyIcon.args = {
   leftIcon: <IconAdd class="h-4 w-4" />,
   variant: "onlyIcon",
+};
+
+Trigger.args = {
+  disabled: false,
+  text: "Add Trigger",
+  leftIcon: <IconAdd class="h-4 w-4" />,
+  variant: "dashed",
+  class: "",
+  size: "large",
 };

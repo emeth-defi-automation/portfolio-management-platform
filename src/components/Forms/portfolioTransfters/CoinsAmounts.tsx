@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
-import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
+import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import { checkPattern, replaceNonMatching } from "~/utils/fractions";
 import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 
@@ -21,7 +21,7 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
               key={`${structure.name}${index}`}
             >
               <div class="flex gap-2">
-                <IconArrowDown />
+                <IconArrowDown class="h-4 w-4 fill-white" />
 
                 <p class="text-sm">{structure.name}</p>
               </div>

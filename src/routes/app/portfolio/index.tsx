@@ -1,5 +1,5 @@
 import { ButtonWithIcon } from "~/components/Buttons/Buttons";
-import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
+import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import IconClose from "@material-design-icons/svg/round/close.svg?jsx";
 import Button from "~/components/Atoms/Buttons/Button";
 import IconTransfer from "@material-design-icons/svg/round/arrow_circle_up.svg?jsx";
@@ -352,7 +352,7 @@ export default component$(() => {
                   class="custom-border-1 h-10 flex-row-reverse justify-between gap-2 rounded-lg px-3"
                 />
               </div>
-              <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
+              <div class="grid h-fit items-start gap-4 text-left text-sm">
                 <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
                   <div class="">TOKEN NAME</div>
                   <div class="">QUANTITY</div>
@@ -564,7 +564,7 @@ export default component$(() => {
                   </div>
                 )}
                 <span class="absolute end-4 top-4 cursor-pointer">
-                  <IconArrowDown />
+                  <IconArrowDown class="h-4 w-4 fill-white" />
                 </span>
               </label>
 
@@ -737,7 +737,7 @@ export default component$(() => {
                   </div>
                 )}
                 <span class="absolute end-4 top-4 cursor-pointer">
-                  <IconArrowDown />
+                  <IconArrowDown class="h-4 w-4 fill-white" />
                 </span>
               </label>
 
