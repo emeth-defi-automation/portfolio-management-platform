@@ -67,6 +67,7 @@ export default component$(() => {
       chains: [mainnet, sepolia],
       projectId: import.meta.env.PUBLIC_PROJECT_ID,
       metadata,
+      enableCoinbase: false,
     });
 
     wagmiConfig.config = noSerialize(wconfig);
