@@ -13,6 +13,13 @@ import { getPortfolioDatesForSelectedPeriod, Period } from "./getPortfolio24hCha
 
 
 export const _totalPortfolioValue = server$(async function (period: Period) {
+
+    const lessEqualTimestampBalanceQueries: string[][] = [];
+    const lessEqualTimestampQueries: string[][] = [];
+    const greaterTimestampQueries: string[][] = [];
+    const tokenPriceForClosestTimestampQueries: string[] = [];
+    const closerTimestamps: string[] = [];
+
     const tickTimes = getPortfolioDatesForSelectedPeriod(period);
 
     const db = await connectToDB(this.env);
@@ -21,6 +28,8 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
     if (!cookie) {
         throw new Error("No cookie found");
     }
+
+
     const { userId } = jwt.decode(cookie.value) as JwtPayload;
 
     const [tokens]: any = await db.query(`SELECT symbol, decimals FROM token;`);
@@ -41,58 +50,117 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
             }
             // continue;
         } else {
-            for (const tickTime of tickTimes) {
-                const [[lessEqualTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
-            WHERE symbol = '${token.symbol}' 
-            AND timestamp <= '${tickTime}' 
-            ORDER BY timestamp DESC LIMIT 1`);
 
-                const [[greaterTimestamp]]: any = await db.query(`SELECT timestamp FROM token_price_history 
+
+            for (const tickTime of tickTimes) {
+
+
+                lessEqualTimestampQueries.push([tickTime, token.symbol,
+                    `SELECT timestamp FROM token_price_history 
+                    WHERE symbol = '${token.symbol}' 
+                     AND timestamp <= '${tickTime}' 
+                    ORDER BY timestamp DESC LIMIT 1;`
+                ])
+
+                greaterTimestampQueries.push([tickTime, token.symbol,
+                    `SELECT timestamp FROM token_price_history 
             WHERE symbol = '${token.symbol}'
             AND timestamp > '${tickTime}' 
-            ORDER BY timestamp ASC LIMIT 1`);
+            ORDER BY timestamp ASC LIMIT 1;`
+                ])
 
-                let closestTimestamp;
-                if (!lessEqualTimestamp) {
-                    closestTimestamp = greaterTimestamp;
-                } else if (!greaterTimestamp) {
-                    closestTimestamp = lessEqualTimestamp;
-                } else {
-                    const diffGreater = Math.abs(new Date(tickTime).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
-                    const diffLess = Math.abs(new Date(tickTime).getTime() - new Date(greaterTimestamp.timestamp).getTime());
-                    closestTimestamp = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
-
-                }
-
-                const [[tokenPriceForClosestTimestamp]]: any = await db.query(`SELECT price FROM token_price_history 
-            WHERE timestamp = '${closestTimestamp.timestamp}' 
-            AND symbol = '${token.symbol}'`);
-                tokenPriceMap[token.symbol][tickTime] = tokenPriceForClosestTimestamp.price;
             }
         }
 
         for (const observedWalletId of observedWalletsIds) {
-            let closestBalance;
-            for (const tickTime of tickTimes) {
 
-                const [[lessEqualTimestampBalance]]: any = await db.query(`SELECT walletValue, timestamp FROM wallet_balance 
+            for (const tickTime of tickTimes) {
+                lessEqualTimestampBalanceQueries.push([tickTime, token.decimals, token.symbol, `SELECT * FROM wallet_balance 
                 WHERE walletId = ${observedWalletId} 
                 AND tokenSymbol = '${token.symbol}' 
-                AND timestamp < '${tickTime}' 
-                ORDER BY timestamp DESC LIMIT 1;`);
-
-                if (!lessEqualTimestampBalance) {
-                    // closestBalance = greaterTimestampBalance;
-                    closestBalance = { timestamp: tickTime, walletValue: "0" };
-                } else {
-                    closestBalance = lessEqualTimestampBalance;
-                }
-
-                const balanceOfTokenQuatity = convertWeiToQuantity(closestBalance.walletValue, parseInt(token.decimals));
-                tokenBalanceMap[token.symbol][tickTime] += Number(balanceOfTokenQuatity);
+                AND timestamp <= '${tickTime}' 
+                ORDER BY timestamp DESC LIMIT 1;`])
             }
+
         }
+
     }
+
+    if (!lessEqualTimestampQueries.length || !greaterTimestampQueries.length) {
+        console.log("no queries to excecute");
+    } else {
+        const lessTimestampQueries = lessEqualTimestampQueries.map(data => data[2]);
+        const greaterTimestampQueries1 = greaterTimestampQueries.map(data => data[2]);
+        const query1 = lessTimestampQueries.join('');
+        const query2 = greaterTimestampQueries1.join('');
+        const lessEqualTimestampResult: any = (await db.query(query1)).flat();
+        const greaterEqualTimestampResult: any = (await db.query(query2)).flat();
+
+
+        const length = lessEqualTimestampResult.length > greaterEqualTimestampResult.length ? lessEqualTimestampResult.length : greaterEqualTimestampResult.length
+
+        let closestTime;
+        let tokenSymbol;
+        for (let i = 0; i < length; i++) {
+
+            const lessEqualTimestamp = lessEqualTimestampResult[i];
+            const greaterTimestamp = greaterEqualTimestampResult[i];
+
+
+            if (!lessEqualTimestamp) {
+                closestTime = greaterTimestamp;
+            } else if (!greaterTimestamp) {
+                closestTime = lessEqualTimestamp;
+            } else {
+                const diffGreater = Math.abs(new Date(lessEqualTimestampQueries[i][0]).getTime() - new Date(lessEqualTimestamp.timestamp).getTime());
+                const diffLess = Math.abs(new Date(greaterTimestampQueries[i][0]).getTime() - new Date(greaterTimestamp.timestamp).getTime());
+                closestTime = diffGreater < diffLess ? lessEqualTimestamp : greaterTimestamp;
+            }
+
+            if (lessEqualTimestampResult.includes(closestTime)) {
+                tokenSymbol = lessEqualTimestampQueries[i][1]
+            } else if (greaterEqualTimestampResult.includes(closestTime)) {
+                tokenSymbol = greaterTimestampQueries[i][1]
+            }
+
+
+            closerTimestamps.push(closestTime)
+            tokenPriceForClosestTimestampQueries.push(`SELECT price FROM token_price_history 
+            WHERE timestamp = '${closestTime.timestamp}' 
+            AND symbol = '${tokenSymbol}';`)
+
+        }
+
+        const tokenPriceForClosestTimestampResults: any = (await db.query(tokenPriceForClosestTimestampQueries.join(" "))).flat();
+
+
+        for (let j = 0; j < length; j++) {
+            tokenPriceMap[lessEqualTimestampQueries[j][1]][lessEqualTimestampQueries[j][0]] = tokenPriceForClosestTimestampResults[j].price;
+        }
+
+    }
+
+
+    if (!lessEqualTimestampBalanceQueries.length) {
+        console.log('No lessEqualTimestampBalanceQueries to execute');
+    } else {
+        const queries = lessEqualTimestampBalanceQueries.map(data => data[3]);
+        const query = queries.join('');
+
+        const lessEqualTimestampBalance: any = await db.query(query);
+
+
+        lessEqualTimestampBalance.forEach((element: any, index: number) => {
+            if (!element || !element[0]) {
+                tokenBalanceMap[lessEqualTimestampBalanceQueries[index][2]][lessEqualTimestampBalanceQueries[index][0]] = 0;
+            } else {
+                const balanceOfTokenQuantity: any = convertWeiToQuantity(element[0].walletValue, parseInt(lessEqualTimestampBalanceQueries[index][1]));
+                tokenBalanceMap[element[0].tokenSymbol][lessEqualTimestampBalanceQueries[index][0]] += Number(balanceOfTokenQuantity);
+            }
+        });
+
+    }
+
 
     let tokenValueMap: { [tokenSymbol: string]: { [timestamp: string]: number } } = {};
 
@@ -124,12 +192,12 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
     if (oldestValue !== 0) {
         percentageChange = ((change) / oldestValue) * 100;
     }
-
     return {
         change, percentageChange,
         values: Object.entries(timestampValueMap).map(([timestamp, value]) => [timestamp, value]) as [string, number][]
     }
 })
+
 
 export const getTotalPortfolioValue = server$(async function () {
     const db = await connectToDB(this.env);
