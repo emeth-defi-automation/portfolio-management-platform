@@ -1,4 +1,4 @@
-import { Swap } from "./Swap";
+import { Swap } from "./SwapAndTransfer";
 
 export default {
   component: Swap,

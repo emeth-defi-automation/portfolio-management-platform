@@ -5,6 +5,7 @@ import IconError from "@material-design-icons/svg/outlined/error_outline.svg?jsx
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 import Button from "~/components/Atoms/Buttons/Button";
 import SelectField from "~/components/Molecules/SelectField/SelectField";
+import { Summary } from "./Summary";
 
 export const Swap = component$(() => {
   const state = useStore({ actionType: "Swap" });
@@ -56,51 +57,7 @@ export const Swap = component$(() => {
         paragraphText="You didn’t choose tokens yet"
         annotationText={`Please select the tokens you wish to ${state.actionType == "Swap" ? "exchange" : "transfer"}.`}
       />
-      <div class="flex flex-col gap-4">
-        <Annotation text="Details" />
-        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
-          <Annotation text="Type" />
-          <Annotation text="My Wallet" variant="white" />
-        </div>
-        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
-          <Annotation text="From" />
-          <Annotation text="Wallet #1" variant="white" />
-        </div>
-        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
-          <Annotation text="To" />
-          <Annotation text="Wallet #2" variant="white" />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <Annotation text="Send" />
-        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
-          <div class="flex items-center gap-2">
-            <img
-              width={16}
-              height={16}
-              src="/public/assets/icons/tokens/usdc.svg"
-              alt="USDC"
-            />
-            <Annotation text="67,059.95" variant="white" />
-          </div>
-          <Annotation text="$67,059.95" variant="white" />
-        </div>
-      </div>
-      <div class="flex flex-col gap-4">
-        <Annotation text="Send" />
-        <div class="flex items-center justify-between rounded-lg bg-black/10 p-4">
-          <div class="flex items-center gap-2">
-            <img
-              width={16}
-              height={16}
-              src="/public/assets/icons/tokens/btc.svg"
-              alt="BTC"
-            />
-            <Annotation text="1.00" variant="white" />
-          </div>
-          <Annotation text="$67,059.95" variant="white" />
-        </div>
-      </div>
+      <Summary actionType={state.actionType} />
     </div>
   );
 });

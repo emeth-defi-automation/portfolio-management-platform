@@ -5,7 +5,7 @@ import IconOpen from "@material-design-icons/svg/filled/open_in_new.svg?jsx";
 import Button from "../Buttons/Button";
 
 export interface DetailsBoxProps {
-  customClass: string;
+  customClass?: string;
   title?: string;
   text?: string;
   tokenPath?: string;
