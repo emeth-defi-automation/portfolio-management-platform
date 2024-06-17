@@ -4,10 +4,10 @@ import Header from "../Atoms/Headers/Header";
 import Button from "../Atoms/Buttons/Button";
 import Paragraph from "../Atoms/Paragraphs/Paragraphs";
 import Input from "../Atoms/Input/Input";
-import IconSwap from "@material-design-icons/svg/round/swap_horiz.svg?jsx";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import IconBTC from "/public/assets/icons/tokens/btc.svg?jsx";
 import Annotation from "../Atoms/Annotation/Annotation";
+import Select from "../Atoms/Select/Select";
 
 export const Step2 = component$(() => {
   return (
@@ -15,26 +15,35 @@ export const Step2 = component$(() => {
       variant="box"
       customClass="flex flex-col gap-6 !shadow-none !overflow-x-hidden h-[550px]"
     >
-      <Header text="Quantities & Destination" variant="h4" />
+      <Header text="Value" variant="h4" />
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-5">
-          <div class="flex items-center gap-2">
-            <Button
-              variant="onlyIcon"
-              leftIcon={<IconArrowDown class="fill-white" />}
-            />
+          <div class="flex items-center justify-between gap-2 rounded-lg bg-white/3 px-4 py-1">
             <Paragraph text="Investment" />
+            <div class="flex items-center gap-2">
+              <Annotation text="Portfolio Transfer Amount" />
+              <Annotation
+                text="$201,179.85"
+                class="rounded-lg bg-black/10 p-2 !text-white"
+              />
+              <Button
+                variant="onlyIcon"
+                customClass="rotate-180"
+                leftIcon={<IconArrowDown class="fill-white" />}
+              />
+            </div>
           </div>
           <div class="flex flex-col gap-4">
-            <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] text-xs text-customGrey">
-              <span>TOKEN NAME</span>
-              <span>CURRENT VALUE</span>
-              <span>WALLET</span>
-              <span>SEND</span>
+            <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_1fr_2fr]">
+              <Annotation text="Token" />
+              <Annotation text="Current Value" />
+              <Annotation text="Wallet" />
+              <Annotation text="Unit" />
+              <Annotation text="Amount" />
             </div>
-            <div class="flex flex-col gap-1">
-              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] rounded-lg bg-white/3 py-3">
-                <div class="flex items-center gap-4 pl-4">
+            <div class="flex flex-col gap-4">
+              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_1fr_2fr] items-center rounded-lg">
+                <div class="flex items-center gap-4">
                   <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
                     <IconBTC class="h-6 w-6" />
                   </div>
@@ -43,20 +52,83 @@ export const Step2 = component$(() => {
                     <Annotation text="BTC" />
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm">$67,083.63</span>
-                  <Annotation text="(481 BTC)" />
+                <div class="flex h-full flex-col justify-center gap-1">
+                  <Paragraph text="481 BTC" size="xs" />
+                  <Annotation text="$32,267,226.03" />
                 </div>
-                <div class="flex items-center">
-                  <span class="text-sm">TreasuryWBTC</span>
+                <Paragraph text="Wallet#1" size="xs" />
+                <div class="mr-4">
+                  <Select
+                    name="crypto"
+                    id="crypto"
+                    size="medium"
+                    options={[{ value: "", text: "Crypto" }]}
+                  />
                 </div>
-                <div class="flex items-center pr-4">
-                  <Input id="swap" InputClass="min-w-56 h-8" />
+                <div class="relative">
+                  <Input id="swap"  size="small" subValue="$67,059.95" />
                   <Button
-                    variant="onlyIcon"
-                    leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
+                    variant="blue"
+                    customClass="absolute top-1/2 -translate-y-1/2 right-2.5 h-5 !p-1 !rounded-md"
+                    text="Max"
                   />
                   <Input id="" size="xs" />
+                </div>
+              </div>
+              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_1fr_2fr] items-center rounded-lg">
+                <div class="flex items-center gap-4">
+                  <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
+                    <IconBTC class="h-6 w-6" />
+                  </div>
+                  <div class="flex h-full flex-col justify-center gap-1">
+                    <Paragraph text="Bitcoin" />
+                    <Annotation text="BTC" />
+                  </div>
+                </div>
+                <div class="flex h-full flex-col justify-center gap-1">
+                  <Paragraph text="481 BTC" size="xs" />
+                  <Annotation text="$32,267,226.03" />
+                </div>
+                <Paragraph text="Wallet#2" size="xs" />
+                <div class="mr-4">
+                  <Select
+                    id=""
+                    name=""
+                    size="medium"
+                    options={[{ value: "", text: "Crypto" }]}
+                  />
+                </div>
+                <div class="relative">
+                  <Input id=""  size="small" subValue="$67,059.95" />
+                  <Button
+                    variant="blue"
+                    customClass="absolute top-1/2 -translate-y-1/2 right-2.5 h-5 !p-1 !rounded-md"
+                    text="Max"
+                  />
+                </div>
+              </div>
+              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_1fr_2fr] items-center rounded-lg">
+                <div class="flex items-center gap-4">
+                  <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
+                    <IconBTC class="h-6 w-6" />
+                  </div>
+                  <div class="flex h-full flex-col justify-center gap-1">
+                    <Paragraph text="Bitcoin" />
+                    <Annotation text="BTC" />
+                  </div>
+                </div>
+                <div class="flex h-full flex-col justify-center gap-1">
+                  <Paragraph text="481 BTC" size="xs" />
+                  <Annotation text="$32,267,226.03" />
+                </div>
+                <Paragraph text="Wallet#3" size="xs" />
+                <div class="mr-4">
+                  <Select
+                    id=""
+                    name=""
+                    size="medium"
+                    options={[{ value: "", text: "Dollar" }]}
+                  />
                 </div>
               </div>
               <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] rounded-lg py-3">
@@ -77,83 +149,12 @@ export const Step2 = component$(() => {
                   <span class="text-sm">TreasuryWBTC</span>
                 </div>
                 <div class="flex items-center pr-4">
-                  <Input id="" InputClass="min-w-56 h-8" />
+                  <Input id="" size="small" subValue="1.00" />
                   <Button
-                    variant="onlyIcon"
-                    leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
+                    variant="blue"
+                    customClass="absolute top-1/2 -translate-y-1/2 right-2.5 h-5 !p-1 !rounded-md"
+                    text="Max"
                   />
-                  <Input id="" size="xs" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col gap-5">
-          <div class="flex items-center gap-2">
-            <Button
-              variant="onlyIcon"
-              leftIcon={<IconArrowDown class="fill-white" />}
-            />
-            <Paragraph text="Marcin" />
-          </div>
-          <div class="flex flex-col gap-4">
-            <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] text-xs text-customGrey">
-              <span>TOKEN NAME</span>
-              <span>CURRENT VALUE</span>
-              <span>WALLET</span>
-              <span>SEND</span>
-            </div>
-            <div class="flex flex-col gap-1">
-              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] rounded-lg bg-white/3 py-3">
-                <div class="flex items-center gap-4 pl-4">
-                  <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
-                    <IconBTC class="h-6 w-6" />
-                  </div>
-                  <div class="flex h-full flex-col justify-center gap-1">
-                    <Paragraph text="Bitcoin" />
-                    <Annotation text="BTC" />
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm">$67,083.63</span>
-                  <Annotation text="(481 BTC)" />
-                </div>
-                <div class="flex items-center">
-                  <span class="text-sm">TreasuryWBTC</span>
-                </div>
-                <div class="flex items-center pr-4">
-                  <Input id="" InputClass="min-w-56 h-8" />
-                  <Button
-                    variant="onlyIcon"
-                    leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
-                  />
-                  <Input id="" size="xs" />
-                </div>
-              </div>
-              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] rounded-lg py-3">
-                <div class="flex items-center gap-4 pl-4">
-                  <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
-                    <IconBTC class="h-6 w-6" />
-                  </div>
-                  <div class="flex h-full flex-col justify-center gap-1">
-                    <Paragraph text="Bitcoin" />
-                    <Annotation text="BTC" />
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm">$67,083.63</span>
-                  <Annotation text="(481 BTC)" />
-                </div>
-                <div class="flex items-center">
-                  <span class="text-sm">TreasuryWBTC</span>
-                </div>
-                <div class="flex items-center pr-4">
-                  <Input id="" InputClass="min-w-56 h-8" />
-                  <Button
-                    variant="onlyIcon"
-                    leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
-                  />
-                  <Input id="" size="xs" />
                 </div>
               </div>
             </div>

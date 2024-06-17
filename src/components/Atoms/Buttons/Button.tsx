@@ -35,6 +35,9 @@ const buttonStyles = cva(
         dashed: [
           "border-dashed border-customBlue border-[1px] rounded-lg w-full bg-customBlue/10",
         ],
+        transfer: [
+          "bg-gradient-to-br from-pink-600 via-pink-600 to-red-300 border-none !text-xs rounded-md !h-6 !w-[146px]",
+        ],
       },
       size: {
         small: ["text-xs font-semibold h-8 px-4"],
