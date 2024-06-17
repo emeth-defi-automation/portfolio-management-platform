@@ -87,7 +87,7 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
     }
 
     if (!lessEqualTimestampQueries.length || !greaterTimestampQueries.length) {
-        console.log("no queries to excecute");
+        console.error("no queries to execute");
     } else {
         const lessTimestampQueries = lessEqualTimestampQueries.map(data => data[2]);
         const greaterTimestampQueries1 = greaterTimestampQueries.map(data => data[2]);
