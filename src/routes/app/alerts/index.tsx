@@ -1,5 +1,22 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useSignal } from "@builder.io/qwik";
+import Dialog from "~/components/Organism/Dialog";
 
 export default component$(() => {
-  return <div>Actions</div>;
+  const ref = useSignal<HTMLDialogElement | undefined>();
+
+  return (
+    <div>
+      <Dialog ref={ref} hasButton={true} title="Add wallet">
+        Hello
+      </Dialog>
+
+      <button
+        onClick$={() => {
+          ref.value?.showModal();
+        }}
+      >
+        Open
+      </button>
+    </div>
+  );
 });

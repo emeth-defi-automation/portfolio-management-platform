@@ -68,7 +68,7 @@ export const CentralView = component$<CentralViewProps>(() => {
             <div class="flex items-center gap-2">
               <Header
                 variant="h4"
-                text={automationPageContext.activeAutomation.value?.name}
+                title={automationPageContext.activeAutomation.value?.name}
                 class="font-normal"
               />
               <Button

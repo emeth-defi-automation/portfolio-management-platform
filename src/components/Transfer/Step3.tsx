@@ -13,7 +13,7 @@ export const Step3 = component$(() => {
       variant="box"
       customClass="flex flex-col gap-6 !shadow-none !overflow-x-hidden h-[550px]"
     >
-      <Header text="Summary" variant="h4" />
+      <Header title="Summary" variant="h4" />
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-5">
           <div class="flex items-center gap-2">

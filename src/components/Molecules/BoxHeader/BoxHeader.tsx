@@ -17,7 +17,7 @@ const BoxHeader = component$(({ ...props }: BoxHeaderProps) => {
     >
       <Header
         variant={props.variantHeader}
-        text={props.title}
+        title={props.title}
         class={props.headerClass}
       />
       <Slot />

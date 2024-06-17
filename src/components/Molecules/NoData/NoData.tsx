@@ -37,7 +37,7 @@ const NoData = component$<NoDataType>(
           </span>
           {variant == "info" ? (
             <>
-              <Header variant="h5" text={title} class="font-medium" />
+              <Header variant="h5" title={title} class="font-medium" />
               <Paragraph
                 variant="secondaryText"
                 size="xs"
@@ -48,7 +48,7 @@ const NoData = component$<NoDataType>(
             </>
           ) : (
             <>
-              <Header variant="h3" text={title} class="font-medium" />
+              <Header variant="h3" title={title} class="font-medium" />
               <Paragraph
                 variant="secondaryText"
                 size="sm"
