@@ -157,6 +157,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
         wagmiConfig.config as Config,
         request,
       );
+      console.log(transactionHash);
       const user = localStorage.getItem("emmethUserWalletAddress");
       await updateAutomationAction(
         isActive,
