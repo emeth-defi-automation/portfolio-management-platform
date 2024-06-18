@@ -64,7 +64,7 @@ export default component$(() => {
         defaultWagmiConfig({
           chains: [sepolia],
           projectId: import.meta.env.PUBLIC_PROJECT_ID,
-          metadata,
+          metadata: wagmiMetadata,
           enableCoinbase: false,
         }),
       ),

@@ -3,10 +3,6 @@ import {
   LoginContext,
   WagmiConfigContext,
 } from "~/components/WalletConnect/context";
-import {
-  LoginContext,
-  WagmiConfigContext,
-} from "~/components/WalletConnect/context";
 import { openWeb3Modal } from "~/utils/walletConnections";
 import Button, { type buttonType } from "../Atoms/Buttons/Button";
 
