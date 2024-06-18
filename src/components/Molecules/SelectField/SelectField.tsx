@@ -9,6 +9,7 @@ export interface SelectFieldProps {
   options?: Option[];
   onValueChange?: any;
   size: "small" | "large" | null;
+  labelClass?: string;
   disabled?: boolean;
   id: string;
 }
@@ -21,13 +22,14 @@ export type SelectFieldType = VariantProps<typeof SelectFieldStyles> &
 const SelectField = ({ ...props }: SelectFieldType) => {
   return (
     <div class={twMerge(SelectFieldStyles(), props.class)}>
-      <Label name={props.name} for={props.id} />
+      <Label name={props.name} for={props.id} class={props.labelClass} />
       <Select
         id={props.id}
         name={props.name}
         options={props.options}
         size={props.size}
         disabled={props.disabled ? props.disabled : false}
+        onValueChange={props.onValueChange}
       />
     </div>
   );

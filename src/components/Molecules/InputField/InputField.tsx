@@ -10,6 +10,7 @@ export interface InputFieldProps {
   placeholder?: string;
   variant: "search" | "checked" | "swap" | null;
   size: "xs" | "small" | "medium" | "large" | null;
+  labelClass?: string;
   disabled?: boolean;
   value?: string;
   onInput?: QRL<(value: any) => void>;
@@ -25,7 +26,7 @@ export interface InputFieldProps {
 const InputField = ({ ...props }: InputFieldProps) => {
   return (
     <div class={twMerge("mb-4 flex flex-col gap-2", props.class)}>
-      <Label name={props.name} for={props.id} />
+      <Label name={props.name} for={props.id} class={props.labelClass} />
       <Input
         ref={props.ref}
         id={props.id}
