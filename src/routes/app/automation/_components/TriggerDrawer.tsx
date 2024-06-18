@@ -198,6 +198,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
             <div>
               <Label name="Token In" class="my-2 block" />
               <Select
+                id="TriggerDrawenTokenIn"
                 name="tokenIn"
                 options={[
                   {
@@ -221,6 +222,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
             <div>
               <Label name="Token Out" class="my-2 block" />
               <Select
+                id="TriggerDrawenTokenOut"
                 name="tokenOut"
                 options={[
                   {
@@ -236,7 +238,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
                     value: "0x9D16475f4d36dD8FC5fE41F74c9F44c7EcCd0709",
                   },
                 ]}
-                onValueChange={$((value) => {
+                onValueChange={$((value: string) => {
                   addModalStore.tokenOut = value;
                 })}
               />
@@ -244,6 +246,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
             <div>
               <Label name="Amount In" class="my-2 block" />
               <Input
+                id="TriggerDrawenAmountIn"
                 name="amountIn"
                 placeholder="enter amountIn"
                 value={addModalStore.amountIn}
@@ -258,6 +261,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
             <div>
               <Label name="Address From" class="my-2 block" />
               <Select
+                id="TriggerDrawenAddressFrom"
                 name="AddressFrom"
                 options={[
                   { value: "", text: "Select wallet" },
@@ -268,7 +272,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
                     };
                   }),
                 ]}
-                onValueChange={$((value) => {
+                onValueChange={$((value: string) => {
                   addModalStore.from = value;
                 })}
               />
@@ -276,6 +280,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
             <div>
               <Label name="Address to" class="my-2 block" />
               <Input
+                id="TriggerDrawenAddressTo"
                 name="to"
                 placeholder="Address to send coins to"
                 value={addModalStore.to}
@@ -289,6 +294,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
             <div>
               <Label name="Time Zero" class="my-2 block" />
               <Input
+                id="TriggerDrawenDateTimeLocal"
                 type="datetime-local"
                 name="TimeZero"
                 onInput={$((e) => {
@@ -310,6 +316,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
             <div>
               <Label name="Interval" class="my-2 block" />
               <Select
+                id="TriggerDrawenDurationInterval"
                 name="durationInterval"
                 options={[
                   {
@@ -325,7 +332,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
                     value: "60",
                   },
                 ]}
-                onValueChange={$((value) => {
+                onValueChange={$((value: number) => {
                   addModalStore.interval = value;
                 })}
               />
@@ -333,6 +340,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
             <div>
               <Label name="How many" class="my-2 block" />
               <Input
+                id="TriggerDrawenDurationCount"
                 name="durationCount"
                 placeholder="0"
                 value={addModalStore.durationCount}

@@ -9,11 +9,13 @@ import { getFavouriteTokens } from "./server";
 
 import Button from "~/components/Atoms/Buttons/Button";
 import NoData from "~/components/Molecules/NoData/NoData";
+import Box from "~/components/Atoms/Box/Box";
+import Annotation from "../../../components/Atoms/Annotation/Annotation";
 import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
 import Tag from "~/components/Atoms/Tags/Tag";
 import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
 import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
-
+import BoxHeader from "../../../components/Molecules/BoxHeader/BoxHeader";
 export {
   getFavouriteTokens,
   getTotalPortfolioValue,
@@ -40,11 +42,10 @@ export default component$(() => {
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
 
-        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
-          <div class="flex items-center justify-between gap-2">
-            <h1 class="text-xl font-semibold">Alerts</h1>
+        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4 h-full">
+          <BoxHeader variantHeader="h3" title="Alerts" class="gap-2">
             <Button text="See All" variant="transparent" size="small" />
-          </div>
+          </BoxHeader>
           <div class="">
             <ParagraphAnnotation
               paragraphText="Bitcoin share exceeded 20%"
@@ -72,13 +73,12 @@ export default component$(() => {
               customClass="py-4"
             />
           </div>
-        </div>
+        </Box>
 
-        <div class="custom-border-1 custom-bg-opacity-5 grid min-w-max grid-rows-[32px_1fr] gap-4 rounded-2xl p-6">
-          <div class="flex items-center justify-between gap-2">
-            <h1 class="text-xl font-semibold">Actions</h1>
+        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4 h-full">
+          <BoxHeader variantHeader="h3" title="Actions" class="gap-2">
             <Button text="See All" variant="transparent" size="small" />
-          </div>
+          </BoxHeader>
           <div>
             <ParagraphAnnotation
               paragraphText="Automation name #1"
@@ -141,21 +141,20 @@ export default component$(() => {
               />
             </ParagraphAnnotation>
           </div>
-        </div>
+        </Box>
       </div>
 
-      <div class="custom-border-1 custom-shadow custom-bg-opacity-5 grid grid-rows-[32px_1fr] gap-6 rounded-2xl p-6">
-        <div class="flex items-center justify-between">
-          <h1 class="text-xl font-semibold">Favourite Tokens</h1>
+      <Box customClass="grid grid-row-[32px_1fr] gap-6">
+        <BoxHeader variantHeader="h3" title="Favourite tokens">
           <Button
+            text="Go to Portfolio"
+            variant="transparent"
+            size="small"
             onClick$={() => {
               nav("/app/portfolio");
             }}
-            text="Go To Portfolio"
-            variant="transparent"
-            size="small"
           />
-        </div>
+        </BoxHeader>
 
         {favoriteTokenLoading.value ? (
           <div class="flex h-full flex-col items-center justify-center">
@@ -171,19 +170,19 @@ export default component$(() => {
           </NoData>
         ) : (
           <div class="grid grid-rows-[32px_auto] gap-4">
-            <div class="custom-text-50 grid grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2 text-xs font-normal uppercase">
-              <div class="">Token name</div>
-              <div class="">Quantity</div>
-              <div class="">Value</div>
+            <div class="custom-text-50 grid grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2">
+              <Annotation text="Token name" transform="upper" />
+              <Annotation text="Quantity" transform="upper" />
+              <Annotation text="Value" transform="upper" />
               <div class="custom-border-1 flex h-8 w-fit gap-2 rounded-lg bg-white bg-opacity-5 p-1 text-white">
                 <button class="custom-bg-button rounded-lg px-2">24h</button>
                 <button class="rounded-lg px-2">3d</button>
                 <button class="rounded-lg px-2">30d</button>
               </div>
-              <div class="">Wallet</div>
-              <div class="">Network</div>
-              <div class="">Subportfolio</div>
-              <div class=""></div>
+              <Annotation text="Wallet" transform="upper" />
+              <Annotation text="Network" transform="upper" />
+              <Annotation text="Subportfolio" transform="upper" />
+              <Annotation transform="upper" />
             </div>
             <div>
               {favoriteTokens.value[0] &&
@@ -214,7 +213,7 @@ export default component$(() => {
             </div>
           </div>
         )}
-      </div>
+      </Box>
     </div>
   );
 });

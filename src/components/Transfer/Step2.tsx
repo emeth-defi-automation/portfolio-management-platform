@@ -51,12 +51,12 @@ export const Step2 = component$(() => {
                   <span class="text-sm">TreasuryWBTC</span>
                 </div>
                 <div class="flex items-center pr-4">
-                  <Input customClass="min-w-56 h-8" />
+                  <Input id="swap" InputClass="min-w-56 h-8" />
                   <Button
                     variant="onlyIcon"
                     leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
                   />
-                  <Input size="xs" />
+                  <Input id="" size="xs" />
                 </div>
               </div>
               <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] rounded-lg py-3">
@@ -77,12 +77,12 @@ export const Step2 = component$(() => {
                   <span class="text-sm">TreasuryWBTC</span>
                 </div>
                 <div class="flex items-center pr-4">
-                  <Input customClass="min-w-56 h-8" />
+                  <Input id="" InputClass="min-w-56 h-8" />
                   <Button
                     variant="onlyIcon"
                     leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
                   />
-                  <Input size="xs" />
+                  <Input id="" size="xs" />
                 </div>
               </div>
             </div>
@@ -122,12 +122,12 @@ export const Step2 = component$(() => {
                   <span class="text-sm">TreasuryWBTC</span>
                 </div>
                 <div class="flex items-center pr-4">
-                  <Input customClass="min-w-56 h-8" />
+                  <Input id="" InputClass="min-w-56 h-8" />
                   <Button
                     variant="onlyIcon"
                     leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
                   />
-                  <Input size="xs" />
+                  <Input id="" size="xs" />
                 </div>
               </div>
               <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] rounded-lg py-3">
@@ -148,12 +148,12 @@ export const Step2 = component$(() => {
                   <span class="text-sm">TreasuryWBTC</span>
                 </div>
                 <div class="flex items-center pr-4">
-                  <Input customClass="min-w-56 h-8" />
+                  <Input id="" InputClass="min-w-56 h-8" />
                   <Button
                     variant="onlyIcon"
                     leftIcon={<IconSwap class="h-5 w-5 fill-white" />}
                   />
-                  <Input size="xs" />
+                  <Input id="" size="xs" />
                 </div>
               </div>
             </div>

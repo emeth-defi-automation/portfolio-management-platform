@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { component$, type JSXOutput, type Signal } from "@builder.io/qwik";
 import { type QRL } from "@builder.io/qwik";
 import { twMerge } from "tailwind-merge";
 
@@ -11,25 +12,28 @@ export interface InputProps {
     | ((value: any) => void)
     | QRL<(value: any) => Promise<void>>
     | ((value: any) => Promise<void>);
-  customClass?: string;
+  InputClass?: string;
   disabled?: boolean;
   subValue?: string;
   type?: string;
+  iconLeft?: JSXOutput | null;
+  iconRight?: JSXOutput | null;
+  id: string;
+  ref?: Signal<Element | undefined>;
 }
 
 const InputStyles = cva(
   [
-    "custom-border-1 min-w-[20rem] w-full rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm",
+    "custom-border-1 min-w-[11rem] w-full cursor-pointer rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm relative",
   ],
   {
     variants: {
       variant: {
-        search: [
-          "bg-[url('/assets/icons/search.svg')] bg-no-repeat bg-[position:12px_50%] pl-10",
-        ],
+        search: ["pl-10"],
         checked: [
-          "bg-[url('/assets/icons/dashboard/success.svg')] bg-[size:16px_16px] bg-no-repeat bg-[position:right_12px_top_50%] text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
+          "text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
         ],
+        swap: ["!border-0 p-0 text-[28px] h-fit focus:!border-0"],
       },
       size: {
         xs: ["h-8 text-xs"],
@@ -46,30 +50,41 @@ const InputStyles = cva(
 
 export type InputType = VariantProps<typeof InputStyles> & InputProps;
 
-const Input = ({ variant, size, ...props }: InputType) => {
+const Input = component$(({ variant, size, ...props }: InputType) => {
   return (
-    <>
+    <div class="relative min-w-max">
+      {props.iconLeft ? (
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 fill-white">
+          {props.iconLeft}
+        </span>
+      ) : null}
       <input
         class={twMerge(
           InputStyles({ variant, size }),
           props.subValue ? "pr-[80px]" : null,
-          props.customClass,
+          props.InputClass,
         )}
+        ref={props.ref}
         placeholder={props.placeholder}
         name={props.name}
-        id={props.name}
+        id={props.id}
         value={props.value}
         onInput$={props.onInput}
         disabled={props.disabled}
-        {...props}
+        type={props.type}
       />
+      {props.iconRight ? (
+        <span class="absolute right-3 top-1/2 -translate-y-1/2  fill-customGreen">
+          {props.iconRight}
+        </span>
+      ) : null}
       {props.subValue ? (
-        <span class="custom-text-50 absolute right-8 top-8 -translate-y-1/2 text-xs">
+        <span class="custom-text-50 absolute right-3 top-1/2 -translate-y-1/2 text-xs">
           ({props.subValue})
         </span>
       ) : null}
-    </>
+    </div>
   );
-};
+});
 
 export default Input;

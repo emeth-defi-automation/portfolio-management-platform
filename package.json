@@ -73,13 +73,13 @@
     "vite-tsconfig-paths": "4.3.2"
   },
   "dependencies": {
-    "@material-design-icons/svg": "^0.14.13",
+    "@material-design-icons/svg": "0.14.13",
     "@moralisweb3/common-evm-utils": "2.25.4",
     "@wagmi/connectors": "4.1.26",
     "@wagmi/core": "2.6.17",
     "@web3modal/siwe": "4.1.9",
     "@web3modal/wagmi": "4.1.9",
-    "class-variance-authority": "^0.7.0",
+    "class-variance-authority": "0.7.0",
     "d3": "7.9.0",
     "jsonwebtoken": "9.0.2",
     "jwt-decode": "4.0.0",
@@ -87,7 +87,7 @@
     "qwik-image": "0.0.8",
     "siwe": "2.3.1",
     "surrealdb.js": "0.11.1",
-    "tailwind-merge": "^2.2.2",
+    "tailwind-merge": "2.2.2",
     "viem": "2.9.21"
   }
 }

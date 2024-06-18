@@ -8,8 +8,9 @@ export interface SelectFieldProps {
   name: string;
   options?: Option[];
   onValueChange?: any;
-  variant: "smallArrow" | "largeArrow" | null;
   size: "small" | "large" | null;
+  disabled?: boolean;
+  id: string;
 }
 
 const SelectFieldStyles = cva(["flex flex-col gap-2"]);
@@ -19,13 +20,14 @@ export type SelectFieldType = VariantProps<typeof SelectFieldStyles> &
 
 const SelectField = ({ ...props }: SelectFieldType) => {
   return (
-    <div {...props} class={twMerge(SelectFieldStyles(), props.class)}>
-      <Label name={props.name} />
+    <div class={twMerge(SelectFieldStyles(), props.class)}>
+      <Label name={props.name} for={props.id} />
       <Select
+        id={props.id}
         name={props.name}
         options={props.options}
-        variant={props.variant}
         size={props.size}
+        disabled={props.disabled ? props.disabled : false}
       />
     </div>
   );

@@ -19,7 +19,7 @@ export async function getErc20TokenTransfers(
   let allEntries: any = [];
   try {
     const response = await Moralis.EvmApi.token.getWalletTokenTransfers({
-      chain: EvmChain.SEPOLIA,
+      chain: EvmChain.SEPOLIA.hex,
       order: "ASC",
       cursor: cursor as string,
       contractAddresses: [

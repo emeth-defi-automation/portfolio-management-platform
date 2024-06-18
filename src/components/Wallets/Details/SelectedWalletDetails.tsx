@@ -8,7 +8,8 @@ import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
 import Button from "~/components/Atoms/Buttons/Button";
 import Tag from "~/components/Atoms/Tags/Tag";
 import IconTrashRed from "@material-design-icons/svg/outlined/delete.svg?jsx";
-import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
+import Annotation from "~/components/Atoms/Annotation/Annotation";
+import BoxHeader from "../../Molecules/BoxHeader/BoxHeader";
 
 interface SelectedWalletProps {
   selectedWallet: Signal<WalletTokensBalances | null>;
@@ -32,12 +33,8 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
       shortAddress = shortAddress.slice(0, 4) + "..." + shortAddress.slice(-4);
     }
     return (
-      <>
-        <BoxHeader
-          title={selectedWallet.value.wallet.name}
-          variantHeader="h3"
-          class="gap-12"
-        >
+      <div class="grid grid-rows-[32px_28px_1fr] gap-6">
+        <BoxHeader variantHeader="h3" title={selectedWallet.value.wallet.name}>
           <div class="flex gap-2">
             <Button
               variant="transparent"
@@ -93,10 +90,10 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
         </div>
         <div class="grid gap-4">
           <div class="custom-text-50 grid grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 text-left text-xs uppercase">
-            <div class="">Token name</div>
-            <div class="">Quantity</div>
-            <div class="">Value</div>
-            <div class="">Allowance</div>
+            <Annotation text="Token name" transform="upper" />
+            <Annotation text="Quantity" transform="upper" />
+            <Annotation text="Value" transform="upper" />
+            <Annotation text="Allowance" transform="upper" />
             <div class="custom-border-1 flex h-8 w-fit gap-2 rounded-lg bg-white bg-opacity-5 p-1 text-white">
               <button class="custom-bg-button rounded-lg px-2">24h</button>
               <button class="rounded-lg px-2">3d</button>
@@ -105,7 +102,6 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             {selectedWallet.value.wallet.isExecutable ? (
               <div class=""></div>
             ) : null}
-            {/* <div class="">Menu</div> */}
           </div>
           <div>
             {selectedWallet.value.tokens.map((token: any) => {
@@ -127,7 +123,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             })}
           </div>
         </div>
-      </>
+      </div>
     );
   },
 );
