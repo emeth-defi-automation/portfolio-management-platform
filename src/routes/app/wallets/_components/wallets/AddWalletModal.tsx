@@ -11,13 +11,10 @@ import { Form } from "@builder.io/qwik-city";
 
 import {
   getAccount,
-  getConnections,
   readContract,
   simulateContract,
-  watchAccount,
   writeContract,
   getConnections,
-  watchAccount,
   type Config,
 } from "@wagmi/core";
 
