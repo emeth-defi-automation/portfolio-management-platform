@@ -41,10 +41,10 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
-  const queryUuid: any = await db.query(`
+  const [queryUuid]: any = await db.query(`
     LIVE SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' and walletId = ${walletId};
     `);
 
@@ -52,7 +52,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
     `INSERT INTO queryuuids (queryuuid, enabled) VALUES ('${queryUuid}', ${true});`,
   );
 
-  yield queryUuid[0];
+  yield queryUuid;
 
   const latestBalanceOfTokenForWallet =
     await db.query(`SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
@@ -68,15 +68,15 @@ export const tokenRowWalletsInfoStream = server$(async function* (
     tokenSymbol = "USDC";
   }
 
-  const latestTokenPriceQueryUuid: any = await db.query(
+  const [latestTokenPriceQueryUuid]: any = await db.query(
     `LIVE SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}';`,
   );
 
   await db.query(
-    `INSERT INTO queryuuids (queryuuid, enabled) VALUES ('${latestTokenPriceQueryUuid[0]}', ${true});`,
+    `INSERT INTO queryuuids (queryuuid, enabled) VALUES ('${latestTokenPriceQueryUuid}', ${true});`,
   );
 
-  yield latestTokenPriceQueryUuid[0];
+  yield latestTokenPriceQueryUuid;
 
   const latestTokenPrice = await db.query(
     `SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}' ORDER BY timestamp DESC LIMIT 1;`,
@@ -84,29 +84,29 @@ export const tokenRowWalletsInfoStream = server$(async function* (
 
   yield latestTokenPrice;
 
-  const queryUuidEnabledLive: any = await db.query(
-    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid[0]}';`,
+  const [queryUuidEnabledLive]: any = await db.query(
+    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid}';`,
   );
 
-  const queryUuidTokenPriceEnabledLive: any = await db.query(
-    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${latestTokenPriceQueryUuid[0]}';`,
+  const [queryUuidTokenPriceEnabledLive]: any = await db.query(
+    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${latestTokenPriceQueryUuid}';`,
   );
 
-  await db.listenLive(queryUuidEnabledLive[0], ({ action }) => {
+  await db.listenLive(queryUuidEnabledLive, ({ action }) => {
     if (action === "UPDATE") {
       resultsStream.push(null);
-      db.kill(queryUuidEnabledLive[0]);
+      db.kill(queryUuidEnabledLive);
     }
   });
 
-  await db.listenLive(queryUuidTokenPriceEnabledLive[0], ({ action }) => {
+  await db.listenLive(queryUuidTokenPriceEnabledLive, ({ action }) => {
     if (action === "UPDATE") {
       resultsStream.push(null);
-      db.kill(queryUuidTokenPriceEnabledLive[0]);
+      db.kill(queryUuidTokenPriceEnabledLive);
     }
   });
 
-  await db.listenLive(queryUuid[0], ({ action, result }) => {
+  await db.listenLive(queryUuid, ({ action, result }) => {
     if (action === "CLOSE") {
       resultsStream.push(null);
       return;
@@ -114,7 +114,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
     resultsStream.push({ action, result, type: "BALANCE" as actionType });
   });
 
-  await db.listenLive(latestTokenPriceQueryUuid[0], ({ action, result }) => {
+  await db.listenLive(latestTokenPriceQueryUuid, ({ action, result }) => {
     if (action === "CLOSE") {
       resultsStream.push(null);
       return;
@@ -129,9 +129,9 @@ export const tokenRowWalletsInfoStream = server$(async function* (
     yield result;
   }
 
-  await db.query(`DELETE FROM queryuuids WHERE queryuuid = '${queryUuid[0]}';`);
+  await db.query(`DELETE FROM queryuuids WHERE queryuuid = '${queryUuid}';`);
   await db.query(
-    `DELETE FROM queryuuids WHERE queryuuid = '${latestTokenPriceQueryUuid[0]}';`,
+    `DELETE FROM queryuuids WHERE queryuuid = '${latestTokenPriceQueryUuid}';`,
   );
 });
 
@@ -205,6 +205,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             latestTokenPrice.value = value.result["price"];
           }
         } else if (value.action === "UPDATE") {
+          console.log(value)
           if (value.type === "PRICE") {
             latestTokenPrice.value = value.result["price"];
           }
