@@ -51,13 +51,11 @@ import IsExecutableSwitch from "~/routes/app/wallets/_components/isExecutableSwi
 import { LoginContext } from "~/components/WalletConnect/context";
 import {
   useAddWallet,
-  useGetBalanceHistory,
 } from "~/routes/app/wallets/server";
-import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
+import { getMoralisBalance } from "~/server/moralis";
 export { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
   useAddWallet,
-  useGetBalanceHistory,
   useRemoveWallet,
 } from "~/routes/app/wallets/server";
 
@@ -87,7 +85,6 @@ export const AddWalletModal = component$<AddWalletModal>(
     const { streamId } = useContext(StreamStoreContext);
     const formMessageProvider = useContext(messagesContext);
 
-    const getWalletBalanceHistory = useGetBalanceHistory();
     const addWalletAction = useAddWallet();
 
     const connectWallet = $(async () => {
@@ -199,23 +196,12 @@ export const AddWalletModal = component$<AddWalletModal>(
           isExecutable: addWalletFormStore.isExecutable.toString(),
         });
 
-        if (success) {
-          await getWalletBalanceHistory.submit({
-            address: addWalletFormStore.address,
-          });
-        }
-
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "success",
           message: "Wallet successfully added.",
           isVisible: true,
         });
-
-        await addAddressToStreamConfig(
-          streamId,
-          addWalletFormStore.address as `0x${string}`,
-        );
 
         addWalletFormStore.address = "";
         addWalletFormStore.name = "";

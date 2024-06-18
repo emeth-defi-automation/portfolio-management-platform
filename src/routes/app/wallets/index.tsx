@@ -13,7 +13,7 @@ import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWall
 import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 import { chainIdToNetworkName } from "~/utils/chains";
 export { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
-export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
+export { useAddWallet, useRemoveWallet } from "./server";
 
 import { AddWalletModal } from "./_components/wallets/AddWalletModal";
 import { DeleteModal } from "./_components/wallets/DeleteModal";
