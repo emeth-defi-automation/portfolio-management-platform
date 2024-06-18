@@ -61,7 +61,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   yield latestBalanceOfTokenForWallet;
 
   //we dont keep usdt price in database.
-  //we just assume its always 1$. that if statment is
+  //we just assume its always 1$. that if statement is
   // in order not to get an error from trying
   //to fetch something that doesnt exist in database.
   if (tokenSymbol === "USDT") {
