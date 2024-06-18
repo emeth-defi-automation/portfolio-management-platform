@@ -78,7 +78,7 @@ export const addAddressToStreamConfig = server$(async function (
   streamId: string,
   address: string,
 ) {
-  await Moralis.Streams.addAddress({ address, id: streamId });
+  await Moralis.Streams.addAddress({ id: streamId, address });
 });
 
 /**

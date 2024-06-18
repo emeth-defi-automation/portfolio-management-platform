@@ -9,7 +9,6 @@ import {
 } from "@wagmi/core";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, sepolia } from "viem/chains";
-
 import { metadata } from "~/routes/layout";
 
 export const openWeb3Modal = async (wagmiContext: any, login: any) => {
@@ -17,6 +16,7 @@ export const openWeb3Modal = async (wagmiContext: any, login: any) => {
   if (!projectId || typeof projectId !== "string") {
     throw new Error("Missing project ID");
   }
+
   const wconfig = defaultWagmiConfig({
     chains: [mainnet, sepolia],
     projectId: import.meta.env.PUBLIC_PROJECT_ID,

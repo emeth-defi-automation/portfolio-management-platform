@@ -158,7 +158,6 @@ export const PortfolioValue = component$<PortfolioValueProps>(
       });
       isDataForChartLoading.value = false;
       const data = await _totalPortfolioValue(selectedPeriodForChart.value);
-      console.log("data", data);
       dataForChart.value = data.values;
       percentageChange.value =
         (data.percentageChange > 0 ? "+" : "") +

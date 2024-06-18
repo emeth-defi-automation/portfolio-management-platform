@@ -1,48 +1,47 @@
 import {
   component$,
+  createContextId,
+  useContextProvider,
   useSignal,
   useStore,
-  useVisibleTask$,
+  type Signal,
 } from "@builder.io/qwik";
 import Button from "~/components/Atoms/Buttons/Button";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
-import { chainIdToNetworkName } from "~/utils/chains";
+
 import Box from "~/components/Atoms/Box/Box";
 
 import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
-export {
-  getObservedWallets,
-  ObservedWalletsList,
-} from "~/components/ObservedWalletsList/ObservedWalletsList";
-export { useAddWallet, useGetBalanceHistory, useRemoveWallet } from "./server";
+import { chainIdToNetworkName } from "~/utils/chains";
+export { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
+export { useAddWallet, useRemoveWallet } from "./server";
 
 import { AddWalletModal } from "./_components/wallets/AddWalletModal";
 import { DeleteModal } from "./_components/wallets/DeleteModal";
-import { balancesLiveStream } from "./server/balancesLiveStream";
-import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
+
+import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
 import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
-import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
+import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
+import { type Wallet } from "~/interface/auth/Wallet";
+
+export const SelectedWalletDetailsContext = createContextId<Signal<any>>(
+  "selected-wallet-details-context",
+);
+export const SelectedWalletNameContext = createContextId<Signal<string>>(
+  "selected-wallet-name-context",
+);
 
 export default component$(() => {
+  const selectedWalletDetails = useSignal<Wallet | undefined>(undefined);
+  useContextProvider(SelectedWalletDetailsContext, selectedWalletDetails);
+  const selectedWalletName = useSignal<string>("");
+  useContextProvider(SelectedWalletNameContext, selectedWalletName);
+
   const isAddWalletModalOpen = useSignal(false);
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
-  const selectedWallet = useSignal<WalletTokensBalances | null>(null);
-
-  const observedWallets = useSignal<WalletTokensBalances[]>([]);
-
-  const msg = useSignal("1");
-
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async () => {
-    const data = await balancesLiveStream();
-    for await (const value of data) {
-      msg.value = value;
-    }
-  });
 
   return (
     <>
@@ -74,19 +73,15 @@ export default component$(() => {
             />
           </div>
 
-          <ObservedWalletsList
-            observedWallets={observedWallets}
-            selectedWallet={selectedWallet}
-          />
+          <ObservedWalletsList />
         </Box>
 
         {/* usunięty div grid gap-6? */}
         {/* <PendingAuthorization/> */}
         <Box customClass="grid grid-rows-[72px_24px_1fr] gap-4 h-full">
-          {selectedWallet.value && (
+          {selectedWalletDetails.value && (
             <SelectedWalletDetails
-              key={selectedWallet.value.wallet.address}
-              selectedWallet={selectedWallet}
+              key={selectedWalletDetails.value.id}
               chainIdToNetworkName={chainIdToNetworkName}
               isDeleteModalopen={isDeleteModalOpen}
               isTransferModalOpen={isTransferModalOpen}
@@ -101,10 +96,7 @@ export default component$(() => {
       )}
 
       {isDeleteModalOpen.value && (
-        <DeleteModal
-          isDeleteModalOpen={isDeleteModalOpen}
-          selectedWallet={selectedWallet}
-        />
+        <DeleteModal isDeleteModalOpen={isDeleteModalOpen} />
       )}
     </>
   );

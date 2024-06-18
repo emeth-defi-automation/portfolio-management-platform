@@ -5,17 +5,17 @@ import {
   useSignal,
   useStore,
   useVisibleTask$,
+  type Signal,
 } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
-import { type Signal } from "@builder.io/qwik";
 
 import {
   getAccount,
+  getConnections,
   readContract,
   simulateContract,
-  writeContract,
-  getConnections,
   watchAccount,
+  writeContract,
   type Config,
 } from "@wagmi/core";
 
@@ -27,10 +27,9 @@ import { type JwtPayload } from "jsonwebtoken";
 import * as jwtDecode from "jwt-decode";
 import { fetchTokens } from "~/database/tokens";
 
-import { StreamStoreContext } from "~/interface/streamStore/streamStore";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 
+import { messagesContext } from "~/routes/app/layout";
 import { convertToFraction } from "~/utils/fractions";
 import { getAccessToken } from "~/utils/refresh";
 import {
@@ -39,34 +38,20 @@ import {
   isProceedDisabled,
 } from "~/utils/validators/addWallet";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
-import { messagesContext } from "~/routes/app/layout";
 
 import Button from "~/components/Atoms/Buttons/Button";
+import { Modal } from "~/components/Modal/Modal";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import AddWalletFormFields from "~/routes/app/wallets/_components/AddWalletFormFields";
 import AmountOfCoins from "~/routes/app/wallets/_components/AmountOfCoins";
 import CoinsToApprove from "~/routes/app/wallets/_components/CoinsToApprove";
 import IsExecutableSwitch from "~/routes/app/wallets/_components/isExecutableSwitch";
-import { Modal } from "~/components/Modal/Modal";
-import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
-import {
-  LoginContext,
-  WagmiConfigContext,
-} from "~/components/WalletConnect/context";
 
-import { addAddressToStreamConfig, getMoralisBalance } from "~/server/moralis";
-import {
-  useAddWallet,
-  useGetBalanceHistory,
-} from "~/routes/app/wallets/server";
-export {
-  ObservedWalletsList,
-  getObservedWallets,
-} from "~/components/ObservedWalletsList/ObservedWalletsList";
-export {
-  useAddWallet,
-  useGetBalanceHistory,
-  useRemoveWallet,
-} from "~/routes/app/wallets/server";
+import { LoginContext } from "~/components/WalletConnect/context";
+import { useAddWallet } from "~/routes/app/wallets/server";
+import { getMoralisBalance } from "~/server/moralis";
+export { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
+export { useAddWallet, useRemoveWallet } from "~/routes/app/wallets/server";
 
 interface AddWalletModal {
   isAddWalletModalOpen: Signal<boolean>;
@@ -75,7 +60,6 @@ interface AddWalletModal {
 export const AddWalletModal = component$<AddWalletModal>(
   ({ isAddWalletModalOpen }) => {
     const isSecondWalletConnected = useSignal(false);
-    const observedWallets = useSignal<WalletTokensBalances[]>([]);
     const walletTokenBalances = useSignal<any>([]);
     const stepsCounter = useSignal(1);
 
@@ -92,14 +76,12 @@ export const AddWalletModal = component$<AddWalletModal>(
 
     const wagmiConfig = useContext(WagmiConfigContext);
     const login = useContext(LoginContext);
-    const { streamId } = useContext(StreamStoreContext);
     const formMessageProvider = useContext(messagesContext);
 
-    const getWalletBalanceHistory = useGetBalanceHistory();
     const addWalletAction = useAddWallet();
 
     const connectWallet = $(async () => {
-      await openWeb3Modal(wagmiConfig!.config, login);
+      await openWeb3Modal(wagmiConfig, login);
     });
 
     const handleReadBalances = $(async (wallet: string) => {
@@ -110,6 +92,9 @@ export const AddWalletModal = component$<AddWalletModal>(
 
     const handleAddWallet = $(async () => {
       isAddWalletModalOpen.value = false;
+
+      const cookie = await getAccessToken();
+      if (!cookie) throw new Error("No accessToken cookie found");
 
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
@@ -124,7 +109,7 @@ export const AddWalletModal = component$<AddWalletModal>(
       try {
         if (addWalletFormStore.isExecutable) {
           if (wagmiConfig.config) {
-            const account = getAccount(wagmiConfig.config);
+            const account = getAccount(wagmiConfig.config as Config);
 
             addWalletFormStore.address = account.address as `0x${string}`;
 
@@ -196,20 +181,11 @@ export const AddWalletModal = component$<AddWalletModal>(
           await disconnectWallets(wagmiConfig.config);
         }
 
-        const {
-          value: { success },
-        } = await addWalletAction.submit({
+        await addWalletAction.submit({
           address: addWalletFormStore.address as `0x${string}`,
           name: addWalletFormStore.name,
           isExecutable: addWalletFormStore.isExecutable.toString(),
         });
-
-        if (success) {
-          observedWallets.value = await getObservedWallets();
-          await getWalletBalanceHistory.submit({
-            address: addWalletFormStore.address,
-          });
-        }
 
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
@@ -217,11 +193,6 @@ export const AddWalletModal = component$<AddWalletModal>(
           message: "Wallet successfully added.",
           isVisible: true,
         });
-
-        await addAddressToStreamConfig(
-          streamId,
-          addWalletFormStore.address as `0x${string}`,
-        );
 
         addWalletFormStore.address = "";
         addWalletFormStore.name = "";
@@ -243,18 +214,19 @@ export const AddWalletModal = component$<AddWalletModal>(
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ track }) => {
       track(() => wagmiConfig.config);
-      watchAccount(wagmiConfig.config!, {
-        onChange() {
-          const connections = getConnections(wagmiConfig.config as Config);
-          if (connections.length > 1) {
-            isSecondWalletConnected.value = true;
-          } else {
-            isSecondWalletConnected.value = false;
-          }
-        },
-      });
+      if (wagmiConfig.config) {
+        watchAccount(wagmiConfig.config!, {
+          onChange() {
+            const connections = getConnections(wagmiConfig.config as Config);
+            if (connections.length > 1) {
+              isSecondWalletConnected.value = true;
+            } else {
+              isSecondWalletConnected.value = false;
+            }
+          },
+        });
+      }
     });
-
     return (
       <Modal
         isOpen={isAddWalletModalOpen}
@@ -334,7 +306,6 @@ export const AddWalletModal = component$<AddWalletModal>(
                     const { address } = getAccount(
                       wagmiConfig.config as Config,
                     );
-
                     await handleReadBalances(address as `0x${string}`);
                   }
                   if (stepsCounter.value === 2) {
