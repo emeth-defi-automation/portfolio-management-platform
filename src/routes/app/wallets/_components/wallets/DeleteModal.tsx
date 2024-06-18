@@ -5,10 +5,9 @@ import Button from "~/components/Atoms/Buttons/Button";
 import { Modal } from "~/components/Modal/Modal";
 import { messagesContext } from "~/routes/app/layout";
 import { useRemoveWallet } from "~/routes/app/wallets/server";
-import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 import Header from "~/components/Atoms/Headers/Header";
-export { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export { useRemoveWallet } from "~/routes/app/wallets/server";
+import { SelectedWalletDetailsContext } from "../..";
 
 interface DeleteModalProps {
   isDeleteModalOpen: Signal<boolean>;

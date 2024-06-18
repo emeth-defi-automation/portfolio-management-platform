@@ -1,5 +1,4 @@
 import { noSerialize, type NoSerialize } from "@builder.io/qwik";
-import { noSerialize, type NoSerialize } from "@builder.io/qwik";
 import {
   type Config,
   disconnect,
