@@ -1,12 +1,11 @@
-import type { Meta } from "storybook-framework-qwik";
 import Input, { type InputProps } from "./Input";
+import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
+import IconChecked from "@material-design-icons/svg/outlined/check_circle_outline.svg?jsx";
 
-const meta: Meta<InputProps> = {
+export default {
   title: "atoms/Input",
   component: Input,
 };
-
-export default meta;
 
 export function PopUp(args: InputProps) {
   return <Input {...args} />;
@@ -32,12 +31,14 @@ PortfolioSearch.args = {
   placeholder: "Search for name",
   variant: "search",
   size: "small",
+  iconLeft: <IconSearch />,
 };
 
 TransferChecked.args = {
   placeholder: "Approval limit...",
   variant: "checked",
   size: "medium",
+  iconRight: <IconChecked class="h-4 w-4" />,
 };
 
 TransferCoin.args = {

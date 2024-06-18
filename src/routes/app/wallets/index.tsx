@@ -8,6 +8,8 @@ import Button from "~/components/Atoms/Buttons/Button";
 import { SelectedWalletDetails } from "~/components/Wallets/Details/SelectedWalletDetails";
 import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
 import { chainIdToNetworkName } from "~/utils/chains";
+import Box from "~/components/Atoms/Box/Box";
+
 import { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export {
   getObservedWallets,
@@ -21,6 +23,7 @@ import { balancesLiveStream } from "./server/balancesLiveStream";
 import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
 import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
+import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
 
 export default component$(() => {
   const isAddWalletModalOpen = useSignal(false);
@@ -44,8 +47,8 @@ export default component$(() => {
   return (
     <>
       <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
-        <div class="custom-border-1 custom-bg-opacity-5 grid grid-rows-[32px_88px_1fr] gap-6 rounded-2xl p-6">
-          <BoxHeader title="Wallets" variantHeader="h3">
+        <Box customClass="grid grid-rows-[32px_88px_1fr] gap-6 h-full min-w-max">
+          <BoxHeader variantHeader="h3" title="Wallets" class="gap-2">
             <Button
               onClick$={() => {
                 isAddWalletModalOpen.value = !isAddWalletModalOpen.value;
@@ -57,18 +60,17 @@ export default component$(() => {
           </BoxHeader>
           <div class="grid w-full gap-2">
             <Input
+              id="searchWallet"
               variant="search"
-              placeholder="Search for Wallet"
-              customClass="text-xs custom-text-50"
+              iconLeft={<IconSearch class="h-4 w-4" />}
+              placeholder="Search for wallet"
+              size="small"
             />
             <Select
+              id="chooseNetwork"
+              name="chooseNetwork"
+              options={[{ value: "", text: "Choose Network" }]}
               size="medium"
-              options={[
-                {
-                  text: "Choose network",
-                  value: "",
-                },
-              ]}
             />
           </div>
 
@@ -76,23 +78,22 @@ export default component$(() => {
             observedWallets={observedWallets}
             selectedWallet={selectedWallet}
           />
-        </div>
+        </Box>
 
-        <div class="grid gap-6">
-          {/* <PendingAuthorization/> */}
-          <div class="custom-border-1 custom-bg-opacity-5 flex min-w-fit flex-col gap-4 rounded-2xl p-6">
-            {selectedWallet.value && (
-              <SelectedWalletDetails
-                key={selectedWallet.value.wallet.address}
-                selectedWallet={selectedWallet}
-                chainIdToNetworkName={chainIdToNetworkName}
-                isDeleteModalopen={isDeleteModalOpen}
-                isTransferModalOpen={isTransferModalOpen}
-                transferredCoin={transferredCoin}
-              />
-            )}
-          </div>
-        </div>
+        {/* usunięty div grid gap-6? */}
+        {/* <PendingAuthorization/> */}
+        <Box customClass="grid grid-rows-[72px_24px_1fr] gap-4 h-full">
+          {selectedWallet.value && (
+            <SelectedWalletDetails
+              key={selectedWallet.value.wallet.address}
+              selectedWallet={selectedWallet}
+              chainIdToNetworkName={chainIdToNetworkName}
+              isDeleteModalopen={isDeleteModalOpen}
+              isTransferModalOpen={isTransferModalOpen}
+              transferredCoin={transferredCoin}
+            />
+          )}
+        </Box>
       </div>
 
       {isAddWalletModalOpen.value && (

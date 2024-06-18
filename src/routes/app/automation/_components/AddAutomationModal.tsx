@@ -117,6 +117,7 @@ export const AddAutomationModal = component$<AddAutomationModalProps>(
           <div class="mb-2">
             <Label name="name" class="mb-2 block" />
             <Input
+              id="AddAutomationModalName"
               name="name"
               placeholder="Enter name"
               value={newAutomationStore.name}
@@ -131,6 +132,7 @@ export const AddAutomationModal = component$<AddAutomationModalProps>(
           <div class="mb-2">
             <Label name="desc" class="mb-2 block" />
             <Input
+              id="AddAutomationModalDesc"
               name="desc"
               placeholder="Enter short description"
               value={newAutomationStore.desc}

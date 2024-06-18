@@ -1,6 +1,7 @@
 import { type Signal, component$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
+import Label from "~/components/Atoms/Label/Label";
 
 export interface CoinsToApproveProps {
   addWalletFormStore: AddWalletFormStore;
@@ -16,9 +17,7 @@ export default component$<CoinsToApproveProps>(
       <>
         <div class="flex max-h-[450px] flex-col overflow-auto pb-4">
           <div class="mb-3 flex items-center justify-between">
-            <p class="custom-text-50 text-light text-xs uppercase">
-              Select tokens
-            </p>
+            <Label name="Select tokens" />
             {/* <div class="relative">
               <label class="custom-text-50 text-light flex h-6 items-center gap-3 text-xs uppercase">
                 <input

@@ -23,7 +23,7 @@ export const FormBadge = component$<FormBadgeProps>((props) => {
       <label
         for={props.for}
         class={twMerge(
-          "custom-bg-white custom-border-1 inline-flex min-h-12 w-full  cursor-pointer items-center justify-between rounded-lg p-2 pr-4",
+          "custom-bg-white custom-border-1 absolute inline-flex min-h-12 w-full cursor-pointer items-center justify-between rounded-lg p-2 pr-4",
           props.customClass,
         )}
       >
@@ -47,7 +47,7 @@ export const FormBadge = component$<FormBadgeProps>((props) => {
           src={props.hasImg}
           width="14"
           height="14"
-          class={twMerge(`absolute end-[62px]`, props.imgClass)}
+          class={twMerge(`absolute end-4`, props.imgClass)}
         />
       ) : null}
     </div>

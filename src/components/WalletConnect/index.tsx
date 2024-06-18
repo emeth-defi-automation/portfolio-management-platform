@@ -3,6 +3,10 @@ import {
   LoginContext,
   WagmiConfigContext,
 } from "~/components/WalletConnect/context";
+import {
+  LoginContext,
+  WagmiConfigContext,
+} from "~/components/WalletConnect/context";
 import { openWeb3Modal } from "~/utils/walletConnections";
 import Button, { type buttonType } from "../Atoms/Buttons/Button";
 
@@ -15,6 +19,7 @@ export default component$<buttonType>((props) => {
   const login = useContext(LoginContext);
 
   const openModal = $(async () => {
+    await openWeb3Modal(wagmiConfig, login);
     await openWeb3Modal(wagmiConfig, login);
   });
 

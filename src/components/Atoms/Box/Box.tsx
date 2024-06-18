@@ -6,10 +6,10 @@ export interface BoxProps {
   customClass?: string;
 }
 
-const BoxStyles = cva([" p-6 h-fit w-full relative overflow-auto bg-white/3"], {
+const BoxStyles = cva(["p-6 h-fit relative overflow-auto bg-white/3"], {
   variants: {
     variant: {
-      box: ["custom-border-1 rounded-3xl custom-shadow-2"],
+      box: ["custom-border-1 rounded-2xl custom-shadow-2"],
       navbar: ["custom-shadow rounded-none custom-border-b-1"],
     },
   },

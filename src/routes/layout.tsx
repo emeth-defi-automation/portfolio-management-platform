@@ -44,7 +44,7 @@ export const onGet: RequestHandler = async ({ cacheControl }) => {
 };
 
 export default component$(() => {
-  const metadata = {
+  const wagmiMetadata = {
     name: import.meta.env.PUBLIC_METADATA_NAME,
     description: import.meta.env.PUBLIC_METADATA_DESCRIPTION,
     url: "https://web3modal.com",
@@ -82,6 +82,7 @@ export default component$(() => {
 
   const wagmiConfig = useContext(WagmiConfigContext);
   const login = useContext(LoginContext);
+
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
     onClient.onClient.value = true;

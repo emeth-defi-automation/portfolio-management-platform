@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
-// import { Select } from "~/components/select/select";
+import Label from "~/components/Atoms/Label/Label";
 
 export interface AddWalletFormProps {
   addWalletFormStore: AddWalletFormStore;
@@ -10,7 +10,7 @@ export default component$<AddWalletFormProps>(({ addWalletFormStore }) => {
   return (
     <>
       <div class="mb-4">
-        <p class="pb-1 text-xs text-white">Type</p>
+        <Label name="type" class="mb-2" />
         <div class="custom-bg-white custom-border-1 grid grid-cols-[50%_50%] rounded p-1">
           <button
             onClick$={() => {
