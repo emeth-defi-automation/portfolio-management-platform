@@ -12,6 +12,7 @@ import { server$ } from "@builder.io/qwik-city";
 import { messagesContext } from "../../layout";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 import IconAdd from "@material-design-icons/svg/outlined/add.svg?jsx";
+import { SaveChanges } from "./SaveChanges/SaveChanges";
 
 const deleteActionFromDb = server$(async function (actionId, user) {
   // await updateIsActiveStatus(actionId, false);
@@ -61,9 +62,10 @@ export const CentralView = component$<CentralViewProps>(() => {
     }
   });
   return (
-    <div class="p-6">
+    <div class="">
       {automationPageContext.activeAutomation.value ? (
-        <div class="flex h-full w-full flex-col">
+        <>
+        <div class="flex h-full w-full flex-col p-6">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <Header
@@ -105,7 +107,9 @@ export const CentralView = component$<CentralViewProps>(() => {
             ) : null}
           </div>
         </div>
+        </>
       ) : null}
+      <SaveChanges/>
     </div>
   );
 });
