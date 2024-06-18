@@ -4,7 +4,6 @@ import {
   useContextProvider,
   useSignal,
   useStore,
-  useVisibleTask$,
   type Signal,
 } from "@builder.io/qwik";
 import Button from "~/components/Atoms/Buttons/Button";
@@ -20,11 +19,10 @@ export { useAddWallet, useRemoveWallet } from "./server";
 import { AddWalletModal } from "./_components/wallets/AddWalletModal";
 import { DeleteModal } from "./_components/wallets/DeleteModal";
 
+import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
 import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
-import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
 import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
-import { balancesLiveStream } from "./server/balancesLiveStream";
 import { type Wallet } from "~/interface/auth/Wallet";
 
 export const SelectedWalletDetailsContext = createContextId<Signal<any>>(
@@ -44,7 +42,6 @@ export default component$(() => {
   const isDeleteModalOpen = useSignal(false);
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
-
 
   return (
     <>
@@ -76,8 +73,7 @@ export default component$(() => {
             />
           </div>
 
-          <ObservedWalletsList
-          />
+          <ObservedWalletsList />
         </Box>
 
         {/* usunięty div grid gap-6? */}

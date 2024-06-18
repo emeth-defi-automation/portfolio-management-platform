@@ -29,7 +29,7 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   const resultStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const cookie = this.cookie.get("accessToken")?.value;

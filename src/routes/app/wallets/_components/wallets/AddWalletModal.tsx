@@ -27,7 +27,6 @@ import { type JwtPayload } from "jsonwebtoken";
 import * as jwtDecode from "jwt-decode";
 import { fetchTokens } from "~/database/tokens";
 
-import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 
 import { messagesContext } from "~/routes/app/layout";
@@ -49,15 +48,10 @@ import CoinsToApprove from "~/routes/app/wallets/_components/CoinsToApprove";
 import IsExecutableSwitch from "~/routes/app/wallets/_components/isExecutableSwitch";
 
 import { LoginContext } from "~/components/WalletConnect/context";
-import {
-  useAddWallet,
-} from "~/routes/app/wallets/server";
+import { useAddWallet } from "~/routes/app/wallets/server";
 import { getMoralisBalance } from "~/server/moralis";
 export { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
-export {
-  useAddWallet,
-  useRemoveWallet,
-} from "~/routes/app/wallets/server";
+export { useAddWallet, useRemoveWallet } from "~/routes/app/wallets/server";
 
 interface AddWalletModal {
   isAddWalletModalOpen: Signal<boolean>;
@@ -82,7 +76,6 @@ export const AddWalletModal = component$<AddWalletModal>(
 
     const wagmiConfig = useContext(WagmiConfigContext);
     const login = useContext(LoginContext);
-    const { streamId } = useContext(StreamStoreContext);
     const formMessageProvider = useContext(messagesContext);
 
     const addWalletAction = useAddWallet();
@@ -188,9 +181,7 @@ export const AddWalletModal = component$<AddWalletModal>(
           await disconnectWallets(wagmiConfig.config);
         }
 
-        const {
-          value: { success },
-        } = await addWalletAction.submit({
+        await addWalletAction.submit({
           address: addWalletFormStore.address as `0x${string}`,
           name: addWalletFormStore.name,
           isExecutable: addWalletFormStore.isExecutable.toString(),

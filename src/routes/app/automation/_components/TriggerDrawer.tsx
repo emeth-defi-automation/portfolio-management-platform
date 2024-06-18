@@ -7,7 +7,12 @@ import {
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
-import { getAccount, simulateContract, writeContract, type Config } from "@wagmi/core";
+import {
+  getAccount,
+  simulateContract,
+  writeContract,
+  type Config,
+} from "@wagmi/core";
 import { emethContractAbi } from "~/abi/emethContractAbi";
 import Button from "~/components/Atoms/Buttons/Button";
 import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
@@ -70,7 +75,7 @@ const updateAutomationAction = server$(
   },
 );
 
-interface TriggerDrawerProps { }
+interface TriggerDrawerProps {}
 
 export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -148,11 +153,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
         ],
       });
 
-      await writeContract(
-        wagmiConfig.config as Config,
-        request,
-      );
-
+      await writeContract(wagmiConfig.config as Config, request);
 
       const user = localStorage.getItem("emmethUserWalletAddress");
       await updateAutomationAction(
