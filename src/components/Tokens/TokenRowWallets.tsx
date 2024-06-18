@@ -41,7 +41,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const [queryUuid]: any = await db.query(`
@@ -205,7 +205,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             latestTokenPrice.value = value.result["price"];
           }
         } else if (value.action === "UPDATE") {
-          console.log(value)
+          console.log(value);
           if (value.type === "PRICE") {
             latestTokenPrice.value = value.result["price"];
           }
