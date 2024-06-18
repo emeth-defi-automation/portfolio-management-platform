@@ -1,5 +1,10 @@
-import { type Signal, component$ } from "@builder.io/qwik";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
+import {
+  type Signal,
+  component$,
+  useContext,
+  useSignal,
+  useTask$,
+} from "@builder.io/qwik";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
 import IconWallet from "@material-design-icons/svg/round/wallet.svg?jsx";
 import IconLoading from "@material-design-icons/svg/round/sync.svg?jsx";
@@ -10,31 +15,52 @@ import Tag from "~/components/Atoms/Tags/Tag";
 import IconTrashRed from "@material-design-icons/svg/outlined/delete.svg?jsx";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 import BoxHeader from "../../Molecules/BoxHeader/BoxHeader";
+import { server$ } from "@builder.io/qwik-city";
+import { connectToDB } from "~/database/db";
+import { type Token } from "~/interface/token/Token";
+import {
+  SelectedWalletDetailsContext,
+  SelectedWalletNameContext,
+} from "~/routes/app/wallets";
 
 interface SelectedWalletProps {
-  selectedWallet: Signal<WalletTokensBalances | null>;
   chainIdToNetworkName: { [key: string]: string };
   isDeleteModalopen: Signal<boolean>;
   isTransferModalOpen: Signal<boolean>;
   transferredCoin: TransferredCoinInterface;
 }
 
+export const fetchAllTokens = server$(async function () {
+  const db = await connectToDB(this.env);
+
+  const tokens = await db.select<Token>("token");
+  return tokens;
+});
+
 export const SelectedWalletDetails = component$<SelectedWalletProps>(
   ({
-    selectedWallet,
     chainIdToNetworkName,
     isDeleteModalopen,
     isTransferModalOpen,
     transferredCoin,
   }) => {
-    if (!selectedWallet.value) return <></>;
-    let shortAddress = selectedWallet.value.wallet.address;
+    const selectedWalletDetails = useContext(SelectedWalletDetailsContext);
+    const selectedWalletName = useContext(SelectedWalletNameContext);
+    const tokens = useSignal<Token[]>([]);
+
+    if (!selectedWalletDetails.value) return <></>;
+    let shortAddress = selectedWalletDetails.value.address;
     if (shortAddress) {
       shortAddress = shortAddress.slice(0, 4) + "..." + shortAddress.slice(-4);
     }
+
+    useTask$(async () => {
+      tokens.value = await fetchAllTokens();
+    });
+
     return (
       <div class="grid grid-rows-[32px_28px_1fr] gap-6">
-        <BoxHeader variantHeader="h3" title={selectedWallet.value.wallet.name}>
+        <BoxHeader variantHeader="h3" title={selectedWalletName.value}>
           <div class="flex gap-2">
             <Button
               variant="transparent"
@@ -64,7 +90,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
           <Tag
             variant="gradient"
             text={
-              selectedWallet.value.wallet.isExecutable
+              selectedWalletDetails.value.isExecutable
                 ? "Executable"
                 : "Read-only"
             }
@@ -78,7 +104,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             icon={<IconWallet class="h-4 w-4 fill-white" />}
           />
           <Tag
-            text={chainIdToNetworkName[selectedWallet.value.wallet.chainId]}
+            text={chainIdToNetworkName[selectedWalletDetails.value.chainId]}
             icon={<IconEthereum class="h-5 w-5" />}
           />
           <Tag
@@ -99,14 +125,13 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               <button class="rounded-lg px-2">3d</button>
               <button class="rounded-lg px-2">30d</button>
             </div>
-            {selectedWallet.value.wallet.isExecutable ? (
-              <div class=""></div>
-            ) : null}
           </div>
           <div>
-            {selectedWallet.value.tokens.map((token: any) => {
+            {tokens.value.map((token: any) => {
               return (
                 <TokenRowWallets
+                  decimals={token.decimals}
+                  walletId={selectedWalletDetails.value.id}
                   key={token.id}
                   allowance={token.allowance}
                   address={token.address}
@@ -117,7 +142,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
                   balanceValueUSD={token.balanceValueUSD}
                   isTransferModalOpen={isTransferModalOpen}
                   transferredCoin={transferredCoin}
-                  isExecutable={selectedWallet.value?.wallet.isExecutable}
+                  isExecutable={selectedWalletDetails.value.isExecutable}
                 />
               );
             })}

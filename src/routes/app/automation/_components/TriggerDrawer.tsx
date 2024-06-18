@@ -6,25 +6,25 @@ import {
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import Header from "~/components/Atoms/Headers/Header";
-import { AutomationPageContext } from "../AutomationPageContext";
-import Input from "~/components/Atoms/Input/Input";
-import Select from "~/components/Atoms/Select/Select";
-import Button from "~/components/Atoms/Buttons/Button";
-import Label from "~/components/Atoms/Label/Label";
-import { getObservedWalletBalances } from "../../portfolio/server/observerWalletBalancesLoader";
+import { server$ } from "@builder.io/qwik-city";
 import {
-  type Config,
   getAccount,
   simulateContract,
   writeContract,
+  type Config,
 } from "@wagmi/core";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
-import { messagesContext } from "../../layout";
 import { emethContractAbi } from "~/abi/emethContractAbi";
+import Button from "~/components/Atoms/Buttons/Button";
 import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
-import { server$ } from "@builder.io/qwik-city";
+import Header from "~/components/Atoms/Headers/Header";
+import Input from "~/components/Atoms/Input/Input";
+import Label from "~/components/Atoms/Label/Label";
+import Select from "~/components/Atoms/Select/Select";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { connectToDB } from "~/database/db";
+import { messagesContext } from "../../layout";
+import { getObservedWalletBalances } from "../../portfolio/server/observerWalletBalancesLoader";
+import { AutomationPageContext } from "../AutomationPageContext";
 
 const updateAutomationAction = server$(
   async function (

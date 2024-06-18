@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "storybook-framework-qwik";
 import { HeroText, type HeroTextProps } from "./HeroText";
 import IconLogo from "/public/assets/icons/logo.svg?jsx";
 import IconHandshake from "/public/assets/icons/signin/handshake.svg?jsx";
-import IconError from "/public/assets/icons/error.svg?jsx";
 
 const meta: Meta<HeroTextProps> = {
   component: HeroText,
@@ -32,18 +31,6 @@ export const SigninPage: Story = {
       description="By connecting your wallet and using Emeth, you agree to our Terms of Service and Privacy Policy."
     >
       <IconHandshake />
-    </HeroText>
-  ),
-};
-
-export const Error: Story = {
-  render: (props) => (
-    <HeroText
-      {...props}
-      title="Error Connecting"
-      description="The connection attempt failed. Please click try again and follow the steps to connect in your wallet."
-    >
-      <IconError />
     </HeroText>
   ),
 };

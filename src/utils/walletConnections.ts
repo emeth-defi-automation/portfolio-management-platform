@@ -23,6 +23,7 @@ export const openWeb3Modal = async (
   if (!projectId || typeof projectId !== "string") {
     throw new Error("Missing project ID");
   }
+
   const wconfig = defaultWagmiConfig({
     chains: [mainnet, sepolia],
     projectId: import.meta.env.PUBLIC_PROJECT_ID,

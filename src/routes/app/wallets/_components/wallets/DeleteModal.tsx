@@ -1,24 +1,23 @@
-import { component$, useSignal } from "@builder.io/qwik";
 import type { Signal } from "@builder.io/qwik";
+import { component$, useContext } from "@builder.io/qwik";
+import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 import Button from "~/components/Atoms/Buttons/Button";
 import { Modal } from "~/components/Modal/Modal";
-import { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
-import { type WalletTokensBalances } from "~/interface/walletsTokensBalances/walletsTokensBalances";
+import { messagesContext } from "~/routes/app/layout";
 import { useRemoveWallet } from "~/routes/app/wallets/server";
-import IconWarning from "@material-design-icons/svg/filled/warning_amber.svg?jsx";
 import Header from "~/components/Atoms/Headers/Header";
-export { getObservedWallets } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export { useRemoveWallet } from "~/routes/app/wallets/server";
+import { SelectedWalletDetailsContext } from "../..";
 
 interface DeleteModalProps {
   isDeleteModalOpen: Signal<boolean>;
-  selectedWallet: Signal<WalletTokensBalances | null>;
 }
 
 export const DeleteModal = component$<DeleteModalProps>(
-  ({ isDeleteModalOpen, selectedWallet }) => {
+  ({ isDeleteModalOpen }) => {
+    const formMessageProvider = useContext(messagesContext);
+    const selectedWalletDetails = useContext(SelectedWalletDetailsContext);
     const removeWalletAction = useRemoveWallet();
-    const observedWallets = useSignal<WalletTokensBalances[]>([]);
 
     return (
       <Modal
@@ -63,16 +62,31 @@ export const DeleteModal = component$<DeleteModalProps>(
             text="Yes, Let’s Do It!"
             customClass="w-full"
             onClick$={async () => {
-              if (selectedWallet.value && selectedWallet.value.wallet.id) {
+              if (
+                selectedWalletDetails.value &&
+                selectedWalletDetails.value.id
+              ) {
                 const {
                   value: { success },
                 } = await removeWalletAction.submit({
-                  id: selectedWallet.value.wallet.id,
+                  id: selectedWalletDetails.value.id,
                 });
-                selectedWallet.value = null;
+                selectedWalletDetails.value = null;
                 isDeleteModalOpen.value = false;
                 if (success) {
-                  observedWallets.value = await getObservedWallets();
+                  formMessageProvider.messages.push({
+                    id: formMessageProvider.messages.length,
+                    variant: "success",
+                    message: "Wallet deleted",
+                    isVisible: true,
+                  });
+                } else {
+                  formMessageProvider.messages.push({
+                    id: formMessageProvider.messages.length,
+                    variant: "error",
+                    message: "Cannot delete wallet",
+                    isVisible: true,
+                  });
                 }
               }
             }}
