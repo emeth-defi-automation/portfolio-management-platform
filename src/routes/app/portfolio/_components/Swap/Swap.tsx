@@ -21,7 +21,7 @@ import {
   getTokenSymbolByAddress,
 } from "~/database/tokens";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
-import { readContract } from "@wagmi/core";
+import { type Config, readContract, reconnect } from "@wagmi/core";
 import { uniswapRouterAbi } from "~/abi/UniswapRouterAbi";
 import { messagesContext } from "~/routes/app/layout";
 import { swapTokensForTokens } from "~/utils/tokens/swap";
@@ -111,20 +111,22 @@ export const SwapModal = component$<SwapModalProps>(
           const routerContractAddress = import.meta.env
             .PUBLIC_ROUTER_CONTRACT_ADDRESS;
 
-          if (!wagmiConfig.config) {
+          if (!wagmiConfig.config.value) {
             return;
           }
 
-          const estimatedValue = await readContract(wagmiConfig.config, {
-            abi: uniswapRouterAbi,
-            address: routerContractAddress,
-            functionName: "getAmountsOut",
-            args: [amountInWEI, [tokenInAddress, tokenOutAddress]],
-          });
+          const estimatedValue = await readContract(
+            wagmiConfig.config.value as Config,
+            {
+              abi: uniswapRouterAbi,
+              address: routerContractAddress,
+              functionName: "getAmountsOut",
+              args: [amountInWEI, [tokenInAddress, tokenOutAddress]],
+            },
+          );
 
           const nominator =
             estimatedValue[1] / BigInt(10) ** BigInt(tokenDecimals[0]);
-          console.log("nominator: ", nominator);
           const denominator = estimatedValue[1]
             .toString()
             .substring(
@@ -137,12 +139,18 @@ export const SwapModal = component$<SwapModalProps>(
       ),
       500,
     );
+
     const isManualAddress = useSignal<boolean>(false);
+
     // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(() => {
-      console.log(allTokensFromDb.value);
+    useVisibleTask$(async () => {
+      if (wagmiConfig.config.value) {
+        await reconnect(wagmiConfig.config.value);
+      }
+
       swapValues.accountToSendTokens = chosenTokenWalletAddress.value;
     });
+
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ track }) => {
       track(() => {
@@ -188,6 +196,7 @@ export const SwapModal = component$<SwapModalProps>(
         message: "Swapping tokens...",
         isVisible: true,
       });
+
       try {
         const swap = await swapTokensForTokens(
           swapValues.chosenToken.address.value as `0x${string}`,

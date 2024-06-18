@@ -157,6 +157,7 @@ export default component$(() => {
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
+    console.log("portfolio config: ", wagmiConfig.config.value);
     availableStructures.value = await getAvailableStructures();
     observedWalletsWithBalance.value = await getObservedWalletBalances();
   });
@@ -198,7 +199,7 @@ export default component$(() => {
 
     try {
       const tokens = await queryTokens();
-      if (wagmiConfig.config) {
+      if (wagmiConfig.config.value) {
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
           for (const cCoin of cStructure.coins) {
@@ -217,7 +218,7 @@ export default component$(() => {
             });
           }
         }
-        const { request } = await simulateContract(wagmiConfig.config, {
+        const { request } = await simulateContract(wagmiConfig.config.value, {
           abi: emethContractAbi,
           address: emethContractAddress,
           functionName: "transferBatch",
@@ -230,11 +231,11 @@ export default component$(() => {
           isVisible: true,
         });
         const transactionHash = await writeContract(
-          wagmiConfig.config,
+          wagmiConfig.config.value,
           request,
         );
 
-        await waitForTransactionReceipt(wagmiConfig.config, {
+        await waitForTransactionReceipt(wagmiConfig.config.value, {
           hash: transactionHash,
         });
 
@@ -488,7 +489,7 @@ export default component$(() => {
         >
           <Form
             action={createStructureAction}
-            onSubmitCompleted$={() => {
+            onSubmitCompleted$={$(() => {
               if (createStructureAction.value?.success) {
                 isCreateNewStructureModalOpen.value = false;
                 isWalletSelected.selection = [];
@@ -498,7 +499,7 @@ export default component$(() => {
                 structureStore.name = "";
                 isStructureNameUnique.value = true;
               }
-            }}
+            })}
             class="mt-8 text-sm"
           >
             <div>

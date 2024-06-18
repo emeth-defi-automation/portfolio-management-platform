@@ -12,7 +12,7 @@ import {
 import { type RequestHandler } from "@builder.io/qwik-city";
 import { type Config, reconnect, watchAccount, getAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
-import { mainnet, sepolia } from "viem/chains";
+import { sepolia } from "viem/chains";
 import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import {
   LoginContext,
@@ -65,6 +65,7 @@ export default component$(() => {
           chains: [sepolia],
           projectId: import.meta.env.PUBLIC_PROJECT_ID,
           metadata,
+          enableCoinbase: false,
         }),
       ),
   );
@@ -85,6 +86,7 @@ export default component$(() => {
   useVisibleTask$(() => {
     onClient.onClient.value = true;
   });
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ track }) => {
     track(() => {
       onClient.onClient.value;
@@ -109,9 +111,11 @@ export default component$(() => {
         });
       } else {
         reconnect(wagmiConfig.config.value as Config);
-        const { address, chainId } = getAccount(wagmiConfig.config.value);
-        login.address.value = address;
-        login.chainId.value = chainId;
+        const account = getAccount(wagmiConfig.config.value);
+
+        login.account = noSerialize(account);
+        login.address.value = account.address;
+        login.chainId.value = account.chainId;
       }
     }
   });

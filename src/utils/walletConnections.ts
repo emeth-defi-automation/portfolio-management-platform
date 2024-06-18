@@ -1,23 +1,58 @@
-import { type NoSerialize } from "@builder.io/qwik";
+import { type Signal, noSerialize, type NoSerialize } from "@builder.io/qwik";
 import {
   type Config,
   disconnect,
   getConnectors,
   reconnect,
   getConnections,
+  watchAccount,
 } from "@wagmi/core";
-import { createWeb3Modal } from "@web3modal/wagmi";
+import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi";
+import { mainnet, sepolia } from "viem/chains";
+import {
+  type Login,
+  type WagmiConfig,
+} from "~/components/WalletConnect/context";
+import { metadata } from "~/routes/layout";
 
-export const openWeb3Modal = async (config: any) => {
-// export const openWeb3Modal = async (config: NoSerialize<Config>) => {
-  console.log('configerinio: ',config.value)
+export const openWeb3Modal = async (
+  wagmiContext: WagmiConfig,
+  login: Login,
+) => {
   const projectId = import.meta.env.PUBLIC_PROJECT_ID;
   if (!projectId || typeof projectId !== "string") {
     throw new Error("Missing project ID");
   }
-  if (config.value) reconnect(config.value);
+  const wconfig = defaultWagmiConfig({
+    chains: [mainnet, sepolia],
+    projectId: import.meta.env.PUBLIC_PROJECT_ID,
+    metadata,
+    enableCoinbase: false,
+  });
+
+  wagmiContext.config.value = noSerialize(wconfig);
+
+  if (wagmiContext.config.value) {
+    watchAccount(wagmiContext.config.value!, {
+      onChange(account) {
+        if (
+          window.location.pathname === "/signin" ||
+          window.location.pathname === "/"
+        ) {
+          localStorage.setItem("emmethUserWalletAddress", `${account.address}`);
+        } else {
+          reconnect(wagmiContext.config.value as Config);
+        }
+        login.account = noSerialize(account);
+        login.address.value = account.address;
+        login.chainId.value = account.chainId;
+      },
+    });
+  }
+
+  if (wagmiContext.config.value) await reconnect(wagmiContext.config.value!);
   const modal = createWeb3Modal({
-    wagmiConfig: config.value,
+    wagmiConfig: wagmiContext.config.value!,
     projectId,
   });
 
@@ -27,8 +62,7 @@ export const openWeb3Modal = async (config: any) => {
 };
 
 export const disconnectWallets = async (
-  // config: NoSerialize<Config>,
-  config: any,
+  config: Signal<NoSerialize<Config> | false>,
   logout?: boolean,
 ) => {
   if (!logout) {

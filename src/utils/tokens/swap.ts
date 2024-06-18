@@ -25,14 +25,14 @@ export const swapTokensForTokens = async (
     );
 
     // TODO: POSSIBLY LOWER IT BY 0.5% ON MAINNET - SLIPPAGE -- move to tokendelegator
-    const amountOutMin = await readContract(wagmiConfig.config, {
+    const amountOutMin = await readContract(wagmiConfig.config.value, {
       abi: uniswapRouterAbi,
       address: routerContractAddress,
       functionName: "getAmountsOut",
       args: [amountInWEI, [tokenInAddress, tokenOutAddress]],
     });
 
-    await writeContract(wagmiConfig.config, {
+    await writeContract(wagmiConfig.config.value, {
       abi: emethContractAbi,
       address: emethContractAddress,
       functionName: "swapTokensForTokens",
