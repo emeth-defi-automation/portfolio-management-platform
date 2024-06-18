@@ -49,7 +49,7 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
           class="flex cursor-pointer items-center justify-between gap-4"
           onClick$={props.onClick$}
         >
-          <div class="flex items-center justify-between gap-4">
+          <div class={twMerge("flex items-center gap-4", customClass)}>
             {hasIconBox ? (
               <IconBox
                 tokenPath={props.iconBoxTokenPath}
@@ -61,12 +61,7 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
                 customIcon={props.iconBoxCustomIcon}
               ></IconBox>
             ) : null}
-            <div
-              class={twMerge(
-                ParagraphAnnotationStyles({ variant }),
-                customClass,
-              )}
-            >
+            <div class={ParagraphAnnotationStyles({ variant })}>
               <Paragraph text={props.paragraphText} size="sm" />
               <Annotation text={props.annotationText} />
             </div>
