@@ -13,8 +13,8 @@ export const Swap = component$(() => {
   return (
     <div class="flex flex-col justify-center gap-6">
       <SelectField
+        id=""
         name="Action Type"
-        variant="largeArrow"
         size="large"
         labelClass="normal-case"
         options={[
@@ -26,12 +26,16 @@ export const Swap = component$(() => {
         })}
       />
       <InputField
+        id=""
         name="Action name"
+        variant={null}
         size="medium"
         placeholder={`${state.actionType} #1`}
         labelClass="normal-case"
       />
       <InputField
+        id=""
+        variant={null}
         name="Action description"
         size="medium"
         placeholder={`${state.actionType} Description`}
