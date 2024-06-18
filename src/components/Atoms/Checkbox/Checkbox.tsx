@@ -9,6 +9,7 @@ export interface CheckboxProps {
   name?: string;
   class?: string;
   setIsChecked?: boolean;
+  checkBoxClass?: string;
 }
 
 const CheckboxStyles = cva(["cursor-pointer"], {
@@ -40,12 +41,20 @@ const Checkbox = component$<CheckboxType>(
   ({ isChecked, variant, size, onClick, ...props }) => {
     const isInputChecked = useSignal<boolean>(isChecked);
     return (
-      <div class={`${variant === "toggleTick" ? "h-5 w-8" : null} relative`}>
+      <div
+        class={twMerge(
+          `${variant === "toggleTick" ? "h-5 w-8" : null} relative`,
+          props.class,
+        )}
+      >
         <input
           id={props.name}
           name={props.name}
           type="checkbox"
-          class={twMerge(CheckboxStyles({ variant, size }), props.class)}
+          class={twMerge(
+            CheckboxStyles({ variant, size }),
+            props.checkBoxClass,
+          )}
           value={props.value}
           onClick$={onClick}
           checked={isChecked}

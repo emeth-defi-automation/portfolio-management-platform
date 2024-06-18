@@ -16,5 +16,4 @@ Default.args = {
     { value: "Ethereum", text: "Ethereum" },
   ],
   size: "large",
-  variant: "largeArrow",
 };

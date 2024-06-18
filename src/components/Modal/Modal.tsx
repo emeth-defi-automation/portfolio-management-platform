@@ -8,6 +8,7 @@ import {
 import IconClose from "@material-design-icons/svg/round/close.svg?jsx";
 import { twMerge } from "tailwind-merge";
 import Button from "../Atoms/Buttons/Button";
+import BoxHeader from "../Molecules/BoxHeader/BoxHeader";
 export interface ModalProps extends HTMLAttributes<any> {
   title: string;
   isOpen: Signal<boolean>;
@@ -34,12 +35,11 @@ export const Modal = component$<ModalProps>(
           }}
           class={twMerge(
             customClass,
-            "custom-border-1 bg-modal-glass relative h-fit  min-w-[455px] overflow-auto rounded-xl p-6",
+            "custom-bg-opacity-5 custom-border-1 relative h-fit  w-fit min-w-[455px] overflow-auto rounded-2xl p-6 backdrop-blur-2xl",
           )}
         >
           {hasButton ? (
-            <div class="mb-8 flex items-center justify-between">
-              <div class="text-xl font-semibold text-white">{title}</div>
+            <BoxHeader variantHeader="h3" title={title} class="mb-8">
               <Button
                 variant="onlyIcon"
                 onClick$={() => {
@@ -50,7 +50,7 @@ export const Modal = component$<ModalProps>(
                 }}
                 leftIcon={<IconClose class="h-6 w-6 fill-white" />}
               />
-            </div>
+            </BoxHeader>
           ) : null}
           <Slot />
         </div>
