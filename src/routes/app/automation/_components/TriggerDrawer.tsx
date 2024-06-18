@@ -130,7 +130,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
       );
       const calculatedAmountIn = BigInt(amountIn) * 10n ** 18n;
 
-      await simulateContract(wagmiConfig.config as Config, {
+      const { request } = await simulateContract(wagmiConfig.config as Config, {
         account: account.address as `0x${string}`,
         abi: emethContractAbi,
         address: emethContractAddress,
@@ -147,6 +147,12 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
           isActive,
         ],
       });
+
+      await writeContract(
+        wagmiConfig.config as Config,
+        request,
+      );
+
 
       const user = localStorage.getItem("emmethUserWalletAddress");
       await updateAutomationAction(
