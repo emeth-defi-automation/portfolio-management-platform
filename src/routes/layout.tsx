@@ -42,12 +42,6 @@ export const onGet: RequestHandler = async ({ cacheControl }) => {
 };
 
 export default component$(() => {
-  // const metadata = {
-  //   name: import.meta.env.PUBLIC_METADATA_NAME,
-  //   description: import.meta.env.PUBLIC_METADATA_DESCRIPTION,
-  //   url: "https://web3modal.com",
-  //   icons: ["https://avatars.githubusercontent.com/u/37784886"],
-  // };
 
   useContextProvider(WagmiConfigContext, {
     config: noSerialize({} as Config),

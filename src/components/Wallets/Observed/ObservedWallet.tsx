@@ -16,9 +16,10 @@ import {
   SelectedWalletNameContext,
 } from "~/routes/app/wallets";
 import IconEthereum from "/public/assets/icons/ethereum.svg?jsx";
+import { type Wallet } from "~/interface/auth/Wallet";
 
 interface ObservedWalletProps {
-  observedWallet: any;
+  observedWallet: Wallet;
   chainIdToNetworkName: { [key: string]: string };
 }
 
@@ -40,7 +41,7 @@ export const observedWalletNameLiveStream = server$(async function* (
 
   const resultStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
   const cookie = this.cookie.get("accessToken")?.value;

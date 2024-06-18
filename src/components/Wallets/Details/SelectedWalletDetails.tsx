@@ -128,10 +128,6 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
               <button class="rounded-lg px-2">3d</button>
               <button class="rounded-lg px-2">30d</button>
             </div>
-            {selectedWalletDetails.value.isExecutable ? (
-              <div class=""></div>
-            ) : null}
-            {/* <div class="">Menu</div> */}
           </div>
           <div>
             {tokens.value.map((token: any) => {

@@ -41,7 +41,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
   const queryUuid: any = await db.query(`
@@ -60,6 +60,10 @@ export const tokenRowWalletsInfoStream = server$(async function* (
 
   yield latestBalanceOfTokenForWallet;
 
+  //we dont keep usdt price in database. 
+  //we just assume its always 1$. that if statment is 
+  // in order not to get an error from trying 
+  //to fetch something that doesnt exist in database.
   if (tokenSymbol === "USDT") {
     tokenSymbol = "USDC";
   }
@@ -190,15 +194,6 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       const latestTokenPriceQueryUuid = await data.next();
       latestTokenPrice.value = (await data.next()).value[0][0]["price"];
 
-      if (symbol === "USDT") {
-        latestBalanceUSD.value = (
-          Number(currentBalanceOfToken.value) * 1
-        ).toFixed(2);
-      } else {
-        latestBalanceUSD.value = (
-          Number(currentBalanceOfToken.value) * Number(latestTokenPrice.value)
-        ).toFixed(2);
-      }
 
       for await (const value of data) {
         if (value.action === "CREATE") {

@@ -45,15 +45,16 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
         tokenPriceMap[token.symbol] = {};
 
         if (token.symbol === "USDT") {
+            // we do it because we dont keep usdt price in database.
+            // we just assume its always 1$. so we assign it the price value of 1
+            // for every ticktime
             for (const tickTime of tickTimes) {
                 tokenPriceMap[token.symbol][tickTime] = 1;
             }
-            // continue;
         } else {
 
 
             for (const tickTime of tickTimes) {
-
 
                 lessEqualTimestampQueries.push([tickTime, token.symbol,
                     `SELECT timestamp FROM token_price_history 
@@ -90,11 +91,9 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
         console.error("no queries to execute");
     } else {
         const lessTimestampQueries = lessEqualTimestampQueries.map(data => data[2]);
-        const greaterTimestampQueries1 = greaterTimestampQueries.map(data => data[2]);
-        const query1 = lessTimestampQueries.join('');
-        const query2 = greaterTimestampQueries1.join('');
-        const lessEqualTimestampResult: any = (await db.query(query1)).flat();
-        const greaterEqualTimestampResult: any = (await db.query(query2)).flat();
+        const greaterTimestampQueriesRaw = greaterTimestampQueries.map(data => data[2]);
+        const lessEqualTimestampResult: any = (await db.query(lessTimestampQueries.join(''))).flat();
+        const greaterEqualTimestampResult: any = (await db.query(greaterTimestampQueriesRaw.join(''))).flat();
 
 
         const length = lessEqualTimestampResult.length > greaterEqualTimestampResult.length ? lessEqualTimestampResult.length : greaterEqualTimestampResult.length
@@ -142,7 +141,7 @@ export const _totalPortfolioValue = server$(async function (period: Period) {
 
 
     if (!lessEqualTimestampBalanceQueries.length) {
-        console.log('No lessEqualTimestampBalanceQueries to execute');
+        console.error('No lessEqualTimestampBalanceQueries to execute');
     } else {
         const queries = lessEqualTimestampBalanceQueries.map(data => data[3]);
         const query = queries.join('');

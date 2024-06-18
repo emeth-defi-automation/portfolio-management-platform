@@ -22,6 +22,7 @@ import Input from "~/components/Atoms/Input/Input";
 import Select from "~/components/Atoms/Select/Select";
 import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
 import { balancesLiveStream } from "./server/balancesLiveStream";
+import { type Wallet } from "~/interface/auth/Wallet";
 
 export const SelectedWalletDetailsContext = createContextId<Signal<any>>(
   "selected-wallet-details-context",
@@ -31,7 +32,7 @@ export const SelectedWalletNameContext = createContextId<Signal<string>>(
 );
 
 export default component$(() => {
-  const selectedWalletDetails = useSignal<any | undefined>(undefined);
+  const selectedWalletDetails = useSignal<Wallet | undefined>(undefined);
   useContextProvider(SelectedWalletDetailsContext, selectedWalletDetails);
   const selectedWalletName = useSignal<string>("");
   useContextProvider(SelectedWalletNameContext, selectedWalletName);
@@ -41,15 +42,6 @@ export default component$(() => {
   const transferredCoin = useStore({ symbol: "", address: "" });
   const isTransferModalOpen = useSignal(false);
 
-  const msg = useSignal("1");
-
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(async () => {
-    const data = await balancesLiveStream();
-    for await (const value of data) {
-      msg.value = value;
-    }
-  });
 
   return (
     <>

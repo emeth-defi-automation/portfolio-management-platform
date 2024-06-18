@@ -44,14 +44,6 @@ export const useAddWallet = routeAction$(
                 address: data.address as `0x${string}`,
             });
 
-
-            // const [createWalletQueryResult] = await db.create<Wallet>("wallet", {
-            //     chainId: 1,
-            //     address: data.address.toString(),
-            //     isExecutable: data.isExecutable === "1" ? true : false,
-            //     nativeBalance: nativeBalance.toString(),
-            // });
-
             const chainId = 1;
             const address = data.address.toString();
             const isExecutable = data.isExecutable === "1" ? true : false;
@@ -75,14 +67,6 @@ export const useAddWallet = routeAction$(
             }
 
 
-
-
-            // await db.query(
-            //     `RELATE ONLY ${userId}->observes_wallet->${walletId} SET name = '${data.name}';`,
-            // );
-
-
-
             // create balances for tokens
             const tokens = await db.select<Token>("token");
             for (const token of tokens) {
@@ -92,7 +76,7 @@ export const useAddWallet = routeAction$(
                     functionName: "balanceOf",
                     args: [result[1][0].address as `0x${string}`],
                 });
-                if (readBalance < 0) {
+                if (!readBalance) {
                     continue;
                 }
                 const [balance] = await db.create<Balance>(`balance`, {

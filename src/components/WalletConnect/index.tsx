@@ -22,10 +22,6 @@ export default component$<buttonType>((props) => {
 
   const login = useContext(LoginContext);
 
-  useTask$(() => {
-    console.log("wagmi config from index ", wagmiConfig.config);
-  });
-
   const openModal = $(async () => {
     await openWeb3Modal(wagmiConfig, login);
   });

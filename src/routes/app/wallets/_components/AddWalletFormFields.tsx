@@ -58,7 +58,7 @@ export default component$<AddWalletFormFieldsProps>(
       if (wagmiConfig.config) {
         watchAccount(wagmiConfig.config as Config, {
           onChange: (account) => {
-            if (account.address != connectedAddress.value) {
+            if (account.address !== connectedAddress.value) {
               connectedAddress.value = account.address;
             }
           },
@@ -144,7 +144,7 @@ export default component$<AddWalletFormFieldsProps>(
                   onClick$={onConnectWalletClick}
                   text={
                     connectedAddress.value !==
-                    localStorage.getItem("emmethUserWalletAddress")
+                      localStorage.getItem("emmethUserWalletAddress")
                       ? "Second Wallet connected."
                       : "Connect another wallet"
                   }

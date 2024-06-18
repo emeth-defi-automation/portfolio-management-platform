@@ -15,7 +15,6 @@ import "dotenv/config";
 import qwikCityPlan from "@qwik-city-plan";
 import { manifest } from "@qwik-client-manifest";
 import render from "./entry.ssr";
-// import express from "express";
 import express from "express";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
@@ -24,7 +23,7 @@ import fs from "fs";
 import http2Express from "http2-express-bridge";
 
 declare global {
-  interface QwikCityPlatform extends PlatformNode {}
+  interface QwikCityPlatform extends PlatformNode { }
 }
 
 // Directories where the static assets are located

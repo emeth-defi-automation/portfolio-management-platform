@@ -29,7 +29,7 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   const resultStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
   const cookie = this.cookie.get("accessToken")?.value;
@@ -38,14 +38,14 @@ export const observedWalletsLiveStream = server$(async function* () {
   }
   const { userId } = jwt.decode(cookie) as JwtPayload;
 
-  const queryUuid: any = await db.query(`LIVE SELECT * FROM wallet;`);
+  const [queryUuid]: any = await db.query(`LIVE SELECT * FROM wallet;`);
 
   await db.query(`
-    INSERT INTO queryuuids (queryuuid,enabled) VALUES ('${queryUuid[0]}',${true});
+    INSERT INTO queryuuids (queryuuid,enabled) VALUES ('${queryUuid}',${true});
     `);
 
-  const queryUuidEnaledLive: any = await db.query(
-    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid[0]}';`,
+  const [queryUuidEnaledLive]: any = await db.query(
+    `LIVE SELECT enabled FROM queryuuids WHERE queryuuid = '${queryUuid}';`,
   );
 
   yield queryUuid;
@@ -53,15 +53,15 @@ export const observedWalletsLiveStream = server$(async function* () {
   const userObservedWallets = await fetchObservedWallets();
   yield userObservedWallets;
 
-  await db.listenLive(queryUuidEnaledLive[0], ({ action }) => {
+  await db.listenLive(queryUuidEnaledLive, ({ action }) => {
     if (action === "UPDATE") {
       resultStream.push(null);
-      db.kill(queryUuidEnaledLive[0]);
+      db.kill(queryUuidEnaledLive);
     }
   });
 
   try {
-    await db.listenLive(queryUuid[0], async ({ action, result }) => {
+    await db.listenLive(queryUuid, async ({ action, result }) => {
       switch (action) {
         case "CLOSE":
           resultStream.push(null);
@@ -86,13 +86,12 @@ export const observedWalletsLiveStream = server$(async function* () {
 
   for await (const result of resultStream) {
     if (!result) {
-      console.log("stream empty");
       break;
     }
     yield result;
   }
 
-  await db.query(`DELETE FROM queryuuids WHERE queryuuid='${queryUuid[0]}';`);
+  await db.query(`DELETE FROM queryuuids WHERE queryuuid='${queryUuid}';`);
   return;
 });
 
@@ -155,7 +154,7 @@ export const ObservedWalletsList = component$(() => {
         <div class="flex flex-col items-center pt-12">
           <Spinner />
         </div>
-      ) : usersObservedWallets.value.length === 0 ? ( // if no wallets --> display message
+      ) : !usersObservedWallets.value.length ? ( // if no wallets --> display message
         <div class="flex flex-col items-center pt-12">
           <span>No wallets added yet</span>
         </div>
