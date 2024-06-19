@@ -13,17 +13,12 @@ import { type RequestHandler } from "@builder.io/qwik-city";
 import { type Config, reconnect, watchAccount, getAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 import { sepolia } from "viem/chains";
-import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import {
   LoginContext,
   OnClientContext,
   WagmiConfigContext,
 } from "~/components/WalletConnect/context";
-import {
-  getStream,
-  initializeStreamIfNeeded,
-  setupStream,
-} from "~/utils/stream";
+import { setupMoralis } from "~/utils/stream";
 
 export const metadata = {
   name: "Web3Modal",
@@ -121,13 +116,8 @@ export default component$(() => {
     }
   });
 
-  useContextProvider(StreamStoreContext, { streamId: "" });
-  const streamStore = useContext(StreamStoreContext);
-
   useTask$(async function () {
-    await initializeStreamIfNeeded(setupStream);
-    const stream = await getStream();
-    streamStore.streamId = stream["jsonResponse"]["id"];
+    await setupMoralis();
   });
 
   return (
