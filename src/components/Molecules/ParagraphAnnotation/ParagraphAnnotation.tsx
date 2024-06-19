@@ -15,6 +15,7 @@ export interface ParagraphAnnotationProps {
   iconBoxCustomClass?: string;
 
   textBoxClass?: string;
+  customClass?: string;
   paragraphText?: string;
   annotationText?: string;
   onClick$?:
@@ -51,7 +52,10 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
     return (
       <>
         <div
-          class="flex w-full cursor-pointer items-center justify-between gap-4"
+          class={twMerge(
+            "flex w-full cursor-pointer items-center justify-between gap-4",
+            props.customClass,
+          )}
           onClick$={props.onClick$}
         >
           <div class="flex items-center gap-4">
