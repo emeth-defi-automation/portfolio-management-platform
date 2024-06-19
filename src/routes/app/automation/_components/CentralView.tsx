@@ -63,7 +63,9 @@ export const CentralView = component$<CentralViewProps>(() => {
   });
 
   return (
-    <div class="grow p-6">
+    <div
+      class={`p-6 duration-500 ease-in ${automationPageContext.isDraverOpen.value ? "w-[calc(100%-48rem)]" : "w-full"}`}
+    >
       {automationPageContext.activeAutomation.value ? (
         <div class="flex h-full w-full  flex-col">
           <div class="flex items-center justify-between">
@@ -102,7 +104,7 @@ export const CentralView = component$<CentralViewProps>(() => {
               {!automationPageContext.activeAutomation.value.deployed ? (
                 <Button
                   text="Add Trigger"
-                  customClass=""
+                  customClass="h-14"
                   variant="dashed"
                   leftIcon={<IconAdd class="h-4 w-4" />}
                   onClick$={async () => {
@@ -117,7 +119,7 @@ export const CentralView = component$<CentralViewProps>(() => {
               {!automationPageContext.activeAutomation.value.deployed ? (
                 <Button
                   text="Add Action"
-                  customClass=""
+                  customClass="h-14"
                   variant="dashed"
                   leftIcon={<IconAdd class="h-4 w-4" />}
                   onClick$={async () => {

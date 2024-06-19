@@ -105,7 +105,9 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
       automationPageContext.activeAutomation.value?.actionId;
     addModalStore.name = automationPageContext.activeAutomation.value?.name;
   });
-
+  useVisibleTask$(() => {
+    console.log("isOpen: ", automationPageContext.isDraverOpen.value);
+  });
   const handleAddAutomation = $(async function () {
     const account = getAccount(wagmiConfig.config.value as Config);
     const emethContractAddress = import.meta.env
@@ -194,7 +196,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
   });
   return (
     <div
-      class={`h-full w-96 gap-6 border-l border-white/10 bg-white/3 p-6 duration-500 ease-in ${automationPageContext.isDraverOpen ? "" : ""}`}
+      class={`absolute h-full w-96 gap-6 border-l border-white/10 bg-white/3 p-6 duration-500 ease-in ${automationPageContext.isDraverOpen.value ? "right-0" : "-right-96"}`}
     >
       {automationPageContext.isDraverOpen.value ? (
         <>
