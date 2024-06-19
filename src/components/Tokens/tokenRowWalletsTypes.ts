@@ -4,8 +4,13 @@ import { type Surreal } from "surrealdb.js";
 export const LiveQueryResult = z.string();
 export type LiveQueryResult = z.infer<typeof LiveQueryResult>;
 export const createLiveQuery = async (db: Surreal, query: string) => {
-  const [queryResult] = await db.query(query);
-  return LiveQueryResult.parse(queryResult);
+  try {
+    const [queryResult] = await db.query(query);
+    return LiveQueryResult.parse(queryResult);
+  } catch (err) {
+    console.error("Error creating live query:", err);
+    throw new Error("Error creating live query");
+  }
 };
 
 export const LatestTokenBalance = z.object({
@@ -24,11 +29,16 @@ export const fetchLatestTokenBalance = async (
   tokenSymbol: string,
   walletId: string,
 ) => {
-  const [[latestBalanceOfTokenForWallet]]: any =
-    await db.query(`SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
+  try {
+    const [[latestBalanceOfTokenForWallet]]: any =
+      await db.query(`SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
     AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1;`);
-  if (!latestBalanceOfTokenForWallet) return undefined;
-  return LatestTokenBalance.parse(latestBalanceOfTokenForWallet);
+    if (!latestBalanceOfTokenForWallet) return undefined;
+    return LatestTokenBalance.parse(latestBalanceOfTokenForWallet);
+  } catch (err) {
+    console.error("Error fetching token balance:", err);
+    throw new Error("Error fetching token balance");
+  }
 };
 
 export const LatestTokenPrice = z.object({
@@ -42,8 +52,13 @@ export const fetchLatestTokenPrice = async (
   db: Surreal,
   tokenSymbol: string,
 ) => {
-  const [[latestTokenPrice]]: any = await db.query(
-    `SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}' ORDER BY timestamp DESC LIMIT 1;`,
-  );
-  return LatestTokenPrice.parse(latestTokenPrice);
+  try {
+    const [[latestTokenPrice]]: any = await db.query(
+      `SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}' ORDER BY timestamp DESC LIMIT 1;`,
+    );
+    return LatestTokenPrice.parse(latestTokenPrice);
+  } catch (err) {
+    console.error("Error fetching token balance:", err);
+    throw new Error("Error fetching token balance");
+  }
 };
