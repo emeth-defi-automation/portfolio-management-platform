@@ -8,7 +8,7 @@ import {
   watchAccount,
 } from "@wagmi/core";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi";
-import { mainnet, sepolia } from "viem/chains";
+import { sepolia } from "viem/chains";
 import {
   type Login,
   type WagmiConfig,
@@ -25,7 +25,7 @@ export const openWeb3Modal = async (
   }
 
   const wconfig = defaultWagmiConfig({
-    chains: [mainnet, sepolia],
+    chains: [sepolia],
     projectId: import.meta.env.PUBLIC_PROJECT_ID,
     metadata,
     enableCoinbase: false,

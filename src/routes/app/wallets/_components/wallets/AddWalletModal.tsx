@@ -37,7 +37,6 @@ import {
   isProceedDisabled,
 } from "~/utils/validators/addWallet";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
-
 import Button from "~/components/Atoms/Buttons/Button";
 import { Modal } from "~/components/Modal/Modal";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
@@ -45,11 +44,9 @@ import AddWalletFormFields from "~/routes/app/wallets/_components/AddWalletFormF
 import AmountOfCoins from "~/routes/app/wallets/_components/AmountOfCoins";
 import CoinsToApprove from "~/routes/app/wallets/_components/CoinsToApprove";
 import IsExecutableSwitch from "~/routes/app/wallets/_components/isExecutableSwitch";
-
 import { LoginContext } from "~/components/WalletConnect/context";
 import { useAddWallet } from "~/routes/app/wallets/server";
 import { getMoralisBalance } from "~/server/moralis";
-import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 export { ObservedWalletsList } from "~/components/ObservedWalletsList/ObservedWalletsList";
 export { useAddWallet, useRemoveWallet } from "~/routes/app/wallets/server";
 
@@ -75,7 +72,6 @@ export const AddWalletModal = component$<AddWalletModal>(
     });
 
     const wagmiConfig = useContext(WagmiConfigContext);
-    const { streamId } = useContext(StreamStoreContext);
     const formMessageProvider = useContext(messagesContext);
 
     const addWalletAction = useAddWallet();
@@ -92,7 +88,7 @@ export const AddWalletModal = component$<AddWalletModal>(
 
     const handleAddWallet = $(async () => {
       isAddWalletModalOpen.value = false;
-
+      console.log("[handleAddWallet]: ", wagmiConfig.config.value);
       const cookie = await getAccessToken();
       if (!cookie) throw new Error("No accessToken cookie found");
 
@@ -108,6 +104,7 @@ export const AddWalletModal = component$<AddWalletModal>(
 
       try {
         if (addWalletFormStore.isExecutable) {
+          console.log("[executable]: ", wagmiConfig.config.value);
           if (wagmiConfig.config.value) {
             const account = getAccount(wagmiConfig.config.value);
 
@@ -143,6 +140,7 @@ export const AddWalletModal = component$<AddWalletModal>(
                   BigInt(denominator);
 
                 if (tokenBalance) {
+                  console.log("token balance");
                   const approval = await simulateContract(
                     wagmiConfig.config.value,
                     {
@@ -231,19 +229,6 @@ export const AddWalletModal = component$<AddWalletModal>(
       } else {
         isSecondWalletConnected.value = false;
       }
-
-      // watchAccount(wagmiConfig.config!, {
-      //   onChange() {
-      //     const connections = getConnections(
-      //       wagmiConfig.config.value as Config,
-      //     );
-      //     if (connections.length > 1) {
-      //       isSecondWalletConnected.value = true;
-      //     } else {
-      //       isSecondWalletConnected.value = false;
-      //     }
-      //   },
-      // });
     });
     return (
       <Modal

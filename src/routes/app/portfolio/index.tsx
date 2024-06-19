@@ -231,6 +231,7 @@ export default component$(() => {
           functionName: "transferBatch",
           args: [argsArray],
         });
+
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "info",
@@ -241,7 +242,7 @@ export default component$(() => {
           wagmiConfig.config.value,
           request,
         );
-
+        console.log(transactionHash);
         await waitForTransactionReceipt(wagmiConfig.config.value, {
           hash: transactionHash,
         });
