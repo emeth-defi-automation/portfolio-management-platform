@@ -193,7 +193,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
     }
   });
   return (
-    <div class="h-full w-96  gap-6 border-l border-white/10 bg-white/3 p-6">
+    <div class="h-full w-96 gap-6 border-l border-white/10 bg-white/3 p-6">
       {automationPageContext.isDraverOpen.value ? (
         <>
           <Header variant="h4" text="Properties" />

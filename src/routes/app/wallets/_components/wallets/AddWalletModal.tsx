@@ -81,7 +81,7 @@ export const AddWalletModal = component$<AddWalletModal>(
     });
 
     const handleReadBalances = $(async (wallet: string) => {
-      const tokenBalances = await getMoralisBalance({ wallet });
+      const tokenBalances: any = await getMoralisBalance({ wallet });
 
       walletTokenBalances.value = tokenBalances.tokens;
     });
@@ -306,7 +306,9 @@ export const AddWalletModal = component$<AddWalletModal>(
                     const { address } = getAccount(
                       wagmiConfig.config.value as Config,
                     );
+                    console.log(address);
                     await handleReadBalances(address as `0x${string}`);
+                    console.log("read balances");
                   }
                   if (stepsCounter.value === 2) {
                     for (

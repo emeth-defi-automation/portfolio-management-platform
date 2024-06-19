@@ -98,7 +98,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
 
   return (
     <>
-      <div class="grid grid-rows-[32px_40px_1fr] gap-6 border-r border-white/10 bg-white/3 p-6">
+      <div class="grid w-96 grid-rows-[32px_40px_1fr] gap-6 border-r border-white/10 bg-white/3 p-6">
         <BoxHeader
           title="Automations"
           variantHeader="h4"

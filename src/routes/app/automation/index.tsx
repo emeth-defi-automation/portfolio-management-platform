@@ -6,7 +6,8 @@ import { TriggerDrawer } from "./_components/TriggerDrawer";
 export default component$(() => {
   return (
     <>
-      <div class="grid grid-cols-[1fr_2fr_1fr]">
+      {/* <div class="grid grid-cols-[1fr_2fr_1fr]"> */}
+      <div class="flex min-h-full w-full">
         <AutomationsMenu />
         <CentralView />
         <TriggerDrawer />

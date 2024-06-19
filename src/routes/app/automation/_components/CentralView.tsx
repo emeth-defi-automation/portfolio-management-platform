@@ -60,10 +60,11 @@ export const CentralView = component$<CentralViewProps>(() => {
       });
     }
   });
+
   return (
-    <div class="p-6">
+    <div class="grow p-6">
       {automationPageContext.activeAutomation.value ? (
-        <div class="flex h-full w-full flex-col">
+        <div class="flex h-full w-full  flex-col">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <Header
@@ -90,10 +91,16 @@ export const CentralView = component$<CentralViewProps>(() => {
         </div> */}
             </div>
           </div>
-          <div class="flex h-full items-center justify-center">
-            {!automationPageContext.activeAutomation.value.deployed ? (
-              <div class="flex w-80 flex-col gap-4">
-                <Annotation text="Trigger" />
+          <div class="flex h-full flex-col items-center justify-center gap-10">
+            {/*
+            - Jesli trigger istnieje wyswietlamy plakietke bez buttona
+            - jesli nie ma triggera wyswietlamy button
+            - zawsze wyswietlamy button dla akcji, jesli sa akcje iteracyjnie wyswietlamy plakietki
+            */}
+
+            <div class="flex w-80 flex-col gap-4">
+              <Annotation text="Trigger" />
+              {!automationPageContext.activeAutomation.value.deployed ? (
                 <Button
                   text="Add Trigger"
                   customClass=""
@@ -103,8 +110,22 @@ export const CentralView = component$<CentralViewProps>(() => {
                     automationPageContext.isDraverOpen.value = true;
                   }}
                 />
-              </div>
-            ) : null}
+              ) : null}
+            </div>
+            <div class="flex w-80 flex-col gap-4">
+              <Annotation text="Actions" />
+              {!automationPageContext.activeAutomation.value.deployed ? (
+                <Button
+                  text="Add Action"
+                  customClass=""
+                  variant="dashed"
+                  leftIcon={<IconAdd class="h-4 w-4" />}
+                  onClick$={async () => {
+                    automationPageContext.isDraverOpen.value = true;
+                  }}
+                />
+              ) : null}
+            </div>
           </div>
         </div>
       ) : null}
