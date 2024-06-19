@@ -134,7 +134,7 @@ export const ObservedWallet = component$<ObservedWalletProps>(
         hasIconBox={true}
         iconBoxSize="small"
         iconBoxCustomIcon={<IconEthereum class="h-full w-full" />}
-        customClass="py-4"
+        textBoxClass="py-4"
       >
         <IconSchedule class="h-5 w-5 fill-customWarning" />
       </ParagraphAnnotation>
