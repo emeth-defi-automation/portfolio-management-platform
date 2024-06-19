@@ -217,9 +217,8 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       }
     });
 
-    if (!Number(currentBalanceOfToken.value)) return <></>;
-
-    return (
+    return Number(currentBalanceOfToken.value) ||
+      Number(latestBalanceUSD.value) ? (
       <>
         <div class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm">
           <ParagraphAnnotation
@@ -245,6 +244,6 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
           </div>
         </div>
       </>
-    );
+    ) : null;
   },
 );
