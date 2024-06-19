@@ -12,6 +12,7 @@ import { server$ } from "@builder.io/qwik-city";
 import { messagesContext } from "../../layout";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 import IconAdd from "@material-design-icons/svg/outlined/add.svg?jsx";
+import { AutomationCard } from "./AutomationCard/AutomationCard";
 
 const deleteActionFromDb = server$(async function (actionId, user) {
   // await updateIsActiveStatus(actionId, false);
@@ -89,14 +90,14 @@ export const CentralView = component$<CentralViewProps>(() => {
         </div> */}
             </div>
           </div>
-          <div class="flex h-full flex-col items-center justify-center gap-10">
+          <div class="flex h-full w-full flex-col items-center justify-center gap-10">
             {/*
             - Jesli trigger istnieje wyswietlamy plakietke bez buttona
             - jesli nie ma triggera wyswietlamy button
             - zawsze wyswietlamy button dla akcji, jesli sa akcje iteracyjnie wyswietlamy plakietki
             */}
 
-            <div class="flex w-80 flex-col gap-4">
+            <div class="flex w-96 flex-col gap-4">
               <Annotation text="Trigger" />
               {!automationPageContext.activeAutomation.value.deployed ? (
                 <Button
@@ -109,8 +110,9 @@ export const CentralView = component$<CentralViewProps>(() => {
                   }}
                 />
               ) : null}
+              <AutomationCard variant="swap" isActive={true} />
             </div>
-            <div class="flex w-80 flex-col gap-4">
+            <div class="flex w-96 flex-col gap-4">
               <Annotation text="Actions" />
               {!automationPageContext.activeAutomation.value.deployed ? (
                 <Button
