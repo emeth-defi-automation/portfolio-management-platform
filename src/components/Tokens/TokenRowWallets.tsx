@@ -41,7 +41,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
   const [queryUuid]: any = await db.query(`
@@ -54,7 +54,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
 
   yield queryUuid;
 
-  const latestBalanceOfTokenForWallet =
+  const [[latestBalanceOfTokenForWallet]]: any =
     await db.query(`SELECT * FROM wallet_balance WHERE tokenSymbol = '${tokenSymbol}' 
     AND walletId = ${walletId} ORDER BY timestamp DESC LIMIT 1;`);
 
@@ -78,7 +78,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
 
   yield latestTokenPriceQueryUuid;
 
-  const latestTokenPrice = await db.query(
+  const [[latestTokenPrice]]: any = await db.query(
     `SELECT * FROM token_price_history WHERE symbol = '${tokenSymbol}' ORDER BY timestamp DESC LIMIT 1;`,
   );
 
@@ -152,6 +152,8 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     const latestTokenPrice = useSignal("");
     const latestBalanceUSD = useSignal("");
 
+
+
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(({ track }) => {
       const trackedValues = track(() => ({
@@ -186,13 +188,18 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
 
       const queryUuid = await data.next();
 
-      currentBalanceOfToken.value = convertWeiToQuantity(
-        (await data.next()).value[0][0]["walletValue"],
-        parseInt(decimals),
-      );
+      const wallet = (await data.next()).value;
+      if (!wallet) {
+        currentBalanceOfToken.value = "0"
+      } else {
+        currentBalanceOfToken.value = convertWeiToQuantity(
+          wallet["walletValue"],
+          parseInt(decimals),
+        );
+      }
 
       const latestTokenPriceQueryUuid = await data.next();
-      latestTokenPrice.value = (await data.next()).value[0][0]["price"];
+      latestTokenPrice.value = (await data.next()).value["price"];
 
       for await (const value of data) {
         if (value.action === "CREATE") {
@@ -211,6 +218,9 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         }
       }
     });
+
+
+    if (!Number(currentBalanceOfToken.value)) return <></>
 
     return (
       <>
