@@ -14,7 +14,6 @@ import { type Config, reconnect, watchAccount, getAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
 
 import { sepolia } from "viem/chains";
-// import { StreamStoreContext } from "~/interface/streamStore/streamStore";
 import {
   LoginContext,
   OnClientContext,
@@ -118,14 +117,8 @@ export default component$(() => {
     }
   });
 
-  // useContextProvider(StreamStoreContext, { streamId: "" });
-  // const streamStore = useContext(StreamStoreContext);
-
   useTask$(async function () {
-    // await initializeStreamIfNeeded(setupStream);
-    // const stream = await getStream();
-    // streamStore.streamId = stream["jsonResponse"]["id"];
-    setupMoralis();
+    await setupMoralis();
   });
 
   return (
