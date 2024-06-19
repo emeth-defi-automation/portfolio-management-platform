@@ -105,9 +105,6 @@ export const SwapModal = component$<SwapModalProps>(
           const tokenDecimals = await getTokenDecimalsServer(tokenInAddress);
 
           const amountInFraction = convertToFraction(amountIn);
-          console.log(amountIn);
-          console.log(tokenInAddress);
-          console.log(tokenOutAddress);
           const amountInWEI =
             (BigInt(amountInFraction.numerator) *
               BigInt(10) ** BigInt(tokenDecimals[0])) /
@@ -149,7 +146,6 @@ export const SwapModal = component$<SwapModalProps>(
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async () => {
-      console.log(chosenToken.value);
       if (wagmiConfig.config.value) {
         await reconnect(wagmiConfig.config.value);
       }
@@ -324,7 +320,6 @@ export const SwapModal = component$<SwapModalProps>(
                   }),
                 ].filter((item) => item != null)}
                 onValueChange={$(async (value: string) => {
-                  console.log(value);
                   swapValues.tokenToSwapOn.address = value;
                   swapValues.tokenToSwapOn.symbol =
                     await getTokenSymbolByAddress(value as `0x${string}`);

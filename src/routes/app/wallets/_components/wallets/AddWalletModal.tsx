@@ -88,7 +88,6 @@ export const AddWalletModal = component$<AddWalletModal>(
 
     const handleAddWallet = $(async () => {
       isAddWalletModalOpen.value = false;
-      console.log("[handleAddWallet]: ", wagmiConfig.config.value);
       const cookie = await getAccessToken();
       if (!cookie) throw new Error("No accessToken cookie found");
 
@@ -104,7 +103,6 @@ export const AddWalletModal = component$<AddWalletModal>(
 
       try {
         if (addWalletFormStore.isExecutable) {
-          console.log("[executable]: ", wagmiConfig.config.value);
           if (wagmiConfig.config.value) {
             const account = getAccount(wagmiConfig.config.value);
 
@@ -140,7 +138,6 @@ export const AddWalletModal = component$<AddWalletModal>(
                   BigInt(denominator);
 
                 if (tokenBalance) {
-                  console.log("token balance");
                   const approval = await simulateContract(
                     wagmiConfig.config.value,
                     {
