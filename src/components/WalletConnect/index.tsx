@@ -17,7 +17,6 @@ export default component$<buttonType>((props) => {
 
   const openModal = $(async () => {
     await openWeb3Modal(wagmiConfig, login);
-    await openWeb3Modal(wagmiConfig, login);
   });
 
   return (
