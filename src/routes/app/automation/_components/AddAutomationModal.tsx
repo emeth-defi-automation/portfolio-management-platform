@@ -12,24 +12,9 @@ import Label from "~/components/Atoms/Label/Label";
 import { Modal } from "~/components/Modal/Modal";
 import { connectToDB } from "~/database/db";
 import { messagesContext } from "../../layout";
-
+import { generateRandomId } from "~/utils/automations";
 interface AddAutomationModalProps {
   isAddModalOpen: Signal<boolean>;
-}
-
-function generateRandomId() {
-  const now = new Date();
-  const datePart =
-    now.getFullYear().toString().slice(-2) +
-    (now.getMonth() + 1).toString().padStart(2, "0") +
-    now.getDate().toString().padStart(2, "0") +
-    now.getHours().toString().padStart(2, "0") +
-    now.getMinutes().toString().padStart(2, "0") +
-    now.getSeconds().toString().padStart(2, "0");
-  const randomPart = Math.floor(Math.random() * 1000)
-    .toString()
-    .padStart(3, "0");
-  return datePart + randomPart;
 }
 
 const addActionBasicToDB = server$(async function (
