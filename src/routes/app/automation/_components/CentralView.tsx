@@ -73,14 +73,12 @@ export const CentralView = component$<CentralViewProps>(() => {
                 class="font-normal"
               />
               <Button
-                customClass="mb-1"
-                variant="onlyIcon"
-                leftIcon={<IconEdit class="h-4 w-4 fill-white" />}
+                leftIcon={<IconEdit class="h-3 w-3 fill-white" />}
+                customClass="bg-white/10 h-8 w-8 p-0"
               />
               <Button
-                customClass="mb-1"
-                variant="onlyIcon"
-                leftIcon={<IconTrash class="h-4 w-4 fill-white" />}
+                leftIcon={<IconTrash class="h-4 w-4 fill-customRed" />}
+                customClass="bg-customRed/10 h-8 w-8 p-0"
                 onClick$={$(async () => {
                   await handleDeleteAction();
                 })}

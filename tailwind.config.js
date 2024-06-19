@@ -20,6 +20,15 @@ export default {
       opacity: {
         3: "0.03",
       },
+      width: {
+        6.5: "26px",
+      },
+      height: {
+        6.5: "26px",
+      },
+      boxShadow: {
+        'cards': '0px 0px 30px 0px rgba(0, 0, 0, 0.3)',
+      },
       keyframes: {
         arrival:{
           '0%, 100%': {

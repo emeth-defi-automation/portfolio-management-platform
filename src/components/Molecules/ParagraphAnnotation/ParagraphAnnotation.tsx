@@ -9,11 +9,12 @@ export interface ParagraphAnnotationProps {
   hasIconBox?: boolean;
   iconBoxSize?: "small" | "large";
   iconBoxBorder?: "gradient" | "default" | "clear";
-  iconBoxBackground?: "transparent" | "white";
+  iconBoxBackground?: "transparent" | "white10" | "white3";
   iconBoxTokenPath?: string;
   iconBoxCustomIcon?: JSXOutput | null;
   iconBoxCustomClass?: string;
 
+  textBoxClass?: string;
   customClass?: string;
   paragraphText?: string;
   annotationText?: string;
@@ -42,14 +43,22 @@ export type ParagraphAnnotationType = VariantProps<
   ParagraphAnnotationProps;
 
 const ParagraphAnnotation = component$<ParagraphAnnotationType>(
-  ({ hasIconBox, customClass, variant, ...props }: ParagraphAnnotationType) => {
+  ({
+    hasIconBox,
+    textBoxClass,
+    variant,
+    ...props
+  }: ParagraphAnnotationType) => {
     return (
       <>
         <div
-          class="flex cursor-pointer items-center justify-between gap-4"
+          class={twMerge(
+            "flex w-full cursor-pointer items-center justify-between gap-4",
+            props.customClass,
+          )}
           onClick$={props.onClick$}
         >
-          <div class={twMerge("flex items-center gap-4", customClass)}>
+          <div class="flex items-center gap-4">
             {hasIconBox ? (
               <IconBox
                 tokenPath={props.iconBoxTokenPath}
@@ -61,7 +70,12 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
                 customIcon={props.iconBoxCustomIcon}
               ></IconBox>
             ) : null}
-            <div class={ParagraphAnnotationStyles({ variant })}>
+            <div
+              class={twMerge(
+                ParagraphAnnotationStyles({ variant }),
+                textBoxClass,
+              )}
+            >
               <Paragraph text={props.paragraphText} size="sm" />
               <Annotation text={props.annotationText} />
             </div>

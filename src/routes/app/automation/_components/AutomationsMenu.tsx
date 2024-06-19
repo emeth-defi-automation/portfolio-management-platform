@@ -127,7 +127,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
               onClick$={$(() => {
                 automationPageContext.activeAutomation.value = action;
               })}
-              customClass="py-4"
+              textBoxClass="py-4"
             >
               <Checkbox
                 variant="toggleTick"
