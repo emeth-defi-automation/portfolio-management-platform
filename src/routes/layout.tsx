@@ -20,8 +20,6 @@ import {
   WagmiConfigContext,
 } from "~/components/WalletConnect/context";
 import {
-  getStream,
-  initializeStreamIfNeeded,
   setupStream,
 } from "~/utils/stream";
 
@@ -125,9 +123,7 @@ export default component$(() => {
   const streamStore = useContext(StreamStoreContext);
 
   useTask$(async function () {
-    await initializeStreamIfNeeded(setupStream);
-    const stream = await getStream();
-    streamStore.streamId = stream["jsonResponse"]["id"];
+    await setupStream();
   });
 
   return (
