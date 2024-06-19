@@ -221,7 +221,7 @@ export const AddWalletModal = component$<AddWalletModal>(
       track(() => wagmiConfig.config.value);
 
       const connections = getConnections(wagmiConfig.config.value as Config);
-      if (connections.length > 1) {
+      if (connections.length) {
         isSecondWalletConnected.value = true;
       } else {
         isSecondWalletConnected.value = false;
