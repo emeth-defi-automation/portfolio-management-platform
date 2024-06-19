@@ -41,7 +41,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const [queryUuid]: any = await db.query(`
@@ -152,8 +152,6 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     const latestTokenPrice = useSignal("");
     const latestBalanceUSD = useSignal("");
 
-
-
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(({ track }) => {
       const trackedValues = track(() => ({
@@ -190,7 +188,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
 
       const wallet = (await data.next()).value;
       if (!wallet) {
-        currentBalanceOfToken.value = "0"
+        currentBalanceOfToken.value = "0";
       } else {
         currentBalanceOfToken.value = convertWeiToQuantity(
           wallet["walletValue"],
@@ -219,8 +217,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       }
     });
 
-
-    if (!Number(currentBalanceOfToken.value)) return <></>
+    if (!Number(currentBalanceOfToken.value)) return <></>;
 
     return (
       <>
