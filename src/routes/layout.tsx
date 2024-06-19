@@ -19,9 +19,7 @@ import {
   OnClientContext,
   WagmiConfigContext,
 } from "~/components/WalletConnect/context";
-import {
-  setupStream,
-} from "~/utils/stream";
+import { setupStream } from "~/utils/stream";
 
 export const metadata = {
   name: "Web3Modal",
