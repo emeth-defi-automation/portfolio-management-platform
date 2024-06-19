@@ -59,15 +59,13 @@ export default component$<AddWalletFormFieldsProps>(
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(({ track }) => {
       track(() => connectedAddress.value);
-      if (wagmiConfig.config) {
-        watchAccount(wagmiConfig.config as Config, {
-          onChange: (account) => {
-            if (account.address !== connectedAddress.value) {
-              connectedAddress.value = account.address;
-            }
-          },
-        });
-      }
+      watchAccount(wagmiConfig.config.value as Config, {
+        onChange: (account) => {
+          if (account.address != connectedAddress.value) {
+            connectedAddress.value = account.address;
+          }
+        },
+      });
     });
 
     useTask$(async ({ track }) => {

@@ -25,7 +25,7 @@ export default component$(() => {
       localStorage.removeItem("emmethUserWalletAddress");
     }
 
-    if (wagmiConfig.config) {
+    if (wagmiConfig.config.value) {
       await disconnectWallets(wagmiConfig.config);
     }
   });

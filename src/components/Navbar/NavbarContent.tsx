@@ -22,7 +22,7 @@ export const NavbarContent = component$(() => {
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ track }) => {
     track(() => login.address.value);
-    wagmiConfig.config &&
+    wagmiConfig.config.value &&
       (login.address.value,
       login.address.value &&
         (address.value =

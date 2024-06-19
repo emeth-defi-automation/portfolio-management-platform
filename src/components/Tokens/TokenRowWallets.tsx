@@ -205,7 +205,6 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             latestTokenPrice.value = value.result["price"];
           }
         } else if (value.action === "UPDATE") {
-          console.log(value);
           if (value.type === "PRICE") {
             latestTokenPrice.value = value.result["price"];
           }

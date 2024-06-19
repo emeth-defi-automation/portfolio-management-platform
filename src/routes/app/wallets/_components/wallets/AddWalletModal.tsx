@@ -11,11 +11,10 @@ import { Form } from "@builder.io/qwik-city";
 
 import {
   getAccount,
-  getConnections,
   readContract,
   simulateContract,
-  watchAccount,
   writeContract,
+  getConnections,
   type Config,
 } from "@wagmi/core";
 
@@ -38,7 +37,6 @@ import {
   isProceedDisabled,
 } from "~/utils/validators/addWallet";
 import { disconnectWallets, openWeb3Modal } from "~/utils/walletConnections";
-
 import Button from "~/components/Atoms/Buttons/Button";
 import { Modal } from "~/components/Modal/Modal";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
@@ -46,7 +44,6 @@ import AddWalletFormFields from "~/routes/app/wallets/_components/AddWalletFormF
 import AmountOfCoins from "~/routes/app/wallets/_components/AmountOfCoins";
 import CoinsToApprove from "~/routes/app/wallets/_components/CoinsToApprove";
 import IsExecutableSwitch from "~/routes/app/wallets/_components/isExecutableSwitch";
-
 import { LoginContext } from "~/components/WalletConnect/context";
 import { useAddWallet } from "~/routes/app/wallets/server";
 import { getMoralisBalance } from "~/server/moralis";
@@ -62,7 +59,7 @@ export const AddWalletModal = component$<AddWalletModal>(
     const isSecondWalletConnected = useSignal(false);
     const walletTokenBalances = useSignal<any>([]);
     const stepsCounter = useSignal(1);
-
+    const login = useContext(LoginContext);
     const addWalletFormStore = useStore<AddWalletFormStore>({
       name: "",
       address: "",
@@ -75,7 +72,6 @@ export const AddWalletModal = component$<AddWalletModal>(
     });
 
     const wagmiConfig = useContext(WagmiConfigContext);
-    const login = useContext(LoginContext);
     const formMessageProvider = useContext(messagesContext);
 
     const addWalletAction = useAddWallet();
@@ -92,7 +88,6 @@ export const AddWalletModal = component$<AddWalletModal>(
 
     const handleAddWallet = $(async () => {
       isAddWalletModalOpen.value = false;
-
       const cookie = await getAccessToken();
       if (!cookie) throw new Error("No accessToken cookie found");
 
@@ -108,8 +103,8 @@ export const AddWalletModal = component$<AddWalletModal>(
 
       try {
         if (addWalletFormStore.isExecutable) {
-          if (wagmiConfig.config) {
-            const account = getAccount(wagmiConfig.config as Config);
+          if (wagmiConfig.config.value) {
+            const account = getAccount(wagmiConfig.config.value);
 
             addWalletFormStore.address = account.address as `0x${string}`;
 
@@ -121,13 +116,16 @@ export const AddWalletModal = component$<AddWalletModal>(
 
             for (const token of tokens) {
               if (addWalletFormStore.coinsToCount.includes(token.symbol)) {
-                const tokenBalance = await readContract(wagmiConfig.config, {
-                  account: account.address as `0x${string}`,
-                  abi: contractABI,
-                  address: checksumAddress(token.address as `0x${string}`),
-                  functionName: "balanceOf",
-                  args: [account.address as `0x${string}`],
-                });
+                const tokenBalance = await readContract(
+                  wagmiConfig.config.value,
+                  {
+                    account: account.address as `0x${string}`,
+                    abi: contractABI,
+                    address: checksumAddress(token.address as `0x${string}`),
+                    functionName: "balanceOf",
+                    args: [account.address as `0x${string}`],
+                  },
+                );
 
                 const amount = addWalletFormStore.coinsToApprove.find(
                   (item) => item.symbol === token.symbol,
@@ -140,17 +138,23 @@ export const AddWalletModal = component$<AddWalletModal>(
                   BigInt(denominator);
 
                 if (tokenBalance) {
-                  const approval = await simulateContract(wagmiConfig.config, {
-                    account: account.address as `0x${string}`,
-                    abi: contractABI,
-                    address: checksumAddress(token.address as `0x${string}`),
-                    functionName: "approve",
-                    args: [emethContractAddress, BigInt(calculation)],
-                  });
+                  const approval = await simulateContract(
+                    wagmiConfig.config.value,
+                    {
+                      account: account.address as `0x${string}`,
+                      abi: contractABI,
+                      address: checksumAddress(token.address as `0x${string}`),
+                      functionName: "approve",
+                      args: [emethContractAddress, BigInt(calculation)],
+                    },
+                  );
 
                   // keep receipts for now, to use waitForTransactionReceipt
                   try {
-                    await writeContract(wagmiConfig.config, approval.request);
+                    await writeContract(
+                      wagmiConfig.config.value,
+                      approval.request,
+                    );
                   } catch (err) {
                     console.error("Error: ", err);
                   }
@@ -165,7 +169,7 @@ export const AddWalletModal = component$<AddWalletModal>(
           const { address } = jwtDecode.jwtDecode(cookie) as JwtPayload;
 
           const { request } = await simulateContract(
-            wagmiConfig.config as Config,
+            wagmiConfig.config.value as Config,
             {
               account: addWalletFormStore.address as `0x${string}`,
               address: emethContractAddress,
@@ -175,9 +179,9 @@ export const AddWalletModal = component$<AddWalletModal>(
             },
           );
 
-          await writeContract(wagmiConfig.config as Config, request);
+          await writeContract(wagmiConfig.config!.value as Config, request);
         }
-        if (wagmiConfig.config) {
+        if (wagmiConfig.config.value) {
           await disconnectWallets(wagmiConfig.config);
         }
 
@@ -202,6 +206,7 @@ export const AddWalletModal = component$<AddWalletModal>(
         stepsCounter.value = 1;
       } catch (err) {
         console.error("error: ", err);
+        await disconnectWallets(wagmiConfig.config);
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "error",
@@ -213,18 +218,13 @@ export const AddWalletModal = component$<AddWalletModal>(
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ track }) => {
-      track(() => wagmiConfig.config);
-      if (wagmiConfig.config) {
-        watchAccount(wagmiConfig.config!, {
-          onChange() {
-            const connections = getConnections(wagmiConfig.config as Config);
-            if (connections.length > 1) {
-              isSecondWalletConnected.value = true;
-            } else {
-              isSecondWalletConnected.value = false;
-            }
-          },
-        });
+      track(() => wagmiConfig.config.value);
+
+      const connections = getConnections(wagmiConfig.config.value as Config);
+      if (connections.length) {
+        isSecondWalletConnected.value = true;
+      } else {
+        isSecondWalletConnected.value = false;
       }
     });
     return (
@@ -239,7 +239,7 @@ export const AddWalletModal = component$<AddWalletModal>(
           addWalletFormStore.coinsToApprove = [];
           stepsCounter.value = 1;
 
-          if (wagmiConfig.config) {
+          if (wagmiConfig.config.value) {
             await disconnectWallets(wagmiConfig.config);
           }
         })}
@@ -304,7 +304,7 @@ export const AddWalletModal = component$<AddWalletModal>(
                 onClick$={async () => {
                   if (stepsCounter.value === 1) {
                     const { address } = getAccount(
-                      wagmiConfig.config as Config,
+                      wagmiConfig.config.value as Config,
                     );
                     await handleReadBalances(address as `0x${string}`);
                   }

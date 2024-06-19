@@ -1,4 +1,4 @@
-import { noSerialize, type NoSerialize } from "@builder.io/qwik";
+import { type Signal, noSerialize, type NoSerialize } from "@builder.io/qwik";
 import {
   type Config,
   disconnect,
@@ -8,26 +8,33 @@ import {
   watchAccount,
 } from "@wagmi/core";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi";
-import { mainnet, sepolia } from "viem/chains";
+import { sepolia } from "viem/chains";
+import {
+  type Login,
+  type WagmiConfig,
+} from "~/components/WalletConnect/context";
 import { metadata } from "~/routes/layout";
 
-export const openWeb3Modal = async (wagmiContext: any, login: any) => {
+export const openWeb3Modal = async (
+  wagmiContext: WagmiConfig,
+  login: Login,
+) => {
   const projectId = import.meta.env.PUBLIC_PROJECT_ID;
   if (!projectId || typeof projectId !== "string") {
     throw new Error("Missing project ID");
   }
 
   const wconfig = defaultWagmiConfig({
-    chains: [mainnet, sepolia],
+    chains: [sepolia],
     projectId: import.meta.env.PUBLIC_PROJECT_ID,
     metadata,
     enableCoinbase: false,
   });
 
-  wagmiContext.config = noSerialize(wconfig);
+  wagmiContext.config.value = noSerialize(wconfig);
 
-  if (wagmiContext.config) {
-    watchAccount(wagmiContext.config!, {
+  if (wagmiContext.config.value) {
+    watchAccount(wagmiContext.config.value!, {
       onChange(account) {
         if (
           window.location.pathname === "/signin" ||
@@ -35,7 +42,7 @@ export const openWeb3Modal = async (wagmiContext: any, login: any) => {
         ) {
           localStorage.setItem("emmethUserWalletAddress", `${account.address}`);
         } else {
-          reconnect(wagmiContext.config as Config);
+          reconnect(wagmiContext.config.value as Config);
         }
         login.account = noSerialize(account);
         login.address.value = account.address;
@@ -44,9 +51,9 @@ export const openWeb3Modal = async (wagmiContext: any, login: any) => {
     });
   }
 
-  if (wagmiContext.config) await reconnect(wagmiContext.config!);
+  if (wagmiContext.config.value) await reconnect(wagmiContext.config.value!);
   const modal = createWeb3Modal({
-    wagmiConfig: wagmiContext.config!,
+    wagmiConfig: wagmiContext.config.value!,
     projectId,
   });
 
@@ -56,25 +63,25 @@ export const openWeb3Modal = async (wagmiContext: any, login: any) => {
 };
 
 export const disconnectWallets = async (
-  config: NoSerialize<Config>,
+  config: Signal<NoSerialize<Config> | false>,
   logout?: boolean,
 ) => {
   if (!logout) {
     const loginAddress = localStorage.getItem("emmethUserWalletAddress");
-    const connectors = await getConnectors(config as Config);
+    const connectors = await getConnectors(config.value as Config);
 
     for (const connector of connectors) {
       const accounts = await connector.getAccounts();
       if (accounts.indexOf(loginAddress as `0x${string}`) < 0) {
-        await disconnect(config as Config, { connector });
+        await disconnect(config.value as Config, { connector });
       }
     }
   } else {
-    const connections = await getConnections(config as Config);
+    const connections = await getConnections(config.value as Config);
     if (connections.length > 0) {
       for (const connection of connections) {
         const connector = connection.connector;
-        await disconnect(config as Config, { connector });
+        await disconnect(config.value as Config, { connector });
       }
     }
 
@@ -82,6 +89,6 @@ export const disconnectWallets = async (
       localStorage.removeItem("emmethUserWalletAddress");
     }
 
-    await disconnect(config as Config);
+    await disconnect(config.value as Config);
   }
 };

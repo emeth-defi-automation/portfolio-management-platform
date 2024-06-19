@@ -14,6 +14,7 @@ export interface WalletConnectProps {
 export default component$<buttonType>((props) => {
   const wagmiConfig = useContext(WagmiConfigContext);
   const login = useContext(LoginContext);
+
   const openModal = $(async () => {
     await openWeb3Modal(wagmiConfig, login);
   });

@@ -35,28 +35,6 @@ export default component$<CoinsToApproveProps>(
               image={`/assets/icons/tokens/${symbol.symbol.toLowerCase()}.svg`}
               description={symbol.symbol}
               for={symbol.symbol}
-              //  TODO: Why the checkbox component returns "insertBefore" error while it is the same thing.
-              //  input={<CheckBox
-              //   name={symbol}
-              //   value={symbol}
-              //   checked={addWalletFormStore.coinsToCount.includes(symbol)}
-              //   onClick={$(() => {
-              //     console.log("coins: ", addWalletFormStore.coinsToCount);
-              //     if (!addWalletFormStore.coinsToCount.includes(symbol)) {
-              //       addWalletFormStore.coinsToCount = [...addWalletFormStore.coinsToCount, symbol];
-              //       console.log('tu jest ifu')
-              //     } else {
-              //       console.log('tu jest elsu')
-              //       const indexToRemove =
-              //         addWalletFormStore.coinsToCount.indexOf(symbol);
-
-              //       if (indexToRemove !== -1) {
-              //         addWalletFormStore.coinsToCount.splice(indexToRemove, 1);
-              //       }
-              //     }
-              //   })}
-
-              //  />
               customClass="border-gradient"
             >
               <input

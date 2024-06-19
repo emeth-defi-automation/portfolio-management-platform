@@ -70,11 +70,11 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   ) {
     try {
       if (deployed) {
-        const account = getAccount(wagmiConfig.config as Config);
+        const account = getAccount(wagmiConfig.config.value as Config);
         const emethContractAddress = import.meta.env
           .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
         const { request } = await simulateContract(
-          wagmiConfig.config as Config,
+          wagmiConfig.config.value as Config,
           {
             account: account.address as `0x${string}`,
             abi: emethContractAbi,
@@ -85,7 +85,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
         );
 
         const transactionHash = await writeContract(
-          wagmiConfig.config as Config,
+          wagmiConfig.config.value as Config,
           request,
         );
         console.log(transactionHash);

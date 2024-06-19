@@ -41,15 +41,17 @@ export default component$(() => {
         statement: "Sign to continue...",
       }).prepareMessage();
 
-      const signature = await signMessage(wagmiConfig.config!, {
-        message,
-      });
+      if (wagmiConfig.config.value) {
+        const signature = await signMessage(wagmiConfig.config.value, {
+          message,
+        });
 
-      const { refreshToken } = await verifyMessageServer(message, signature);
+        const { refreshToken } = await verifyMessageServer(message, signature);
 
-      localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("refreshToken", refreshToken);
 
-      await nav("/app/dashboard");
+        await nav("/app/dashboard");
+      }
     }
   });
 
