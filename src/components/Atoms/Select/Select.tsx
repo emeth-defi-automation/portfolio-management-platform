@@ -42,7 +42,7 @@ const Select = component$(({ size, onValueChange, ...props }: SelectProps) => {
   return (
     <div
       class={twMerge(
-        `relative min-w-max ${size == "small" ? "w-fit" : size == "swap" ? "h-8" : null}`,
+        `relative ${size == "small" ? "w-fit" : size == "swap" ? "h-8" : null}`,
       )}
     >
       <select

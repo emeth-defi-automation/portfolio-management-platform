@@ -10,6 +10,7 @@ import BoxHeader from "../Molecules/BoxHeader/BoxHeader";
 import Input from "../Atoms/Input/Input";
 import Select from "../Atoms/Select/Select";
 import Annotation from "../Atoms/Annotation/Annotation";
+import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
 
 export const Step1 = component$(() => {
   return (
@@ -22,28 +23,28 @@ export const Step1 = component$(() => {
         >
           <div class="flex items-center gap-2">
             <Annotation text="Select All" />
-            <Checkbox variant="toggleTick" isChecked={false} class="" />
+            <Checkbox variant="toggleTick" isChecked={false} />
           </div>
         </BoxHeader>
         <Input
           id="portfolio"
-          variant="search"
           size="small"
-          placeholder="Search for Portfolio"
-          InputClass="flex-row-reverse placeholder:text-opacity-100"
+          placeholder="Search for Subportfolio"
+          InputClass="placeholder:text-opacity-100"
+          iconRight={<IconSearch class="fill-white h-4 w-4"/>}
         />
         <div>
           <div class="flex items-center justify-between gap-4 p-4">
             <div class="flex flex-col gap-3">
               <Header variant="h5" text="Investment" class="font-normal" />
-              <Annotation text="$400,000.00" />
+              <Annotation text="$400,000.00" class="text-[10px]"/>
             </div>
             <Checkbox variant="toggleTick" isChecked={true} />
           </div>
           <div class="flex items-center justify-between gap-4 p-4">
             <div class="flex flex-col gap-3">
               <Header variant="h5" text="Marcin" class="font-normal" />
-              <Annotation text="$20,000.00" />
+              <Annotation text="$20,000.00" class="text-[10px]"/>
             </div>
             <Checkbox variant="toggleTick" isChecked={true} />
           </div>
@@ -51,13 +52,13 @@ export const Step1 = component$(() => {
       </Box>
       <Box customClass="flex flex-col gap-6 p-6 !overflow-x-hidden h-[550px]">
         <Header variant="h4" text="Tokens" class="font-normal" />
-        <div class="flex gap-2">
+        <div class="grid grid-cols-3 gap-2">
           <Input
             id="token"
-            variant="search"
             size="small"
-            placeholder="Search Token"
-            InputClass="flex-row-reverse placeholder:text-opacity-100 min-w-[10rem]"
+            placeholder="Search for Subportfolio"
+            InputClass="placeholder:text-opacity-100 "
+            iconRight={<IconSearch class="fill-white h-4 w-4"/>}
           />
           <Select
             name="filterSubPortfolio"

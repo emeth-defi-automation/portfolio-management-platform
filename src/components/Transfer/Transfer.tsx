@@ -61,14 +61,14 @@ export const Transfer = component$(() => {
           </div>
         </Destination> */}
         <ProgressBar>
-          <div class="flex items-center gap-2">
+          {/* <div class="flex items-center gap-2">
             <Checkbox isChecked={false} />
             <Paragraph
               text="I am aware that sending funds to a wrong address means losing funds."
               class="!text-wrap text-xs !leading-4"
             />
           </div>
-          <Button text="Next Step" />
+          <Button text="Next Step" /> */}
         </ProgressBar>
       </div>
     </Modal>
