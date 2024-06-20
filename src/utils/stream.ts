@@ -1,7 +1,7 @@
 import { server$ } from "@builder.io/qwik-city";
 import Moralis from "moralis";
 
-export const setupStream = server$(async function () {
+export const setupMoralis = server$(async function () {
   const moralisApiKey = this.env.get("MORALIS_API_KEY");
 
   if (!moralisApiKey) {
