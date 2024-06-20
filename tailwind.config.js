@@ -37,10 +37,25 @@ export default {
           '20%, 80%': {
             transform: 'translateX(-256px)'
           }
+        },
+        fadeIn: {
+          '0%': {
+            transform: 'scale(0.8)',
+            opacity: 0,
+          },
+          '40%': {
+            transform: 'scale(1.05)',
+            opacity: 0.75,
+          },
+          '100%': {
+            transform: 'scale(1)',
+            opacity: 1,
+          }
         }
-      }, 
+      },
       animation: {
-        messageArrival: 'arrival 5s',
+        messageArrival: 'arrival 5s ease-in-out',
+        fadeIn: 'fadeIn 1s'
       }
     },
   },

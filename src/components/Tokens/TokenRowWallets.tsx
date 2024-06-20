@@ -248,15 +248,27 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             iconBoxSize="small"
             iconBoxTokenPath={imagePath}
           />
-          <div class="overflow-auto">{currentBalanceOfToken.value}</div>
-          <div class="overflow-auto">${latestBalanceUSD.value}</div>
+          <div
+            key={`${currentBalanceOfToken.value}:${symbol}`}
+            class="animate-fadeIn overflow-auto"
+          >
+            {currentBalanceOfToken.value}
+          </div>
+          <div
+            key={`${latestBalanceUSD.value}:${symbol}`}
+            class="animate-fadeIn overflow-auto"
+          >
+            ${latestBalanceUSD.value}
+          </div>
           <div class="">{allowance}</div>
           <div class="flex h-full items-center gap-4">
             <span class="text-customGreen">3,6%</span>
             <IconGraph />
           </div>
           <div class="text-right">
-            {/* <Button
+            {/* 
+            leave it till it will be necessary
+            <Button
               variant="onlyIcon"
               leftIcon={<IconMenuDots class="w-4 h-4 fill-white/>}
             /> */}
