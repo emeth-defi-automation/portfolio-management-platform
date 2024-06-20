@@ -40,22 +40,22 @@ export default {
         },
         fadeIn: {
           '0%': {
-            transform: 'scale(0.8, 0.8)',
+            transform: 'scale(0.8)',
             opacity: 0,
           },
           '40%': {
-            transform: 'scale(1.1, 1.1)',
-            opacity: 0.5,
+            transform: 'scale(1.05)',
+            opacity: 0.75,
           },
           '100%': {
-            transform: 'scale(1, 1)',
+            transform: 'scale(1)',
             opacity: 1,
           }
         }
       },
       animation: {
         messageArrival: 'arrival 5s ease-in-out',
-        fadeIn: 'fadeIn 1.3s'
+        fadeIn: 'fadeIn 1s'
       }
     },
   },

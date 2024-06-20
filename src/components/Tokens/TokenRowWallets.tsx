@@ -151,7 +151,6 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     const currentBalanceOfToken = useSignal("");
     const latestTokenPrice = useSignal("");
     const latestBalanceUSD = useSignal("");
-    const animationTrigger = useSignal(false);
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(({ track }) => {
@@ -159,10 +158,6 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         latestTokenPrice: latestTokenPrice.value,
         currentBalanceOfToken: currentBalanceOfToken.value,
       }));
-      animationTrigger.value = true;
-      setTimeout(() => {
-        animationTrigger.value = false;
-      }, 1000);
 
       if (symbol === "USDT") {
         latestBalanceUSD.value = (
@@ -228,15 +223,27 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
             iconBoxSize="small"
             iconBoxTokenPath={imagePath}
           />
-          <div class="overflow-auto">{currentBalanceOfToken.value}</div>
-          <div class={`overflow-auto ${animationTrigger.value ? 'animate-fadeIn' : ''}`}>${latestBalanceUSD.value}</div>
+          <div
+            key={currentBalanceOfToken.value}
+            class="animate-fadeIn overflow-auto"
+          >
+            {currentBalanceOfToken.value}
+          </div>
+          <div
+            key={latestBalanceUSD.value}
+            class="animate-fadeIn overflow-auto"
+          >
+            ${latestBalanceUSD.value}
+          </div>
           <div class="">{allowance}</div>
           <div class="flex h-full items-center gap-4">
             <span class="text-customGreen">3,6%</span>
             <IconGraph />
           </div>
           <div class="text-right">
-            {/* <Button
+            {/* 
+            leave it till it will be necessary
+            <Button
               variant="onlyIcon"
               leftIcon={<IconMenuDots class="w-4 h-4 fill-white/>}
             /> */}
