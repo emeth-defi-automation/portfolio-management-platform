@@ -1,4 +1,4 @@
-import { component$, type JSXOutput } from "@builder.io/qwik";
+import { component$, useSignal, useTask$, type JSXOutput } from "@builder.io/qwik";
 import type { QRL, Signal } from "@builder.io/qwik";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import {
@@ -10,6 +10,8 @@ import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance"
 import { chainIdToNetworkName } from "~/utils/chains";
 import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
+import { fetchAllTokens } from "../Wallets/Details/SelectedWalletDetails";
+import { Token } from "~/interface/token/Token";
 
 export interface GroupProps {
   createdStructure: Structure;
@@ -28,6 +30,7 @@ function extractData(
   walletAddressOfTokenToSwap: Signal<string>,
   tokenFromAddress: Signal<string>,
   tokenFromSymbol: Signal<string>,
+  tokens: Signal<Token[]>
 ): JSXOutput[] {
   const extractedArray: {
     walletId: string;
@@ -60,8 +63,8 @@ function extractData(
     },
   );
 
-  return extractedArray.map((entry: any, index: number) => (
-    <TokenRow
+  return extractedArray.map((entry: any, index: number) => {
+    return <TokenRow
       key={`${entry.balanceId} - ${index}`}
       icon={`/assets/icons/tokens/${entry.symbol.toLowerCase()}.svg`}
       tokenName={entry.tokenName}
@@ -80,10 +83,19 @@ function extractData(
       tokenFromAddress={tokenFromAddress}
       tokenFromSymbol={tokenFromSymbol}
     />
-  ));
+  });
 }
 
 export const Group = component$<GroupProps>((props) => {
+
+  const tokens = useSignal<Token[]>([]);
+
+  useTask$(async () => {
+    tokens.value = await fetchAllTokens();
+  });
+
+
+
   return (
     <>
       <div class="">
@@ -107,6 +119,7 @@ export const Group = component$<GroupProps>((props) => {
             props.walletAddressOfTokenToSwap,
             props.tokenFromAddress,
             props.tokenFromSymbol,
+            tokens,
           )}
         </div>
       </div>
