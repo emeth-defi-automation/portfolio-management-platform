@@ -1,14 +1,13 @@
-import { component$, type JSXOutput } from "@builder.io/qwik";
 import type { QRL, Signal } from "@builder.io/qwik";
+import { component$, type JSXOutput } from "@builder.io/qwik";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
+import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
+import { TokenRow } from "~/components/Groups/TokenRow";
 import {
   type Structure,
   type StructureBalance,
 } from "~/interface/structure/Structure";
-import { TokenRow } from "~/components/Groups/TokenRow";
-import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import { chainIdToNetworkName } from "~/utils/chains";
-import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
 import Button from "../Atoms/Buttons/Button";
 
 export interface GroupProps {
@@ -34,11 +33,11 @@ function extractData(
     walletName: string;
     symbol: string;
     tokenName: string;
-    quantity: string;
     networkName: string;
     value: string;
     balanceId: string;
     structureId: string;
+    decimals: number;
   }[] = [];
   createdStructure.structureBalance.forEach(
     (balanceEntry: StructureBalance) => {
@@ -49,10 +48,7 @@ function extractData(
           chainIdToNetworkName[balanceEntry.wallet.chainId.toString()],
         symbol: balanceEntry.balance.symbol,
         tokenName: balanceEntry.balance.name,
-        quantity: convertWeiToQuantity(
-          balanceEntry.balance.balance,
-          balanceEntry.balance.decimals,
-        ),
+        decimals: balanceEntry.balance.decimals,
         value: balanceEntry.balance.balanceValueUSD,
         balanceId: balanceEntry.balance.balanceId as string,
         structureId: createdStructure.structure.id as string,
@@ -60,27 +56,28 @@ function extractData(
     },
   );
 
-  return extractedArray.map((entry: any, index: number) => (
-    <TokenRow
-      key={`${entry.balanceId} - ${index}`}
-      icon={`/assets/icons/tokens/${entry.symbol.toLowerCase()}.svg`}
-      tokenName={entry.tokenName}
-      symbol={entry.symbol}
-      quantity={entry.quantity}
-      value={`$${(entry.value * entry.quantity).toFixed(2)}`}
-      walletName={entry.walletName}
-      network={entry.networkName}
-      onClick$={() => {
-        tokenStore.balanceId = entry.balanceId;
-        tokenStore.structureId = entry.structureId;
-      }}
-      isSwapModalOpen={isSwapModalOpen}
-      walletId={entry.walletId}
-      walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
-      tokenFromAddress={tokenFromAddress}
-      tokenFromSymbol={tokenFromSymbol}
-    />
-  ));
+  return extractedArray.map((entry: any, index: number) => {
+    return (
+      <TokenRow
+        key={`${entry.balanceId} - ${index}`}
+        icon={`/assets/icons/tokens/${entry.symbol.toLowerCase()}.svg`}
+        tokenName={entry.tokenName}
+        symbol={entry.symbol}
+        walletName={entry.walletName}
+        network={entry.networkName}
+        decimals={entry.decimals}
+        onClick$={() => {
+          tokenStore.balanceId = entry.balanceId;
+          tokenStore.structureId = entry.structureId;
+        }}
+        isSwapModalOpen={isSwapModalOpen}
+        walletId={entry.walletId}
+        walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
+        tokenFromAddress={tokenFromAddress}
+        tokenFromSymbol={tokenFromSymbol}
+      />
+    );
+  });
 }
 
 export const Group = component$<GroupProps>((props) => {

@@ -23,6 +23,7 @@ import {
   fetchLatestTokenPrice,
 } from "./tokenRowWalletsTypes";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
+import { type actionType } from "~/routes/app/portfolio/interface";
 
 type TokenRowWalletsProps = {
   walletId?: string;
@@ -38,8 +39,6 @@ type TokenRowWalletsProps = {
   allowance: string;
   isExecutable: boolean | undefined;
 };
-
-type actionType = "PRICE" | "BALANCE";
 
 export const tokenRowWalletsInfoStream = server$(async function* (
   walletId: string,

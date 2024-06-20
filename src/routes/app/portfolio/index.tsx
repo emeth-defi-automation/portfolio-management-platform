@@ -379,22 +379,25 @@ export default component$(() => {
                 <Annotation text="" transform="upper" />
               </div>
               {availableStructures.value.structures.map(
-                (createdStructures: any) => (
-                  <Group
-                    key={createdStructures.structure.name}
-                    createdStructure={createdStructures}
-                    tokenStore={clickedToken}
-                    onClick$={async () => {
-                      await deleteStructureAction.submit({
-                        id: createdStructures.structure.id,
-                      });
-                    }}
-                    isSwapModalOpen={isSwapModalOpen}
-                    walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
-                    tokenFromAddress={tokenFromAddress}
-                    tokenFromSymbol={tokenFromSymbol}
-                  />
-                ),
+                (createdStructures: any) => {
+                  console.log("created structures", createdStructures);
+                  return (
+                    <Group
+                      key={createdStructures.structure.name}
+                      createdStructure={createdStructures}
+                      tokenStore={clickedToken}
+                      onClick$={async () => {
+                        await deleteStructureAction.submit({
+                          id: createdStructures.structure.id,
+                        });
+                      }}
+                      isSwapModalOpen={isSwapModalOpen}
+                      walletAddressOfTokenToSwap={walletAddressOfTokenToSwap}
+                      tokenFromAddress={tokenFromAddress}
+                      tokenFromSymbol={tokenFromSymbol}
+                    />
+                  );
+                },
               )}
             </div>
           </Box>
