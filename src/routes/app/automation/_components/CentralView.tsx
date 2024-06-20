@@ -65,8 +65,8 @@ export const CentralView = component$<CentralViewProps>(() => {
     <div class="">
       {automationPageContext.activeAutomation.value ? (
         <>
-        <div class="flex h-full w-full flex-col p-6">
-          <div class="flex items-center justify-between">
+        <div class="flex h-full w-full flex-col">
+          <div class="flex items-center justify-between p-6">
             <div class="flex items-center gap-2">
               <Header
                 variant="h4"
@@ -85,12 +85,12 @@ export const CentralView = component$<CentralViewProps>(() => {
                 })}
               />
               {/* <div class="flex items-center gap-2">
-          <Paragraph size="xs" class="text-customGreen" text="Active" />
-          <Checkbox variant="toggleTick" isChecked={true} class="" />
-        </div> */}
+                <Paragraph size="xs" class="text-customGreen" text="Active" />
+                <Checkbox variant="toggleTick" isChecked={true} class="" />
+              </div> */}
             </div>
           </div>
-          <div class="flex h-full items-center justify-center">
+          <div class="flex h-full items-center justify-center p-6">
             {!automationPageContext.activeAutomation.value.deployed ? (
               <div class="flex w-[438px] flex-col gap-4">
                 <Annotation text="Trigger" />
@@ -106,10 +106,10 @@ export const CentralView = component$<CentralViewProps>(() => {
               </div>
             ) : null}
           </div>
+          <SaveChanges/>
         </div>
         </>
       ) : null}
-      <SaveChanges/>
     </div>
   );
 });
