@@ -1,20 +1,24 @@
-import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import type { QRL, Signal } from "@builder.io/qwik";
-import IconGraph from "/public/assets/icons/graph.svg?jsx";
+import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
+import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
+import IconSwap from "@material-design-icons/svg/round/swap_vert.svg?jsx";
+import { Readable } from "stream";
 import { connectToDB } from "~/database/db";
 import { getTokenSymbolByAddress } from "~/database/tokens";
-import Button from "../Atoms/Buttons/Button";
-import IconSwap from "@material-design-icons/svg/round/swap_vert.svg?jsx";
-import IconTrash from "@material-design-icons/svg/outlined/delete.svg?jsx";
-import ParagraphAnnotation from "../Molecules/ParagraphAnnotation/ParagraphAnnotation";
-import { LatestTokenBalance, LiveQueryResult, createLiveQuery, fetchLatestTokenBalance, fetchLatestTokenPrice } from "../Tokens/tokenRowWalletsTypes";
-import { actionType } from "../Tokens/TokenRowWallets";
-import { Readable } from "stream";
-import { killLiveQuery } from "../ObservedWalletsList/ObservedWalletsList";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
-import { Token } from "~/interface/token/Token";
-import { fetchAllTokens } from "../Wallets/Details/SelectedWalletDetails";
+import Button from "../Atoms/Buttons/Button";
+import ParagraphAnnotation from "../Molecules/ParagraphAnnotation/ParagraphAnnotation";
+import { killLiveQuery } from "../ObservedWalletsList/ObservedWalletsList";
+import { type actionType } from "../Tokens/TokenRowWallets";
+import {
+  createLiveQuery,
+  fetchLatestTokenBalance,
+  fetchLatestTokenPrice,
+  type LatestTokenBalance,
+  type LiveQueryResult,
+} from "../Tokens/tokenRowWalletsTypes";
+import IconGraph from "/public/assets/icons/graph.svg?jsx";
 
 export const tokenRowWalletsInfoStream = server$(async function* (
   walletId: string,
@@ -23,7 +27,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const walletBalanceLiveQuery = `
@@ -163,12 +167,9 @@ export interface TokenRowProps {
   decimals: number;
 }
 export const TokenRow = component$<TokenRowProps>((props) => {
-
   const currentBalanceOfToken = useSignal("");
   const latestTokenPrice = useSignal("");
   const latestBalanceUSD = useSignal("");
-  const tokens = useSignal<Token[]>([]);
-  const decimals = useSignal<number>();
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ track }) => {
@@ -195,7 +196,6 @@ export const TokenRow = component$<TokenRowProps>((props) => {
       await killLiveQuery(queryUuid);
       await killLiveQuery(latestTokenPriceQueryUuid);
     });
-
 
     if (!props.walletId) {
       throw new Error("No wallet id");
@@ -251,7 +251,9 @@ export const TokenRow = component$<TokenRowProps>((props) => {
         <div class="flex h-full items-center overflow-auto">
           {currentBalanceOfToken.value}
         </div>
-        <div class="flex h-full items-center overflow-auto">${latestBalanceUSD.value}</div>
+        <div class="flex h-full items-center overflow-auto">
+          ${latestBalanceUSD.value}
+        </div>
 
         <div class="flex h-full items-center gap-4">
           <span class="text-customGreen">3,6%</span>
