@@ -248,10 +248,16 @@ export const TokenRow = component$<TokenRowProps>((props) => {
           iconBoxSize="small"
           iconBoxTokenPath={props.icon}
         />
-        <div class="flex h-full items-center overflow-auto">
+        <div
+          key={`${currentBalanceOfToken.value}:${props.symbol}`}
+          class="flex h-full animate-fadeIn items-center overflow-auto"
+        >
           {currentBalanceOfToken.value}
         </div>
-        <div class="flex h-full items-center overflow-auto">
+        <div
+          key={`${latestBalanceUSD.value}:${props.symbol}`}
+          class="flex h-full animate-fadeIn items-center overflow-auto"
+        >
           ${latestBalanceUSD.value}
         </div>
 
