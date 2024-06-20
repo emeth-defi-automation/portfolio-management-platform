@@ -160,6 +160,7 @@ export interface TokenRowProps {
   walletAddressOfTokenToSwap: Signal<string>;
   tokenFromAddress: Signal<string>;
   tokenFromSymbol: Signal<string>;
+  decimals: number;
 }
 export const TokenRow = component$<TokenRowProps>((props) => {
 
@@ -196,15 +197,6 @@ export const TokenRow = component$<TokenRowProps>((props) => {
     });
 
 
-    tokens.value = await fetchAllTokens();
-
-    tokens.value.forEach((token) => {
-      if (token.symbol === props.symbol) {
-        decimals.value = token.decimals;
-      }
-    })
-
-
     if (!props.walletId) {
       throw new Error("No wallet id");
     }
@@ -219,7 +211,7 @@ export const TokenRow = component$<TokenRowProps>((props) => {
     } else {
       currentBalanceOfToken.value = convertWeiToQuantity(
         wallet["walletValue"],
-        decimals.value!,
+        props.decimals,
       );
     }
 
@@ -232,7 +224,7 @@ export const TokenRow = component$<TokenRowProps>((props) => {
         if (value.type === "BALANCE") {
           currentBalanceOfToken.value = convertWeiToQuantity(
             value.result["walletValue"],
-            decimals.value!,
+            props.decimals,
           );
         } else {
           latestTokenPrice.value = value.result["price"];

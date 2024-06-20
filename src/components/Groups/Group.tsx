@@ -42,6 +42,7 @@ function extractData(
     value: string;
     balanceId: string;
     structureId: string;
+    decimals: number;
   }[] = [];
   createdStructure.structureBalance.forEach(
     (balanceEntry: StructureBalance) => {
@@ -52,6 +53,7 @@ function extractData(
           chainIdToNetworkName[balanceEntry.wallet.chainId.toString()],
         symbol: balanceEntry.balance.symbol,
         tokenName: balanceEntry.balance.name,
+        decimals: balanceEntry.balance.decimals,
         quantity: convertWeiToQuantity(
           balanceEntry.balance.balance,
           balanceEntry.balance.decimals,
@@ -73,6 +75,7 @@ function extractData(
       value={`$${(entry.value * entry.quantity).toFixed(2)}`}
       walletName={entry.walletName}
       network={entry.networkName}
+      decimals={entry.decimals}
       onClick$={() => {
         tokenStore.balanceId = entry.balanceId;
         tokenStore.structureId = entry.structureId;
