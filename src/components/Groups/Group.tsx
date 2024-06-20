@@ -8,7 +8,6 @@ import {
   type StructureBalance,
 } from "~/interface/structure/Structure";
 import { chainIdToNetworkName } from "~/utils/chains";
-import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import Button from "../Atoms/Buttons/Button";
 
 export interface GroupProps {

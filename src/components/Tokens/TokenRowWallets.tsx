@@ -40,7 +40,6 @@ type TokenRowWalletsProps = {
   isExecutable: boolean | undefined;
 };
 
-
 export const tokenRowWalletsInfoStream = server$(async function* (
   walletId: string,
   tokenSymbol: string,
@@ -48,7 +47,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() { },
+    read() {},
   });
 
   const walletBalanceLiveQuery = `
