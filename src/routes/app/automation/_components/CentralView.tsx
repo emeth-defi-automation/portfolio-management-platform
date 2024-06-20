@@ -64,7 +64,7 @@ export const CentralView = component$<CentralViewProps>(() => {
 
   return (
     <div
-      class={`p-6 duration-500 ease-in ${automationPageContext.isDraverOpen.value ? "w-[calc(100%-48rem)]" : "w-full"}`}
+      class={`p-6 duration-500 ease-out ${automationPageContext.isDraverOpen.value ? "w-[calc(100%-48rem)]" : "w-full"}`}
     >
       {automationPageContext.activeAutomation.value ? (
         <div class="flex h-full w-full  flex-col">
@@ -99,7 +99,7 @@ export const CentralView = component$<CentralViewProps>(() => {
             - zawsze wyswietlamy button dla akcji, jesli sa akcje iteracyjnie wyswietlamy plakietki
             */}
 
-            <div class="flex w-96 flex-col gap-4">
+            <div class="flex w-[438px] flex-col gap-4">
               <Annotation text="Trigger" />
               {!automationPageContext.activeAutomation.value.deployed ? (
                 <Button
@@ -114,7 +114,7 @@ export const CentralView = component$<CentralViewProps>(() => {
               ) : null}
               <AutomationCard variant="swap" isActive={true} />
             </div>
-            <div class="flex w-96 flex-col gap-4">
+            <div class="flex w-[438px] flex-col gap-4">
               <Annotation text="Actions" />
               {!automationPageContext.activeAutomation.value.deployed ? (
                 <Button
