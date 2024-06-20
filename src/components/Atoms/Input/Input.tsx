@@ -52,7 +52,7 @@ export type InputType = VariantProps<typeof InputStyles> & InputProps;
 
 const Input = component$(({ variant, size, ...props }: InputType) => {
   return (
-    <div class="relative">
+    <div class="relative w-full">
       {props.iconLeft ? (
         <span class="absolute left-3 top-1/2 -translate-y-1/2 fill-white">
           {props.iconLeft}

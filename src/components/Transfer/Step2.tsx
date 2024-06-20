@@ -66,13 +66,12 @@ export const Step2 = component$(() => {
                   />
                 </div>
                 <div class="relative">
-                  <Input id="swap"  size="small" subValue="$67,059.95" />
+                  <Input id="swap" size="small" subValue="$67,059.95" />
                   <Button
                     variant="blue"
                     customClass="absolute top-1/2 -translate-y-1/2 right-2.5 h-5 !p-1 !rounded-md"
                     text="Max"
                   />
-                  <Input id="" size="xs" />
                 </div>
               </div>
               <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_1fr_2fr] items-center rounded-lg">
@@ -99,7 +98,7 @@ export const Step2 = component$(() => {
                   />
                 </div>
                 <div class="relative">
-                  <Input id=""  size="small" subValue="$67,059.95" />
+                  <Input id="" size="small" subValue="$67,059.95" />
                   <Button
                     variant="blue"
                     customClass="absolute top-1/2 -translate-y-1/2 right-2.5 h-5 !p-1 !rounded-md"
@@ -130,25 +129,7 @@ export const Step2 = component$(() => {
                     options={[{ value: "", text: "Dollar" }]}
                   />
                 </div>
-              </div>
-              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] rounded-lg py-3">
-                <div class="flex items-center gap-4 pl-4">
-                  <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
-                    <IconBTC class="h-6 w-6" />
-                  </div>
-                  <div class="flex h-full flex-col justify-center gap-1">
-                    <Paragraph text="Bitcoin" />
-                    <Annotation text="BTC" />
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm">$67,083.63</span>
-                  <Annotation text="(481 BTC)" />
-                </div>
-                <div class="flex items-center">
-                  <span class="text-sm">TreasuryWBTC</span>
-                </div>
-                <div class="flex items-center pr-4">
+                <div class="relative">
                   <Input id="" size="small" subValue="1.00" />
                   <Button
                     variant="blue"

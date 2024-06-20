@@ -2,7 +2,7 @@ import { component$, useSignal } from "@builder.io/qwik";
 import { Modal } from "~/components/Modal/Modal";
 import Button from "../Atoms/Buttons/Button";
 import { ProgressBar } from "./ProgressBar";
-import { Step1 } from "./Step1";
+import { Step3 } from "./Step3";
 import Header from "../Atoms/Headers/Header";
 import IconClose from "@material-design-icons/svg/round/close.svg?jsx";
 import Checkbox from "../Atoms/Checkbox/Checkbox";
@@ -39,7 +39,7 @@ export const Transfer = component$(() => {
           />
         </div>
         {/* CHOOSE STEP */}
-        <Step1 />
+        <Step3 />
         {/* <Destination>
           IF STEP 2:
           <Input
@@ -61,14 +61,14 @@ export const Transfer = component$(() => {
           </div>
         </Destination> */}
         <ProgressBar>
-          {/* <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2">
             <Checkbox isChecked={false} />
             <Paragraph
               text="I am aware that sending funds to a wrong address means losing funds."
               class="!text-wrap text-xs !leading-4"
             />
           </div>
-          <Button text="Next Step" /> */}
+          <Button text="Next Step" />
         </ProgressBar>
       </div>
     </Modal>
