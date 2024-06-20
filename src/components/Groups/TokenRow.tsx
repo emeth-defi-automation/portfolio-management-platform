@@ -9,7 +9,6 @@ import { getTokenSymbolByAddress } from "~/database/tokens";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import Button from "../Atoms/Buttons/Button";
 import ParagraphAnnotation from "../Molecules/ParagraphAnnotation/ParagraphAnnotation";
-import { killLiveQuery } from "../ObservedWalletsList/ObservedWalletsList";
 import { type actionType } from "../Tokens/TokenRowWallets";
 import {
   createLiveQuery,
@@ -20,6 +19,14 @@ import {
 } from "../Tokens/tokenRowWalletsTypes";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
 
+export const killLiveQuery = server$(async function (queryUuid: string) {
+  const db = await connectToDB(this.env);
+  await db.kill(queryUuid);
+  await db.query(
+    `UPDATE queryuuids SET enabled = ${false} WHERE queryuuid = '${queryUuid}'; `,
+  );
+});
+
 export const tokenRowWalletsInfoStream = server$(async function* (
   walletId: string,
   tokenSymbol: string,
@@ -27,7 +34,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
   const walletBalanceLiveQuery = `
