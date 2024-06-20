@@ -9,7 +9,6 @@ import { getTokenSymbolByAddress } from "~/database/tokens";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import Button from "../Atoms/Buttons/Button";
 import ParagraphAnnotation from "../Molecules/ParagraphAnnotation/ParagraphAnnotation";
-import { type actionType } from "../Tokens/TokenRowWallets";
 import {
   createLiveQuery,
   fetchLatestTokenBalance,
@@ -18,6 +17,7 @@ import {
   type LiveQueryResult,
 } from "../Tokens/tokenRowWalletsTypes";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
+import { type actionType } from "~/routes/app/portfolio/interface";
 
 export const killLiveQuery = server$(async function (queryUuid: string) {
   const db = await connectToDB(this.env);
@@ -34,7 +34,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
   const walletBalanceLiveQuery = `
@@ -161,8 +161,6 @@ export interface TokenRowProps {
   icon?: string;
   tokenName?: string;
   symbol: string;
-  quantity?: string;
-  value?: string;
   walletName?: string;
   network?: string;
   onClick$?: QRL<() => void>;

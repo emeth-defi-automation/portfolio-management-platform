@@ -30,3 +30,5 @@ export interface BatchTransferFormStore {
   receiverAddress: string;
   coinsToTransfer: StructureToApprove[];
 }
+export type actionType = "PRICE" | "BALANCE";
+

@@ -34,7 +34,6 @@ function extractData(
     walletName: string;
     symbol: string;
     tokenName: string;
-    quantity: string;
     networkName: string;
     value: string;
     balanceId: string;
@@ -51,10 +50,6 @@ function extractData(
         symbol: balanceEntry.balance.symbol,
         tokenName: balanceEntry.balance.name,
         decimals: balanceEntry.balance.decimals,
-        quantity: convertWeiToQuantity(
-          balanceEntry.balance.balance,
-          balanceEntry.balance.decimals,
-        ),
         value: balanceEntry.balance.balanceValueUSD,
         balanceId: balanceEntry.balance.balanceId as string,
         structureId: createdStructure.structure.id as string,
@@ -69,8 +64,6 @@ function extractData(
         icon={`/assets/icons/tokens/${entry.symbol.toLowerCase()}.svg`}
         tokenName={entry.tokenName}
         symbol={entry.symbol}
-        quantity={entry.quantity}
-        value={`$${(entry.value * entry.quantity).toFixed(2)}`}
         walletName={entry.walletName}
         network={entry.networkName}
         decimals={entry.decimals}
