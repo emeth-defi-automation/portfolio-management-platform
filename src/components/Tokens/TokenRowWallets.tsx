@@ -217,27 +217,26 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         .value;
       latestTokenPrice.value = (await data.next()).value["price"];
 
-      let previousTime = "1970-01-01T00:00:00Z";
-      let recentTime;
-      for await (const value of data) {
-        if (value.action === "CREATE") {
-          if (value.type === "BALANCE") {
-            recentTime = value.result["timestamp"];
-            if (
-              new Date(recentTime).getTime() >= new Date(previousTime).getTime()
-            ) {
+      let previousTime = new Date("1970-01-01T00:00:00Z").getTime();
+
+      for await (const { action, type, result } of data) {
+        const { timestamp, walletValue, price } = result;
+        if (action === "CREATE") {
+          if (type === "BALANCE") {
+            let recentTime = timestamp;
+            if (new Date(recentTime).getTime() >= previousTime) {
               currentBalanceOfToken.value = convertWeiToQuantity(
-                value.result["walletValue"],
+                walletValue,
                 parseInt(decimals),
               );
               previousTime = recentTime;
             }
           } else {
-            latestTokenPrice.value = value.result["price"];
+            latestTokenPrice.value = price;
           }
-        } else if (value.action === "UPDATE") {
-          if (value.type === "PRICE") {
-            latestTokenPrice.value = value.result["price"];
+        } else if (action === "UPDATE") {
+          if (type === "PRICE") {
+            latestTokenPrice.value = price;
           }
         }
       }
