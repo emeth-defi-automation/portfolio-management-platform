@@ -47,7 +47,7 @@ export const tokenRowWalletsInfoStream = server$(async function* (
   const db = await connectToDB(this.env);
   const resultsStream = new Readable({
     objectMode: true,
-    read() {},
+    read() { },
   });
 
   const walletBalanceLiveQuery = `
@@ -213,17 +213,26 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         );
       }
 
+
+
       const latestTokenPriceQueryUuid: LiveQueryResult = (await data.next())
         .value;
       latestTokenPrice.value = (await data.next()).value["price"];
 
+      let previousTime = "1970-01-01T00:00:00Z";
+      let recentTime;
       for await (const value of data) {
         if (value.action === "CREATE") {
           if (value.type === "BALANCE") {
-            currentBalanceOfToken.value = convertWeiToQuantity(
-              value.result["walletValue"],
-              parseInt(decimals),
-            );
+            // console.log("create", value.result)
+            recentTime = value.result["timestamp"];
+            if (new Date(recentTime).getTime() >= new Date(previousTime).getTime()) {
+              currentBalanceOfToken.value = convertWeiToQuantity(
+                value.result["walletValue"],
+                parseInt(decimals),
+              );
+              previousTime = recentTime;
+            }
           } else {
             latestTokenPrice.value = value.result["price"];
           }
