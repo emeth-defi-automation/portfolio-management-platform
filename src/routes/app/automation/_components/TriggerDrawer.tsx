@@ -104,10 +104,12 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
     addModalStore.actionId =
       automationPageContext.activeAutomation.value?.actionId;
     addModalStore.name = automationPageContext.activeAutomation.value?.name;
+    console.log(
+      "current action: ",
+      automationPageContext.activeAutomation.value,
+    );
   });
-  useVisibleTask$(() => {
-    console.log("isOpen: ", automationPageContext.isDraverOpen.value);
-  });
+
   const handleAddAutomation = $(async function () {
     const account = getAccount(wagmiConfig.config.value as Config);
     const emethContractAddress = import.meta.env

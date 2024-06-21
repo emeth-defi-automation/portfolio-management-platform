@@ -30,7 +30,7 @@ const addActionBasicToDB = server$(async function (
   const db = await connectToDB(this.env);
 
   await db.query(
-    `INSERT INTO automations (name, isActive, desc, user, actionId, deployed) VALUES ($name, $isActive, $desc, $user, $actionId, $deployed);`,
+    `INSERT INTO automations (name, isActive, desc, user, actionId, deployed, actions, trigger) VALUES ($name, $isActive, $desc, $user, $actionId, $deployed, $actions, $trigger);`,
     {
       name: name,
       isActive: false,
@@ -38,6 +38,8 @@ const addActionBasicToDB = server$(async function (
       user: user,
       actionId: actionId,
       deployed: false,
+      actions: [],
+      trigger: undefined,
     },
   );
 });

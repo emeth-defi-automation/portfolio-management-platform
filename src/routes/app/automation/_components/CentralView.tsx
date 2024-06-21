@@ -13,6 +13,8 @@ import { messagesContext } from "../../layout";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 import IconAdd from "@material-design-icons/svg/outlined/add.svg?jsx";
 import { AutomationCard } from "./AutomationCard/AutomationCard";
+import Paragraph from "~/components/Atoms/Paragraphs/Paragraphs";
+import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
 
 const deleteActionFromDb = server$(async function (actionId, user) {
   // await updateIsActiveStatus(actionId, false);
@@ -67,8 +69,8 @@ export const CentralView = component$<CentralViewProps>(() => {
       class={`p-6 duration-500 ease-out ${automationPageContext.isDraverOpen.value ? "w-[calc(100%-48rem)]" : "w-full"}`}
     >
       {automationPageContext.activeAutomation.value ? (
-        <div class="flex h-full w-full  flex-col">
-          <div class="flex items-center justify-between">
+        <div class="flex h-full w-full flex-col">
+          <div class="flex w-full items-center justify-between">
             <div class="flex items-center gap-2">
               <Header
                 variant="h4"
@@ -86,10 +88,10 @@ export const CentralView = component$<CentralViewProps>(() => {
                   await handleDeleteAction();
                 })}
               />
-              {/* <div class="flex items-center gap-2">
-          <Paragraph size="xs" class="text-customGreen" text="Active" />
-          <Checkbox variant="toggleTick" isChecked={true} class="" />
-        </div> */}
+            </div>
+            <div class="flex  items-center  gap-2">
+              <Paragraph size="xs" class="text-customGreen" text="Active" />
+              <Checkbox variant="toggleTick" isChecked={true} class="" />
             </div>
           </div>
           <div class="flex h-full w-full flex-col items-center justify-center gap-10">
@@ -101,7 +103,9 @@ export const CentralView = component$<CentralViewProps>(() => {
 
             <div class="flex w-[438px] flex-col gap-4">
               <Annotation text="Trigger" />
-              {!automationPageContext.activeAutomation.value.deployed ? (
+
+              {!automationPageContext.activeAutomation.value.deployed &&
+              !automationPageContext.activeAutomation.value.trigger ? (
                 <Button
                   text="Add Trigger"
                   customClass="h-14"
@@ -111,22 +115,37 @@ export const CentralView = component$<CentralViewProps>(() => {
                     automationPageContext.isDraverOpen.value = true;
                   }}
                 />
-              ) : null}
-              <AutomationCard variant="swap" isActive={true} />
+              ) : (
+                <AutomationCard
+                  variant="trigger"
+                  isActive={true}
+                  title="Trigger"
+                />
+              )}
             </div>
             <div class="flex w-[438px] flex-col gap-4">
               <Annotation text="Actions" />
-              {!automationPageContext.activeAutomation.value.deployed ? (
-                <Button
-                  text="Add Action"
-                  customClass="h-14"
-                  variant="dashed"
-                  leftIcon={<IconAdd class="h-4 w-4" />}
-                  onClick$={async () => {
-                    automationPageContext.isDraverOpen.value = true;
-                  }}
-                />
-              ) : null}
+              <Button
+                text="Add Action"
+                customClass="h-14"
+                variant="dashed"
+                leftIcon={<IconAdd class="h-4 w-4" />}
+                onClick$={async () => {
+                  automationPageContext.isDraverOpen.value = true;
+                }}
+              />
+              <AutomationCard
+                variant="swap"
+                isActive={true}
+                title="Moj swap"
+                description="Swap USDC na CHWDUPE"
+              />
+              <AutomationCard
+                variant="transfer"
+                isActive={false}
+                title="Moj transfer"
+                description="Na jebanie policji"
+              />
             </div>
           </div>
         </div>

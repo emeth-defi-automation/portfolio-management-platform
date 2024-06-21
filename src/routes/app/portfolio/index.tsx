@@ -238,6 +238,7 @@ export default component$(() => {
           message: "Transferring tokens...",
           isVisible: true,
         });
+
         const transactionHash = await writeContract(
           wagmiConfig.config.value,
           request,
@@ -249,6 +250,7 @@ export default component$(() => {
 
         batchTransferFormStore.receiverAddress = "";
         batchTransferFormStore.coinsToTransfer = [];
+
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "success",

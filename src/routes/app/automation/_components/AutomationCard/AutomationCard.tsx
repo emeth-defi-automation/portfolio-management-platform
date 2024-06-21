@@ -10,12 +10,14 @@ import IconAlarm from "@material-design-icons/svg/round/alarm.svg?jsx";
 export interface AutomationCardProps {
   variant: "swap" | "transfer" | "trigger" | null;
   isActive: boolean;
+  title?: string;
+  description?: string;
 }
 
 export const AutomationCard = component$<AutomationCardProps>((props) => {
   return (
     <Box
-      customClass={`!shadow-cards p-4 rounded-lg flex items-center ${props.isActive ? "!overflow-visible gradient-border before:rounded-lg" : ""}`}
+      customClass={`!shadow-cards p-4 rounded-lg flex items-center  ${props.isActive ? "!overflow-visible gradient-border before:rounded-lg" : "cursor-pointer"}`}
     >
       <ParagraphAnnotation
         hasIconBox={true}
@@ -30,8 +32,8 @@ export const AutomationCard = component$<AutomationCardProps>((props) => {
         }
         iconBoxBackground="white3"
         iconBoxBorder={props.isActive ? "gradient" : "default"}
-        paragraphText="Swap #1"
-        annotationText="Swap Description"
+        paragraphText={props.title}
+        annotationText={props.description}
       >
         <Button
           leftIcon={<IconEdit class="h-3 w-3 fill-white" />}
