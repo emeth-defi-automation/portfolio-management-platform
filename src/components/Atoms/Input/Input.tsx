@@ -24,20 +24,18 @@ export interface InputProps {
 
 const InputStyles = cva(
   [
-    "custom-border-1 min-w-[11rem] w-full cursor-pointer rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm relative",
+    "custom-border-1 min-w-[13rem] w-full rounded-lg px-4 text-white placeholder:text-white/50 bg-transparent font-['Sora'] text-sm",
   ],
   {
     variants: {
       variant: {
         search: ["pl-10"],
-        checked: [
-          "text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
-        ],
+        checked: ["text-customGreen !border-customGreen pr-10"],
         swap: ["!border-0 p-0 text-[28px] h-fit focus:!border-0"],
       },
       size: {
         xs: ["h-8 text-xs"],
-        small: ["h-10 text-xs placeholder:text-opacity-50"],
+        small: ["h-10 text-xs"],
         medium: ["h-11"],
         large: ["h-12"],
       },
@@ -52,7 +50,7 @@ export type InputType = VariantProps<typeof InputStyles> & InputProps;
 
 const Input = component$(({ variant, size, ...props }: InputType) => {
   return (
-    <div class="relative min-w-max">
+    <div class="relative w-full">
       {props.iconLeft ? (
         <span class="absolute left-3 top-1/2 -translate-y-1/2 fill-white">
           {props.iconLeft}
@@ -61,7 +59,8 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
       <input
         class={twMerge(
           InputStyles({ variant, size }),
-          props.subValue ? "pr-[80px]" : null,
+          props.subValue ? "pr-[130px]" : null,
+          props.iconRight ? "pr-10" : null,
           props.InputClass,
         )}
         ref={props.ref}
@@ -79,8 +78,8 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
         </span>
       ) : null}
       {props.subValue ? (
-        <span class="custom-text-50 absolute right-3 top-1/2 -translate-y-1/2 text-xs">
-          ({props.subValue})
+        <span class="custom-text-50 absolute right-14 top-1/2 -translate-y-1/2 text-xs">
+          {props.subValue}
         </span>
       ) : null}
     </div>
