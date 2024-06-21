@@ -164,7 +164,6 @@ export default component$(() => {
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async () => {
-    console.log("portfolio config: ", wagmiConfig.config.value);
     availableStructures.value = await getAvailableStructures();
     observedWalletsWithBalance.value = await getObservedWalletBalances();
   });
@@ -242,7 +241,6 @@ export default component$(() => {
           wagmiConfig.config.value,
           request,
         );
-        console.log(transactionHash);
         await waitForTransactionReceipt(wagmiConfig.config.value, {
           hash: transactionHash,
         });
@@ -380,7 +378,6 @@ export default component$(() => {
               </div>
               {availableStructures.value.structures.map(
                 (createdStructures: any) => {
-                  console.log("created structures", createdStructures);
                   return (
                     <Group
                       key={createdStructures.structure.name}

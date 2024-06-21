@@ -11,19 +11,19 @@ import { server$ } from "@builder.io/qwik-city";
 import { useImageProvider, type ImageTransformerProps } from "qwik-image";
 import { Readable } from "stream";
 import { connectToDB } from "~/database/db";
+import { type actionType } from "~/routes/app/portfolio/interface";
 import { type TransferredCoinInterface } from "~/routes/app/wallets/interface";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 import ParagraphAnnotation from "../Molecules/ParagraphAnnotation/ParagraphAnnotation";
 import { killLiveQuery } from "../ObservedWalletsList/ObservedWalletsList";
 import {
-  type LatestTokenBalance,
-  type LiveQueryResult,
   createLiveQuery,
   fetchLatestTokenBalance,
   fetchLatestTokenPrice,
+  type LatestTokenBalance,
+  type LiveQueryResult,
 } from "./tokenRowWalletsTypes";
 import IconGraph from "/public/assets/icons/graph.svg?jsx";
-import { type actionType } from "~/routes/app/portfolio/interface";
 
 type TokenRowWalletsProps = {
   walletId?: string;
@@ -217,19 +217,26 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         .value;
       latestTokenPrice.value = (await data.next()).value["price"];
 
-      for await (const value of data) {
-        if (value.action === "CREATE") {
-          if (value.type === "BALANCE") {
-            currentBalanceOfToken.value = convertWeiToQuantity(
-              value.result["walletValue"],
-              parseInt(decimals),
-            );
+      let timeOfPreviousBalanceChange = 0;
+
+      for await (const { action, type, result } of data) {
+        const { timestamp, walletValue, price } = result;
+        if (action === "CREATE") {
+          if (type === "BALANCE") {
+            const timeOfLatestBalanceChange = new Date(timestamp).getTime();
+            if (timeOfLatestBalanceChange >= timeOfPreviousBalanceChange) {
+              currentBalanceOfToken.value = convertWeiToQuantity(
+                walletValue,
+                parseInt(decimals),
+              );
+              timeOfPreviousBalanceChange = timeOfLatestBalanceChange;
+            }
           } else {
-            latestTokenPrice.value = value.result["price"];
+            latestTokenPrice.value = price;
           }
-        } else if (value.action === "UPDATE") {
-          if (value.type === "PRICE") {
-            latestTokenPrice.value = value.result["price"];
+        } else if (action === "UPDATE") {
+          if (type === "PRICE") {
+            latestTokenPrice.value = price;
           }
         }
       }
@@ -266,7 +273,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
           </div>
           <div class="text-right">
             {/* 
-            leave it till it will be necessary
+            leave it till it will be needed
             <Button
               variant="onlyIcon"
               leftIcon={<IconMenuDots class="w-4 h-4 fill-white/>}
@@ -274,6 +281,44 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
           </div>
         </div>
       </>
-    ) : null;
+    ) : (
+      <>
+        <div class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm">
+          <ParagraphAnnotation
+            paragraphText={name}
+            annotationText={symbol}
+            variant="annotationNear"
+            hasIconBox={true}
+            iconBoxSize="small"
+            iconBoxTokenPath={imagePath}
+          />
+          <div
+            key={`${currentBalanceOfToken.value}:${symbol}`}
+            class="animate-fadeIn overflow-auto"
+          >
+            Loading...
+          </div>
+          <div
+            key={`${latestBalanceUSD.value}:${symbol}`}
+            class="animate-fadeIn overflow-auto"
+          >
+            $0.00
+          </div>
+          <div class="">{allowance}</div>
+          <div class="flex h-full items-center gap-4">
+            <span class="text-customGreen">3,6%</span>
+            <IconGraph />
+          </div>
+          <div class="text-right">
+            {/* 
+        leave it till it will be needed
+        <Button
+          variant="onlyIcon"
+          leftIcon={<IconMenuDots class="w-4 h-4 fill-white/>}
+        /> */}
+          </div>
+        </div>
+      </>
+    );
   },
 );

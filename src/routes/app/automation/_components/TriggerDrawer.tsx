@@ -70,7 +70,7 @@ const updateAutomationAction = server$(
         },
       );
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
 );
@@ -156,11 +156,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
         },
       );
 
-      const transactionHash = await writeContract(
-        wagmiConfig.config.value as Config,
-        request,
-      );
-      console.log(transactionHash);
+      await writeContract(wagmiConfig.config.value as Config, request);
       const user = localStorage.getItem("emmethUserWalletAddress");
       await updateAutomationAction(
         isActive,
@@ -183,7 +179,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
         isVisible: true,
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "error",
@@ -371,7 +367,7 @@ export const TriggerDrawer = component$<TriggerDrawerProps>(() => {
                   await handleAddAutomation();
                   automationPageContext.isDraverOpen.value = false;
                 } catch (err) {
-                  console.log(err);
+                  console.error(err);
                 }
               })}
             />
