@@ -9,14 +9,18 @@ export interface FormBadge2Props {
 
 export const FormBadge2 = component$<FormBadge2Props>((props) => {
   return (
-    <label class="block rounded-lg border border-white/10 p-2">
+    <label
+      class={`has-[:checked]:gradient-border group block select-none rounded-lg border border-white/10 p-2`}
+    >
       <ParagraphAnnotation
         paragraphText={props.tokenName}
         annotationText={props.tokenSymbol}
         variant="annotationBelow"
         iconBoxTokenPath={props.tokenPath}
         iconBoxBackground="white3"
+        iconBoxSize="large"
         hasIconBox={true}
+        iconBoxCustomClass="group-has-[:checked]:gradient-border"
       >
         <Slot />
       </ParagraphAnnotation>
