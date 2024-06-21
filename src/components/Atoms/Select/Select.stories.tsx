@@ -18,6 +18,10 @@ export function Dashboard(args: SelectProps) {
   return <Select {...args} />;
 }
 
+export function SelectWithIcon(args: SelectProps) {
+  return <Select {...args} />;
+}
+
 Portfolio.args = {
   options: [
     { value: "", text: "Choose Network" },
@@ -40,6 +44,15 @@ Modal.args = {
 
 Dashboard.args = {
   options: [{ value: "", text: "All" }],
+  size: "small",
+  onValueChange: $((target: any) => console.log(target)),
+};
+
+SelectWithIcon.args = {
+  options: [
+    { value: "", text: "All" },
+    { value: "bitcoin", img: true, text: "bitcoin" },
+  ],
   size: "small",
   onValueChange: $((target: any) => console.log(target)),
 };

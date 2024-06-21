@@ -6,6 +6,7 @@ import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 export type Option = {
   value: string;
   text: string;
+  img: boolean;
 };
 
 const SelectStyles = cva(
@@ -19,6 +20,7 @@ const SelectStyles = cva(
         medium: ["w-full h-10 pr-8"],
         large: ["w-full h-12 pr-10 text-sm"],
         swap: ["w-full h-8 pr-10"],
+        withIcon: [""],
       },
     },
     defaultVariants: {
@@ -63,7 +65,14 @@ const Select = component$(({ size, onValueChange, ...props }: SelectProps) => {
             key={`${option.text}${index}`}
             value={option.value}
           >
-            {option.text}
+            {option.img
+              ? `${(
+                  <div class="flex">
+                    <img src={`/assets/icons/tokens/wan.svg`} />
+                    {option.text}
+                  </div>
+                )}`
+              : "no"}
           </option>
         ))}
       </select>
@@ -76,4 +85,10 @@ const Select = component$(({ size, onValueChange, ...props }: SelectProps) => {
   );
 });
 
+{
+  /* {size=="withIcon" ? `/assets/icons/tokens/${option.text.toLowerCase()}.svg` : ""} */
+}
+{
+  /* {option.img ? option.img + "  " + option.text : option.text} */
+}
 export default Select;
