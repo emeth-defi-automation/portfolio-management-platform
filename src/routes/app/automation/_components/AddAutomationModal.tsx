@@ -93,7 +93,7 @@ export const AddAutomationModal = component$<AddAutomationModalProps>(
           isVisible: true,
         });
       } catch (err) {
-        console.log(err);
+        console.error(err);
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "error",

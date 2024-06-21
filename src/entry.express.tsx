@@ -23,7 +23,7 @@ import fs from "fs";
 import http2Express from "http2-express-bridge";
 
 declare global {
-  interface QwikCityPlatform extends PlatformNode {}
+  interface QwikCityPlatform extends PlatformNode { }
 }
 
 // Directories where the static assets are located
@@ -67,8 +67,8 @@ app.use(router);
 app.use(notFound);
 
 const httpsOptions = {
-  key: fs.readFileSync("./ssl/localhost-key.pem"),
-  cert: fs.readFileSync("./ssl/localhost.pem"),
+  key: fs.readFileSync("./ssl/127.0.0.1-key.pem"),
+  cert: fs.readFileSync("./ssl/127.0.0.1.pem"),
   allowHTTP1: true,
 };
 
