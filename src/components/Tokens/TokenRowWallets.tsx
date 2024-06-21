@@ -217,9 +217,7 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
         .value;
       latestTokenPrice.value = (await data.next()).value["price"];
 
-      let timeOfPreviousBalanceChange = new Date(
-        "1970-01-01T00:00:00Z",
-      ).getTime();
+      let timeOfPreviousBalanceChange = 0;
 
       for await (const { action, type, result } of data) {
         const { timestamp, walletValue, price } = result;
