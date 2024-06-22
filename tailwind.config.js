@@ -51,11 +51,26 @@ export default {
             transform: 'scale(1)',
             opacity: 1,
           }
+        },
+        slowAppearance: {
+          '0%': {
+            transform: 'scale(0.75)',
+            opacity: 0,
+          },
+          '40%': {
+            transform: 'scale(1)',
+            opacity: 0.4,
+          },
+          '100%': {
+            transform: 'scale(1)',
+            opacity: 1,
+          }
         }
       },
       animation: {
         messageArrival: 'arrival 5s ease-in-out',
-        fadeIn: 'fadeIn 1s'
+        fadeIn: 'fadeIn 1s',
+        slowAppearance: 'slowAppearance 1s'
       }
     },
   },

@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { AutomationsMenu } from "./_components/AutomationsMenu";
 import { CentralView } from "./_components/CentralView";
-import { TriggerDrawer } from "./_components/TriggerDrawer";
+import { TriggerDrawer } from "./_components/SideDrawer";
 
 export default component$(() => {
   return (

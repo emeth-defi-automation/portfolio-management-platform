@@ -6,15 +6,13 @@ import { type JSXOutput, type QRL, type Signal } from "@builder.io/qwik";
 export interface InputFieldProps {
   class?: string;
   name: string;
-  onValueChange?: any;
   placeholder?: string;
   variant: "search" | "checked" | "swap" | null;
   size: "xs" | "small" | "medium" | "large" | null;
   labelClass?: string;
   disabled?: boolean;
-  value?: string;
+  value?: string | number;
   onInput?: QRL<(value: any) => void>;
-  subValue?: string;
   iconLeft?: JSXOutput | null;
   iconRight?: JSXOutput | null;
   type?: string;

@@ -113,6 +113,8 @@ export const CentralView = component$<CentralViewProps>(() => {
                   leftIcon={<IconAdd class="h-4 w-4" />}
                   onClick$={async () => {
                     automationPageContext.isDraverOpen.value = true;
+                    automationPageContext.sideDraverVariant.value =
+                      "triggerForm";
                   }}
                 />
               ) : (
@@ -134,18 +136,17 @@ export const CentralView = component$<CentralViewProps>(() => {
                   automationPageContext.isDraverOpen.value = true;
                 }}
               />
-              <AutomationCard
-                variant="swap"
-                isActive={true}
-                title="Moj swap"
-                description="Swap USDC na CHWDUPE"
-              />
-              <AutomationCard
-                variant="transfer"
-                isActive={false}
-                title="Moj transfer"
-                description="Na jebanie policji"
-              />
+              {automationPageContext.activeAutomation.value.actions.map(
+                (action: any) => (
+                  <AutomationCard
+                    key={`${automationPageContext.activeAutomation.value.automationId}${action.actionId}`}
+                    variant={action.variant}
+                    isActive={false}
+                    title={action.name}
+                    description={action.desc}
+                  />
+                ),
+              )}
             </div>
           </div>
         </div>

@@ -4,14 +4,14 @@ import Label from "~/components/Atoms/Label/Label";
 import Select, { type Option } from "~/components/Atoms/Select/Select";
 
 export interface SelectFieldProps {
-  class?: string;
+  id: string;
   name: string;
+  size: "small" | "large" | null;
+  class?: string;
   options?: Option[];
   onValueChange?: any;
-  size: "small" | "large" | null;
   labelClass?: string;
   disabled?: boolean;
-  id: string;
 }
 
 const SelectFieldStyles = cva(["flex flex-col gap-2"]);
