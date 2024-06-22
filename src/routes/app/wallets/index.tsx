@@ -46,7 +46,7 @@ export default component$(() => {
   return (
     <>
       <div class="grid grid-cols-[1fr_3fr] gap-6 p-6">
-        <Box customClass="grid grid-rows-[32px_88px_1fr] gap-6 h-full min-w-max">
+        <Box customClass="flex flex-col gap-6 h-full min-w-max">
           <BoxHeader variantHeader="h3" title="Wallets" class="gap-2">
             <Button
               onClick$={() => {
@@ -78,7 +78,7 @@ export default component$(() => {
 
         {/* usunięty div grid gap-6? */}
         {/* <PendingAuthorization/> */}
-        <Box customClass="grid grid-rows-[72px_24px_1fr] gap-4 h-full">
+        <Box customClass="h-full">
           {selectedWalletDetails.value && (
             <SelectedWalletDetails
               key={selectedWalletDetails.value.id}

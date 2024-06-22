@@ -171,7 +171,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
     return (
       <Box
-        customClass={`${isDataForChartLoading.value ? "" : "grid gap-4"}  h-full ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10  grid-rows-[52px_32px_1fr_110px]"}`}
+        customClass={`${isDataForChartLoading.value ? "" : "flex gap-4"} min-w-max h-full ${!isPortfolioFullScreen.value ? " flex-col" : "m-10 flex-col"}`}
       >
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
           <Header variant="h3" text="Portfolio Value" />
@@ -293,7 +293,11 @@ export const PortfolioValue = component$<PortfolioValueProps>(
         )}
 
         {isDataForChartLoading.value ? null : (
-          <div id="container" ref={outputRef}></div>
+          <div
+            id="container"
+            class="h-full w-full min-w-fit"
+            ref={outputRef}
+          ></div>
         )}
         {isPortfolioFullScreen.value && !isDataForChartLoading.value && (
           <div class="ml-7">

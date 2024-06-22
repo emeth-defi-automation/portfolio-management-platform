@@ -67,29 +67,31 @@ export default component$(() => {
     <>
       <div class="background-container"></div>
       <div class="content-container grid h-full grid-rows-[85%_15%] items-center justify-items-center">
-        <div class="grid min-w-[448px] max-w-md gap-10 pt-20">
+        <div class="flex min-w-[448px] max-w-md flex-col gap-10 pt-20">
           <HeroText
             title="Welcome to Emeth"
             description="By connecting your wallet and using Emeth, you agree to our Terms of Service and Privacy Policy."
           >
             <IconHandshake />
           </HeroText>
-          <div class="grid w-full grid-cols-2 gap-4">
+          <div class="flex gap-4">
             <Button
               onClick$={cancelHandler}
               variant="transparent"
               text="Cancel"
               dataTestId="cancel-button"
+              customClass="w-full"
             />
             <Button
               onClick$={signInHandler}
               variant="gradient"
               text="Accept and Sign"
               dataTestId="accept-and-sign-button"
+              customClass="w-full"
             />
           </div>
         </div>
-        <div class="grid h-full items-end justify-items-center pb-10">
+        <div class="flex h-full items-end justify-items-center pb-10">
           <Copyright />
         </div>
       </div>

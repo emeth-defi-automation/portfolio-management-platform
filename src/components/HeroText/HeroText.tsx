@@ -11,8 +11,12 @@ export const HeroText = component$<HeroTextProps>((props) => {
   return (
     <div class="flex flex-col items-center justify-center gap-6 text-center">
       <Slot />
-      <Header variant="h1" class="font-medium" text={props.title}/>
-      <Paragraph size="base" text={props.description} class="text-wrap !leading-normal"/>
+      <Header variant="h1" class="font-medium" text={props.title} />
+      <Paragraph
+        size="base"
+        text={props.description}
+        class="text-wrap !leading-normal"
+      />
     </div>
   );
 });

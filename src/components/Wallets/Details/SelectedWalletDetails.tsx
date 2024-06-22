@@ -59,7 +59,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
     });
 
     return (
-      <div class="grid grid-rows-[32px_28px_1fr] gap-6">
+      <div class="flex flex-col gap-6">
         <BoxHeader variantHeader="h3" title={selectedWalletName.value}>
           <div class="flex gap-2">
             <Button
@@ -114,7 +114,7 @@ export const SelectedWalletDetails = component$<SelectedWalletProps>(
             icon={<IconLoading class="h-4 w-4 fill-customBlue" />}
           />
         </div>
-        <div class="grid gap-4">
+        <div class="flex flex-col gap-4">
           <div class="custom-text-50 grid grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 text-left text-xs uppercase">
             <Annotation text="Token name" transform="upper" />
             <Annotation text="Quantity" transform="upper" />
