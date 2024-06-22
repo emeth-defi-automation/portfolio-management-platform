@@ -1,4 +1,7 @@
 import { Slot, component$ } from "@builder.io/qwik";
+import Header from "../Atoms/Headers/Header";
+import Paragraph from "../Atoms/Paragraphs/Paragraphs";
+
 export interface HeroTextProps {
   title?: string;
   description?: string;
@@ -6,10 +9,10 @@ export interface HeroTextProps {
 
 export const HeroText = component$<HeroTextProps>((props) => {
   return (
-    <div class="grid justify-items-center gap-6 text-center">
+    <div class="flex flex-col items-center justify-center gap-6 text-center">
       <Slot />
-      <h1 class="text-4xl font-medium">{props.title}</h1>
-      <p class="text-base font-normal">{props.description}</p>
+      <Header variant="h1" class="font-medium" text={props.title}/>
+      <Paragraph size="base" text={props.description} class="text-wrap !leading-normal"/>
     </div>
   );
 });
