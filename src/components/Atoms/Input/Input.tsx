@@ -24,7 +24,7 @@ export interface InputProps {
 
 const InputStyles = cva(
   [
-    "custom-border-1 min-w-[11rem] w-full cursor-pointer rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm relative",
+    "custom-border-1 min-w-[13rem] w-full rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm",
   ],
   {
     variants: {
@@ -52,7 +52,7 @@ export type InputType = VariantProps<typeof InputStyles> & InputProps;
 
 const Input = component$(({ variant, size, ...props }: InputType) => {
   return (
-    <div class="relative min-w-max">
+    <div class="relative w-full">
       {props.iconLeft ? (
         <span class="absolute left-3 top-1/2 -translate-y-1/2 fill-white">
           {props.iconLeft}
@@ -61,7 +61,8 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
       <input
         class={twMerge(
           InputStyles({ variant, size }),
-          props.subValue ? "pr-[80px]" : null,
+          props.subValue ? "pr-[130px]" : null,
+          props.iconRight ? "pr-10" : null,
           props.InputClass,
         )}
         ref={props.ref}
@@ -79,8 +80,8 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
         </span>
       ) : null}
       {props.subValue ? (
-        <span class="custom-text-50 absolute right-3 top-1/2 -translate-y-1/2 text-xs">
-          ({props.subValue})
+        <span class="custom-text-50 absolute right-14 top-1/2 -translate-y-1/2 text-xs">
+          {props.subValue}
         </span>
       ) : null}
     </div>

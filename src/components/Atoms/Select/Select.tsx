@@ -10,7 +10,7 @@ export type Option = {
 
 const SelectStyles = cva(
   [
-    "custom-border-1 min-w-max w-full cursor-pointer rounded-lg bg-transparent px-4 text-white  text-xs font-['Sora'] appearance-none ",
+    "custom-border-1 min-w-max cursor-pointer rounded-lg bg-transparent px-4 text-white text-xs font-['Sora'] appearance-none ",
   ],
   {
     variants: {
@@ -42,7 +42,8 @@ const Select = component$(({ size, onValueChange, ...props }: SelectProps) => {
   return (
     <div
       class={twMerge(
-        `relative min-w-max ${size == "small" ? "w-fit" : size == "swap" ? "h-8" : null}`,
+        `relative flex w-full items-center ${size == "small" ? "w-fit" : size == "swap" ? "h-8" : null}`,
+        props.class,
       )}
     >
       <select

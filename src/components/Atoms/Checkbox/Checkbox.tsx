@@ -18,7 +18,7 @@ const CheckboxStyles = cva(["cursor-pointer"], {
       checkTick: [
         "appearance-none custom-border-1 rounded custom-bg-white checkbox-gradient-border relative before:absolute before:rounded before:p-px after:absolute  border-grd after:rotate-45",
       ],
-      toggleTick: ["opacity-0 w-8 h-5 absolute"],
+      toggleTick: ["opacity-0 w-8 h-4 absolute"],
     },
     size: {
       small: [
@@ -71,7 +71,7 @@ const Checkbox = component$<CheckboxType>(
                 onClick();
               }
             }}
-            class={`absolute h-5 w-8 cursor-pointer rounded-full before:absolute before:left-1 before:top-1/2 before:h-3 before:w-3 before:-translate-y-1/2 before:rounded-full before:bg-white after:absolute after:left-2 after:top-1/2 after:h-1.5 after:w-1 after:-translate-y-1/2 after:rotate-45 after:border-2 after:border-l-0 after:border-t-0 after:border-solid ${isInputChecked.value ? "bg-customGreen before:translate-x-3 after:translate-x-3 after:border-customGreen" : "bg-gray-400 after:border-gray-400"}`}
+            class={`absolute h-4 w-8 cursor-pointer rounded-full before:absolute before:left-1 before:top-1/2 before:h-2.5 before:w-2.5 before:-translate-y-1/2 before:rounded-full before:bg-white ${isInputChecked.value ? "bg-customGreen before:translate-x-3.5" : "bg-gray-400 after:border-gray-400"}`}
           />
         ) : null}
       </div>

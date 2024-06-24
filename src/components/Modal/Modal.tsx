@@ -10,7 +10,7 @@ import { twMerge } from "tailwind-merge";
 import Button from "../Atoms/Buttons/Button";
 import BoxHeader from "../Molecules/BoxHeader/BoxHeader";
 export interface ModalProps extends HTMLAttributes<any> {
-  title: string;
+  title?: string;
   isOpen: Signal<boolean>;
   customClass?: string;
   onClose?: QRL<() => void>;
