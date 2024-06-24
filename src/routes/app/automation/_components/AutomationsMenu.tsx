@@ -5,23 +5,23 @@ import {
   useSignal,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import Button from "~/components/Atoms/Buttons/Button";
-import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
-import { connectToDB } from "~/database/db";
 import { server$ } from "@builder.io/qwik-city";
-import { AddAutomationModal } from "./AddAutomationModal";
-import { AutomationPageContext } from "../AutomationPageContext";
 import {
-  type Config,
   getAccount,
   simulateContract,
   writeContract,
+  type Config,
 } from "@wagmi/core";
 import { emethContractAbi } from "~/abi/emethContractAbi";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import Button from "~/components/Atoms/Buttons/Button";
+import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
 import Input from "~/components/Atoms/Input/Input";
-import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
 import BoxHeader from "~/components/Molecules/BoxHeader/BoxHeader";
+import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import { connectToDB } from "~/database/db";
+import { AutomationPageContext } from "../AutomationPageContext";
+import { AddAutomationModal } from "./AddAutomationModal";
 
 const updateIsActiveStatus = server$(async function (actionId, isActive) {
   const db = await connectToDB(this.env);
@@ -31,7 +31,7 @@ const updateIsActiveStatus = server$(async function (actionId, isActive) {
       { actionId: actionId, isActive: isActive },
     );
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 });
 
@@ -84,15 +84,11 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
           },
         );
 
-        const transactionHash = await writeContract(
-          wagmiConfig.config.value as Config,
-          request,
-        );
-        console.log(transactionHash);
+        await writeContract(wagmiConfig.config.value as Config, request);
       }
       await updateIsActiveStatus(actionId, isActive);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   });
 

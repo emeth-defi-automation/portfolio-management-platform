@@ -67,8 +67,8 @@ app.use(router);
 app.use(notFound);
 
 const httpsOptions = {
-  key: fs.readFileSync("./ssl/localhost-key.pem"),
-  cert: fs.readFileSync("./ssl/localhost.pem"),
+  key: fs.readFileSync("./ssl/127.0.0.1-key.pem"),
+  cert: fs.readFileSync("./ssl/127.0.0.1.pem"),
   allowHTTP1: true,
 };
 

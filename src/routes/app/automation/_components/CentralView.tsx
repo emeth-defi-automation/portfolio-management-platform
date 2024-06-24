@@ -30,7 +30,7 @@ const deleteActionFromDb = server$(async function (actionId, user) {
       },
     );
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 });
 
@@ -54,7 +54,7 @@ export const CentralView = component$<CentralViewProps>(() => {
         isVisible: true,
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       formMessageProvider.messages.push({
         id: formMessageProvider.messages.length,
         variant: "error",

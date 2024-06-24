@@ -200,7 +200,7 @@ export const SwapModal = component$<SwapModalProps>(
       });
 
       try {
-        const swap = await swapTokensForTokens(
+        await swapTokensForTokens(
           swapValues.chosenToken.address.value as `0x${string}`,
           swapValues.tokenToSwapOn.address as `0x${string}`,
           swapValues.chosenToken.value,
@@ -208,7 +208,6 @@ export const SwapModal = component$<SwapModalProps>(
           swapValues.accountToSendTokens as `0x${string}`,
           wagmiConfig,
         );
-        console.log(swap);
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "success",
@@ -216,7 +215,7 @@ export const SwapModal = component$<SwapModalProps>(
           isVisible: true,
         });
       } catch (err) {
-        console.log("swapping error: ", err);
+        console.error("swapping error: ", err);
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "error",
