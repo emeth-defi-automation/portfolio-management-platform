@@ -24,20 +24,18 @@ export interface InputProps {
 
 const InputStyles = cva(
   [
-    "custom-border-1 min-w-[13rem] w-full rounded-lg px-4 text-white placeholder:text-white bg-transparent font-['Sora'] text-sm",
+    "custom-border-1 min-w-[13rem] w-full rounded-lg px-4 text-white placeholder:text-white/70 bg-transparent font-['Sora'] text-sm",
   ],
   {
     variants: {
       variant: {
         search: ["pl-10"],
-        checked: [
-          "text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
-        ],
+        checked: ["text-customGreen !border-customGreen pr-10"],
         swap: ["!border-0 p-0 text-[28px] h-fit focus:!border-0"],
       },
       size: {
         xs: ["h-8 text-xs"],
-        small: ["h-10 text-xs placeholder:text-opacity-50"],
+        small: ["h-10 text-xs"],
         medium: ["h-11"],
         large: ["h-12"],
       },

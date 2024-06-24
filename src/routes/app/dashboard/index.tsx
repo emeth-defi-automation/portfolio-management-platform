@@ -144,7 +144,7 @@ export default component$(() => {
         </Box>
       </div>
 
-      <Box customClass="grid grid-row-[32px_1fr] gap-6">
+      <Box customClass="grid grid-row-[32px_1fr] gap-6 !h-full">
         <BoxHeader variantHeader="h3" title="Favourite tokens">
           <Button
             text="Go to Portfolio"
