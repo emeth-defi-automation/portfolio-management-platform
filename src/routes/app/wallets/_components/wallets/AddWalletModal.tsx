@@ -16,6 +16,7 @@ import {
   writeContract,
   getConnections,
   type Config,
+  waitForTransactionReceipt,
 } from "@wagmi/core";
 
 import { checksumAddress } from "viem";
@@ -151,10 +152,14 @@ export const AddWalletModal = component$<AddWalletModal>(
 
                   // keep receipts for now, to use waitForTransactionReceipt
                   try {
-                    await writeContract(
+                    const transactionHash = await writeContract(
                       wagmiConfig.config.value,
                       approval.request,
                     );
+
+                    await waitForTransactionReceipt(wagmiConfig.config.value, {
+                      hash: transactionHash,
+                    });
                   } catch (err) {
                     console.error("Error: ", err);
                   }
@@ -179,7 +184,14 @@ export const AddWalletModal = component$<AddWalletModal>(
             },
           );
 
-          await writeContract(wagmiConfig.config!.value as Config, request);
+          const transactionHash = await writeContract(
+            wagmiConfig.config!.value as Config,
+            request,
+          );
+
+          await waitForTransactionReceipt(wagmiConfig.config.value, {
+            hash: transactionHash,
+          });
         }
         if (wagmiConfig.config.value) {
           await disconnectWallets(wagmiConfig.config);
