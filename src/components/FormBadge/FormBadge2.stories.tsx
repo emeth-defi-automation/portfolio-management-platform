@@ -21,7 +21,7 @@ export function ApprovalLimit(args: FormBadge2Props) {
     const target = e.target;
     const value = target.value;
     console.log(value);
-    return value;
+    return false;
   });
 
   return (
@@ -29,7 +29,7 @@ export function ApprovalLimit(args: FormBadge2Props) {
       <Input
         id=""
         onInput={onInput}
-        // variant={inputValue !== "" ? "checked" : null}
+        variant={`${onInput}` ? "checked" : null}
         iconRight={<IconSuccess class="h-4 w-4" />}
       />
     </FormBadge2>
