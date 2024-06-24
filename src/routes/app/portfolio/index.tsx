@@ -285,7 +285,7 @@ export default component$(() => {
           />
         </NoData>
       ) : (
-        <div class="grid grid-rows-[32px_auto] gap-6 px-10 pb-10 pt-8">
+        <div class="flex flex-col gap-6 px-10 pb-10 pt-8">
           <BoxHeader variantHeader="h2" title="Portfolio Name">
             <div class="flex items-center gap-2">
               <Button
@@ -333,7 +333,7 @@ export default component$(() => {
               />
             </div>
           </BoxHeader>
-          <Box customClass="grid min-h-[260px] grid-rows-[20px_32px_auto] gap-6 h-full">
+          <Box customClass="flex min-h-[260px] flex-col gap-6 h-full">
             <Header variant="h3" text="Token list" />
             <div class="grid grid-cols-4 gap-2">
               <Input
@@ -362,7 +362,7 @@ export default component$(() => {
                 size="medium"
               />
             </div>
-            <div class="grid grid-rows-[40px_auto] items-start gap-4  text-left text-sm">
+            <div class="grid grid-rows-[40px_auto] items-start gap-4 text-left text-sm">
               <div class="custom-text-50 grid grid-cols-[18%_13%_15%_18%_10%_10%_13%_6%] items-center text-xs font-normal">
                 <Annotation text="Token name" transform="upper" />
                 <Annotation text="Quantity" transform="upper" />

@@ -57,7 +57,7 @@ export default component$(() => {
               size="small"
             />
           </BoxHeader>
-          <div class="grid w-full gap-2">
+          <div class="flex w-full flex-col gap-2">
             <Input
               id="searchWallet"
               variant="search"

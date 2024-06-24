@@ -42,7 +42,7 @@ export default component$(() => {
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
 
-        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4 h-full">
+        <Box customClass="flex flex-col min-w-max gap-4 h-full">
           <BoxHeader variantHeader="h3" title="Alerts" class="gap-2">
             <Button text="See All" variant="transparent" size="small" />
           </BoxHeader>
@@ -75,7 +75,7 @@ export default component$(() => {
           </div>
         </Box>
 
-        <Box customClass="grid min-w-max grid-rows-[32px_1fr] gap-4 h-full">
+        <Box customClass="flex flex-col min-w-max gap-4 h-full">
           <BoxHeader variantHeader="h3" title="Actions" class="gap-2">
             <Button text="See All" variant="transparent" size="small" />
           </BoxHeader>
