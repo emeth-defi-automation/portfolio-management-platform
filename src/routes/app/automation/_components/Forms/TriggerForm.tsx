@@ -2,29 +2,17 @@ import {
   $,
   component$,
   useContext,
-  useSignal,
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
-import {
-  getAccount,
-  simulateContract,
-  writeContract,
-  type Config,
-} from "@wagmi/core";
-import { emethContractAbi } from "~/abi/emethContractAbi";
 import Button from "~/components/Atoms/Buttons/Button";
 import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
 import Header from "~/components/Atoms/Headers/Header";
-import Input from "~/components/Atoms/Input/Input";
 import Label from "~/components/Atoms/Label/Label";
-import Select from "~/components/Atoms/Select/Select";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { connectToDB } from "~/database/db";
 import { AutomationPageContext } from "../../AutomationPageContext";
 import { messagesContext } from "~/routes/app/layout";
-import { getObservedWalletBalances } from "~/routes/app/portfolio";
 import InputField from "~/components/Molecules/InputField/InputField";
 import { Divider } from "~/components/Atoms/Divider/Divider";
 import SelectField from "~/components/Molecules/SelectField/SelectField";
@@ -72,10 +60,8 @@ const updateAutomationAction = server$(
 interface TriggerFormProps {}
 
 export const TriggerForm = component$<TriggerFormProps>(() => {
-  const wagmiConfig = useContext(WagmiConfigContext);
   const automationPageContext = useContext(AutomationPageContext);
   const formMessageProvider = useContext(messagesContext);
-  const observedWallets = useSignal<any>([]);
   const addTriggerStore = useStore({
     isActive: false,
     triggerName: "",
@@ -89,17 +75,9 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
     track(() => {
       automationPageContext.isDraverOpen.value;
     });
-    // observedWallets.value = await getObservedWalletBalances();
-    console.log(
-      "current action: ",
-      automationPageContext.activeAutomation.value,
-    );
   });
 
   const handleAddAutomation = $(async function () {
-    const account = getAccount(wagmiConfig.config.value as Config);
-    const emethContractAddress = import.meta.env
-      .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
     const {
       isActive,
 
@@ -116,56 +94,13 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
       isVisible: true,
     });
     try {
-      console.log("durationCount: ", durationCount, "interval: ", interval);
       const duration = durationCount * interval;
       const timeZeroCalculated = Math.floor(
         new Date(timeZero).getTime() / 1000,
       );
-      //   const calculatedAmountIn = BigInt(amountIn) * 10n ** 18n;
 
-      //   const { request } = await simulateContract(
-      //     wagmiConfig.config.value as Config,
-      //     {
-      //       account: account.address as `0x${string}`,
-      //       abi: emethContractAbi,
-      //       address: emethContractAddress,
-      //       functionName: "addAction",
-      //       args: [
-      //         BigInt(actionId),
-      //         tokenIn as `0x${string}`,
-      //         tokenOut as `0x${string}`,
-      //         BigInt(calculatedAmountIn),
-      //         from as `0x${string}`,
-      //         to as `0x${string}`,
-      //         BigInt(timeZeroCalculated),
-      //         BigInt(duration),
-      //         isActive,
-      //       ],
-      //     },
-      //   );
-
-      //   const transactionHash = await writeContract(
-      //     wagmiConfig.config.value as Config,
-      //     request,
-      //   );
-      //   console.log(transactionHash);
       const user = localStorage.getItem("emmethUserWalletAddress");
-      console.log(
-        "id: ",
-        automationPageContext.activeAutomation.value.actionId,
-        "user: ",
-        user,
-        "triggerName: ",
-        triggerName,
-        "desc: ",
-        triggerDesc,
-        "isactive: ",
-        isActive,
-        "timeZeroCalculated: ",
-        timeZeroCalculated,
-        "duration: ",
-        duration,
-      );
+
       await updateAutomationAction(
         automationPageContext.activeAutomation.value.actionId,
         user,
@@ -265,7 +200,6 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
               },
             ]}
             onValueChange={$((value: number) => {
-              console.log(value);
               addTriggerStore.interval = value;
             })}
           />
@@ -297,8 +231,8 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
             onClick$={$(async () => {
               try {
                 await handleAddAutomation();
-                console.log(addTriggerStore);
                 automationPageContext.isDraverOpen.value = false;
+                automationPageContext.activeAutomation.value = null;
               } catch (err) {
                 console.log(err);
               }

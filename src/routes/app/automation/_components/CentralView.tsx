@@ -121,7 +121,14 @@ export const CentralView = component$<CentralViewProps>(() => {
                 <AutomationCard
                   variant="trigger"
                   isActive={true}
-                  title="Trigger"
+                  title={
+                    automationPageContext.activeAutomation.value?.trigger
+                      .triggerName
+                  }
+                  description={
+                    automationPageContext.activeAutomation.value?.trigger
+                      .triggerDesc
+                  }
                 />
               )}
             </div>

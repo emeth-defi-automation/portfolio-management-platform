@@ -8,9 +8,12 @@ export const TriggerDrawer = component$<SideDrawerProps>(() => {
   const automationPageContext = useContext(AutomationPageContext);
 
   // eslint-disable-next-line qwik/no-use-visible-task
-  // useVisibleTask$(async ({ track }) => {
-
-  // });
+  useVisibleTask$(async ({ track }) => {
+    track(() => {
+      automationPageContext.activeAutomation.value.trigger;
+    });
+    console.log(automationPageContext.activeAutomation.value);
+  });
 
   return (
     <div
