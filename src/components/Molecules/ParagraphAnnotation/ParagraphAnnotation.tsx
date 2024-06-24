@@ -31,9 +31,14 @@ const ParagraphAnnotationStyles = cva(["flex"], {
       annotationNear: "gap-2 items-center",
       annotationBelow: "flex-col gap-1.5",
     },
+    annotationVariant: {
+      white: "white",
+      default: "default",
+    },
   },
   defaultVariants: {
     variant: "annotationBelow",
+    annotationVariant: "default",
   },
 });
 
@@ -47,6 +52,7 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
     hasIconBox,
     textBoxClass,
     variant,
+    annotationVariant,
     ...props
   }: ParagraphAnnotationType) => {
     return (
@@ -58,7 +64,7 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
           )}
           onClick$={props.onClick$}
         >
-          <div class="flex items-center gap-4">
+          <div class={twMerge("flex items-center gap-4")}>
             {hasIconBox ? (
               <IconBox
                 tokenPath={props.iconBoxTokenPath}
@@ -77,7 +83,10 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
               )}
             >
               <Paragraph text={props.paragraphText} size="sm" />
-              <Annotation text={props.annotationText} />
+              <Annotation
+                text={props.annotationText}
+                variant={annotationVariant}
+              />
             </div>
           </div>
           <Slot />
