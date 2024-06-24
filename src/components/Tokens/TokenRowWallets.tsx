@@ -248,7 +248,10 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
     return Number(currentBalanceOfToken.value) ||
       Number(latestBalanceUSD.value) ? (
       <>
-        <div class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm">
+        <div
+          key={`${symbol}_${name}_$`}
+          class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm"
+        >
           <ParagraphAnnotation
             paragraphText={name}
             annotationText={symbol}
@@ -286,7 +289,10 @@ export const TokenRowWallets = component$<TokenRowWalletsProps>(
       </>
     ) : isLoading.value ? (
       <>
-        <div class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm">
+        <div
+          key={`${symbol}_${name}_$`}
+          class="custom-border-b-1 grid  grid-cols-[25%_18%_18%_18%_18%_18%] items-center gap-2 py-2 text-sm"
+        >
           <ParagraphAnnotation
             paragraphText={name}
             annotationText={symbol}
