@@ -31,6 +31,14 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
               <div class="mr-2 flex flex-col gap-2 py-2">
                 {structure.coins.map((coin: any, index: number) => {
                   if (coin.isChecked === false) return null;
+                  const isValid = () => {
+                    return (
+                      checkPattern(coin.amount, /^\d*\.?\d*$/) &&
+                      coin.amount != "0" &&
+                      coin.amount.length > 0 &&
+                      coin.amount[0] != "0"
+                    );
+                  };
                   return (
                     <>
                       <FormBadge
@@ -66,21 +74,9 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
 
                             currentCoin!.amount = target.value;
                           })}
-                          isValid={
-                            checkPattern(coin.amount, /^\d*\.?\d*$/) &&
-                            coin.amount != "0" &&
-                            coin.amount.length > 0 &&
-                            coin.amount[0] != "0"
-                              ? true
-                              : false
-                          }
+                          isValid={isValid() ? true : false}
                           iconRight={
-                            checkPattern(coin.amount, /^\d*\.?\d*$/) &&
-                            coin.amount != "0" &&
-                            coin.amount.length > 0 &&
-                            coin.amount[0] != "0" ? (
-                              <IconSuccess class="h-4 w-4" />
-                            ) : null
+                            isValid() ? <IconSuccess class="h-4 w-4" /> : null
                           }
                         />
                       </FormBadge>
