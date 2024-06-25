@@ -1,8 +1,11 @@
-import { component$ } from "@builder.io/qwik";
-import { FormBadge } from "~/components/FormBadge/FormBadge";
+import { $, component$ } from "@builder.io/qwik";
+// import { FormBadge } from "~/components/FormBadge/FormBadge";
+import { FormBadge } from "~/components/FormBadge/FormBadge2";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
+import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
 import { checkPattern, replaceNonMatching } from "~/utils/fractions";
 import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
+import Input from "~/components/Atoms/Input/Input";
 
 export interface CoinsAmountsProps {
   batchTransferFormStore: BatchTransferFormStore;
@@ -32,32 +35,17 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                     <>
                       <FormBadge
                         key={`${coin}${index}`}
-                        class=""
-                        customClass="h-[56px]"
-                        labelClass="start-4"
-                        imgClass="end-5"
-                        description={`${coin.wallet}`}
-                        text={coin.symbol}
-                        image={`/assets/icons/tokens/${coin.symbol.toLowerCase()}.svg`}
-                        for={`${coin.symbol}${coin.wallet}Amount`}
-                        hasImg={
-                          checkPattern(coin.amount, /^\d*\.?\d*$/) &&
-                          coin.amount != "0" &&
-                          coin.amount.length > 0 &&
-                          coin.amount[0] != "0"
-                            ? "/assets/icons/dashboard/success.svg?jsx"
-                            : undefined
-                        }
+                        tokenName={coin.symbol}
+                        tokenSymbol={`${coin.wallet}`}
+                        tokenPath={`/assets/icons/tokens/${coin.symbol.toLowerCase()}.svg`}
                       >
-                        <input
-                          type="text"
+                        <Input
                           name={`${coin.symbol}${coin.wallet}Amount`}
                           id={`${coin.symbol}${coin.wallet}Amount`}
-                          class={`custom-border-1 absolute end-4 block h-8 w-1/2 rounded-lg bg-transparent p-3 text-sm  placeholder-white placeholder-opacity-50
-                        ${checkPattern(coin.amount, /^\d*\.?\d*$/) && coin.amount != "0" && coin.amount.length > 0 && coin.amount[0] != "0" ? "border-[#24a148] text-[#24a148] focus:border-[#24a148]" : ""}`}
-                          placeholder={`${coin.symbol} approval limit`}
+                          placeholder="Approval limit..."
                           value={coin.amount}
-                          onInput$={(e) => {
+                          inputClass="pr-10"
+                          onInput={$((e) => {
                             const target = e.target as HTMLInputElement;
                             const regex = /^\d*\.?\d*$/;
                             target.value = replaceNonMatching(
@@ -77,7 +65,23 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                             );
 
                             currentCoin!.amount = target.value;
-                          }}
+                          })}
+                          isValid={
+                            checkPattern(coin.amount, /^\d*\.?\d*$/) &&
+                            coin.amount != "0" &&
+                            coin.amount.length > 0 &&
+                            coin.amount[0] != "0"
+                              ? true
+                              : false
+                          }
+                          iconRight={
+                            checkPattern(coin.amount, /^\d*\.?\d*$/) &&
+                            coin.amount != "0" &&
+                            coin.amount.length > 0 &&
+                            coin.amount[0] != "0" ? (
+                              <IconSuccess class="h-4 w-4" />
+                            ) : null
+                          }
                         />
                       </FormBadge>
                       <span class="block pb-1 text-xs text-white">

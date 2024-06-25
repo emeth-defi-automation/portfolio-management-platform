@@ -63,7 +63,7 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
           props.iconRight ? "pr-10" : null,
           props.inputClass,
           props.isValid
-            ? "!border-customGreen pr-10 text-customGreen placeholder:text-opacity-50 focus:border-customGreen focus:outline-none"
+            ? "!border-customGreen text-customGreen placeholder:text-opacity-50 focus:border-customGreen focus:outline-none"
             : "",
         )}
         ref={props.ref}

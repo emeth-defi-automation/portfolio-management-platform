@@ -29,7 +29,7 @@ const ParagraphAnnotationStyles = cva(["flex"], {
   variants: {
     variant: {
       annotationNear: "gap-2 items-center",
-      annotationBelow: "flex-col gap-1.5",
+      annotationBelow: "flex-col gap-1.5 min-w-fit",
     },
     annotationVariant: {
       white: "white",
@@ -64,7 +64,7 @@ const ParagraphAnnotation = component$<ParagraphAnnotationType>(
           )}
           onClick$={props.onClick$}
         >
-          <div class={twMerge("flex items-center gap-4")}>
+          <div class={twMerge("flex min-w-fit items-center gap-4")}>
             {hasIconBox ? (
               <IconBox
                 tokenPath={props.iconBoxTokenPath}
