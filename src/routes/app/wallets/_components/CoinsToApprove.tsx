@@ -1,7 +1,8 @@
-import { type Signal, component$, useTask$ } from "@builder.io/qwik";
-import { FormBadge } from "~/components/FormBadge/FormBadge";
+import { type Signal, component$, $, useTask$ } from "@builder.io/qwik";
+import { FormBadge } from "~/components/FormBadge/FormBadge2";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 import Label from "~/components/Atoms/Label/Label";
+import CheckBox from "~/components/Atoms/Checkbox/Checkbox";
 
 export interface CoinsToApproveProps {
   addWalletFormStore: AddWalletFormStore;
@@ -18,7 +19,7 @@ export default component$<CoinsToApproveProps>(
     );
     return (
       <>
-        <div class="flex max-h-[450px] flex-col overflow-auto pb-4">
+        <div class="flex max-h-[450px] flex-col gap-2 overflow-auto pb-4">
           <div class="mb-3 flex items-center justify-between">
             <Label name="Select tokens" />
             {/* <div class="relative">
@@ -34,22 +35,16 @@ export default component$<CoinsToApproveProps>(
           {coins.map((symbol: any) => (
             <FormBadge
               key={symbol.symbol}
-              class="mb-2"
-              image={`/assets/icons/tokens/${symbol.symbol.toLowerCase()}.svg`}
-              description={symbol.symbol}
-              for={symbol.symbol}
-              customClass="border-gradient"
+              tokenSymbol={symbol.symbol}
+              tokenPath={`/assets/icons/tokens/${symbol.symbol.toLowerCase()}.svg`}
             >
-              <input
-                id={symbol.symbol}
-                type="checkbox"
+              <CheckBox
                 name={symbol.symbol}
                 value={symbol.symbol}
-                class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-2 z-10 h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-2.5 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                checked={addWalletFormStore.coinsToCount.includes(
+                isChecked={addWalletFormStore.coinsToCount.includes(
                   symbol.symbol,
                 )}
-                onClick$={() => {
+                onClick={$(() => {
                   if (
                     !addWalletFormStore.coinsToCount.includes(symbol.symbol)
                   ) {
@@ -65,7 +60,7 @@ export default component$<CoinsToApproveProps>(
                       addWalletFormStore.coinsToCount.splice(indexToRemove, 1);
                     }
                   }
-                }}
+                })}
               />
             </FormBadge>
           ))}
