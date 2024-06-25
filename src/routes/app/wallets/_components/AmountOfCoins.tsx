@@ -19,8 +19,8 @@ export default component$<AmountOfCoinsProps>(
     });
     return (
       <>
-        <div class="mb-8">
-          <Label name="Select tokens" />
+        <div class="flex flex-col gap-2 pb-3">
+          <Label name="Selected tokens" />
           {addWalletFormStore.coinsToCount.map((symbol) => {
             const coin = addWalletFormStore.coinsToApprove.find(
               (item) => item.symbol === symbol,
@@ -50,7 +50,11 @@ export default component$<AmountOfCoinsProps>(
                       name={`${symbol}Amount`}
                       id={`${symbol}Amount`}
                       placeholder="Approval limit..."
-                      value={coin!.amount}
+                      value={
+                        coin!.amount === "0"
+                          ? "Approval limit..."
+                          : coin!.amount
+                      }
                       onInput={$((e) => {
                         const target = e.target as HTMLInputElement;
                         const regex = /^\d*\.?\d*$/;
@@ -70,7 +74,8 @@ export default component$<AmountOfCoinsProps>(
                   </FormBadge>
                   <Button
                     text="max"
-                    variant="transparent"
+                    variant="blue"
+                    size="small"
                     onClick$={async () => {
                       const inputTokenValue =
                         addWalletFormStore.coinsToApprove.find(

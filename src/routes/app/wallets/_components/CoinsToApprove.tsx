@@ -20,18 +20,7 @@ export default component$<CoinsToApproveProps>(
     return (
       <>
         <div class="flex max-h-[450px] flex-col gap-2 overflow-auto pb-4">
-          <div class="mb-3 flex items-center justify-between">
-            <Label name="Select tokens" />
-            {/* <div class="relative">
-              <label class="custom-text-50 text-light flex h-6 items-center gap-3 text-xs uppercase">
-                <input
-                  type="checkbox"
-                  class="border-gradient custom-border-1 custom-bg-white checked:after:border-bg z-10 h-6 w-6 appearance-none rounded checked:after:absolute  checked:after:ms-2 checked:after:mt-1 checked:after:h-2.5 checked:after:w-1.5 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                />
-                <span class="custom-text-50 text-xs uppercase">select all</span>
-              </label>
-            </div> */}
-          </div>
+          <Label name="Select tokens" />
           {coins.map((symbol: any) => (
             <FormBadge
               key={symbol.symbol}
