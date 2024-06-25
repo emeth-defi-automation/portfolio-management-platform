@@ -10,7 +10,7 @@ export interface FormBadge2Props {
 export const FormBadge = component$<FormBadge2Props>((props) => {
   return (
     <label
-      class={`has-[:checked]:gradient-border group block min-w-fit select-none rounded-lg border border-white/10 p-2`}
+      class={`has-[:checked]:gradient-border group block w-full min-w-fit select-none rounded-lg border border-white/10 p-2`}
     >
       <ParagraphAnnotation
         paragraphText={props.tokenName}

@@ -29,7 +29,7 @@ const ParagraphAnnotationStyles = cva(["flex"], {
   variants: {
     variant: {
       annotationNear: "gap-2 items-center",
-      annotationBelow: "flex-col gap-1.5 min-w-fit",
+      annotationBelow: "flex-col gap-1.5 min-w-[50px]",
     },
     annotationVariant: {
       white: "white",
