@@ -7,7 +7,7 @@ export interface FormBadge2Props {
   tokenPath?: string;
 }
 
-export const FormBadge2 = component$<FormBadge2Props>((props) => {
+export const FormBadge = component$<FormBadge2Props>((props) => {
   return (
     <label
       class={`has-[:checked]:gradient-border group block min-w-fit select-none rounded-lg border border-white/10 p-2`}

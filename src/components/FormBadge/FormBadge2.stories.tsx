@@ -1,19 +1,19 @@
 import { $ } from "@builder.io/qwik";
 import Checkbox from "../Atoms/Checkbox/Checkbox";
 import Input from "../Atoms/Input/Input";
-import { FormBadge2, type FormBadge2Props } from "./FormBadge2";
+import { FormBadge, type FormBadge2Props } from "./FormBadge2";
 import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
 import { checkPattern } from "~/utils/fractions";
 
 export default {
-  component: FormBadge2,
+  component: FormBadge,
 };
 
 export function SelectToken(args: FormBadge2Props) {
   return (
-    <FormBadge2 {...args}>
+    <FormBadge {...args}>
       <Checkbox isChecked={true} />
-    </FormBadge2>
+    </FormBadge>
   );
 }
 
@@ -32,13 +32,13 @@ export function ApprovalLimit(args: FormBadge2Props) {
   });
 
   return (
-    <FormBadge2 {...args}>
+    <FormBadge {...args}>
       <Input
         id=""
         isValid={true}
         // iconRight={isValid function ? <IconSuccess class="h-4 w-4" /> : null}
       />
-    </FormBadge2>
+    </FormBadge>
   );
 }
 
