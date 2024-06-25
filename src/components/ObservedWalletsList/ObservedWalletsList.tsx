@@ -72,6 +72,10 @@ export const observedWalletsLiveStream = server$(async function* () {
         case "CREATE":
           const query = `SELECT * FROM observes_wallet WHERE in=${userId} AND out=${result.id};`;
           const [[response]]: any = await db.query(query);
+          if (!response) {
+            console.log("No response", response);
+            break;
+          }
           if (userId == response.in) {
             resultStream.push({ action, result });
           }

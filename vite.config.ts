@@ -12,9 +12,10 @@ export default defineConfig((): UserConfig => {
             headers: {
                 "Cache-Control": "public, max-age=0",
             },
+
             https: {
-                key: "./ssl/127.0.0.1-key.pem",
-                cert: "./ssl/127.0.0.1.pem",
+                key: process.env.SSL_KEY_PATH,
+                cert: process.env.SSL_CERT_PATH,
             },
         },
         preview: {

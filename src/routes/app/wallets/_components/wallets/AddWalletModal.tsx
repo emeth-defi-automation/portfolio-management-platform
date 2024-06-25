@@ -16,6 +16,7 @@ import {
   writeContract,
   getConnections,
   type Config,
+  waitForTransactionReceipt,
 } from "@wagmi/core";
 
 import { checksumAddress } from "viem";
@@ -138,7 +139,7 @@ export const AddWalletModal = component$<AddWalletModal>(
                   BigInt(denominator);
 
                 if (tokenBalance) {
-                  const approval = await simulateContract(
+                  const { request } = await simulateContract(
                     wagmiConfig.config.value,
                     {
                       account: account.address as `0x${string}`,
@@ -148,13 +149,19 @@ export const AddWalletModal = component$<AddWalletModal>(
                       args: [emethContractAddress, BigInt(calculation)],
                     },
                   );
+                  if (request.gasPrice) {
+                    request.gasPrice *= 2n;
+                  }
 
                   // keep receipts for now, to use waitForTransactionReceipt
                   try {
-                    await writeContract(
+                    const hash = await writeContract(
                       wagmiConfig.config.value,
-                      approval.request,
+                      request,
                     );
+                    await waitForTransactionReceipt(wagmiConfig.config.value, {
+                      hash,
+                    });
                   } catch (err) {
                     console.error("Error: ", err);
                   }
@@ -178,8 +185,18 @@ export const AddWalletModal = component$<AddWalletModal>(
               args: [address as `0x${string}`],
             },
           );
+          if (request.gasPrice) {
+            request.gasPrice *= 2n;
+          }
 
-          await writeContract(wagmiConfig.config!.value as Config, request);
+          const hash = await writeContract(
+            wagmiConfig.config!.value as Config,
+            request,
+          );
+
+          await waitForTransactionReceipt(wagmiConfig.config.value as Config, {
+            hash,
+          });
         }
         if (wagmiConfig.config.value) {
           await disconnectWallets(wagmiConfig.config);
