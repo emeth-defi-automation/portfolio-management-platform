@@ -1,5 +1,5 @@
 import { type Signal, component$, $, useTask$ } from "@builder.io/qwik";
-import { FormBadge } from "~/components/FormBadge/FormBadge2";
+import { FormBadge } from "~/components/FormBadge/FormBadge";
 import { checkPattern, replaceNonMatching } from "~/utils/fractions";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 import Button from "~/components/Atoms/Buttons/Button";

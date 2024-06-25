@@ -1,6 +1,5 @@
 import { $, component$ } from "@builder.io/qwik";
-// import { FormBadge } from "~/components/FormBadge/FormBadge";
-import { FormBadge } from "~/components/FormBadge/FormBadge2";
+import { FormBadge } from "~/components/FormBadge/FormBadge";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
 import { checkPattern, replaceNonMatching } from "~/utils/fractions";

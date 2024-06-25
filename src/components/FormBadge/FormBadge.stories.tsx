@@ -1,43 +1,55 @@
-import type { Meta, StoryObj } from "storybook-framework-qwik";
-import { FormBadge, type FormBadgeProps } from "./FormBadge";
-import { CheckBox } from "../Checkbox/Checkbox";
-import { Input } from "../Input/Input";
 import { $ } from "@builder.io/qwik";
+import Checkbox from "../Atoms/Checkbox/Checkbox";
+import Input from "../Atoms/Input/Input";
+import { FormBadge, type FormBadgeProps } from "./FormBadge";
+import IconSuccess from "@material-design-icons/svg/round/check_circle_outline.svg?jsx";
+import { checkPattern } from "~/utils/fractions";
 
-const meta: Meta<FormBadgeProps> = {
+export default {
   component: FormBadge,
 };
 
-type Story = StoryObj<FormBadgeProps>;
+export function SelectToken(args: FormBadgeProps) {
+  return (
+    <FormBadge {...args}>
+      <Checkbox isChecked={true} />
+    </FormBadge>
+  );
+}
 
-export default meta;
+export function ApprovalLimit(args: FormBadgeProps) {
+  const onInput = $((e: any) => {
+    const target = e.target;
+    const value = target.value;
+    console.log(value);
+    return value;
+  });
 
-export const WithCheckbox: Story = {
-  render: () => (
-    <FormBadge
-      input={
-        <CheckBox value="1" checked={false} name="name" onClick={$(() => {})} />
-      }
-      image="/assets/icons/tokens/btc.svg"
-      text="Bitcoin"
-      description="BTC"
-    />
-  ),
+  const isValid = $((value: string) => {
+    return (
+      checkPattern(value, /^\d*\.?\d*$/) && value !== "0" && value.length > 0
+    );
+  });
+
+  return (
+    <FormBadge {...args}>
+      <Input
+        id=""
+        isValid={true}
+        // iconRight={isValid function ? <IconSuccess class="h-4 w-4" /> : null}
+      />
+    </FormBadge>
+  );
+}
+
+SelectToken.args = {
+  tokenName: "Bitcoin",
+  tokenSymbol: "BTC",
+  tokenPath: "/assets/icons/tokens/btc.svg",
 };
 
-export const WithInput: Story = {
-  render: () => (
-    <FormBadge
-      input={
-        <Input
-          labelClass="mb-0"
-          customClass="p-2 z-10 h-9 w-56 appearance-none rounded bg-transparent placeholder:text-white placeholder:text-stone-200 mt-0"
-          placeholder="Approval limit..."
-        />
-      }
-      image="/assets/icons/tokens/btc.svg"
-      text="Bitcoin"
-      description="BTC"
-    />
-  ),
+ApprovalLimit.args = {
+  tokenName: "Bitcoin",
+  tokenSymbol: "BTC",
+  tokenPath: "/assets/icons/tokens/btc.svg",
 };
