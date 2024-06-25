@@ -25,6 +25,7 @@ export type CoinToApprove = {
 export type StructureToApprove = {
   name: string;
   coins: CoinToApprove[];
+  isChecked?: boolean
 };
 export interface BatchTransferFormStore {
   receiverAddress: string;

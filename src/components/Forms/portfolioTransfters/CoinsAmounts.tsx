@@ -49,7 +49,6 @@ export default component$<CoinsAmountsProps>(({ batchTransferFormStore }) => {
                             : undefined
                         }
                       >
-                        {" "}
                         <input
                           type="text"
                           name={`${coin.symbol}${coin.wallet}Amount`}

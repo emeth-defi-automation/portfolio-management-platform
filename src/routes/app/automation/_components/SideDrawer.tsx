@@ -1,6 +1,7 @@
 import { component$, useContext, useVisibleTask$ } from "@builder.io/qwik";
 import { AutomationPageContext } from "../AutomationPageContext";
 import { TriggerForm } from "./Forms/TriggerForm";
+import { AddActionForm } from "./Forms/AddActionFrom";
 
 interface SideDrawerProps {}
 
@@ -10,7 +11,7 @@ export const TriggerDrawer = component$<SideDrawerProps>(() => {
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
     track(() => {
-      automationPageContext.activeAutomation.value.trigger;
+      automationPageContext.activeAutomation.value?.trigger;
     });
     console.log(automationPageContext.activeAutomation.value);
   });
@@ -21,6 +22,8 @@ export const TriggerDrawer = component$<SideDrawerProps>(() => {
     >
       {automationPageContext.sideDraverVariant.value === "triggerForm" ? (
         <TriggerForm />
+      ) : automationPageContext.sideDraverVariant.value === "addActionForm" ? (
+        <AddActionForm />
       ) : null}
     </div>
   );

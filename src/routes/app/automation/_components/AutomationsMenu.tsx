@@ -111,7 +111,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
         id="automation"
         variant="search"
         placeholder="Search for Automation"
-        InputClass="text-xs"
+        inputClass="text-xs"
       />
       <div class="flex flex-col">
         {automationPageContext.automations.value.map((action: any) => (

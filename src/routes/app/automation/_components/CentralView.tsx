@@ -95,12 +95,6 @@ export const CentralView = component$<CentralViewProps>(() => {
             </div>
           </div>
           <div class="flex h-full w-full flex-col items-center justify-center gap-10">
-            {/*
-            - Jesli trigger istnieje wyswietlamy plakietke bez buttona
-            - jesli nie ma triggera wyswietlamy button
-            - zawsze wyswietlamy button dla akcji, jesli sa akcje iteracyjnie wyswietlamy plakietki
-            */}
-
             <div class="flex w-[438px] flex-col gap-4">
               <Annotation text="Trigger" />
 
@@ -134,6 +128,18 @@ export const CentralView = component$<CentralViewProps>(() => {
             </div>
             <div class="flex w-[438px] flex-col gap-4">
               <Annotation text="Actions" />
+
+              {automationPageContext.activeAutomation.value.actions.map(
+                (action: any) => (
+                  <AutomationCard
+                    key={`${automationPageContext.activeAutomation.value.automationId}${action.actionId}`}
+                    variant={action.actionType.toLowerCase()}
+                    isActive={false}
+                    title={action.actionName}
+                    description={action.actionDesc}
+                  />
+                ),
+              )}
               <Button
                 text="Add Action"
                 customClass="h-14"
@@ -141,19 +147,10 @@ export const CentralView = component$<CentralViewProps>(() => {
                 leftIcon={<IconAdd class="h-4 w-4" />}
                 onClick$={async () => {
                   automationPageContext.isDraverOpen.value = true;
+                  automationPageContext.sideDraverVariant.value =
+                    "addActionForm";
                 }}
               />
-              {automationPageContext.activeAutomation.value.actions.map(
-                (action: any) => (
-                  <AutomationCard
-                    key={`${automationPageContext.activeAutomation.value.automationId}${action.actionId}`}
-                    variant={action.variant}
-                    isActive={false}
-                    title={action.name}
-                    description={action.desc}
-                  />
-                ),
-              )}
             </div>
           </div>
         </div>

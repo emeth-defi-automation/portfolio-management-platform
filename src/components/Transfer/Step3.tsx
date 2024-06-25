@@ -31,6 +31,7 @@ export const Step3 = component$(() => {
               />
             </div>
           </div>
+          {/* kolumny tabelki */}
           <div class="flex flex-col gap-4">
             <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr]">
               <Annotation text="Token" />
@@ -38,6 +39,7 @@ export const Step3 = component$(() => {
               <Annotation text="Wallet" />
               <Annotation text="Amount" class="text-right" />
             </div>
+            {/* Coiny */}
             <div class="flex flex-col gap-1">
               <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] items-center py-3">
                 <div class="flex items-center gap-4">
@@ -59,46 +61,7 @@ export const Step3 = component$(() => {
                   <Annotation text="$67,083.63" />
                 </div>
               </div>
-              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] items-center py-3">
-                <div class="flex items-center gap-4">
-                  <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
-                    <IconBTC class="h-6 w-6" />
-                  </div>
-                  <div class="flex h-full flex-col justify-center gap-1">
-                    <Paragraph text="Bitcoin" />
-                    <Annotation text="BTC" />
-                  </div>
-                </div>
-                <div class="flex h-full flex-col justify-center gap-1">
-                  <Paragraph text="481 BTC" size="xs" />
-                  <Annotation text="$32,267,226.03" />
-                </div>
-                <Paragraph text="Wallet#2" size="xs" />
-                <div class="flex h-full flex-col items-end gap-1">
-                  <Paragraph text="1 BTC" size="xs" />
-                  <Annotation text="$67,083.63" />
-                </div>
-              </div>
-              <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] items-center py-3">
-                <div class="flex items-center gap-4">
-                  <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
-                    <IconBTC class="h-6 w-6" />
-                  </div>
-                  <div class="flex h-full flex-col justify-center gap-1">
-                    <Paragraph text="Bitcoin" />
-                    <Annotation text="BTC" />
-                  </div>
-                </div>
-                <div class="flex h-full flex-col justify-center gap-1">
-                  <Paragraph text="481 BTC" size="xs" />
-                  <Annotation text="$32,267,226.03" />
-                </div>
-                <Paragraph text="Wallet#3" size="xs" />
-                <div class="flex h-full flex-col items-end gap-1">
-                  <Paragraph text="1 BTC" size="xs" />
-                  <Annotation text="$67,083.63" />
-                </div>
-              </div>
+              {/* koniec coina */}
             </div>
           </div>
         </div>

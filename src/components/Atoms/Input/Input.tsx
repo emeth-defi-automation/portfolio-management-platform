@@ -12,7 +12,7 @@ export interface InputProps {
     | ((value: any) => void)
     | QRL<(value: any) => Promise<void>>
     | ((value: any) => Promise<void>);
-  InputClass?: string;
+  inputClass?: string;
   disabled?: boolean;
   subValue?: string;
   type?: string;
@@ -63,7 +63,7 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
           InputStyles({ variant, size }),
           props.subValue ? "pr-[130px]" : null,
           props.iconRight ? "pr-10" : null,
-          props.InputClass,
+          props.inputClass,
         )}
         ref={props.ref}
         placeholder={props.placeholder}

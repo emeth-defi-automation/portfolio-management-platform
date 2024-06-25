@@ -163,7 +163,7 @@ export default component$<AddWalletFormFieldsProps>(
               <Input
                 id="address"
                 name="address"
-                InputClass={`${!isValidAddress(addWalletFormStore.address) || !isCheckSum(addWalletFormStore.address) ? "!border-red-700" : ""}`}
+                inputClass={`${!isValidAddress(addWalletFormStore.address) || !isCheckSum(addWalletFormStore.address) ? "!border-red-700" : ""}`}
                 value={addWalletFormStore.address}
                 placeholder="Enter wallet address..."
                 onInput={$((e) => {

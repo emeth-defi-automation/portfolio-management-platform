@@ -5,6 +5,8 @@ export interface AutomationPageInterface {
   activeAutomation: Signal<any | null>;
   isDraverOpen: Signal<boolean>;
   sideDraverVariant: Signal<string>;
+  addSwapModalOpen: Signal<boolean>;
+  addTransferModalOpen: Signal<boolean>;
 }
 
 export const AutomationPageContext = createContextId<AutomationPageInterface>(

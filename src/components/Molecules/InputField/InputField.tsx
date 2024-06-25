@@ -36,7 +36,7 @@ const InputField = ({ ...props }: InputFieldProps) => {
         name={props.name}
         value={props.value}
         onInput={props.onInput}
-        InputClass={
+        inputClass={
           props.isInvalid ? "!border-red-700 border border-solid" : ""
         }
       />

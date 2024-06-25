@@ -12,6 +12,8 @@ export default component$(() => {
     activeAutomation: useSignal(null),
     isDraverOpen: useSignal(false),
     sideDraverVariant: useSignal(""),
+    addSwapModalOpen: useSignal(false),
+    addTransferModalOpen: useSignal(false),
   });
 
   return <Slot />;
