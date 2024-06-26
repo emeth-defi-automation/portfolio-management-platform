@@ -72,6 +72,7 @@ import Label from "~/components/Atoms/Label/Label";
 import Input from "~/components/Atoms/Input/Input";
 import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
 import Select from "~/components/Atoms/Select/Select";
+import { Transfer } from "~/components/Transfer/Transfer";
 
 export default component$(() => {
   const wagmiConfig = useContext(WagmiConfigContext);
@@ -404,6 +405,9 @@ export default component$(() => {
         </div>
       )}
       {isTransferModalOpen.value ? (
+        <Transfer isOpen={isTransferModalOpen} />
+      ) : null}
+      {/* {isTransferModalOpen.value ? (
         <Modal
           title="Transfer Funds"
           isOpen={isTransferModalOpen}
@@ -484,7 +488,7 @@ export default component$(() => {
             />
           </div>
         </Modal>
-      ) : null}
+      ) : null} */}
       {isCreateNewStructureModalOpen.value && (
         <Modal
           isOpen={isCreateNewStructureModalOpen}

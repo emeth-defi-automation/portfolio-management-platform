@@ -4,7 +4,6 @@ import Box from "../Atoms/Box/Box";
 import Header from "../Atoms/Headers/Header";
 import Button from "../Atoms/Buttons/Button";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
-import IconBTC from "/public/assets/icons/tokens/btc.svg?jsx";
 import Checkbox from "../Atoms/Checkbox/Checkbox";
 import BoxHeader from "../Molecules/BoxHeader/BoxHeader";
 import Input from "../Atoms/Input/Input";
