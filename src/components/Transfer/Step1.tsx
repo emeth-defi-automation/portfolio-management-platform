@@ -1,4 +1,4 @@
-import { $, component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
+import { $, component$, useSignal } from "@builder.io/qwik";
 import Paragraph from "../Atoms/Paragraphs/Paragraphs";
 import Box from "../Atoms/Box/Box";
 import Header from "../Atoms/Headers/Header";
@@ -23,7 +23,6 @@ export const Step1 = component$<Step1Props>(
     const isCheckAllChecked = useSignal(false);
     return (
       <div class="flex gap-6">
-        {/* left side */}
         <Box customClass="flex flex-col w-1/3 h-auto min-w-fit gap-6 p-6">
           <BoxHeader
             variantHeader="h4"
@@ -84,7 +83,6 @@ export const Step1 = component$<Step1Props>(
             </div>
           ) : null}
         </Box>
-        {/* right side */}
         <Box customClass="flex flex-col gap-6 p-6 !overflow-x-hidden h-[550px]">
           <Header variant="h4" text="Tokens" class="font-normal" />
           <div class="flex gap-2">
@@ -108,7 +106,6 @@ export const Step1 = component$<Step1Props>(
               options={[{ value: "", text: "Filter by Wallet" }]}
             />
           </div>
-          {/* STRUKTURA */}
           {batchTransferFormStore.coinsToTransfer.length
             ? availableStructures?.value.structures.map(
                 (structure: any, index: number) => {
@@ -138,7 +135,6 @@ export const Step1 = component$<Step1Props>(
                           />
                         </div>
                       </div>
-                      {/* kolumny tabeli*/}
                       <div
                         class={`flex flex-col gap-4 ${currentStructure.isVisible ? "flex" : "hidden"}`}
                       >
@@ -147,7 +143,6 @@ export const Step1 = component$<Step1Props>(
                           <Annotation text="Current Value" />
                           <Annotation text="Wallet" />
                         </div>
-                        {/* TOKEN W STRUKTURZE */}
                         {structure.structureBalance.map(
                           (balance: any, index: number) => {
                             const currentStructure =
@@ -207,7 +202,6 @@ export const Step1 = component$<Step1Props>(
                                     />
                                   </div>
                                 </div>
-                                {/* koniec tokenu */}
                               </div>
                             ) : null;
                           },
@@ -218,7 +212,6 @@ export const Step1 = component$<Step1Props>(
                 },
               )
             : null}
-          {/* Koniec struktury */}
         </Box>
       </div>
     );

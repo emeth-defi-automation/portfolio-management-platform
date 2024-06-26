@@ -6,81 +6,29 @@ import {
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { server$ } from "@builder.io/qwik-city";
 import Button from "~/components/Atoms/Buttons/Button";
-
 import Header from "~/components/Atoms/Headers/Header";
-
-import { connectToDB } from "~/database/db";
 import { AutomationPageContext } from "../../AutomationPageContext";
-import { messagesContext } from "~/routes/app/layout";
 import InputField from "~/components/Molecules/InputField/InputField";
-
 import SelectField from "~/components/Molecules/SelectField/SelectField";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
 
 import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
 import IconError from "@material-design-icons/svg/outlined/error_outline.svg?jsx";
-import { Summary } from "../SwapAndTransfer/Summary";
-import { generateRandomId } from "~/utils/automations";
+// import { Summary } from "../SwapAndTransfer/Summary";
 import { AddSwapActionModal } from "../AddSwapAutomationModal";
-
-const addAutomationAction = server$(
-  async function (
-    automationId,
-    actionId,
-    user,
-    actionName,
-    actionDesc,
-    actionType,
-  ) {
-    const db = await connectToDB(this.env);
-
-    try {
-      const newAction = {
-        actionName: actionName,
-        actionDesc: actionDesc,
-        actionType: actionType,
-        actionId: actionId,
-      };
-      console.log(
-        automationId,
-        actionId,
-        user,
-        actionName,
-        actionDesc,
-        actionType,
-      );
-      const result = await db.query(
-        `
-            UPDATE automations
-            SET actions = ARRAY::APPEND(actions, $newAction)
-            WHERE actionId = $automationId AND user = $user;
-          `,
-        {
-          newAction,
-          automationId,
-          user,
-        },
-      );
-
-      console.log("Action added successfully:", result);
-    } catch (error) {
-      console.error("Error adding action:", error);
-    }
-  },
-);
+import { Transfer } from "~/components/Transfer/Transfer";
 
 interface AddActionFormProps {}
 
 export const AddActionForm = component$<AddActionFormProps>(() => {
   const state = useSignal("");
   const automationPageContext = useContext(AutomationPageContext);
-  const formMessageProvider = useContext(messagesContext);
   const addActionStore = useStore({
     actionName: "",
     actionType: "",
     actionDesc: "",
+    automationId: automationPageContext.activeAutomation.value.actionId,
   });
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
@@ -90,29 +38,11 @@ export const AddActionForm = component$<AddActionFormProps>(() => {
   });
 
   const handleChooseOptions = $(async () => {
-    const user = localStorage.getItem("emmethUserWalletAddress");
-    const actionId = `${generateRandomId()}`;
-
-    // try {
-    //   await addAutomationAction(
-    //     automationPageContext.activeAutomation.value.actionId,
-    //     actionId,
-    //     user,
-    //     addActionStore.actionName,
-    //     addActionStore.actionDesc,
-    //     addActionStore.actionType,
-    //   );
-    // } catch (err) {
-    //   console.log(err);
-    // }
-    console.log("tu jezdem na zewnatrz: ", state.value);
-
     if (state.value.toLowerCase() === "swap") {
-      console.log("tu jezdem");
       automationPageContext.addSwapModalOpen.value = true;
     }
     if (state.value.toLowerCase() === "transfer") {
-      automationPageContext.addSwapModalOpen.value = true;
+      automationPageContext.addTransferModalOpen.value = true;
     }
   });
 
@@ -189,6 +119,12 @@ export const AddActionForm = component$<AddActionFormProps>(() => {
       {automationPageContext.addSwapModalOpen.value ? (
         <AddSwapActionModal
           isOpen={automationPageContext.addSwapModalOpen}
+          automationAction={addActionStore}
+        />
+      ) : null}
+      {automationPageContext.addTransferModalOpen.value ? (
+        <Transfer
+          isOpen={automationPageContext.addTransferModalOpen}
           automationAction={addActionStore}
         />
       ) : null}

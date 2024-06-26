@@ -6,7 +6,6 @@ import {
   useContext,
   useVisibleTask$,
   useSignal,
-  QRL,
   useTask$,
 } from "@builder.io/qwik";
 import Box from "~/components/Atoms/Box/Box";
@@ -35,52 +34,43 @@ import InputField from "~/components/Molecules/InputField/InputField";
 import WalletAddressValueSwitch from "../../portfolio/_components/Swap/WalletAddressValueSwitch";
 import { getObservedWalletBalances } from "../../portfolio/server/observerWalletBalancesLoader";
 import { connectToDB } from "~/database/db";
+import { generateRandomId } from "~/utils/automations";
 
-const addAutomationAction = server$(
-  async function (
-    automationId,
-    actionId,
-    user,
-    actionName,
-    actionDesc,
-    actionType,
-  ) {
-    const db = await connectToDB(this.env);
-
-    try {
-      const newAction = {
-        actionName: actionName,
-        actionDesc: actionDesc,
-        actionType: actionType,
-        actionId: actionId,
-      };
-      console.log(
+const addAutomationAction = server$(async function (
+  automationAction: any,
+  swapValues: any,
+  user: string,
+  actionId: string,
+) {
+  const db = await connectToDB(this.env);
+  try {
+    const newAction = {
+      actionName: automationAction.actionName,
+      actionDesc: automationAction.actionDesc,
+      actionType: automationAction.actionType,
+      chosenToken: swapValues.chosenToken,
+      tokenToSwapOn: swapValues.tokenToSwapOn,
+      accountToSendTokens: swapValues.accountToSendTokens,
+      addressToSwapFrom: swapValues.chosenTokenWalletAddress,
+      actionId: actionId,
+    };
+    const automationId = `${automationAction.automationId}`;
+    await db.query(
+      `
+        UPDATE automations
+        SET actions = ARRAY::APPEND(actions, $newAction)
+        WHERE actionId = $automationId AND user = $user;
+      `,
+      {
+        newAction,
         automationId,
-        actionId,
         user,
-        actionName,
-        actionDesc,
-        actionType,
-      );
-      const result = await db.query(
-        `
-            UPDATE automations
-            SET actions = ARRAY::APPEND(actions, $newAction)
-            WHERE actionId = $automationId AND user = $user;
-          `,
-        {
-          newAction,
-          automationId,
-          user,
-        },
-      );
-
-      console.log("Action added successfully:", result);
-    } catch (error) {
-      console.error("Error adding action:", error);
-    }
-  },
-);
+      },
+    );
+  } catch (error) {
+    console.error("Error adding action:", error);
+  }
+});
 
 const askMoralisForPrices = server$(async () => {
   const response = await Moralis.EvmApi.token.getMultipleTokenPrices(
@@ -131,6 +121,7 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
       chosenTokenWalletAddress: "",
     });
 
+    const isManualAddress = useSignal<boolean>(false);
     const tokenFromAmountDebounce = useDebouncer(
       $(
         async ({
@@ -185,7 +176,6 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
       const tokens: any = await fetchTokens();
       allTokensFromDb.value = tokens;
     });
-    const isManualAddress = useSignal<boolean>(false);
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async () => {
@@ -235,7 +225,42 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
       });
     });
 
-    const handleSaveSwap = $(async () => {});
+    const handleSaveSwap = $(async () => {
+      try {
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "info",
+          message: "Swapping tokens...",
+          isVisible: true,
+        });
+        const user = localStorage.getItem("emmethUserWalletAddress");
+        if (!user) {
+          return new Error("there is no user address");
+        }
+        const actionId = `${generateRandomId()}`;
+        await addAutomationAction(
+          automationAction,
+          swapValues,
+          user!,
+          `${actionId}`,
+        );
+
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "success",
+          message: "Tokens swapped!",
+          isVisible: true,
+        });
+      } catch (err) {
+        console.log(err);
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "error",
+          message: "Error while swapping",
+          isVisible: true,
+        });
+      }
+    });
 
     return (
       <Modal
@@ -280,7 +305,6 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
                   value={swapValues.chosenToken.value}
                   onInput={$(async (e) => {
                     const target = e.target as HTMLInputElement;
-
                     const regex = /^\d*\.?\d*$/;
                     target.value = replaceNonMatching(target.value, regex, "");
 
@@ -318,6 +342,9 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
                   }),
                 ].filter((item) => item != null)}
                 size="swap"
+                onValueChange={$((value: string) => {
+                  swapValues.chosenToken.address = value;
+                })}
               />
             </Box>
             <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
@@ -356,7 +383,11 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
               />
             </Box>
           </div>
-          <WalletAddressValueSwitch isManualAddress={isManualAddress} />
+          <WalletAddressValueSwitch
+            isManualAddress={isManualAddress}
+            textLeft="Observed"
+            textRight="Custom"
+          />
           <div class="flex flex-col gap-2">
             <Label
               for="swapValues.accountToSendTokens"
@@ -414,7 +445,7 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
               customClass="w-full"
               onClick$={async () => {
                 isOpen.value = false;
-
+                handleSaveSwap();
                 console.log("done");
               }}
               disabled={

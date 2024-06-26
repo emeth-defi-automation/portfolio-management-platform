@@ -72,7 +72,6 @@ export const SwapModal = component$<SwapModalProps>(
     isOpen,
     wallets,
     allTokensFromDb,
-    addAutomation,
   }) => {
     const formMessageProvider = useContext(messagesContext);
     const wagmiConfig = useContext(WagmiConfigContext);
@@ -329,7 +328,11 @@ export const SwapModal = component$<SwapModalProps>(
               />
             </Box>
           </div>
-          <WalletAddressValueSwitch isManualAddress={isManualAddress} />
+          <WalletAddressValueSwitch
+            isManualAddress={isManualAddress}
+            textLeft="Observed"
+            textRight="Custom"
+          />
           <div class="flex flex-col gap-2">
             <Label
               for="swapValues.accountToSendTokens"

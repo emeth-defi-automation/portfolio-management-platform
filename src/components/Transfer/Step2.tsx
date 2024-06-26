@@ -5,7 +5,6 @@ import Button from "../Atoms/Buttons/Button";
 import Paragraph from "../Atoms/Paragraphs/Paragraphs";
 import Input from "../Atoms/Input/Input";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
-import IconBTC from "/public/assets/icons/tokens/btc.svg?jsx";
 import Annotation from "../Atoms/Annotation/Annotation";
 import Select from "../Atoms/Select/Select";
 import { BatchTransferFormStore } from "~/routes/app/portfolio/interface";
@@ -26,7 +25,6 @@ export const Step2 = component$<Step2Props>(
       >
         <Header text="Value" variant="h4" />
         <div class="flex flex-col gap-6">
-          {/* plakietka struktury */}
           {batchTransferFormStore.coinsToTransfer.map(
             (structure: any, index: number) => {
               const s = structure.coins.filter(
@@ -51,7 +49,6 @@ export const Step2 = component$<Step2Props>(
                     </div>
                   </div>
                   <div class="flex flex-col gap-4">
-                    {/* kolumny tabeli */}
                     <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_1fr_2fr]">
                       <Annotation text="Token" />
                       <Annotation text="Current Value" />
@@ -59,9 +56,7 @@ export const Step2 = component$<Step2Props>(
                       <Annotation text="Unit" />
                       <Annotation text="Amount" />
                     </div>
-                    {/* Coin w strukturze */}
                     {structure.coins.map((coin: any, index: number) => {
-                      console.log("coin: ", coin);
                       if (coin.isChecked === false) return null;
                       return (
                         <div class="flex flex-col gap-4">
