@@ -36,6 +36,9 @@ export interface AddWalletFormFieldsProps {
 
 export default component$<AddWalletFormFieldsProps>(
   ({ addWalletFormStore, onConnectWalletClick }) => {
+    useTask$(() => {
+      addWalletFormStore.modalTitle = "Add Wallet";
+    });
     const newWalletNameInput = useSignal<HTMLInputElement>();
     const nameInputDebounce = useDebouncer(
       $(async (value: string) => {

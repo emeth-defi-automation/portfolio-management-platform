@@ -1,4 +1,4 @@
-import { type Signal, component$ } from "@builder.io/qwik";
+import { type Signal, component$, useTask$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
 import { checkPattern, replaceNonMatching } from "~/utils/fractions";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
@@ -12,6 +12,9 @@ export interface AmountOfCoinsProps {
 
 export default component$<AmountOfCoinsProps>(
   ({ addWalletFormStore, walletTokenBalances }) => {
+    useTask$(() => {
+      addWalletFormStore.modalTitle = "Set Approval Limit";
+    });
     return (
       <>
         <div class="mb-8">

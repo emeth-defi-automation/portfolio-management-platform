@@ -1,4 +1,4 @@
-import { type Signal, component$ } from "@builder.io/qwik";
+import { type Signal, component$, useTask$ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
 import { type AddWalletFormStore } from "~/routes/app/wallets/interface";
 import Label from "~/components/Atoms/Label/Label";
@@ -10,6 +10,9 @@ export interface CoinsToApproveProps {
 
 export default component$<CoinsToApproveProps>(
   ({ addWalletFormStore, walletTokenBalances }) => {
+    useTask$(() => {
+      addWalletFormStore.modalTitle = "Wallet Authorization";
+    });
     const coins = walletTokenBalances.value.filter(
       (tokenBalance: any) => tokenBalance.balance != 0,
     );
