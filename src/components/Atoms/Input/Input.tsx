@@ -70,7 +70,7 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
         placeholder={props.placeholder}
         name={props.name}
         id={props.id}
-        bind:value={props.value}
+        value={props.value}
         onInput$={props.onInput}
         disabled={props.disabled}
         type={props.type}
