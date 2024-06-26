@@ -25,10 +25,12 @@ export type CoinToApprove = {
 export type StructureToApprove = {
   name: string;
   coins: CoinToApprove[];
-  isChecked?: boolean
+  isChecked?: boolean;
+  isVisible?: boolean;
 };
 export interface BatchTransferFormStore {
   receiverAddress: string;
+  consent: boolean,
   coinsToTransfer: StructureToApprove[];
 }
 export type actionType = "PRICE" | "BALANCE";

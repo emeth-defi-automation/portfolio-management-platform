@@ -8,22 +8,21 @@ import {
 } from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
 import Button from "~/components/Atoms/Buttons/Button";
-import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
+
 import Header from "~/components/Atoms/Headers/Header";
-import Label from "~/components/Atoms/Label/Label";
+
 import { connectToDB } from "~/database/db";
 import { AutomationPageContext } from "../../AutomationPageContext";
 import { messagesContext } from "~/routes/app/layout";
 import InputField from "~/components/Molecules/InputField/InputField";
-import { Divider } from "~/components/Atoms/Divider/Divider";
+
 import SelectField from "~/components/Molecules/SelectField/SelectField";
 import Annotation from "~/components/Atoms/Annotation/Annotation";
-import { DetailsBox } from "~/components/Atoms/DetailsBox/DetailsBox";
+
 import ParagraphAnnotation from "~/components/Molecules/ParagraphAnnotation/ParagraphAnnotation";
 import IconError from "@material-design-icons/svg/outlined/error_outline.svg?jsx";
 import { Summary } from "../SwapAndTransfer/Summary";
 import { generateRandomId } from "~/utils/automations";
-import { SwapModal } from "~/routes/app/portfolio/_components/Swap/Swap";
 import { AddSwapActionModal } from "../AddSwapAutomationModal";
 
 const addAutomationAction = server$(
@@ -78,11 +77,10 @@ export const AddActionForm = component$<AddActionFormProps>(() => {
   const state = useSignal("");
   const automationPageContext = useContext(AutomationPageContext);
   const formMessageProvider = useContext(messagesContext);
-  const addAddActionStore = useStore({
+  const addActionStore = useStore({
     actionName: "",
     actionType: "",
     actionDesc: "",
-    callData: [],
   });
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(async ({ track }) => {
@@ -100,9 +98,9 @@ export const AddActionForm = component$<AddActionFormProps>(() => {
     //     automationPageContext.activeAutomation.value.actionId,
     //     actionId,
     //     user,
-    //     addAddActionStore.actionName,
-    //     addAddActionStore.actionDesc,
-    //     addAddActionStore.actionType,
+    //     addActionStore.actionName,
+    //     addActionStore.actionDesc,
+    //     addActionStore.actionType,
     //   );
     // } catch (err) {
     //   console.log(err);
@@ -137,7 +135,7 @@ export const AddActionForm = component$<AddActionFormProps>(() => {
             ]}
             onValueChange={$((value: string) => {
               state.value = value;
-              addAddActionStore.actionType = value;
+              addActionStore.actionType = value;
             })}
           />
           <InputField
@@ -149,7 +147,7 @@ export const AddActionForm = component$<AddActionFormProps>(() => {
             labelClass="normal-case"
             onInput={$((e) => {
               const target = e.target;
-              addAddActionStore.actionName = target.value;
+              addActionStore.actionName = target.value;
             })}
           />
           <InputField
@@ -161,7 +159,7 @@ export const AddActionForm = component$<AddActionFormProps>(() => {
             labelClass="normal-case"
             onInput={$((e) => {
               const target = e.target;
-              addAddActionStore.actionDesc = target.value;
+              addActionStore.actionDesc = target.value;
             })}
           />
           <hr class="h-[1px] border-0 bg-white/10" />
@@ -189,7 +187,10 @@ export const AddActionForm = component$<AddActionFormProps>(() => {
         </div>
       </div>
       {automationPageContext.addSwapModalOpen.value ? (
-        <AddSwapActionModal isOpen={automationPageContext.addSwapModalOpen} />
+        <AddSwapActionModal
+          isOpen={automationPageContext.addSwapModalOpen}
+          automationAction={addActionStore}
+        />
       ) : null}
     </div>
   );

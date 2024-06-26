@@ -53,7 +53,6 @@ export const Step1 = component$<Step1Props>(
                     batchTransferFormStore.coinsToTransfer!.find(
                       (struct) => struct.name === structure.structure.name,
                     )!;
-                  console.log("currentStructure: ", currentStructure);
                   return (
                     <div class="flex items-center justify-between gap-4 p-4">
                       <div class="flex flex-col gap-3">
@@ -67,6 +66,10 @@ export const Step1 = component$<Step1Props>(
                       <Checkbox
                         variant="toggleTick"
                         isChecked={!!currentStructure.isChecked}
+                        onClick={$(() => {
+                          currentStructure.isChecked =
+                            !currentStructure.isChecked;
+                        })}
                       />
                     </div>
                   );
@@ -103,9 +106,13 @@ export const Step1 = component$<Step1Props>(
           {batchTransferFormStore.coinsToTransfer.length
             ? availableStructures?.value.structures.map(
                 (structure: any, index: number) => {
-                  console.log(structure);
+                  const currentStructure =
+                    batchTransferFormStore.coinsToTransfer!.find(
+                      (struct) => struct.name === structure.structure.name,
+                    )!;
+                  if (!currentStructure.isChecked) return null;
                   return (
-                    <div class="flex flex-col gap-5">
+                    <div class={`flex flex-col gap-5`}>
                       <div class="flex items-center justify-between gap-2 rounded-lg bg-white/3 px-4 py-1">
                         <Paragraph text={structure.structure.name} />
                         <div class="flex items-center gap-2">
@@ -116,13 +123,19 @@ export const Step1 = component$<Step1Props>(
                           />
                           <Button
                             variant="onlyIcon"
-                            customClass="rotate-180"
+                            customClass={`${currentStructure.isVisible ? "" : "rotate-180"}`}
                             leftIcon={<IconArrowDown class="fill-white" />}
+                            onClick$={() => {
+                              currentStructure.isVisible =
+                                !currentStructure.isVisible;
+                            }}
                           />
                         </div>
                       </div>
                       {/* kolumny tabeli*/}
-                      <div class="flex flex-col gap-4">
+                      <div
+                        class={`flex flex-col gap-4 ${currentStructure.isVisible ? "flex" : "hidden"}`}
+                      >
                         <div class="grid grid-cols-[repeat(3,minmax(0,1fr))] text-xs text-customGrey">
                           <Annotation text="Token" />
                           <Annotation text="Current Value" />

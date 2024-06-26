@@ -50,7 +50,6 @@ export const Step2 = component$<Step2Props>(
                       />
                     </div>
                   </div>
-                  {/*  */}
                   <div class="flex flex-col gap-4">
                     {/* kolumny tabeli */}
                     <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_1fr_2fr]">
@@ -77,6 +76,7 @@ export const Step2 = component$<Step2Props>(
                               </div>
                               <div class="flex h-full flex-col justify-center gap-1">
                                 <Paragraph text="Bitcoin" />
+                                {/* dodac nazwe coina */}
                                 <Annotation text={coin.symbol} />
                               </div>
                             </div>
@@ -140,10 +140,7 @@ export const Step2 = component$<Step2Props>(
                                         item.wallet === coin.wallet &&
                                         item.symbol === coin.symbol,
                                     );
-                                  console.log(
-                                    "availables: ",
-                                    availableStructures.value,
-                                  );
+
                                   const chosenStructure =
                                     availableStructures.value.structures.find(
                                       (struct: any) =>
@@ -160,9 +157,7 @@ export const Step2 = component$<Step2Props>(
                                     chosenCoin.balance.balance,
                                     Number(chosenCoin.balance.decimals),
                                   );
-                                  console.log(chosenCoinValue);
-
-                                  coin.amount = `${chosenCoinValue}`;
+                                  currentCoin!.amount = `${chosenCoinValue}`;
                                 }}
                               />
                             </div>

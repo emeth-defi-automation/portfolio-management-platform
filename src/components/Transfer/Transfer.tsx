@@ -1,4 +1,5 @@
 import {
+  $,
   component$,
   useSignal,
   useStore,
@@ -22,6 +23,7 @@ import {
 } from "~/routes/app/portfolio/interface";
 import { getAvailableStructures } from "~/routes/app/portfolio/server/availableStructuresLoader";
 import { getObservedWalletBalances } from "~/routes/app/portfolio/server/observerWalletBalancesLoader";
+import { setupServiceWorker } from "@builder.io/qwik-city/service-worker";
 
 export const Transfer = component$(() => {
   const isTransferModalOpen = useSignal(true);
@@ -29,6 +31,7 @@ export const Transfer = component$(() => {
   const batchTransferFormStore = useStore<BatchTransferFormStore>({
     receiverAddress: "",
     coinsToTransfer: [],
+    consent: false,
   });
   const availableStructures = useSignal<any>({
     structures: [],
@@ -57,6 +60,7 @@ export const Transfer = component$(() => {
         name: structure.structure.name,
         coins: coins,
         isChecked: false,
+        isVisible: false,
       });
     }
   });
@@ -118,18 +122,41 @@ export const Transfer = component$(() => {
             availableStructures={availableStructures}
           />
         ) : (
-          <Step3 />
+          <Step3
+            batchTransferFormStore={batchTransferFormStore}
+            availableStructures={availableStructures}
+          />
         )}
 
-        <ProgressBar>
+        <ProgressBar batchTransferFormStore={batchTransferFormStore}>
           <div class="flex items-center gap-2">
-            <Checkbox isChecked={false} />
+            <Checkbox
+              isChecked={batchTransferFormStore.consent}
+              onClick={$(() => {
+                batchTransferFormStore.consent =
+                  !batchTransferFormStore.consent;
+              })}
+            />
             <Paragraph
               text="I am aware that sending funds to a wrong address means losing funds."
               class="!text-wrap text-xs !leading-4"
             />
           </div>
-          <Button text="Next Step" />
+          <Button
+            text="Next Step"
+            onClick$={() => {
+              if (step.value === 3) {
+                if (
+                  batchTransferFormStore.consent &&
+                  batchTransferFormStore.receiverAddress
+                ) {
+                  console.log("store: ", batchTransferFormStore);
+                }
+              } else {
+                step.value = step.value + 1;
+              }
+            }}
+          />
         </ProgressBar>
       </div>
     </Modal>

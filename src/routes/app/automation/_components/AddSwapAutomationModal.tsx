@@ -32,9 +32,55 @@ import { isAddress } from "viem";
 import { type Token } from "~/interface/token/Token";
 import Label from "~/components/Atoms/Label/Label";
 import InputField from "~/components/Molecules/InputField/InputField";
-import { WalletWithBalance } from "../../portfolio/interface";
 import WalletAddressValueSwitch from "../../portfolio/_components/Swap/WalletAddressValueSwitch";
 import { getObservedWalletBalances } from "../../portfolio/server/observerWalletBalancesLoader";
+import { connectToDB } from "~/database/db";
+
+const addAutomationAction = server$(
+  async function (
+    automationId,
+    actionId,
+    user,
+    actionName,
+    actionDesc,
+    actionType,
+  ) {
+    const db = await connectToDB(this.env);
+
+    try {
+      const newAction = {
+        actionName: actionName,
+        actionDesc: actionDesc,
+        actionType: actionType,
+        actionId: actionId,
+      };
+      console.log(
+        automationId,
+        actionId,
+        user,
+        actionName,
+        actionDesc,
+        actionType,
+      );
+      const result = await db.query(
+        `
+            UPDATE automations
+            SET actions = ARRAY::APPEND(actions, $newAction)
+            WHERE actionId = $automationId AND user = $user;
+          `,
+        {
+          newAction,
+          automationId,
+          user,
+        },
+      );
+
+      console.log("Action added successfully:", result);
+    } catch (error) {
+      console.error("Error adding action:", error);
+    }
+  },
+);
 
 const askMoralisForPrices = server$(async () => {
   const response = await Moralis.EvmApi.token.getMultipleTokenPrices(
@@ -59,10 +105,11 @@ const askMoralisForPrices = server$(async () => {
 
 interface AddSwapActionModalProps {
   isOpen: Signal<boolean>;
+  automationAction: any;
 }
 
 export const AddSwapActionModal = component$<AddSwapActionModalProps>(
-  ({ isOpen }) => {
+  ({ isOpen, automationAction }) => {
     const formMessageProvider = useContext(messagesContext);
     const allTokensFromDb = useSignal([]);
     const wallets = useSignal<any>([]);

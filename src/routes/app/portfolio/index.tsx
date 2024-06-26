@@ -98,6 +98,7 @@ export default component$(() => {
   const batchTransferFormStore = useStore<BatchTransferFormStore>({
     receiverAddress: "",
     coinsToTransfer: [],
+    consent: false,
   });
   const tokenFromAddress = useSignal("");
   const allTokensFromDb = useSignal([]);
