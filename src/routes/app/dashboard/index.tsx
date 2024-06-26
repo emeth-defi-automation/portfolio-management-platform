@@ -38,7 +38,7 @@ export default component$(() => {
   return isPortfolioFullScreen.value ? (
     <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
   ) : (
-    <div class="grid grid-rows-[max(430px)_auto] gap-6 p-10">
+    <div class="grid grid-rows-[max(440px)_auto] gap-6 p-10">
       <div class="grid grid-cols-[2fr_1fr_1fr] gap-6">
         <PortfolioValue isPortfolioFullScreen={isPortfolioFullScreen} />
 
@@ -144,7 +144,7 @@ export default component$(() => {
         </Box>
       </div>
 
-      <Box customClass="grid grid-row-[32px_1fr] gap-6">
+      <Box customClass="flex flex-col h-full gap-6">
         <BoxHeader variantHeader="h3" title="Favourite tokens">
           <Button
             text="Go to Portfolio"
@@ -169,7 +169,7 @@ export default component$(() => {
             <Button text="Add Favourite Tokens" size="small" />
           </NoData>
         ) : (
-          <div class="grid grid-rows-[32px_auto] gap-4">
+          <div class="flex flex-col gap-4">
             <div class="custom-text-50 grid grid-cols-[18%_10%_15%_18%_10%_10%_12%_8%] items-center gap-2">
               <Annotation text="Token name" transform="upper" />
               <Annotation text="Quantity" transform="upper" />
