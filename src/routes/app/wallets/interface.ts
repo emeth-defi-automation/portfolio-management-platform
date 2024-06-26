@@ -10,6 +10,7 @@ export interface AddWalletFormStore {
     symbol: string;
     amount: string;
   }[];
+  modalTitle: string;
 }
 
 export interface TransferredCoinInterface {

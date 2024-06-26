@@ -10,6 +10,7 @@ export interface CoinsToApproveProps {
 
 export default component$<CoinsToApproveProps>(
   ({ addWalletFormStore, walletTokenBalances }) => {
+    addWalletFormStore.modalTitle = "Wallet authorization";
     const coins = walletTokenBalances.value.filter(
       (tokenBalance: any) => tokenBalance.balance != 0,
     );

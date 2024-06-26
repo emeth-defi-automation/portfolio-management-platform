@@ -70,6 +70,7 @@ export const AddWalletModal = component$<AddWalletModal>(
       isAddressUnique: true,
       coinsToCount: [],
       coinsToApprove: [],
+      modalTitle: "",
     });
 
     const wagmiConfig = useContext(WagmiConfigContext);
@@ -247,7 +248,7 @@ export const AddWalletModal = component$<AddWalletModal>(
     return (
       <Modal
         isOpen={isAddWalletModalOpen}
-        title="Add Wallet"
+        title={addWalletFormStore.modalTitle}
         onClose={$(async () => {
           addWalletFormStore.address = "";
           addWalletFormStore.name = "";

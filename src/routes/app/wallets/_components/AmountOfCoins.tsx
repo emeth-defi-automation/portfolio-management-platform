@@ -12,6 +12,7 @@ export interface AmountOfCoinsProps {
 
 export default component$<AmountOfCoinsProps>(
   ({ addWalletFormStore, walletTokenBalances }) => {
+    addWalletFormStore.modalTitle = "Set Approval Limit";
     return (
       <>
         <div class="mb-8">
