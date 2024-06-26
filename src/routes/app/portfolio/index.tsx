@@ -13,23 +13,12 @@ import {
   useSignal,
   useStore,
   useTask$,
-  useContext,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { messagesContext } from "../layout";
+
 import { Form } from "@builder.io/qwik-city";
 import { Modal } from "~/components/Modal/Modal";
 import { isValidName } from "~/utils/validators/addWallet";
-
-import {
-  simulateContract,
-  writeContract,
-  waitForTransactionReceipt,
-} from "@wagmi/core";
-import { emethContractAbi } from "~/abi/emethContractAbi";
-import CoinsToTransfer from "~/components/Forms/portfolioTransfters/CoinsToTransfer";
-import CoinsAmounts from "~/components/Forms/portfolioTransfters/CoinsAmounts";
-import Destination from "~/components/Forms/portfolioTransfters/Destination";
 import {
   useDeleteStructure,
   useDeleteToken,
@@ -44,14 +33,9 @@ export {
   getObservedWalletBalances,
   getAvailableStructures,
 } from "./server";
-import { fetchTokens, queryTokens } from "~/database/tokens";
-import { convertToFraction } from "~/utils/fractions";
-import {
-  type WalletWithBalance,
-  type BatchTransferFormStore,
-} from "./interface";
-import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import { fetchTokens } from "~/database/tokens";
 
+import { type WalletWithBalance } from "./interface";
 import { Spinner } from "~/components/Spinner/Spinner";
 
 import { type ObservedBalanceDetails } from "~/interface/walletsTokensBalances/walletsTokensBalances";
@@ -59,7 +43,6 @@ import {
   hasExecutableWallet,
   isNameUnique,
 } from "~/utils/validators/availableStructure";
-
 import { SwapModal } from "./_components/Swap/Swap";
 import NoData from "~/components/Molecules/NoData/NoData";
 import { useDebouncer } from "~/utils/debouncer";
@@ -75,7 +58,6 @@ import Select from "~/components/Atoms/Select/Select";
 import { Transfer } from "~/components/Transfer/Transfer";
 
 export default component$(() => {
-  const wagmiConfig = useContext(WagmiConfigContext);
   const clickedToken = useStore({ balanceId: "", structureId: "" });
   const structureStore = useStore({ name: "" });
   const selectedWallets = useStore({ wallets: [] as any[] });
@@ -83,7 +65,6 @@ export default component$(() => {
   const isTransferModalOpen = useSignal(false);
   const isSwapModalOpen = useSignal<boolean>(false);
   const deleteToken = useDeleteToken();
-  const formMessageProvider = useContext(messagesContext);
   const createStructureAction = useCreateStructure();
   const deleteStructureAction = useDeleteStructure();
   const isWalletSelected = useStore({
@@ -95,12 +76,6 @@ export default component$(() => {
     selection: [] as { balanceId: string; status: boolean }[],
   });
   const availableBalances = useSignal<number>(0);
-  const stepsCounter = useSignal(1);
-  const batchTransferFormStore = useStore<BatchTransferFormStore>({
-    receiverAddress: "",
-    coinsToTransfer: [],
-    consent: false,
-  });
   const tokenFromAddress = useSignal("");
   const allTokensFromDb = useSignal([]);
   const walletAddressOfTokenToSwap = useSignal("");
@@ -197,78 +172,6 @@ export default component$(() => {
     },
   );
 
-  const handleBatchTransfer = $(async () => {
-    const emethContractAddress = import.meta.env
-      .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
-
-    if (!emethContractAddress) {
-      throw new Error("Missing PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA");
-    }
-
-    try {
-      const tokens = await queryTokens();
-      if (wagmiConfig.config.value) {
-        const argsArray = [];
-        for (const cStructure of batchTransferFormStore.coinsToTransfer) {
-          for (const cCoin of cStructure.coins) {
-            const chosenToken = tokens.find(
-              (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
-            );
-            const { numerator, denominator } = convertToFraction(cCoin.amount);
-            const calculation =
-              BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
-              BigInt(denominator);
-            argsArray.push({
-              from: cCoin.address as `0x${string}`,
-              to: batchTransferFormStore.receiverAddress as `0x${string}`,
-              amount: calculation,
-              token: chosenToken.address as `0x${string}`,
-            });
-          }
-        }
-        const { request } = await simulateContract(wagmiConfig.config.value, {
-          abi: emethContractAbi,
-          address: emethContractAddress,
-          functionName: "transferBatch",
-          args: [argsArray],
-        });
-
-        formMessageProvider.messages.push({
-          id: formMessageProvider.messages.length,
-          variant: "info",
-          message: "Transferring tokens...",
-          isVisible: true,
-        });
-
-        const transactionHash = await writeContract(
-          wagmiConfig.config.value,
-          request,
-        );
-        await waitForTransactionReceipt(wagmiConfig.config.value, {
-          hash: transactionHash,
-        });
-
-        batchTransferFormStore.receiverAddress = "";
-        batchTransferFormStore.coinsToTransfer = [];
-
-        formMessageProvider.messages.push({
-          id: formMessageProvider.messages.length,
-          variant: "success",
-          message: "Success!",
-          isVisible: true,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      formMessageProvider.messages.push({
-        id: formMessageProvider.messages.length,
-        variant: "error",
-        message: "Something went wrong.",
-        isVisible: true,
-      });
-    }
-  });
-
   return (
     <>
       {availableStructures.value.isLoading ? (
@@ -300,25 +203,6 @@ export default component$(() => {
                   !hasExecutableWallet(availableStructures.value.structures)
                 }
                 onClick$={async () => {
-                  for (const structure of availableStructures.value
-                    .structures) {
-                    const coins = [];
-                    for (const wallet of structure.structureBalance) {
-                      const walletAddress = `${observedWalletsWithBalance.value.find((item: WalletWithBalance) => item.wallet.id === wallet.wallet.id)?.wallet.address}`;
-                      coins.push({
-                        wallet: wallet.wallet.name,
-                        isExecutable: wallet.wallet.isExecutable,
-                        address: walletAddress,
-                        symbol: wallet.balance.symbol,
-                        amount: "0",
-                        isChecked: false,
-                      });
-                    }
-                    batchTransferFormStore.coinsToTransfer.push({
-                      name: structure.structure.name,
-                      coins: coins,
-                    });
-                  }
                   isTransferModalOpen.value = true;
                 }}
                 customClass="font-normal"
@@ -407,88 +291,6 @@ export default component$(() => {
       {isTransferModalOpen.value ? (
         <Transfer isOpen={isTransferModalOpen} />
       ) : null}
-      {/* {isTransferModalOpen.value ? (
-        <Modal
-          title="Transfer Funds"
-          isOpen={isTransferModalOpen}
-          onClose={$(() => {
-            batchTransferFormStore.receiverAddress = "";
-            batchTransferFormStore.coinsToTransfer = [];
-            stepsCounter.value = 1;
-          })}
-        >
-          <div class="mb-4 flex flex-col overflow-y-scroll">
-            {stepsCounter.value === 1 ? (
-              <CoinsToTransfer
-                // add filter to exclude structures with no exe wallet
-                availableStructures={availableStructures}
-                batchTransferFormStore={batchTransferFormStore}
-              />
-            ) : null}
-            {stepsCounter.value === 2 ? (
-              <CoinsAmounts batchTransferFormStore={batchTransferFormStore} />
-            ) : null}
-            {stepsCounter.value === 3 ? (
-              <Destination batchTransferFormStore={batchTransferFormStore} />
-            ) : null}
-          </div>
-          <div class="flex gap-4">
-            <Button
-              variant="transparent"
-              type="button"
-              text={stepsCounter.value === 1 ? "Cancel" : "Back"}
-              onClick$={async () => {
-                if (stepsCounter.value === 2) {
-                  batchTransferFormStore.coinsToTransfer = [];
-                  for (const structure of availableStructures.value
-                    .structures) {
-                    const coins = [];
-                    for (const wallet of structure.structureBalance) {
-                      const walletAddress = `${observedWalletsWithBalance.value.find((item: WalletWithBalance) => item.walletName === wallet.wallet.name)?.wallet.address}`;
-                      coins.push({
-                        wallet: wallet.wallet.name,
-                        isExecutable: wallet.wallet.isExecutable,
-                        address: walletAddress,
-                        symbol: wallet.balance.symbol,
-                        amount: "0",
-                        isChecked: false,
-                      });
-                    }
-                    batchTransferFormStore.coinsToTransfer.push({
-                      name: structure.structure.name,
-                      coins: coins,
-                    });
-                  }
-                }
-                if (stepsCounter.value > 1) {
-                  stepsCounter.value = stepsCounter.value - 1;
-                } else {
-                  isTransferModalOpen.value = false;
-                  batchTransferFormStore.receiverAddress = "";
-                  batchTransferFormStore.coinsToTransfer = [];
-                  stepsCounter.value = 1;
-                }
-              }}
-              customClass="w-full"
-            />
-            <Button
-              variant="blue"
-              text={stepsCounter.value === 3 ? "Send" : "Next"}
-              onClick$={async () => {
-                if (stepsCounter.value === 3) {
-                  isTransferModalOpen.value = false;
-                  stepsCounter.value = 1;
-
-                  await handleBatchTransfer();
-                } else {
-                  stepsCounter.value = stepsCounter.value + 1;
-                }
-              }}
-              customClass="w-full"
-            />
-          </div>
-        </Modal>
-      ) : null} */}
       {isCreateNewStructureModalOpen.value && (
         <Modal
           isOpen={isCreateNewStructureModalOpen}

@@ -1,4 +1,4 @@
-import { $, component$, useVisibleTask$ } from "@builder.io/qwik";
+import { $, component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import Paragraph from "../Atoms/Paragraphs/Paragraphs";
 import Box from "../Atoms/Box/Box";
 import Header from "../Atoms/Headers/Header";
@@ -10,10 +10,7 @@ import Input from "../Atoms/Input/Input";
 import Select from "../Atoms/Select/Select";
 import Annotation from "../Atoms/Annotation/Annotation";
 import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
-import {
-  BatchTransferFormStore,
-  WalletWithBalance,
-} from "~/routes/app/portfolio/interface";
+import { BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
 interface Step1Props {
@@ -23,6 +20,7 @@ interface Step1Props {
 
 export const Step1 = component$<Step1Props>(
   ({ batchTransferFormStore, availableStructures }) => {
+    const isCheckAllChecked = useSignal(false);
     return (
       <div class="flex gap-6">
         {/* left side */}
@@ -34,7 +32,16 @@ export const Step1 = component$<Step1Props>(
           >
             <div class="flex items-center gap-2">
               <Annotation text="Select All" />
-              <Checkbox variant="toggleTick" isChecked={false} />
+              <Checkbox
+                variant="toggleTick"
+                isChecked={isCheckAllChecked.value}
+                onClick={$(() => {
+                  isCheckAllChecked.value = !isCheckAllChecked.value;
+                  for (let structure of batchTransferFormStore.coinsToTransfer) {
+                    structure.isChecked = isCheckAllChecked.value;
+                  }
+                })}
+              />
             </div>
           </BoxHeader>
           <Input
@@ -45,7 +52,7 @@ export const Step1 = component$<Step1Props>(
             iconRight={<IconSearch class="h-4 w-4 fill-white" />}
           />
           {batchTransferFormStore.coinsToTransfer.length ? (
-            <div>
+            <div key={`${isCheckAllChecked.value}structures`}>
               {availableStructures?.value.structures.map(
                 (structure: any, index: number) => {
                   const currentStructure =

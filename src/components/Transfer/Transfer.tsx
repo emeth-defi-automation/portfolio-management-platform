@@ -249,6 +249,7 @@ export const Transfer = component$<TransferProps>(({ isOpen }) => {
                   batchTransferFormStore.receiverAddress
                 ) {
                   console.log("store: ", batchTransferFormStore);
+                  isOpen.value = false;
                   await handleBatchTransfer();
                 }
               } else {
