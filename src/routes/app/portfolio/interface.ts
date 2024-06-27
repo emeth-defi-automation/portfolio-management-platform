@@ -30,7 +30,7 @@ export type StructureToApprove = {
 };
 export interface BatchTransferFormStore {
   receiverAddress: string;
-  consent: boolean,
+  consent: boolean;
   coinsToTransfer: StructureToApprove[];
 }
 export type actionType = "PRICE" | "BALANCE";

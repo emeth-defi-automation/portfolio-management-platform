@@ -142,23 +142,26 @@ export const Transfer = component$<TransferProps>(
           const argsArray = [];
           for (const cStructure of batchTransferFormStore.coinsToTransfer) {
             for (const cCoin of cStructure.coins) {
-              const chosenToken = tokens.find(
-                (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
-              );
-              const { numerator, denominator } = convertToFraction(
-                cCoin.amount,
-              );
-              const calculation =
-                BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
-                BigInt(denominator);
-              argsArray.push({
-                from: cCoin.address as `0x${string}`,
-                to: batchTransferFormStore.receiverAddress as `0x${string}`,
-                amount: calculation,
-                token: chosenToken.address as `0x${string}`,
-              });
+              if (cCoin.isChecked) {
+                const chosenToken = tokens.find(
+                  (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
+                );
+                const { numerator, denominator } = convertToFraction(
+                  cCoin.amount,
+                );
+                const calculation =
+                  BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
+                  BigInt(denominator);
+                argsArray.push({
+                  from: cCoin.address as `0x${string}`,
+                  to: batchTransferFormStore.receiverAddress as `0x${string}`,
+                  amount: calculation,
+                  token: chosenToken.address as `0x${string}`,
+                });
+              }
             }
           }
+
           const { request } = await simulateContract(wagmiConfig.config.value, {
             abi: emethContractAbi,
             address: emethContractAddress,
@@ -214,19 +217,23 @@ export const Transfer = component$<TransferProps>(
         const argsArray = [];
         for (const cStructure of batchTransferFormStore.coinsToTransfer) {
           for (const cCoin of cStructure.coins) {
-            const chosenToken = tokens.find(
-              (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
-            );
-            const { numerator, denominator } = convertToFraction(cCoin.amount);
-            const calculation =
-              BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
-              BigInt(denominator);
-            argsArray.push({
-              from: cCoin.address as `0x${string}`,
-              to: batchTransferFormStore.receiverAddress as `0x${string}`,
-              amount: `${calculation}`,
-              token: chosenToken.address as `0x${string}`,
-            });
+            if (cCoin.isChecked) {
+              const chosenToken = tokens.find(
+                (token: any) => token.symbol === cCoin.symbol.toUpperCase(),
+              );
+              const { numerator, denominator } = convertToFraction(
+                cCoin.amount,
+              );
+              const calculation =
+                BigInt(numerator * BigInt(10 ** chosenToken.decimals)) /
+                BigInt(denominator);
+              argsArray.push({
+                from: cCoin.address as `0x${string}`,
+                to: batchTransferFormStore.receiverAddress as `0x${string}`,
+                amount: `${calculation}`,
+                token: chosenToken.address as `0x${string}`,
+              });
+            }
           }
         }
         const user = localStorage.getItem("emmethUserWalletAddress");

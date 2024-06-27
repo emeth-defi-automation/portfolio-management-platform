@@ -160,9 +160,9 @@ export const AddWalletModal = component$<AddWalletModal>(
                       wagmiConfig.config.value,
                       request,
                     );
-                    await waitForTransactionReceipt(wagmiConfig.config.value, {
-                      hash,
-                    });
+                    // await waitForTransactionReceipt(wagmiConfig.config.value, {
+                    //   hash,
+                    // });
                   } catch (err) {
                     console.error("Error: ", err);
                   }
@@ -195,9 +195,9 @@ export const AddWalletModal = component$<AddWalletModal>(
             request,
           );
 
-          await waitForTransactionReceipt(wagmiConfig.config.value as Config, {
-            hash,
-          });
+          // await waitForTransactionReceipt(wagmiConfig.config.value as Config, {
+          //   hash,
+          // });
         }
         if (wagmiConfig.config.value) {
           await disconnectWallets(wagmiConfig.config);

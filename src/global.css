@@ -82,6 +82,9 @@ body {
     src: url("/fonts/Sora-ExtraLight.woff2") format("woff2");
   }
 }
+::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
 /* Our customs classes for re-using */
 .custom-text-50 {
   color: rgba(255, 255, 255, 0.5);

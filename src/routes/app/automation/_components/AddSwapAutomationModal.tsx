@@ -218,6 +218,7 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ track }) => {
       track(() => swapValues.tokenToSwapOn.symbol);
+
       await tokenFromAmountDebounce({
         amountIn: swapValues.chosenToken.value,
         tokenInAddress: swapValues.chosenToken.address as `0x${string}`,
@@ -342,8 +343,11 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
                   }),
                 ].filter((item) => item != null)}
                 size="swap"
-                onValueChange={$((value: string) => {
+                onValueChange={$(async (value: string) => {
                   swapValues.chosenToken.address = value;
+                  swapValues.chosenToken.symbol = await getTokenSymbolByAddress(
+                    value as `0x${string}`,
+                  );
                 })}
               />
             </Box>

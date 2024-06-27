@@ -67,94 +67,97 @@ export const CentralView = component$<CentralViewProps>(() => {
 
   return (
     <div
-      class={`p-6 duration-500 ease-out ${automationPageContext.isDraverOpen.value ? "w-[calc(100%-48rem)]" : "w-full"}`}
+      class={`relative p-6 duration-500 ease-out ${automationPageContext.isDraverOpen.value ? "w-[calc(100%-48rem)]" : "w-full"}`}
     >
       {automationPageContext.activeAutomation.value ? (
-        <div class="flex h-full w-full flex-col">
-          <div class="flex w-full items-center justify-between">
-            <div class="flex items-center gap-2">
-              <Header
-                variant="h4"
-                text={automationPageContext.activeAutomation.value?.name}
-                class="font-normal"
-              />
-              <Button
-                leftIcon={<IconEdit class="h-3 w-3 fill-white" />}
-                customClass="bg-white/10 h-8 w-8 p-0"
-              />
-              <Button
-                leftIcon={<IconTrash class="h-4 w-4 fill-customRed" />}
-                customClass="bg-customRed/10 h-8 w-8 p-0"
-                onClick$={$(async () => {
-                  await handleDeleteAction();
-                })}
-              />
-            </div>
-            <div class="flex  items-center  gap-2">
-              <Paragraph size="xs" class="text-customGreen" text="Active" />
-              <Checkbox variant="toggleTick" isChecked={true} class="" />
-            </div>
-          </div>
-          <div class="flex h-full w-full flex-col items-center justify-center gap-10">
-            <div class="flex w-[438px] flex-col gap-4">
-              <Annotation text="Trigger" />
-
-              {!automationPageContext.activeAutomation.value.deployed &&
-              !automationPageContext.activeAutomation.value.trigger ? (
+        <>
+          <div class="flex h-full w-full flex-col">
+            <div class="flex w-full items-center justify-between">
+              <div class="flex items-center gap-2">
+                <Header
+                  variant="h4"
+                  text={automationPageContext.activeAutomation.value?.name}
+                  class="font-normal"
+                />
                 <Button
-                  text="Add Trigger"
+                  leftIcon={<IconEdit class="h-3 w-3 fill-white" />}
+                  customClass="bg-white/10 h-8 w-8 p-0"
+                />
+                <Button
+                  leftIcon={<IconTrash class="h-4 w-4 fill-customRed" />}
+                  customClass="bg-customRed/10 h-8 w-8 p-0"
+                  onClick$={$(async () => {
+                    await handleDeleteAction();
+                  })}
+                />
+              </div>
+              <div class="flex  items-center  gap-2">
+                <Paragraph size="xs" class="text-customGreen" text="Active" />
+                <Checkbox variant="toggleTick" isChecked={true} class="" />
+              </div>
+            </div>
+            <div class="flex h-full w-full flex-col items-center justify-center gap-10">
+              <div class="flex w-[438px] flex-col gap-4">
+                <Annotation text="Trigger" />
+
+                {!automationPageContext.activeAutomation.value.deployed &&
+                !automationPageContext.activeAutomation.value.trigger ? (
+                  <Button
+                    text="Add Trigger"
+                    customClass="h-14"
+                    variant="dashed"
+                    leftIcon={<IconAdd class="h-4 w-4" />}
+                    onClick$={async () => {
+                      automationPageContext.isDraverOpen.value = true;
+                      automationPageContext.sideDraverVariant.value =
+                        "triggerForm";
+                    }}
+                  />
+                ) : (
+                  <AutomationCard
+                    variant="trigger"
+                    isActive={true}
+                    title={
+                      automationPageContext.activeAutomation.value?.trigger
+                        .triggerName
+                    }
+                    description={
+                      automationPageContext.activeAutomation.value?.trigger
+                        .triggerDesc
+                    }
+                  />
+                )}
+              </div>
+              <div class="flex w-[438px] flex-col gap-4">
+                <Annotation text="Actions" />
+
+                {automationPageContext.activeAutomation.value.actions.map(
+                  (action: any) => (
+                    <AutomationCard
+                      key={`${automationPageContext.activeAutomation.value.automationId}${action.actionId}`}
+                      variant={action.actionType.toLowerCase()}
+                      isActive={false}
+                      title={action.actionName}
+                      description={action.actionDesc}
+                    />
+                  ),
+                )}
+                <Button
+                  text="Add Action"
                   customClass="h-14"
                   variant="dashed"
                   leftIcon={<IconAdd class="h-4 w-4" />}
                   onClick$={async () => {
                     automationPageContext.isDraverOpen.value = true;
                     automationPageContext.sideDraverVariant.value =
-                      "triggerForm";
+                      "addActionForm";
                   }}
                 />
-              ) : (
-                <AutomationCard
-                  variant="trigger"
-                  isActive={true}
-                  title={
-                    automationPageContext.activeAutomation.value?.trigger
-                      .triggerName
-                  }
-                  description={
-                    automationPageContext.activeAutomation.value?.trigger
-                      .triggerDesc
-                  }
-                />
-              )}
-            </div>
-            <div class="flex w-[438px] flex-col gap-4">
-              <Annotation text="Actions" />
-
-              {automationPageContext.activeAutomation.value.actions.map(
-                (action: any) => (
-                  <AutomationCard
-                    key={`${automationPageContext.activeAutomation.value.automationId}${action.actionId}`}
-                    variant={action.actionType.toLowerCase()}
-                    isActive={false}
-                    title={action.actionName}
-                    description={action.actionDesc}
-                  />
-                ),
-              )}
-              <Button
-                text="Add Action"
-                customClass="h-14"
-                variant="dashed"
-                leftIcon={<IconAdd class="h-4 w-4" />}
-                onClick$={async () => {
-                  automationPageContext.isDraverOpen.value = true;
-                  automationPageContext.sideDraverVariant.value =
-                    "addActionForm";
-                }}
-              />
+              </div>
             </div>
           </div>
-        </div>
+          <SaveChanges />
+        </>
       ) : null}
     </div>
   );

@@ -50,7 +50,6 @@ const updateAutomationAction = server$(
           triggerDesc: triggerDesc,
         },
       );
-      console.log("result: ", result);
     } catch (err) {
       console.log(err);
     }
@@ -117,6 +116,7 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
         message: "Success!",
         isVisible: true,
       });
+      automationPageContext.isDraverOpen.value = false;
     } catch (err) {
       console.log(err);
       formMessageProvider.messages.push({
