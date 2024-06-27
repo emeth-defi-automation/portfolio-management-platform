@@ -20,6 +20,7 @@ import {
   WagmiConfigContext,
 } from "~/components/WalletConnect/context";
 import { setupMoralis } from "~/utils/stream";
+import { AutomationPageContext } from "./app/automation/AutomationPageContext";
 
 export const metadata = {
   name: "Web3Modal",
@@ -49,6 +50,15 @@ export default component$(() => {
 
   useContextProvider(OnClientContext, {
     onClient: useSignal(false),
+  });
+
+  useContextProvider(AutomationPageContext, {
+    automations: useSignal([]),
+    activeAutomation: useSignal(null),
+    isDraverOpen: useSignal(false),
+    sideDraverVariant: useSignal(""),
+    addSwapModalOpen: useSignal(false),
+    addTransferModalOpen: useSignal(false),
   });
 
   const onClient = useContext(OnClientContext);

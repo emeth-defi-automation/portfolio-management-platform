@@ -6,38 +6,34 @@ import { AutomationPageContext } from "../../AutomationPageContext";
 import { messagesContext } from "~/routes/app/layout";
 import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { emethContractAbi } from "~/abi/emethContractAbi";
-import {
-  simulateContract,
-  waitForTransactionReceipt,
-  writeContract,
-} from "@wagmi/core";
+import { simulateContract, writeContract } from "@wagmi/core";
 import { addressToUint256 } from "~/utils/automations";
 import { convertToFraction } from "~/utils/fractions";
 import { getTokenDecimalsServer } from "~/database/tokens";
-import { server$ } from "@builder.io/qwik-city";
-import { connectToDB } from "~/database/db";
+// import { server$ } from "@builder.io/qwik-city";
+// import { connectToDB } from "~/database/db";
 
-const updateActionDeployedStatus = server$(
-  async function (automationId, user, actionId, deployedStatus) {
-    const query = `
-    UPDATE automations
-    SET actions = (
-      SELECT array::replace(actions, actions[$index], merge(actions[$index], { deployed: $deployedStatus }))
-      FROM actions
-      LET $index = array::find(actions, id = $actionId)
-    )
-    WHERE actionId = $automationId AND user = $user;
-  `;
-    const db = await connectToDB(this.env);
+// const updateActionDeployedStatus = server$(
+//   async function (automationId, user, actionId, deployedStatus) {
+//     const query = `
+//     UPDATE automations
+//     SET actions = (
+//       SELECT array::replace(actions, actions[$index], merge(actions[$index], { deployed: $deployedStatus }))
+//       FROM actions
+//       LET $index = array::find(actions, id = $actionId)
+//     )
+//     WHERE actionId = $automationId AND user = $user;
+//   `;
+//     const db = await connectToDB(this.env);
 
-    await db.query(query, {
-      automationId,
-      user,
-      actionId,
-      deployedStatus,
-    });
-  },
-);
+//     await db.query(query, {
+//       automationId,
+//       user,
+//       actionId,
+//       deployedStatus,
+//     });
+//   },
+// );
 
 export const SaveChanges = component$(() => {
   const automationPageContext = useContext(AutomationPageContext);
@@ -55,10 +51,16 @@ export const SaveChanges = component$(() => {
     const actions = automationPageContext.activeAutomation.value.actions;
     const trigger = automationPageContext.activeAutomation.value.trigger;
 
-    try {
-      const user = localStorage.getItem("emmethUserWalletAddress");
-      if (wagmiConfig.config.value && user) {
-        for (let action of actions) {
+    const user = localStorage.getItem("emmethUserWalletAddress");
+    if (wagmiConfig.config.value && user) {
+      for (const action of actions) {
+        try {
+          formMessageProvider.messages.push({
+            id: formMessageProvider.messages.length,
+            variant: "info",
+            message: `Deploying ${action.actionName}`,
+            isVisible: true,
+          });
           let callData;
           let transfers;
           let _contractAddress;
@@ -177,25 +179,30 @@ export const SaveChanges = component$(() => {
             request,
           );
 
-          await updateActionDeployedStatus(
-            `${automationPageContext.activeAutomation.value.automationId}`,
-            user,
-            `${actionId}`,
-            true,
-          );
+          // await updateActionDeployedStatus(
+          //   `${automationPageContext.activeAutomation.value.automationId}`,
+          //   user,
+          //   `${actionId}`,
+          //   true,
+          // );
           console.log("hash: ", transactionHash);
-          const receipt = await waitForTransactionReceipt(
-            wagmiConfig.config.value,
-            {
-              hash: transactionHash,
-            },
-          );
-
-          console.log("hash: ", receipt);
+          formMessageProvider.messages.push({
+            id: formMessageProvider.messages.length,
+            variant: "success",
+            message: `Deployed ${action.actionName}`,
+            isVisible: true,
+          });
+        } catch (err) {
+          console.log(err);
+          formMessageProvider.messages.push({
+            id: formMessageProvider.messages.length,
+            variant: "error",
+            message: `Could not deploy ${action.actionName}.`,
+            isVisible: true,
+          });
         }
       }
-    } catch (err) {
-      console.log(err);
+      console.log("DONE!");
     }
   });
 

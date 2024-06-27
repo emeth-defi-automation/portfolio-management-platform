@@ -1,4 +1,4 @@
-import { component$, useContext, useVisibleTask$ } from "@builder.io/qwik";
+import { component$, useContext } from "@builder.io/qwik";
 import { AutomationPageContext } from "../AutomationPageContext";
 import { TriggerForm } from "./Forms/TriggerForm";
 import { AddActionForm } from "./Forms/AddActionFrom";

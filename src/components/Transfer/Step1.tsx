@@ -10,7 +10,7 @@ import Input from "../Atoms/Input/Input";
 import Select from "../Atoms/Select/Select";
 import Annotation from "../Atoms/Annotation/Annotation";
 import IconSearch from "@material-design-icons/svg/filled/search.svg?jsx";
-import { BatchTransferFormStore } from "~/routes/app/portfolio/interface";
+import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
 interface Step1Props {
@@ -36,7 +36,7 @@ export const Step1 = component$<Step1Props>(
                 isChecked={isCheckAllChecked.value}
                 onClick={$(() => {
                   isCheckAllChecked.value = !isCheckAllChecked.value;
-                  for (let structure of batchTransferFormStore.coinsToTransfer) {
+                  for (const structure of batchTransferFormStore.coinsToTransfer) {
                     structure.isChecked = isCheckAllChecked.value;
                   }
                 })}
@@ -59,7 +59,10 @@ export const Step1 = component$<Step1Props>(
                       (struct) => struct.name === structure.structure.name,
                     )!;
                   return (
-                    <div class="flex items-center justify-between gap-4 p-4">
+                    <div
+                      class="flex items-center justify-between gap-4 p-4"
+                      key={`${structure.structure.name}${index}`}
+                    >
                       <div class="flex flex-col gap-3">
                         <Header
                           variant="h5"
@@ -115,7 +118,10 @@ export const Step1 = component$<Step1Props>(
                     )!;
                   if (!currentStructure.isChecked) return null;
                   return (
-                    <div class={`flex flex-col gap-5`}>
+                    <div
+                      class="flex flex-col gap-5"
+                      key={`${index}${structure.structure.name}`}
+                    >
                       <div class="flex items-center justify-between gap-2 rounded-lg bg-white/3 px-4 py-1">
                         <Paragraph text={structure.structure.name} />
                         <div class="flex items-center gap-2">
@@ -158,7 +164,10 @@ export const Step1 = component$<Step1Props>(
                             );
 
                             return balance.wallet.isExecutable ? (
-                              <div class="flex flex-col gap-1">
+                              <div
+                                class="flex flex-col gap-1"
+                                key={`${index}${balance.balance.name}`}
+                              >
                                 <div class="grid grid-cols-[repeat(3,minmax(0,1fr))] rounded-lg bg-white/3 py-2.5">
                                   <div class="flex items-center gap-4 pl-4">
                                     <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
@@ -167,7 +176,6 @@ export const Step1 = component$<Step1Props>(
                                         width="24"
                                         height="24"
                                       />
-                                      {/* icon should be changed */}
                                     </div>
                                     <div class="flex h-full flex-col justify-center gap-1">
                                       <Paragraph text={balance.balance.name} />

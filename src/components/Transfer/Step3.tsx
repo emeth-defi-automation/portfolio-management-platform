@@ -5,7 +5,7 @@ import Button from "../Atoms/Buttons/Button";
 import Paragraph from "../Atoms/Paragraphs/Paragraphs";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import Annotation from "../Atoms/Annotation/Annotation";
-import { BatchTransferFormStore } from "~/routes/app/portfolio/interface";
+import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 
 interface Step3Props {
   batchTransferFormStore: BatchTransferFormStore;
@@ -24,7 +24,10 @@ export const Step3 = component$<Step3Props>(({ batchTransferFormStore }) => {
             const s = structure.coins.filter((c: any) => c.isChecked === true);
             if (!s.length) return null;
             return (
-              <div class="flex flex-col gap-5">
+              <div
+                class="flex flex-col gap-5"
+                key={`${index}${structure.name}`}
+              >
                 <div class="flex items-center justify-between gap-2 rounded-lg bg-white/3 px-4 py-1">
                   <Paragraph text={structure.name} />
                   <div class="flex items-center gap-2">
@@ -50,7 +53,10 @@ export const Step3 = component$<Step3Props>(({ batchTransferFormStore }) => {
                   {structure.coins.map((coin: any, index: number) => {
                     if (coin.isChecked === false) return null;
                     return (
-                      <div class="flex flex-col gap-1">
+                      <div
+                        class="flex flex-col gap-1"
+                        key={`${index}${coin.symbol}`}
+                      >
                         <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_3fr] items-center py-3">
                           <div class="flex items-center gap-4">
                             <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">

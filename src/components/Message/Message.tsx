@@ -8,23 +8,24 @@ export interface MessageProps {
   message: string;
   isVisible: boolean;
   id: number;
+  time?: number;
 }
 
 export const Message = component$(
-  ({ variant = "info", message = "", isVisible, id }: MessageProps) => {
+  ({ variant = "info", message = "", isVisible, id, time }: MessageProps) => {
     const messagesProvider = useContext(messagesContext);
     const shouldBeVisible = useSignal(false);
 
     useTask$(({ track, cleanup }) => {
       track(() => isVisible);
       shouldBeVisible.value = isVisible;
-
+      const delay = time ? time : 5000;
       if (isVisible) {
         const timeId = setTimeout(() => {
           shouldBeVisible.value = false;
           const index = messagesProvider.messages.findIndex((m) => m.id === id);
           messagesProvider.messages.splice(index, 1);
-        }, 5000);
+        }, delay);
 
         cleanup(() => {
           clearTimeout(timeId);

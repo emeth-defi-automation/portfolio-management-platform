@@ -7,9 +7,7 @@ import {
 } from "@builder.io/qwik";
 import { server$ } from "@builder.io/qwik-city";
 import Button from "~/components/Atoms/Buttons/Button";
-import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
 import Header from "~/components/Atoms/Headers/Header";
-import Label from "~/components/Atoms/Label/Label";
 import { connectToDB } from "~/database/db";
 import { AutomationPageContext } from "../../AutomationPageContext";
 import { messagesContext } from "~/routes/app/layout";
@@ -28,7 +26,7 @@ const updateAutomationAction = server$(
   ) {
     const db = await connectToDB(this.env);
     try {
-      const result = await db.query(
+      await db.query(
         `UPDATE automations 
             SET trigger = { 
               timeZero: $timeZero, 
@@ -72,7 +70,7 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
     });
   });
 
-  const handleAddAutomation = $(async function () {
+  const handleAddTrigger = $(async function () {
     const { triggerName, triggerDesc, timeZero, durationCount, interval } =
       addTriggerStore;
     formMessageProvider.messages.push({
@@ -208,7 +206,7 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
             text="Approve"
             onClick$={$(async () => {
               try {
-                await handleAddAutomation();
+                await handleAddTrigger();
                 automationPageContext.isDraverOpen.value = false;
                 automationPageContext.activeAutomation.value = null;
               } catch (err) {

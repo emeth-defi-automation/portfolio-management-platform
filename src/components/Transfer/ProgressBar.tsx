@@ -8,7 +8,7 @@ import {
 import Paragraph from "~/components/Atoms/Paragraphs/Paragraphs";
 import Select from "../Atoms/Select/Select";
 import Input from "../Atoms/Input/Input";
-import { BatchTransferFormStore } from "~/routes/app/portfolio/interface";
+import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 import { getObservedWalletBalances } from "~/routes/app/portfolio/server/observerWalletBalancesLoader";
 
 interface ProgressBarProps {

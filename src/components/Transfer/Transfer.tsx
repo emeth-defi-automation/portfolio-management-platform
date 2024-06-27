@@ -1,6 +1,6 @@
 import {
   $,
-  Signal,
+  type Signal,
   component$,
   useContext,
   useSignal,
@@ -18,8 +18,8 @@ import Paragraph from "~/components/Atoms/Paragraphs/Paragraphs";
 import { Step2 } from "./Step2";
 import { Step1 } from "./Step1";
 import {
-  BatchTransferFormStore,
-  WalletWithBalance,
+  type BatchTransferFormStore,
+  type WalletWithBalance,
 } from "~/routes/app/portfolio/interface";
 import { getAvailableStructures } from "~/routes/app/portfolio/server/availableStructuresLoader";
 import { getObservedWalletBalances } from "~/routes/app/portfolio/server/observerWalletBalancesLoader";
@@ -36,6 +36,7 @@ import { messagesContext } from "~/routes/app/layout";
 import { generateRandomId } from "~/utils/automations";
 import { server$ } from "@builder.io/qwik-city";
 import { connectToDB } from "~/database/db";
+import { AutomationPageContext } from "~/routes/app/automation/AutomationPageContext";
 
 const addAutomationAction = server$(async function (
   automationAction: any,
@@ -78,6 +79,7 @@ interface TransferProps {
 
 export const Transfer = component$<TransferProps>(
   ({ isOpen, automationAction }) => {
+    const automationPageContext = useContext(AutomationPageContext);
     const wagmiConfig = useContext(WagmiConfigContext);
     const formMessageProvider = useContext(messagesContext);
     const step = useSignal(1);
@@ -238,9 +240,11 @@ export const Transfer = component$<TransferProps>(
           }
         }
         const user = localStorage.getItem("emmethUserWalletAddress");
+
         if (!user) {
           return new Error("there is no user address");
         }
+
         const actionId = `${generateRandomId()}`;
         await addAutomationAction(
           automationAction,
@@ -251,6 +255,7 @@ export const Transfer = component$<TransferProps>(
         automationAction.actionName = "";
         automationAction.actionDesc = "";
         automationAction.actionType = "";
+        automationPageContext.isDraverOpen.value = false;
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "success",

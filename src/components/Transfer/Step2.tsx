@@ -7,7 +7,7 @@ import Input from "../Atoms/Input/Input";
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import Annotation from "../Atoms/Annotation/Annotation";
 import Select from "../Atoms/Select/Select";
-import { BatchTransferFormStore } from "~/routes/app/portfolio/interface";
+import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 import { replaceNonMatching } from "~/utils/fractions";
 import { convertWeiToQuantity } from "~/utils/formatBalances/formatTokenBalance";
 
@@ -32,7 +32,10 @@ export const Step2 = component$<Step2Props>(
               );
               if (!s.length) return null;
               return (
-                <div class="flex flex-col gap-5">
+                <div
+                  class="flex flex-col gap-5"
+                  key={`${index}${structure.name}`}
+                >
                   <div class="flex items-center justify-between gap-2 rounded-lg bg-white/3 px-4 py-1">
                     <Paragraph text={structure.name} />
                     <div class="flex items-center gap-2">
@@ -59,7 +62,10 @@ export const Step2 = component$<Step2Props>(
                     {structure.coins.map((coin: any, index: number) => {
                       if (coin.isChecked === false) return null;
                       return (
-                        <div class="flex flex-col gap-4">
+                        <div
+                          class="flex flex-col gap-4"
+                          key={`${index}${coin.symbol}`}
+                        >
                           <div class="grid grid-cols-[repeat(3,minmax(0,1fr))_1fr_2fr] items-center rounded-lg">
                             <div class="flex items-center gap-4">
                               <div class="flex items-center justify-center rounded-lg bg-white/3 p-2">
@@ -70,7 +76,7 @@ export const Step2 = component$<Step2Props>(
                                 />
                               </div>
                               <div class="flex h-full flex-col justify-center gap-1">
-                                <Paragraph text="Bitcoin" />
+                                <Paragraph text="" />
                                 {/* dodac nazwe coina */}
                                 <Annotation text={coin.symbol} />
                               </div>

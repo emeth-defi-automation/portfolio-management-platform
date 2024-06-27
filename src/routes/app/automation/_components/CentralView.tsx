@@ -120,18 +120,17 @@ export const CentralView = component$<CentralViewProps>(() => {
             <div class="flex h-full w-full flex-col items-center justify-center gap-10">
               <div class="flex w-[438px] flex-col gap-4">
                 <Annotation text="Trigger" />
-                {automationPageContext.activeAutomation.value.trigger !=
-                undefined ? (
+                {automationPageContext.activeAutomation.value.trigger ? (
                   <AutomationCard
                     variant="trigger"
                     isActive={true}
                     title={
                       automationPageContext.activeAutomation.value?.trigger
-                        .triggerName
+                        ?.triggerName
                     }
                     description={
                       automationPageContext.activeAutomation.value?.trigger
-                        .triggerDesc
+                        ?.triggerDesc
                     }
                   />
                 ) : (
