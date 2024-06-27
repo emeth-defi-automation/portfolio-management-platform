@@ -201,62 +201,58 @@ export const PortfolioValue = component$<PortfolioValueProps>(
             <Spinner isTextVisible={false} />
           </div>
         ) : (
-          <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <Annotation transform="upper" text="Value over time" />
-              <div class="custom-bg-opacity-5 custom-border-1 flex h-8 rounded-lg p-1">
-                <button
-                  name="24h"
-                  class={
-                    selectedPeriodForChart.value === Period.DAY
-                      ? "custom-bg-button rounded-lg px-2"
-                      : "rounded-lg px-2"
-                  }
-                  onClick$={() => {
+              <div class="custom-border-1 flex h-8 items-center gap-2 rounded-lg bg-white/5 p-1">
+                <Button
+                  text="24h"
+                  onClick$={$(() => {
                     selectedPeriodForChart.value = Period.DAY;
-                  }}
-                >
-                  24h
-                </button>
-                <button
-                  name="1W"
-                  class={
-                    selectedPeriodForChart.value === Period.WEEK
-                      ? "custom-bg-button rounded-lg px-2"
-                      : "rounded-lg px-2"
+                  })}
+                  customClass="rounded-lg w-full h-full !px-2 text-xs"
+                  variant={
+                    selectedPeriodForChart.value === Period.DAY
+                      ? "transfer"
+                      : "onlyIcon"
                   }
-                  onClick$={() => {
+                />
+                <Button
+                  text="1W"
+                  onClick$={$(() => {
                     selectedPeriodForChart.value = Period.WEEK;
-                  }}
-                >
-                  1W
-                </button>
-                <button
-                  name="1M"
-                  class={
-                    selectedPeriodForChart.value === Period.MONTH
-                      ? "custom-bg-button rounded-lg px-2"
-                      : "rounded-lg px-2"
+                  })}
+                  customClass="rounded-lg w-full h-full !px-2 text-xs"
+                  variant={
+                    selectedPeriodForChart.value === Period.WEEK
+                      ? "transfer"
+                      : "onlyIcon"
                   }
-                  onClick$={() => {
+                />
+                <Button
+                  text="1M"
+                  onClick$={$(() => {
                     selectedPeriodForChart.value = Period.MONTH;
-                  }}
-                >
-                  1M
-                </button>
-                <button
-                  name="1Y"
-                  class={
-                    selectedPeriodForChart.value === Period.YEAR
-                      ? "custom-bg-button rounded-lg px-2"
-                      : "rounded-lg px-2"
+                  })}
+                  customClass="rounded-lg w-full h-full !px-2 text-xs"
+                  variant={
+                    selectedPeriodForChart.value === Period.MONTH
+                      ? "transfer"
+                      : "onlyIcon"
                   }
-                  onClick$={() => {
+                />
+                <Button
+                  text="1Y"
+                  onClick$={$(() => {
                     selectedPeriodForChart.value = Period.YEAR;
-                  }}
-                >
-                  1Y
-                </button>
+                  })}
+                  customClass="rounded-lg w-full h-full !px-2 text-xs"
+                  variant={
+                    selectedPeriodForChart.value === Period.YEAR
+                      ? "transfer"
+                      : "onlyIcon"
+                  }
+                />
               </div>
             </div>
 

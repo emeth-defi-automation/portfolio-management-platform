@@ -35,7 +35,7 @@ const buttonStyles = cva(
           "border-dashed border-customBlue border-[1px] rounded-lg w-full bg-customBlue/10",
         ],
         transfer: [
-          "bg-gradient-to-br from-pink-600 via-pink-600 to-red-300 border-none rounded-md hover:brightness-100",
+          "bg-customGradient border-none rounded-md hover:brightness-100",
         ],
       },
       size: {

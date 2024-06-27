@@ -159,18 +159,7 @@ body {
 }
 
 .custom-text-gradient {
-  background: linear-gradient(
-    120deg,
-    #da301f 0%,
-    #f48946 1%,
-    #ee3560 2%,
-    #fa4784 3%,
-    #ff48c0 6%,
-    #8e38b5 9%,
-    #5542bb 11%,
-    #0051c4 100%
-  );
-
+  background: linear-gradient(135deg, #ec008c 0%, #fc6767 100%);
   background-clip: text;
 }
 
