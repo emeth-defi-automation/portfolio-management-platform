@@ -19,8 +19,7 @@ export interface ButtonProps {
 
 const buttonStyles = cva(
   [
-    "font-['Sora'] pointer flex items-center gap-2 text-nowrap justify-center rounded-full border-2 border-transparent",
-    "hover:brightness-75 disabled:bg-transparent disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:border-2 disabled:border-customGrey/15 disabled:text-customGrey",
+    "font-['Sora'] pointer flex items-center gap-2 text-nowrap justify-center rounded-full border-2 text-white border-transparent hover:brightness-75 disabled:bg-transparent disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:border-2 disabled:border-customGrey/15 disabled:text-customGrey",
   ],
   {
     variants: {
@@ -30,13 +29,13 @@ const buttonStyles = cva(
         red: ["bg-customRed"],
         danger: ["bg-customRed/20 text-customRed"],
         gradient: ["gradient-border disabled:before:p-0 "],
-        iconBox: ["custom-border-1 custom-bg-white rounded-lg !px-2 !py-2"],
-        onlyIcon: ["!p-0 gap-0 !h-fit"],
+        iconBox: ["custom-border-1 custom-bg-white rounded-lg !p-2"],
+        onlyIcon: ["!p-0 gap-0 !h-fit border-0"],
         dashed: [
           "border-dashed border-customBlue border-[1px] rounded-lg w-full bg-customBlue/10",
         ],
         transfer: [
-          "bg-gradient-to-br from-pink-600 via-pink-600 to-red-300 border-none !text-xs rounded-md !h-6 !w-[146px]",
+          "bg-gradient-to-br from-pink-600 via-pink-600 to-red-300 border-none rounded-md hover:brightness-100",
         ],
       },
       size: {

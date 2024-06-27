@@ -158,20 +158,6 @@ body {
   z-index: -1;
 }
 
-.custom-btn-gradient {
-  background: linear-gradient(
-    to right,
-    #da301f,
-    #f48946,
-    #ee3560,
-    #fa4784,
-    #ff48c0,
-    #8e38b5,
-    #5542bb,
-    #0051c3
-  );
-}
-
 .custom-text-gradient {
   background: linear-gradient(
     120deg,
