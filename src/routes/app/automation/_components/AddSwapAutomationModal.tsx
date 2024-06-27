@@ -35,6 +35,7 @@ import WalletAddressValueSwitch from "../../portfolio/_components/Swap/WalletAdd
 import { getObservedWalletBalances } from "../../portfolio/server/observerWalletBalancesLoader";
 import { connectToDB } from "~/database/db";
 import { generateRandomId } from "~/utils/automations";
+import { AutomationPageContext } from "../AutomationPageContext";
 
 const addAutomationAction = server$(async function (
   automationAction: any,
@@ -53,6 +54,7 @@ const addAutomationAction = server$(async function (
       accountToSendTokens: swapValues.accountToSendTokens,
       addressToSwapFrom: swapValues.chosenTokenWalletAddress,
       actionId: actionId,
+      deployed: false,
     };
     const automationId = `${automationAction.automationId}`;
     await db.query(
@@ -101,6 +103,7 @@ interface AddSwapActionModalProps {
 export const AddSwapActionModal = component$<AddSwapActionModalProps>(
   ({ isOpen, automationAction }) => {
     const formMessageProvider = useContext(messagesContext);
+    const automationPageContext = useContext(AutomationPageContext);
     const allTokensFromDb = useSignal([]);
     const wallets = useSignal<any>([]);
     const wagmiConfig = useContext(WagmiConfigContext);
@@ -245,13 +248,16 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
           user!,
           `${actionId}`,
         );
-
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "success",
           message: "Tokens swapped!",
           isVisible: true,
         });
+        automationPageContext.isDraverOpen.value = false;
+        automationAction.actionName = "";
+        automationAction.actionDesc = "";
+        automationAction.actionType = "";
       } catch (err) {
         console.log(err);
         formMessageProvider.messages.push({

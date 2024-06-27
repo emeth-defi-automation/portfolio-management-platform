@@ -23,7 +23,6 @@ const updateAutomationAction = server$(
     user,
     triggerName,
     triggerDesc,
-    isActive,
     timeZero,
     duration,
   ) {
@@ -31,8 +30,7 @@ const updateAutomationAction = server$(
     try {
       const result = await db.query(
         `UPDATE automations 
-            SET trigger = {
-              isActive: $isActive, 
+            SET trigger = { 
               timeZero: $timeZero, 
               triggerName: $triggerName, 
               triggerDesc: $triggerDesc, 
@@ -43,7 +41,6 @@ const updateAutomationAction = server$(
         {
           actionId: `${actionId}`,
           user: user,
-          isActive: isActive,
           timeZero: timeZero,
           duration: duration,
           triggerName: triggerName,
@@ -62,7 +59,6 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
   const automationPageContext = useContext(AutomationPageContext);
   const formMessageProvider = useContext(messagesContext);
   const addTriggerStore = useStore({
-    isActive: false,
     triggerName: "",
     triggerDesc: "",
     durationCount: 0,
@@ -77,15 +73,8 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
   });
 
   const handleAddAutomation = $(async function () {
-    const {
-      isActive,
-
-      triggerName,
-      triggerDesc,
-      timeZero,
-      durationCount,
-      interval,
-    } = addTriggerStore;
+    const { triggerName, triggerDesc, timeZero, durationCount, interval } =
+      addTriggerStore;
     formMessageProvider.messages.push({
       id: formMessageProvider.messages.length,
       variant: "info",
@@ -105,7 +94,6 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
         user,
         triggerName,
         triggerDesc,
-        isActive,
         timeZeroCalculated,
         duration,
       );
@@ -216,16 +204,6 @@ export const TriggerForm = component$<TriggerFormProps>(() => {
               addTriggerStore.durationCount = target.value;
             })}
           />
-          <div class="flex items-center gap-2">
-            <Checkbox
-              variant="toggleTick"
-              isChecked={addTriggerStore.isActive}
-              onClick={$(() => {
-                addTriggerStore.isActive = !addTriggerStore.isActive;
-              })}
-            />
-            <Label name="Is Active?" class="my-2 block" />
-          </div>
           <Button
             text="Approve"
             onClick$={$(async () => {

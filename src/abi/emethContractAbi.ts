@@ -183,4 +183,29 @@ export const emethContractAbi = [
     ],
     stateMutability: "view",
   },
+  {
+    type: "event",
+    name: "ActionExecutionAttempted",
+    inputs: [
+      {
+        name: "actionId",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "timeZero",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "contractAddress",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
 ] as const;

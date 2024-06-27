@@ -14,6 +14,30 @@ import {
 import { addressToUint256 } from "~/utils/automations";
 import { convertToFraction } from "~/utils/fractions";
 import { getTokenDecimalsServer } from "~/database/tokens";
+import { server$ } from "@builder.io/qwik-city";
+import { connectToDB } from "~/database/db";
+
+const updateActionDeployedStatus = server$(
+  async function (automationId, user, actionId, deployedStatus) {
+    const query = `
+    UPDATE automations
+    SET actions = (
+      SELECT array::replace(actions, actions[$index], merge(actions[$index], { deployed: $deployedStatus }))
+      FROM actions
+      LET $index = array::find(actions, id = $actionId)
+    )
+    WHERE actionId = $automationId AND user = $user;
+  `;
+    const db = await connectToDB(this.env);
+
+    await db.query(query, {
+      automationId,
+      user,
+      actionId,
+      deployedStatus,
+    });
+  },
+);
 
 export const SaveChanges = component$(() => {
   const automationPageContext = useContext(AutomationPageContext);
@@ -29,13 +53,11 @@ export const SaveChanges = component$(() => {
       .PUBLIC_TRANSFER_CONTRACT_ADDRESS as `0x${string}`;
 
     const actions = automationPageContext.activeAutomation.value.actions;
-    const automationId = BigInt(
-      automationPageContext.activeAutomation.value.actionId,
-    );
     const trigger = automationPageContext.activeAutomation.value.trigger;
 
     try {
-      if (wagmiConfig.config.value) {
+      const user = localStorage.getItem("emmethUserWalletAddress");
+      if (wagmiConfig.config.value && user) {
         for (let action of actions) {
           let callData;
           let transfers;
@@ -50,13 +72,15 @@ export const SaveChanges = component$(() => {
                 amountIn: BigInt(item.amount),
               };
             });
-            // parse calldata
+
             const length = BigInt(transfers.length);
             const ownerAddress = addressToUint256(trigger.user);
             const initialized = BigInt(1);
             const duration = BigInt(trigger.duration);
             const timeZero = BigInt(trigger.timeZero);
-            const isActive = BigInt(trigger.isActive ? 1 : 0);
+            const isActive = BigInt(
+              automationPageContext.activeAutomation.value.isActive ? 1 : 0,
+            );
             const uintTransfersArray = [
               length,
               ...action.argsArray.map((item: any) => {
@@ -72,7 +96,6 @@ export const SaveChanges = component$(() => {
             const transferArray = uintTransfersArray.map((item) =>
               BigInt(item),
             );
-            console.log("arajka: ", transferArray);
             callData = [
               BigInt(ownerAddress),
               BigInt(initialized),
@@ -81,13 +104,9 @@ export const SaveChanges = component$(() => {
               BigInt(isActive),
               ...transferArray,
             ];
-            console.log(transfers);
-            console.log(callData);
-            console.log(action.actionId);
-            console.log(_contractAddress);
           } else {
             _contractAddress = swapAutomationContractAddress as `0x${string}`;
-            // parse transfers is different for swap you moron
+
             const tokenValueFraction = convertToFraction(
               action.chosenToken.value,
             );
@@ -106,12 +125,10 @@ export const SaveChanges = component$(() => {
               },
             ];
 
-            // parse calldata
             const ownerAddress = addressToUint256(trigger.user);
             const initialized = BigInt(1);
             const duration = BigInt(trigger.duration);
             const timeZero = BigInt(trigger.timeZero);
-            // convert to fraction and calculation
             const tokenIn = addressToUint256(action.chosenToken.address);
             const tokenOut = addressToUint256(action.tokenToSwapOn.address);
             const amountInFraction = convertToFraction(
@@ -126,7 +143,9 @@ export const SaveChanges = component$(() => {
               BigInt(amountInFraction.denominator);
             const from = addressToUint256(action.addressToSwapFrom);
             const to = addressToUint256(action.accountToSendTokens);
-            const isActive = BigInt(trigger.isActive ? 1 : 0);
+            const isActive = BigInt(
+              automationPageContext.activeAutomation.value.isActive ? 1 : 0,
+            );
             callData = [
               ownerAddress,
               initialized,
@@ -139,29 +158,30 @@ export const SaveChanges = component$(() => {
               to,
               isActive,
             ];
+            console.log(callData);
+            console.log(transfers);
+            console.log(_contractAddress);
           }
-          // koniec ifa
-          // const uintTransfersArrayStrings = callData.map((value) =>
-          //   value.toString(),
-          // );
+
           const actionId = BigInt(action.actionId);
 
           const { request } = await simulateContract(wagmiConfig.config.value, {
             abi: emethContractAbi,
             address: emethContractAddress,
             functionName: "addActionExternal",
-            args: [
-              actionId,
-              _contractAddress,
-              transfers,
-              // uintTransfersArrayStrings,
-              callData,
-            ],
+            args: [actionId, _contractAddress, transfers, callData],
           });
 
           const transactionHash = await writeContract(
             wagmiConfig.config.value,
             request,
+          );
+
+          await updateActionDeployedStatus(
+            `${automationPageContext.activeAutomation.value.automationId}`,
+            user,
+            `${actionId}`,
+            true,
           );
           console.log("hash: ", transactionHash);
           const receipt = await waitForTransactionReceipt(
@@ -170,6 +190,7 @@ export const SaveChanges = component$(() => {
               hash: transactionHash,
             },
           );
+
           console.log("hash: ", receipt);
         }
       }

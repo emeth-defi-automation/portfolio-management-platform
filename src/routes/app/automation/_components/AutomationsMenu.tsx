@@ -57,10 +57,19 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
     track(() => {
       isAddModalOpen.value === false;
       automationPageContext.isDraverOpen.value === false;
+      automationPageContext.activeAutomation.value === null;
     });
     const user = localStorage.getItem("emmethUserWalletAddress");
     const actionsFromDb = await getActionsFromDb(user);
     automationPageContext.automations.value = actionsFromDb;
+    if (automationPageContext.activeAutomation.value != null) {
+      automationPageContext.activeAutomation.value =
+        automationPageContext.automations.value.find(
+          (item: any) =>
+            item.actionId ===
+            automationPageContext.activeAutomation.value.actionId,
+        );
+    }
   });
 
   const handleActiveStatus = $(async function (

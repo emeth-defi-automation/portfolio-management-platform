@@ -1,4 +1,4 @@
-import { $, component$, useContext } from "@builder.io/qwik";
+import { $, component$, useContext, useVisibleTask$ } from "@builder.io/qwik";
 import Button from "~/components/Atoms/Buttons/Button";
 
 import Header from "~/components/Atoms/Headers/Header";
@@ -40,6 +40,26 @@ interface CentralViewProps {}
 export const CentralView = component$<CentralViewProps>(() => {
   const automationPageContext = useContext(AutomationPageContext);
   const formMessageProvider = useContext(messagesContext);
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(({ track }) => {
+    track(() => {
+      automationPageContext.isDraverOpen.value === false;
+    });
+    if (automationPageContext.activeAutomation.value != null) {
+      automationPageContext.activeAutomation.value =
+        automationPageContext.automations.value.find(
+          (item: any) =>
+            item.actionId ===
+            automationPageContext.activeAutomation.value.actionId,
+        );
+    }
+  });
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(({ track }) => {
+    track(() => {
+      automationPageContext.activeAutomation.value;
+    });
+  });
 
   const handleDeleteAction = $(async () => {
     const user = localStorage.getItem("emmethUserWalletAddress");
@@ -71,7 +91,7 @@ export const CentralView = component$<CentralViewProps>(() => {
     >
       {automationPageContext.activeAutomation.value ? (
         <>
-          <div class="flex h-full w-full flex-col">
+          <div class="flex h-full w-full flex-col ">
             <div class="flex w-full items-center justify-between">
               <div class="flex items-center gap-2">
                 <Header
@@ -88,6 +108,7 @@ export const CentralView = component$<CentralViewProps>(() => {
                   customClass="bg-customRed/10 h-8 w-8 p-0"
                   onClick$={$(async () => {
                     await handleDeleteAction();
+                    automationPageContext.activeAutomation.value = null;
                   })}
                 />
               </div>
@@ -99,21 +120,8 @@ export const CentralView = component$<CentralViewProps>(() => {
             <div class="flex h-full w-full flex-col items-center justify-center gap-10">
               <div class="flex w-[438px] flex-col gap-4">
                 <Annotation text="Trigger" />
-
-                {!automationPageContext.activeAutomation.value.deployed &&
-                !automationPageContext.activeAutomation.value.trigger ? (
-                  <Button
-                    text="Add Trigger"
-                    customClass="h-14"
-                    variant="dashed"
-                    leftIcon={<IconAdd class="h-4 w-4" />}
-                    onClick$={async () => {
-                      automationPageContext.isDraverOpen.value = true;
-                      automationPageContext.sideDraverVariant.value =
-                        "triggerForm";
-                    }}
-                  />
-                ) : (
+                {automationPageContext.activeAutomation.value.trigger !=
+                undefined ? (
                   <AutomationCard
                     variant="trigger"
                     isActive={true}
@@ -126,22 +134,36 @@ export const CentralView = component$<CentralViewProps>(() => {
                         .triggerDesc
                     }
                   />
+                ) : (
+                  <Button
+                    text="Add Trigger"
+                    customClass="h-14"
+                    variant="dashed"
+                    leftIcon={<IconAdd class="h-4 w-4" />}
+                    onClick$={async () => {
+                      automationPageContext.isDraverOpen.value = true;
+                      automationPageContext.sideDraverVariant.value =
+                        "triggerForm";
+                    }}
+                  />
                 )}
               </div>
               <div class="flex w-[438px] flex-col gap-4">
                 <Annotation text="Actions" />
 
-                {automationPageContext.activeAutomation.value.actions.map(
-                  (action: any) => (
-                    <AutomationCard
-                      key={`${automationPageContext.activeAutomation.value.automationId}${action.actionId}`}
-                      variant={action.actionType.toLowerCase()}
-                      isActive={false}
-                      title={action.actionName}
-                      description={action.actionDesc}
-                    />
-                  ),
-                )}
+                {!automationPageContext.activeAutomation.value.deployed &&
+                  automationPageContext.activeAutomation.value.actions.map(
+                    (action: any) => (
+                      <AutomationCard
+                        key={`${automationPageContext.activeAutomation.value.automationId}${action.actionId}`}
+                        variant={action.actionType.toLowerCase()}
+                        isActive={false}
+                        title={action.actionName}
+                        description={action.actionDesc}
+                      />
+                    ),
+                  )}
+
                 <Button
                   text="Add Action"
                   customClass="h-14"

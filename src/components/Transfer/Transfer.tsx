@@ -51,6 +51,7 @@ const addAutomationAction = server$(async function (
       actionType: automationAction.actionType,
       argsArray: argsArray,
       actionId: actionId,
+      deployed: false,
     };
     const automationId = `${automationAction.automationId}`;
     console.log("{ACTION]: ", newAction);
@@ -247,7 +248,9 @@ export const Transfer = component$<TransferProps>(
           user!,
           `${actionId}`,
         );
-
+        automationAction.actionName = "";
+        automationAction.actionDesc = "";
+        automationAction.actionType = "";
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "success",
