@@ -88,7 +88,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
             account: account.address as `0x${string}`,
             abi: emethContractAbi,
             address: emethContractAddress,
-            functionName: "setAutomationActiveState",
+            functionName: "setActiveState",
             args: [BigInt(actionId), isActive],
           },
         );
