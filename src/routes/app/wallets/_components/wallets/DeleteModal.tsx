@@ -50,7 +50,7 @@ export const DeleteModal = component$<DeleteModalProps>(
             </li>
           </ul>
         </div>
-        <div class="grid grid-cols-[49%_49%] gap-2">
+        <div class="flex gap-2">
           <Button
             variant="transparent"
             text="Cancel"

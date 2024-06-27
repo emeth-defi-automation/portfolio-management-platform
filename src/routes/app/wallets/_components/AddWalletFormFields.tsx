@@ -162,7 +162,7 @@ export default component$<AddWalletFormFieldsProps>(
           </Label>
 
           {!addWalletFormStore.isExecutable ? (
-            <div class="mb-5 grid grid-cols-[75%_25%] items-center justify-between gap-2">
+            <div class="mb-5 flex items-center justify-between gap-2">
               <Input
                 id="address"
                 name="address"
