@@ -16,6 +16,14 @@ import { AutomationCard } from "./AutomationCard/AutomationCard";
 import Paragraph from "~/components/Atoms/Paragraphs/Paragraphs";
 import Checkbox from "~/components/Atoms/Checkbox/Checkbox";
 import { SaveChanges } from "./SaveChanges/SaveChanges";
+import {
+  Config,
+  getAccount,
+  simulateContract,
+  writeContract,
+} from "@wagmi/core";
+import { WagmiConfigContext } from "~/components/WalletConnect/context";
+import { emethContractAbi } from "~/abi/emethContractAbi";
 
 const deleteActionFromDb = server$(async function (actionId, user) {
   // await updateIsActiveStatus(actionId, false);
@@ -40,6 +48,7 @@ interface CentralViewProps {}
 export const CentralView = component$<CentralViewProps>(() => {
   const automationPageContext = useContext(AutomationPageContext);
   const formMessageProvider = useContext(messagesContext);
+  const wagmiConfig = useContext(WagmiConfigContext);
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ track }) => {
     track(() => {
@@ -85,6 +94,35 @@ export const CentralView = component$<CentralViewProps>(() => {
     }
   });
 
+  const handleActiveStatus = $(async function (
+    actionId: string,
+    isActive: boolean,
+    deployed: boolean,
+  ) {
+    try {
+      if (deployed) {
+        const account = getAccount(wagmiConfig.config.value as Config);
+        const emethContractAddress = import.meta.env
+          .PUBLIC_EMETH_CONTRACT_ADDRESS_SEPOLIA;
+        const { request } = await simulateContract(
+          wagmiConfig.config.value as Config,
+          {
+            account: account.address as `0x${string}`,
+            abi: emethContractAbi,
+            address: emethContractAddress,
+            functionName: "setActiveState",
+            args: [BigInt(actionId), isActive],
+          },
+        );
+
+        await writeContract(wagmiConfig.config.value as Config, request);
+      }
+      await updateIsActiveStatus(actionId, isActive);
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
   return (
     <div
       class={`relative p-6 duration-500 ease-out ${automationPageContext.isDraverOpen.value ? "w-[calc(100%-48rem)]" : "w-full"}`}
@@ -114,7 +152,20 @@ export const CentralView = component$<CentralViewProps>(() => {
               </div>
               <div class="flex  items-center  gap-2">
                 <Paragraph size="xs" class="text-customGreen" text="Active" />
-                <Checkbox variant="toggleTick" isChecked={true} class="" />
+                <Checkbox
+                  variant="toggleTick"
+                  isChecked={
+                    automationPageContext.activeAutomation.value.isActive
+                  }
+                  class=""
+                  onClick={$(async () => {
+                    await handleActiveStatus(
+                      automationPageContext.activeAutomation.value.actionId,
+                      !automationPageContext.activeAutomation.value.isActive,
+                      automationPageContext.activeAutomation.value.deployed,
+                    );
+                  })}
+                />
               </div>
             </div>
             <div class="flex h-full w-full flex-col items-center justify-center gap-10">
@@ -183,3 +234,6 @@ export const CentralView = component$<CentralViewProps>(() => {
     </div>
   );
 });
+function updateIsActiveStatus(actionId: string, isActive: boolean) {
+  throw new Error("Function not implemented.");
+}
