@@ -35,11 +35,11 @@ export const Modal = component$<ModalProps>(
           }}
           class={twMerge(
             customClass,
-            "custom-bg-opacity-5 custom-border-1 relative h-fit  w-fit min-w-[455px] overflow-auto rounded-2xl p-6 backdrop-blur-2xl",
+            "custom-bg-opacity-5 custom-border-1 relative flex h-fit w-fit min-w-[455px] flex-col gap-6 overflow-auto rounded-2xl p-6 backdrop-blur-2xl",
           )}
         >
           {hasButton ? (
-            <BoxHeader variantHeader="h3" title={title} class="mb-8">
+            <BoxHeader variantHeader="h3" title={title} class="">
               <Button
                 variant="onlyIcon"
                 onClick$={() => {

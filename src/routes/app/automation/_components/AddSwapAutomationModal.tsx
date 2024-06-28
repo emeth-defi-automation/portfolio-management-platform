@@ -6,6 +6,7 @@ import {
   useContext,
   useVisibleTask$,
   useSignal,
+  useTask$,
 } from "@builder.io/qwik";
 import Box from "~/components/Atoms/Box/Box";
 import Button from "~/components/Atoms/Buttons/Button";
@@ -17,6 +18,7 @@ import Moralis from "moralis";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { useDebouncer } from "~/utils/debouncer";
 import {
+  fetchTokens,
   getTokenDecimalsServer,
   getTokenSymbolByAddress,
 } from "~/database/tokens";
@@ -24,14 +26,53 @@ import { WagmiConfigContext } from "~/components/WalletConnect/context";
 import { type Config, readContract, reconnect } from "@wagmi/core";
 import { uniswapRouterAbi } from "~/abi/UniswapRouterAbi";
 import { messagesContext } from "~/routes/app/layout";
-import { swapTokensForTokens } from "~/utils/tokens/swap";
-import { type WalletWithBalance } from "../../interface";
 import { convertToFraction, replaceNonMatching } from "~/utils/fractions";
-import WalletAddressValueSwitch from "./WalletAddressValueSwitch";
 import { isAddress } from "viem";
 import { type Token } from "~/interface/token/Token";
 import Label from "~/components/Atoms/Label/Label";
 import InputField from "~/components/Molecules/InputField/InputField";
+import WalletAddressValueSwitch from "../../portfolio/_components/Swap/WalletAddressValueSwitch";
+import { getObservedWalletBalances } from "../../portfolio/server/observerWalletBalancesLoader";
+import { connectToDB } from "~/database/db";
+import { generateRandomId } from "~/utils/automations";
+import { AutomationPageContext } from "../AutomationPageContext";
+
+const addAutomationAction = server$(async function (
+  automationAction: any,
+  swapValues: any,
+  user: string,
+  actionId: string,
+) {
+  const db = await connectToDB(this.env);
+  try {
+    const newAction = {
+      actionName: automationAction.actionName,
+      actionDesc: automationAction.actionDesc,
+      actionType: automationAction.actionType,
+      chosenToken: swapValues.chosenToken,
+      tokenToSwapOn: swapValues.tokenToSwapOn,
+      accountToSendTokens: swapValues.accountToSendTokens,
+      addressToSwapFrom: swapValues.chosenTokenWalletAddress,
+      actionId: actionId,
+      deployed: false,
+    };
+    const automationId = `${automationAction.automationId}`;
+    await db.query(
+      `
+        UPDATE automations
+        SET actions = ARRAY::APPEND(actions, $newAction)
+        WHERE actionId = $automationId AND user = $user;
+      `,
+      {
+        newAction,
+        automationId,
+        user,
+      },
+    );
+  } catch (error) {
+    console.error("Error adding action:", error);
+  }
+});
 
 const askMoralisForPrices = server$(async () => {
   const response = await Moralis.EvmApi.token.getMultipleTokenPrices(
@@ -54,31 +95,23 @@ const askMoralisForPrices = server$(async () => {
   return { response: response.raw };
 });
 
-interface SwapModalProps {
-  chosenToken: Signal<string>;
-  chosenTokenWalletAddress: Signal<string>;
-  chosenTokenSymbol: Signal<string>;
+interface AddSwapActionModalProps {
   isOpen: Signal<boolean>;
-  wallets: WalletWithBalance[];
-  allTokensFromDb: any;
+  automationAction: any;
 }
 
-export const SwapModal = component$<SwapModalProps>(
-  ({
-    chosenToken,
-    chosenTokenWalletAddress,
-    chosenTokenSymbol,
-    isOpen,
-    wallets,
-    allTokensFromDb,
-  }) => {
+export const AddSwapActionModal = component$<AddSwapActionModalProps>(
+  ({ isOpen, automationAction }) => {
     const formMessageProvider = useContext(messagesContext);
+    const automationPageContext = useContext(AutomationPageContext);
+    const allTokensFromDb = useSignal([]);
+    const wallets = useSignal<any>([]);
     const wagmiConfig = useContext(WagmiConfigContext);
     const swapValues = useStore({
       chosenToken: {
-        address: chosenToken,
+        address: "",
         value: "0",
-        symbol: chosenTokenSymbol,
+        symbol: "",
         dolarValue: "0",
       },
       tokenToSwapOn: {
@@ -88,9 +121,10 @@ export const SwapModal = component$<SwapModalProps>(
         dolarValue: "0",
       },
       accountToSendTokens: "",
-      chosenTokenWalletAddress: chosenTokenWalletAddress,
+      chosenTokenWalletAddress: "",
     });
 
+    const isManualAddress = useSignal<boolean>(false);
     const tokenFromAmountDebounce = useDebouncer(
       $(
         async ({
@@ -141,16 +175,18 @@ export const SwapModal = component$<SwapModalProps>(
       ),
       500,
     );
-
-    const isManualAddress = useSignal<boolean>(false);
+    useTask$(async () => {
+      const tokens: any = await fetchTokens();
+      allTokensFromDb.value = tokens;
+    });
 
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async () => {
       if (wagmiConfig.config.value) {
         await reconnect(wagmiConfig.config.value);
       }
-
-      swapValues.accountToSendTokens = chosenTokenWalletAddress.value;
+      wallets.value = await getObservedWalletBalances();
+      swapValues.accountToSendTokens = swapValues.chosenTokenWalletAddress;
     });
 
     // eslint-disable-next-line qwik/no-use-visible-task
@@ -162,7 +198,7 @@ export const SwapModal = component$<SwapModalProps>(
 
       const { response } = await askMoralisForPrices();
       const findFromToken = response.find(
-        (token) => token.tokenSymbol === swapValues.chosenToken.symbol.value,
+        (token) => token.tokenSymbol === swapValues.chosenToken.symbol,
       );
       const findToToken = response.find(
         (token) => token.tokenSymbol === swapValues.tokenToSwapOn.symbol,
@@ -185,28 +221,32 @@ export const SwapModal = component$<SwapModalProps>(
     // eslint-disable-next-line qwik/no-use-visible-task
     useVisibleTask$(async ({ track }) => {
       track(() => swapValues.tokenToSwapOn.symbol);
+
       await tokenFromAmountDebounce({
         amountIn: swapValues.chosenToken.value,
-        tokenInAddress: swapValues.chosenToken.address.value as `0x${string}`,
+        tokenInAddress: swapValues.chosenToken.address as `0x${string}`,
         tokenOutAddress: swapValues.tokenToSwapOn.address as `0x${string}`,
       });
     });
-    const handleSwap = $(async () => {
-      formMessageProvider.messages.push({
-        id: formMessageProvider.messages.length,
-        variant: "info",
-        message: "Swapping tokens...",
-        isVisible: true,
-      });
 
+    const handleSaveSwap = $(async () => {
       try {
-        await swapTokensForTokens(
-          swapValues.chosenToken.address.value as `0x${string}`,
-          swapValues.tokenToSwapOn.address as `0x${string}`,
-          swapValues.chosenToken.value,
-          swapValues.chosenTokenWalletAddress.value as `0x${string}`,
-          swapValues.accountToSendTokens as `0x${string}`,
-          wagmiConfig,
+        formMessageProvider.messages.push({
+          id: formMessageProvider.messages.length,
+          variant: "info",
+          message: "Swapping tokens...",
+          isVisible: true,
+        });
+        const user = localStorage.getItem("emmethUserWalletAddress");
+        if (!user) {
+          return new Error("there is no user address");
+        }
+        const actionId = `${generateRandomId()}`;
+        await addAutomationAction(
+          automationAction,
+          swapValues,
+          user!,
+          `${actionId}`,
         );
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
@@ -214,8 +254,9 @@ export const SwapModal = component$<SwapModalProps>(
           message: "Tokens swapped!",
           isVisible: true,
         });
+        automationPageContext.isDraverOpen.value = false;
       } catch (err) {
-        console.error("swapping error: ", err);
+        console.log(err);
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,
           variant: "error",
@@ -224,20 +265,131 @@ export const SwapModal = component$<SwapModalProps>(
         });
       }
     });
+
     return (
       <Modal
         isOpen={isOpen}
         title="Swap"
-        customClass=""
+        customClass="!min-w-[500px] !w-fit"
         onClose={$(() => {
-          swapValues.chosenToken.address.value = "";
+          swapValues.chosenToken.address = "";
           swapValues.chosenToken.value = "";
           swapValues.tokenToSwapOn.address = "";
           swapValues.tokenToSwapOn.value = "";
           swapValues.accountToSendTokens = "";
         })}
       >
-        <div class="flex flex-col gap-6">
+        <div class="flex min-w-[500px] max-w-[500px] flex-col gap-6 font-['Sora']">
+          <div class="flex flex-col gap-2">
+            <Select
+              id="swapValues.chosenWallet"
+              name="Wallet"
+              options={[
+                { value: "", text: "Select wallet" },
+                ...wallets.value.map((option: any) => {
+                  return {
+                    value: option.wallet.address,
+                    text: option.walletName,
+                    selected: undefined,
+                  };
+                }),
+              ]}
+              onValueChange={$((value: string) => {
+                swapValues.chosenTokenWalletAddress = value;
+              })}
+            />
+            <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
+              <div class="flex flex-col gap-6">
+                <InputField
+                  id="amount"
+                  name="You pay"
+                  variant="swap"
+                  size="large"
+                  placeholder="00.00"
+                  value={swapValues.chosenToken.value}
+                  onInput={$(async (e) => {
+                    const target = e.target as HTMLInputElement;
+                    const regex = /^\d*\.?\d*$/;
+                    target.value = replaceNonMatching(target.value, regex, "");
+
+                    swapValues.chosenToken.value = target.value;
+                    if (
+                      swapValues.chosenToken.address != "" &&
+                      swapValues.tokenToSwapOn.address != "" &&
+                      swapValues.chosenToken.value != "0"
+                    ) {
+                      const amountIn = target.value;
+                      await tokenFromAmountDebounce({
+                        amountIn: amountIn,
+                        tokenInAddress: swapValues.chosenToken
+                          .address as `0x${string}`,
+                        tokenOutAddress: swapValues.tokenToSwapOn
+                          .address as `0x${string}`,
+                      });
+                    }
+                  })}
+                />
+                <span class="text-xs font-normal text-white/60">
+                  ${swapValues.chosenToken.dolarValue}
+                </span>
+              </div>
+              <Select
+                id="chosenToken"
+                name="chosenToken"
+                options={[
+                  { value: "", text: "Pick a coin" },
+                  ...allTokensFromDb.value.map((token: Token) => {
+                    return {
+                      value: token.address,
+                      text: token.symbol,
+                    };
+                  }),
+                ].filter((item) => item != null)}
+                size="swap"
+                onValueChange={$(async (value: string) => {
+                  swapValues.chosenToken.address = value;
+                  swapValues.chosenToken.symbol = await getTokenSymbolByAddress(
+                    value as `0x${string}`,
+                  );
+                })}
+              />
+            </Box>
+            <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
+              <div class="flex flex-col gap-6">
+                <InputField
+                  id="receive"
+                  name="You receive"
+                  variant="swap"
+                  size="large"
+                  value={swapValues.tokenToSwapOn.value}
+                  placeholder="00.00"
+                />
+                <span class="text-xs font-normal text-white/60">
+                  ${swapValues.tokenToSwapOn.value}
+                </span>
+              </div>
+
+              <Select
+                id="selectedToken"
+                name="selectedToken"
+                options={[
+                  { value: "", text: "Pick a coin" },
+                  ...allTokensFromDb.value.map((token: Token) => {
+                    return {
+                      value: token.address,
+                      text: token.symbol,
+                    };
+                  }),
+                ].filter((item) => item != null)}
+                onValueChange={$(async (value: string) => {
+                  swapValues.tokenToSwapOn.address = value;
+                  swapValues.tokenToSwapOn.symbol =
+                    await getTokenSymbolByAddress(value as `0x${string}`);
+                })}
+                size="swap"
+              />
+            </Box>
+          </div>
           <WalletAddressValueSwitch
             isManualAddress={isManualAddress}
             textLeft="Observed"
@@ -265,7 +417,7 @@ export const SwapModal = component$<SwapModalProps>(
                 name="Wallet"
                 options={[
                   { value: "", text: "Select wallet" },
-                  ...wallets.map((option) => {
+                  ...wallets.value.map((option: any) => {
                     return {
                       value: option.wallet.address,
                       text: option.walletName,
@@ -279,95 +431,6 @@ export const SwapModal = component$<SwapModalProps>(
               />
             )}
           </div>
-          <div class="flex flex-col gap-2">
-            <Box customClass="!shadow-none flex justify-between p-4 gap-4 rounded-xl">
-              <div class="flex flex-col gap-6">
-                <InputField
-                  id="amount"
-                  name="You pay"
-                  variant="swap"
-                  size="large"
-                  placeholder="00.00"
-                  value={swapValues.chosenToken.value}
-                  onInput={$(async (e) => {
-                    const target = e.target as HTMLInputElement;
-
-                    const regex = /^\d*\.?\d*$/;
-                    target.value = replaceNonMatching(target.value, regex, "");
-
-                    swapValues.chosenToken.value = target.value;
-                    if (
-                      swapValues.chosenToken.address.value != "" &&
-                      swapValues.tokenToSwapOn.address != "" &&
-                      swapValues.chosenToken.value != "0"
-                    ) {
-                      const amountIn = target.value;
-                      await tokenFromAmountDebounce({
-                        amountIn: amountIn,
-                        tokenInAddress: swapValues.chosenToken.address
-                          .value as `0x${string}`,
-                        tokenOutAddress: swapValues.tokenToSwapOn
-                          .address as `0x${string}`,
-                      });
-                    }
-                  })}
-                />
-                <span class="text-xs font-normal text-white/60">
-                  ${swapValues.chosenToken.dolarValue}
-                </span>
-              </div>
-              <Select
-                id="chosenToken"
-                name="chosenToken"
-                options={[
-                  {
-                    value: swapValues.chosenToken.address.value,
-                    text: swapValues.chosenToken.symbol.value,
-                  },
-                ]}
-                size="swap"
-              />
-            </Box>
-            <Box customClass="!shadow-none flex justify-between p-4 rounded-xl">
-              <div class="flex flex-col gap-6">
-                <InputField
-                  id="receive"
-                  name="You receive"
-                  variant="swap"
-                  size="large"
-                  value={swapValues.tokenToSwapOn.value}
-                  placeholder="00.00"
-                />
-                <span class="text-xs font-normal text-white/60">
-                  ${swapValues.tokenToSwapOn.value}
-                </span>
-              </div>
-
-              <Select
-                id="selectedToken"
-                name="selectedToken"
-                options={[
-                  { value: "", text: "Pick a coin" },
-                  ...allTokensFromDb.value.map((token: Token) => {
-                    if (
-                      !(token.symbol === swapValues.chosenToken.symbol.value)
-                    ) {
-                      return {
-                        value: token.address,
-                        text: token.symbol,
-                      };
-                    } else return null;
-                  }),
-                ].filter((item) => item != null)}
-                onValueChange={$(async (value: string) => {
-                  swapValues.tokenToSwapOn.address = value;
-                  swapValues.tokenToSwapOn.symbol =
-                    await getTokenSymbolByAddress(value as `0x${string}`);
-                })}
-                size="swap"
-              />
-            </Box>
-          </div>
           {/* BUTTONS */}
           <div class="flex items-center gap-4">
             <Button
@@ -376,7 +439,7 @@ export const SwapModal = component$<SwapModalProps>(
               customClass="w-full"
               onClick$={() => {
                 isOpen.value = false;
-                swapValues.chosenToken.address.value = "";
+                swapValues.chosenToken.address = "";
                 swapValues.chosenToken.value = "";
                 swapValues.tokenToSwapOn.address = "";
                 swapValues.accountToSendTokens = "";
@@ -389,10 +452,11 @@ export const SwapModal = component$<SwapModalProps>(
               customClass="w-full"
               onClick$={async () => {
                 isOpen.value = false;
-                await handleSwap();
+                handleSaveSwap();
+                console.log("done");
               }}
               disabled={
-                !swapValues.chosenToken.address.value ||
+                !swapValues.chosenToken.address ||
                 !swapValues.tokenToSwapOn.address ||
                 swapValues.chosenToken.value == "0" ||
                 !isAddress(swapValues.accountToSendTokens as `0x${string}`)

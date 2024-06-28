@@ -12,7 +12,7 @@ export interface InputProps {
     | ((value: any) => void)
     | QRL<(value: any) => Promise<void>>
     | ((value: any) => Promise<void>);
-  InputClass?: string;
+  inputClass?: string;
   disabled?: boolean;
   subValue?: string;
   type?: string;
@@ -20,6 +20,7 @@ export interface InputProps {
   iconRight?: JSXOutput | null;
   id: string;
   ref?: Signal<Element | undefined>;
+  isValid?: boolean;
 }
 
 const InputStyles = cva(
@@ -30,9 +31,6 @@ const InputStyles = cva(
     variants: {
       variant: {
         search: ["pl-10"],
-        checked: [
-          "text-customGreen !border-customGreen placeholder:text-opacity-50 pr-10",
-        ],
         swap: ["!border-0 p-0 text-[28px] h-fit focus:!border-0"],
       },
       size: {
@@ -63,7 +61,10 @@ const Input = component$(({ variant, size, ...props }: InputType) => {
           InputStyles({ variant, size }),
           props.subValue ? "pr-[130px]" : null,
           props.iconRight ? "pr-10" : null,
-          props.InputClass,
+          props.inputClass,
+          props.isValid
+            ? "!border-customGreen text-customGreen placeholder:text-opacity-50 focus:border-customGreen focus:outline-none"
+            : "",
         )}
         ref={props.ref}
         placeholder={props.placeholder}

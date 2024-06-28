@@ -12,6 +12,7 @@ import {
 import { type RequestHandler } from "@builder.io/qwik-city";
 import { type Config, reconnect, watchAccount, getAccount } from "@wagmi/core";
 import { defaultWagmiConfig } from "@web3modal/wagmi";
+
 import { sepolia } from "viem/chains";
 import {
   LoginContext,
@@ -19,6 +20,7 @@ import {
   WagmiConfigContext,
 } from "~/components/WalletConnect/context";
 import { setupMoralis } from "~/utils/stream";
+import { AutomationPageContext } from "./app/automation/AutomationPageContext";
 
 export const metadata = {
   name: "Web3Modal",
@@ -48,6 +50,15 @@ export default component$(() => {
 
   useContextProvider(OnClientContext, {
     onClient: useSignal(false),
+  });
+
+  useContextProvider(AutomationPageContext, {
+    automations: useSignal([]),
+    activeAutomation: useSignal(null),
+    isDraverOpen: useSignal(false),
+    sideDraverVariant: useSignal(""),
+    addSwapModalOpen: useSignal(false),
+    addTransferModalOpen: useSignal(false),
   });
 
   const onClient = useContext(OnClientContext);

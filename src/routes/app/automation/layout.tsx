@@ -1,17 +1,5 @@
-import {
-  Slot,
-  component$,
-  useContextProvider,
-  useSignal,
-} from "@builder.io/qwik";
-import { AutomationPageContext } from "./AutomationPageContext";
+import { Slot, component$ } from "@builder.io/qwik";
 
 export default component$(() => {
-  useContextProvider(AutomationPageContext, {
-    automations: useSignal([]),
-    activeAutomation: useSignal(null),
-    isDraverOpen: useSignal(false),
-  });
-
   return <Slot />;
 });

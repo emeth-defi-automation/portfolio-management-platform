@@ -16,7 +16,6 @@ import {
   writeContract,
   getConnections,
   type Config,
-  waitForTransactionReceipt,
 } from "@wagmi/core";
 
 import { checksumAddress } from "viem";
@@ -83,7 +82,7 @@ export const AddWalletModal = component$<AddWalletModal>(
     });
 
     const handleReadBalances = $(async (wallet: string) => {
-      const tokenBalances = await getMoralisBalance({ wallet });
+      const tokenBalances: any = await getMoralisBalance({ wallet });
 
       walletTokenBalances.value = tokenBalances.tokens;
     });
@@ -154,15 +153,8 @@ export const AddWalletModal = component$<AddWalletModal>(
                     request.gasPrice *= 2n;
                   }
 
-                  // keep receipts for now, to use waitForTransactionReceipt
                   try {
-                    const hash = await writeContract(
-                      wagmiConfig.config.value,
-                      request,
-                    );
-                    await waitForTransactionReceipt(wagmiConfig.config.value, {
-                      hash,
-                    });
+                    await writeContract(wagmiConfig.config.value, request);
                   } catch (err) {
                     console.error("Error: ", err);
                   }
@@ -190,14 +182,7 @@ export const AddWalletModal = component$<AddWalletModal>(
             request.gasPrice *= 2n;
           }
 
-          const hash = await writeContract(
-            wagmiConfig.config!.value as Config,
-            request,
-          );
-
-          await waitForTransactionReceipt(wagmiConfig.config.value as Config, {
-            hash,
-          });
+          await writeContract(wagmiConfig.config!.value as Config, request);
         }
         if (wagmiConfig.config.value) {
           await disconnectWallets(wagmiConfig.config);
@@ -324,7 +309,9 @@ export const AddWalletModal = component$<AddWalletModal>(
                     const { address } = getAccount(
                       wagmiConfig.config.value as Config,
                     );
+                    console.log(address);
                     await handleReadBalances(address as `0x${string}`);
+                    console.log("read balances");
                   }
                   if (stepsCounter.value === 2) {
                     for (

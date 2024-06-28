@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 import IconArrowDown from "/public/assets/icons/arrow-down.svg?jsx";
 
 export type Option = {
-  value: string;
+  value: string | number;
   text: string;
 };
 

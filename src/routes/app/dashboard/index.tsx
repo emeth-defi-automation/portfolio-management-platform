@@ -174,10 +174,22 @@ export default component$(() => {
               <Annotation text="Token name" transform="upper" />
               <Annotation text="Quantity" transform="upper" />
               <Annotation text="Value" transform="upper" />
-              <div class="custom-border-1 flex h-8 w-fit gap-2 rounded-lg bg-white bg-opacity-5 p-1 text-white">
-                <button class="custom-bg-button rounded-lg px-2">24h</button>
-                <button class="rounded-lg px-2">3d</button>
-                <button class="rounded-lg px-2">30d</button>
+              <div class="custom-border-1 flex h-8 w-fit items-center gap-1 rounded-lg bg-white/5 p-1">
+                <Button
+                  text="24h"
+                  customClass="rounded-lg w-full h-full !px-2 text-xs"
+                  variant="transfer"
+                />
+                <Button
+                  text="3d"
+                  customClass="rounded-lg w-full h-full !px-2 text-xs"
+                  variant="onlyIcon"
+                />
+                <Button
+                  text="30d"
+                  customClass="rounded-lg w-full h-full !px-2 text-xs"
+                  variant="onlyIcon"
+                />
               </div>
               <Annotation text="Wallet" transform="upper" />
               <Annotation text="Network" transform="upper" />

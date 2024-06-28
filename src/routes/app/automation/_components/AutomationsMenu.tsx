@@ -56,11 +56,20 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   useVisibleTask$(async ({ track }) => {
     track(() => {
       isAddModalOpen.value === false;
-      automationPageContext.isDraverOpen.value = false;
+      automationPageContext.isDraverOpen.value === false;
+      automationPageContext.activeAutomation.value === null;
     });
     const user = localStorage.getItem("emmethUserWalletAddress");
     const actionsFromDb = await getActionsFromDb(user);
     automationPageContext.automations.value = actionsFromDb;
+    if (automationPageContext.activeAutomation.value != null) {
+      automationPageContext.activeAutomation.value =
+        automationPageContext.automations.value.find(
+          (item: any) =>
+            item.actionId ===
+            automationPageContext.activeAutomation.value.actionId,
+        );
+    }
   });
 
   const handleActiveStatus = $(async function (
@@ -79,7 +88,7 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
             account: account.address as `0x${string}`,
             abi: emethContractAbi,
             address: emethContractAddress,
-            functionName: "setAutomationActiveState",
+            functionName: "setActiveState",
             args: [BigInt(actionId), isActive],
           },
         );
@@ -93,57 +102,55 @@ export const AutomationsMenu = component$<AutomationsMenuProps>(() => {
   });
 
   return (
-    <>
-      <div class="flex flex-col gap-6 border-r border-white/10 bg-white/3 p-6">
-        <BoxHeader
-          title="Automations"
-          variantHeader="h4"
-          headerClass="font-normal"
-        >
-          <Button
-            text="Add New"
-            variant="transparent"
-            size="small"
-            customClass="font-normal bg-white/10 !border-0"
-            onClick$={() => (isAddModalOpen.value = !isAddModalOpen.value)}
-          />
-        </BoxHeader>
-        <Input
-          id="automation"
-          variant="search"
-          placeholder="Search for Automation"
-          InputClass="text-xs"
+    <div class="grid w-96 grid-rows-[32px_40px_1fr] gap-6 border-r border-white/10 bg-white/3 p-6">
+      <BoxHeader
+        title="Automations"
+        variantHeader="h4"
+        headerClass="font-normal"
+      >
+        <Button
+          text="Add New"
+          variant="transparent"
+          size="small"
+          customClass="font-normal bg-white/10 !border-0"
+          onClick$={() => (isAddModalOpen.value = !isAddModalOpen.value)}
         />
-        <div class="flex flex-col ">
-          {automationPageContext.automations.value.map((action: any) => (
-            <ParagraphAnnotation
-              key={action.actionId}
-              paragraphText={action.name}
-              annotationText={action.desc}
-              onClick$={$(() => {
-                automationPageContext.activeAutomation.value = action;
+      </BoxHeader>
+      <Input
+        id="automation"
+        variant="search"
+        placeholder="Search for Automation"
+        inputClass="text-xs"
+      />
+      <div class="flex flex-col">
+        {automationPageContext.automations.value.map((action: any) => (
+          <ParagraphAnnotation
+            key={action.actionId}
+            paragraphText={action.name}
+            annotationText={action.desc}
+            onClick$={$(() => {
+              automationPageContext.activeAutomation.value = action;
+            })}
+            textBoxClass="py-4"
+          >
+            <Checkbox
+              variant="toggleTick"
+              isChecked={action.isActive}
+              class=""
+              onClick={$(async () => {
+                await handleActiveStatus(
+                  action.actionId,
+                  !action.isActive,
+                  action.deployed,
+                );
               })}
-              textBoxClass="py-4"
-            >
-              <Checkbox
-                variant="toggleTick"
-                isChecked={action.isActive}
-                class=""
-                onClick={$(async () => {
-                  await handleActiveStatus(
-                    action.actionId,
-                    !action.isActive,
-                    action.deployed,
-                  );
-                })}
-              />
-            </ParagraphAnnotation>
-          ))}
-        </div>
+            />
+          </ParagraphAnnotation>
+        ))}
       </div>
       {isAddModalOpen.value ? (
         <AddAutomationModal isAddModalOpen={isAddModalOpen} />
       ) : null}
-    </>
+    </div>
   );
 });

@@ -29,12 +29,15 @@ export default {
       boxShadow: {
         'cards': '0px 0px 30px 0px rgba(0, 0, 0, 0.3)',
       },
+      backgroundImage: {
+        'customGradient': 'linear-gradient(135deg, #EC008C 0%, #FC6767 100%)',
+      },
       keyframes: {
         arrival:{
           '0%, 100%': {
             transform: 'translateX(200px)'
           },
-          '20%, 80%': {
+          '20%, 90%': {
             transform: 'translateX(-256px)'
           }
         },
@@ -51,11 +54,26 @@ export default {
             transform: 'scale(1)',
             opacity: 1,
           }
+        },
+        slowAppearance: {
+          '0%': {
+            transform: 'scale(0.75)',
+            opacity: 0,
+          },
+          '40%': {
+            transform: 'scale(1)',
+            opacity: 0.4,
+          },
+          '100%': {
+            transform: 'scale(1)',
+            opacity: 1,
+          }
         }
       },
       animation: {
         messageArrival: 'arrival 5s ease-in-out',
-        fadeIn: 'fadeIn 1s'
+        fadeIn: 'fadeIn 1s',
+        slowAppearance: 'slowAppearance 1s'
       }
     },
   },

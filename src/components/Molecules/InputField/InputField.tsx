@@ -6,21 +6,20 @@ import { type JSXOutput, type QRL, type Signal } from "@builder.io/qwik";
 export interface InputFieldProps {
   class?: string;
   name: string;
-  onValueChange?: any;
   placeholder?: string;
-  variant: "search" | "checked" | "swap" | null;
+  variant: "search" | "swap" | null;
   size: "xs" | "small" | "medium" | "large" | null;
   labelClass?: string;
   disabled?: boolean;
-  value?: string;
+  value?: string | number;
   onInput?: QRL<(value: any) => void>;
-  subValue?: string;
   iconLeft?: JSXOutput | null;
   iconRight?: JSXOutput | null;
   type?: string;
   isInvalid?: boolean;
   id: string;
   ref?: Signal<Element | undefined>;
+  inputClass?: string;
 }
 
 const InputField = ({ ...props }: InputFieldProps) => {
@@ -38,9 +37,10 @@ const InputField = ({ ...props }: InputFieldProps) => {
         name={props.name}
         value={props.value}
         onInput={props.onInput}
-        InputClass={
-          props.isInvalid ? "!border-red-700 border border-solid" : ""
-        }
+        inputClass={twMerge(
+          props.isInvalid ? "!border-red-700 border border-solid" : "",
+          props.inputClass,
+        )}
       />
     </div>
   );

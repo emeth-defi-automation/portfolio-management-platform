@@ -61,7 +61,6 @@ const IconBox = component$(
               height={boxSize == "large" ? 24 : 16}
               alt={`${tokenName} logo`}
               src={tokenPath}
-              class="w-full"
             />
           ) : (
             customIcon

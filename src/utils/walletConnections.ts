@@ -40,7 +40,9 @@ export const openWeb3Modal = async (
           window.location.pathname === "/signin" ||
           window.location.pathname === "/"
         ) {
-          localStorage.setItem("emmethUserWalletAddress", `${account.address}`);
+          if(!localStorage.getItem('emmethUserWalletAddress')){
+            localStorage.setItem("emmethUserWalletAddress", `${account.address}`);
+          }
         } else {
           reconnect(wagmiContext.config.value as Config);
         }
