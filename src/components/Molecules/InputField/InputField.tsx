@@ -7,7 +7,7 @@ export interface InputFieldProps {
   class?: string;
   name: string;
   placeholder?: string;
-  variant: "search" | "checked" | "swap" | null;
+  variant: "search" | "swap" | null;
   size: "xs" | "small" | "medium" | "large" | null;
   labelClass?: string;
   disabled?: boolean;
