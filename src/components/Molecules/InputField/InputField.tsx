@@ -19,6 +19,7 @@ export interface InputFieldProps {
   isInvalid?: boolean;
   id: string;
   ref?: Signal<Element | undefined>;
+  inputClass?: string;
 }
 
 const InputField = ({ ...props }: InputFieldProps) => {
@@ -36,9 +37,10 @@ const InputField = ({ ...props }: InputFieldProps) => {
         name={props.name}
         value={props.value}
         onInput={props.onInput}
-        inputClass={
-          props.isInvalid ? "!border-red-700 border border-solid" : ""
-        }
+        inputClass={twMerge(
+          props.isInvalid ? "!border-red-700 border border-solid" : "",
+          props.inputClass,
+        )}
       />
     </div>
   );
