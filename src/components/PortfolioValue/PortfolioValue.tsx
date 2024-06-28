@@ -171,7 +171,7 @@ export const PortfolioValue = component$<PortfolioValueProps>(
 
     return (
       <Box
-        customClass={`${isDataForChartLoading.value ? "" : "grid gap-4"}  h-full ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10  grid-rows-[52px_32px_1fr_110px]"}`}
+        customClass={`${isDataForChartLoading.value ? "" : "grid gap-4"}  h-full ${!isPortfolioFullScreen.value ? " grid-rows-[52px_32px_1fr]" : "m-10 grid-rows-[52px_32px_1fr_110px]"}`}
       >
         <div class="custom-border-b-1-opacity-5 flex items-center justify-between pb-4">
           <Header variant="h3" text="Portfolio Value" />
