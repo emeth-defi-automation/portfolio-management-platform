@@ -35,6 +35,9 @@ export const AddActionForm = component$<AddActionFormProps>(() => {
     track(() => {
       automationPageContext.isDraverOpen.value;
     });
+    addActionStore.actionName = "";
+    addActionStore.actionDesc = "";
+    addActionStore.actionType = "";
   });
 
   const handleChooseOptions = $(async () => {

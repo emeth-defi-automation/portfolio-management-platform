@@ -115,7 +115,7 @@ export const Transfer = component$<TransferProps>(
           name: structure.structure.name,
           coins: coins,
           isChecked: false,
-          isVisible: false,
+          isVisible: true,
         });
       }
     });
@@ -252,9 +252,6 @@ export const Transfer = component$<TransferProps>(
           user!,
           `${actionId}`,
         );
-        automationAction.actionName = "";
-        automationAction.actionDesc = "";
-        automationAction.actionType = "";
         automationPageContext.isDraverOpen.value = false;
         formMessageProvider.messages.push({
           id: formMessageProvider.messages.length,

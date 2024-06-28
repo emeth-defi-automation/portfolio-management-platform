@@ -255,9 +255,6 @@ export const AddSwapActionModal = component$<AddSwapActionModalProps>(
           isVisible: true,
         });
         automationPageContext.isDraverOpen.value = false;
-        automationAction.actionName = "";
-        automationAction.actionDesc = "";
-        automationAction.actionType = "";
       } catch (err) {
         console.log(err);
         formMessageProvider.messages.push({

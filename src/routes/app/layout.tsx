@@ -51,7 +51,7 @@ export default component$(() => {
   const messagesProvider = useContext(messagesContext);
   return (
     <>
-      <div class="scrollbar relative z-0 grid h-screen grid-rows-[auto_1fr] bg-black font-['Sora']">
+      <div class="scrollbar relative z-0 grid h-screen grid-rows-[auto_1fr] overflow-x-hidden bg-black font-['Sora']">
         <div class="gradient absolute left-1/4 top-0 h-1/5 w-6/12 rounded-full"></div>
         <Navbar>
           <NavbarContent />
@@ -59,7 +59,7 @@ export default component$(() => {
         <Slot />
         <div class="gradient absolute bottom-0 left-1/4 h-1/5 w-6/12 rounded-full"></div>
         <div
-          class={`relative bottom-8 left-full flex flex-col ${messagesProvider.messages.length ? "" : ""}`}
+          class={`fixed bottom-8 left-full flex h-full flex-col justify-end gap-4`}
         >
           {messagesProvider.messages.map((item, key) => (
             <Message

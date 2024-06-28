@@ -36,8 +36,8 @@ export const Message = component$(
     return (
       <>
         <div
-          class={`fixed bottom-10 left-full flex min-w-48 max-w-96 animate-messageArrival 
-          
+          class={`   
+            flex min-w-48 max-w-96 animate-messageArrival 
             items-center justify-between rounded border p-2 ${variant === "success" ? "border-customGreen bg-[#EDFEEE] text-customGreen" : variant === "error" ? "border-[#F16360] bg-[#FDEDED] text-[#F16360]" : "border-[#1AB1F5] bg-[#E5F6FD] text-[#1AB1F5]"}`}
         >
           <div

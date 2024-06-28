@@ -2,6 +2,7 @@ import { component$, useContext } from "@builder.io/qwik";
 import { AutomationPageContext } from "../AutomationPageContext";
 import { TriggerForm } from "./Forms/TriggerForm";
 import { AddActionForm } from "./Forms/AddActionFrom";
+import { Summary } from "./SwapAndTransfer/Summary";
 
 interface SideDrawerProps {}
 
@@ -16,6 +17,10 @@ export const TriggerDrawer = component$<SideDrawerProps>(() => {
         <TriggerForm />
       ) : automationPageContext.sideDraverVariant.value === "addActionForm" ? (
         <AddActionForm />
+      ) : automationPageContext.sideDraverVariant.value === "transferAction" ? (
+        <Summary />
+      ) : automationPageContext.sideDraverVariant.value === "swapAction" ? (
+        <Summary />
       ) : null}
     </div>
   );
