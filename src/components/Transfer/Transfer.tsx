@@ -283,12 +283,9 @@ export const Transfer = component$<TransferProps>(
             <Header text="Transfer Funds" variant="h3" class="font-normal" />
             <div class="custom-border-1 flex h-8 w-[450px] items-center gap-1 rounded-md p-1">
               <Button
-               
-              variant={step.value === 1 ? "transfer"
-              : "onlyIcon"}
+                variant={step.value === 1 ? "transfer" : "onlyIcon"}
                 text="Tokens"
-              customClass="h-full w-full text-xs p-0"
-          
+                customClass="h-full w-full text-xs p-0"
                 onClick$={() => {
                   step.value = 1;
                 }}

@@ -238,7 +238,11 @@ export const SwapModal = component$<SwapModalProps>(
         })}
       >
         <div class="flex flex-col gap-6">
-          <WalletAddressValueSwitch isManualAddress={isManualAddress} />
+          <WalletAddressValueSwitch
+            isManualAddress={isManualAddress}
+            textLeft="Observed"
+            textRight="Custom"
+          />
           <div class="flex flex-col gap-2">
             <Label
               for="swapValues.accountToSendTokens"
@@ -363,47 +367,6 @@ export const SwapModal = component$<SwapModalProps>(
                 size="swap"
               />
             </Box>
-          </div>
-          <WalletAddressValueSwitch
-            isManualAddress={isManualAddress}
-            textLeft="Observed"
-            textRight="Custom"
-          />
-          <div class="flex flex-col gap-2">
-            <Label
-              for="swapValues.accountToSendTokens"
-              name="Address to send coins to:"
-            />
-            {isManualAddress.value ? (
-              <Input
-                id="swapValues.accountToSendTokens"
-                type="text"
-                name="swapValues.accountToSendTokens"
-                value={swapValues.accountToSendTokens}
-                onInput={$((e) => {
-                  const target = e.target;
-                  swapValues.accountToSendTokens = target.value;
-                })}
-              />
-            ) : (
-              <Select
-                id="swapValues.accountToSendTokens"
-                name="Wallet"
-                options={[
-                  { value: "", text: "Select wallet" },
-                  ...wallets.map((option) => {
-                    return {
-                      value: option.wallet.address,
-                      text: option.walletName,
-                      selected: undefined,
-                    };
-                  }),
-                ]}
-                onValueChange={$((value: string) => {
-                  swapValues.accountToSendTokens = value;
-                })}
-              />
-            )}
           </div>
           {/* BUTTONS */}
           <div class="flex items-center gap-4">
