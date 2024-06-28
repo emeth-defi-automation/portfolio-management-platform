@@ -1,9 +1,10 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, $ } from "@builder.io/qwik";
 import { FormBadge } from "~/components/FormBadge/FormBadge";
 
 import IconArrowDown from "@material-design-icons/svg/filled/expand_more.svg?jsx";
 import { type BatchTransferFormStore } from "~/routes/app/portfolio/interface";
 import { hasExecutableWallet } from "~/utils/validators/availableStructure";
+import CheckBox from "~/components/Atoms/Checkbox/Checkbox";
 
 export interface CoinsToTransferProps {
   batchTransferFormStore: BatchTransferFormStore;
@@ -45,27 +46,20 @@ export default component$<CoinsToTransferProps>(
                           return balance.wallet.isExecutable ? (
                             <FormBadge
                               key={index}
-                              text={balance.balance.symbol}
-                              class="!mb-3"
-                              customClass="h-[56px]"
-                              labelClass="start-4"
-                              description={balance.wallet.name}
-                              image={`/assets/icons/tokens/${balance.balance.symbol.toLowerCase()}.svg`}
-                              for={`${structure.structure.name}${balance.wallet.name}${balance.balance.symbol}`}
+                              tokenName={balance.balance.symbol}
+                              tokenSymbol={balance.wallet.name}
+                              tokenPath={`/assets/icons/tokens/${balance.balance.symbol.toLowerCase()}.svg`}
                             >
-                              <input
-                                id={`${structure.structure.name}${balance.wallet.name}${balance.balance.symbol}`}
+                              <CheckBox
                                 name={`${structure.structure.name}${balance.wallet.name}${balance.balance.symbol}`}
-                                type="checkbox"
-                                checked={currentCoin?.isChecked}
-                                // value={`${structure.structure.name}${balance.balance.symbol}`}
-                                class="border-gradient custom-border-1 custom-bg-white checked checked:after:border-bg absolute end-4 z-10  h-6 w-6 appearance-none rounded checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-2.5 checked:after:w-1.5 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:rotate-45 checked:after:border-solid hover:cursor-pointer focus:after:absolute focus:after:z-[1]"
-                                onClick$={() => {
+                                isChecked={currentCoin?.isChecked ?? false}
+                                onClick={$(() => {
                                   if (currentCoin) {
                                     currentCoin.isChecked =
                                       !currentCoin.isChecked;
                                   }
-                                }}
+                                })}
+                                // value={`${structure.structure.name}${balance.balance.symbol}`}
                               />
                             </FormBadge>
                           ) : null;

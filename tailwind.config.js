@@ -29,6 +29,9 @@ export default {
       boxShadow: {
         'cards': '0px 0px 30px 0px rgba(0, 0, 0, 0.3)',
       },
+      backgroundImage: {
+        'customGradient': 'linear-gradient(135deg, #EC008C 0%, #FC6767 100%)',
+      },
       keyframes: {
         arrival:{
           '0%, 100%': {

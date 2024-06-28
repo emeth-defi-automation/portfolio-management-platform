@@ -281,11 +281,11 @@ export const Transfer = component$<TransferProps>(
         <div class="grid gap-6 overflow-auto">
           <div class="flex items-center justify-between gap-4">
             <Header text="Transfer Funds" variant="h3" class="font-normal" />
-            <div class="custom-bg-opacity-5 custom-border-1 flex h-8 items-center rounded-md px-1">
+            <div class="custom-border-1 flex h-8 w-[450px] items-center gap-1 rounded-md p-1">
               <Button
                 variant={step.value === 1 ? "transfer" : "onlyIcon"}
                 text="Tokens"
-                customClass="h-6 w-[146px] !text-xs"
+                customClass="h-full w-full text-xs p-0"
                 onClick$={() => {
                   step.value = 1;
                 }}
@@ -293,7 +293,7 @@ export const Transfer = component$<TransferProps>(
               <Button
                 variant={step.value === 2 ? "transfer" : "onlyIcon"}
                 text="Value"
-                customClass="h-6 w-[146px] !text-xs"
+                customClass="h-full w-full text-xs p-0"
                 onClick$={() => {
                   step.value = 2;
                 }}
@@ -301,7 +301,7 @@ export const Transfer = component$<TransferProps>(
               <Button
                 variant={step.value === 3 ? "transfer" : "onlyIcon"}
                 text="Summary"
-                customClass="h-6 w-[146px] !text-xs"
+                customClass="h-full w-full text-xs p-0"
                 onClick$={() => {
                   step.value = 3;
                 }}

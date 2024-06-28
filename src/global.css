@@ -85,6 +85,38 @@ body {
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
+
+@layer components {
+  .gradient-border {
+    position: relative;
+  }
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    top: -1px;
+    left: -1px;
+    border-radius: 8px;
+    padding: 1px;
+    background: linear-gradient(
+      130deg,
+      #da301f 0.24%,
+      #f48946 18.43%,
+      #ee3560 35.57%,
+      #fa4784 51.68%,
+      #ff48c0 66.75%,
+      #8e38b5 81.82%,
+      #5542bb 89.09%,
+      #0051c3 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
 /* Our customs classes for re-using */
 .custom-text-50 {
   color: rgba(255, 255, 255, 0.5);
@@ -158,33 +190,8 @@ body {
   z-index: -1;
 }
 
-.custom-btn-gradient {
-  background: linear-gradient(
-    to right,
-    #da301f,
-    #f48946,
-    #ee3560,
-    #fa4784,
-    #ff48c0,
-    #8e38b5,
-    #5542bb,
-    #0051c3
-  );
-}
-
 .custom-text-gradient {
-  background: linear-gradient(
-    120deg,
-    #da301f 0%,
-    #f48946 1%,
-    #ee3560 2%,
-    #fa4784 3%,
-    #ff48c0 6%,
-    #8e38b5 9%,
-    #5542bb 11%,
-    #0051c4 100%
-  );
-
+  background: linear-gradient(135deg, #ec008c 0%, #fc6767 100%);
   background-clip: text;
 }
 
